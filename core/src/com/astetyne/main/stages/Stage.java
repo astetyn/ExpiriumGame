@@ -1,10 +1,17 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.net.server.actions.ServerAction;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.List;
 
 public abstract class Stage {
+
+    protected final SpriteBatch batch;
+
+     public Stage() {
+         batch = new SpriteBatch();
+     }
 
     public abstract void update();
 
@@ -12,7 +19,9 @@ public abstract class Stage {
 
     public abstract void resize();
 
-    public abstract void dispose();
+    public void dispose() {
+        batch.dispose();
+    }
 
     public abstract void onServerUpdate(List<ServerAction> actions);
 

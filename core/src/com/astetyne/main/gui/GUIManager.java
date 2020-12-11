@@ -1,6 +1,9 @@
 package com.astetyne.main.gui;
 
+import com.astetyne.main.gui.elements.ScreenElement;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -11,15 +14,18 @@ public class GUIManager {
 
     private final OrthographicCamera guiCam;
     private final List<ScreenElement> elements;
+    private final InputMultiplexer inputMultiplexer;
 
     public GUIManager() {
         guiCam = new OrthographicCamera();
         elements = new ArrayList<>();
+        inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     public void update() {
         for(ScreenElement element : elements) {
-            element.update();
+            element.preUpdate();
         }
     }
 
@@ -40,8 +46,18 @@ public class GUIManager {
         }
     }
 
-    public List<ScreenElement> getElements() {
-        return elements;
+    public void addElement(ScreenElement element) {
+        elements.add(element);
     }
 
+    public void removeElement(ScreenElement element) {
+        if(element instanceof InputProcessor) {
+            inputMultiplexer.removeProcessor((InputProcessor) element);
+        }
+        elements.remove(element);
+    }
+
+    public InputMultiplexer getInputMultiplexer() {
+        return inputMultiplexer;
+    }
 }

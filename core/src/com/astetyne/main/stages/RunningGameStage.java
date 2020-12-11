@@ -3,8 +3,8 @@ package com.astetyne.main.stages;
 import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.entity.Entity;
 import com.astetyne.main.entity.Player;
-import com.astetyne.main.gui.TextElement;
-import com.astetyne.main.gui.ThumbStick;
+import com.astetyne.main.gui.elements.TextElement;
+import com.astetyne.main.gui.elements.ThumbStick;
 import com.astetyne.main.net.client.actions.PlayerMoveActionC;
 import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.netobjects.SPlayer;
@@ -24,7 +24,6 @@ public class RunningGameStage extends Stage {
 
     public static float PPM = 32;
 
-    private final SpriteBatch batch;
     private final GameWorld gameWorld;
     private final OrthographicCamera cameraWorld;
     private final ThumbStick thumbStick;
@@ -35,15 +34,14 @@ public class RunningGameStage extends Stage {
 
     public RunningGameStage() {
 
-        this.batch = new SpriteBatch();
         cameraWorld = new OrthographicCamera();
 
         b2dr = new Box2DDebugRenderer();
 
         thumbStick = new ThumbStick(10,10, 200);
-        fpsTextE = new TextElement(85, 90, "fps:", 0.5f);
-        ExpiriumGame.getGame().getGui().getElements().add(fpsTextE);
-        ExpiriumGame.getGame().getGui().getElements().add(thumbStick);
+        fpsTextE = new TextElement(85, 90, 100, "fps:", 0.5f);
+        ExpiriumGame.getGame().getGui().addElement(fpsTextE);
+        ExpiriumGame.getGame().getGui().addElement(thumbStick);
 
         gameWorld = new GameWorld(batch, this);
 
@@ -93,7 +91,7 @@ public class RunningGameStage extends Stage {
 
     @Override
     public void dispose() {
-        batch.dispose();
+        super.dispose();
         gameWorld.dispose();
     }
 
