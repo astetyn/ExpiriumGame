@@ -1,4 +1,5 @@
 buildscript {
+    
 
     repositories {
         mavenLocal()
@@ -9,15 +10,17 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        
+
     }
 }
 
 allprojects {
+    apply plugin: "eclipse"
 
     version = '1.0'
     ext {
-        appName = "Expirium"
+        appName = "ExpiriumGame"
         gdxVersion = '1.9.12'
         roboVMVersion = '2.3.11'
         box2DLightsVersion = '1.5'
@@ -38,18 +41,19 @@ allprojects {
 project(":desktop") {
     apply plugin: "java-library"
 
+
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
+
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
