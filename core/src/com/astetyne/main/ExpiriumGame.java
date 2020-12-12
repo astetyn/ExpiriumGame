@@ -1,25 +1,23 @@
 package com.astetyne.main;
 
-import com.astetyne.main.gui.GUIManager;
 import com.astetyne.main.net.client.ClientGateway;
 import com.astetyne.main.net.server.GameServer;
+import com.astetyne.main.stages.ExpiStage;
 import com.astetyne.main.stages.LauncherStage;
-import com.astetyne.main.stages.Stage;
 import com.badlogic.gdx.ApplicationAdapter;
 
 public class ExpiriumGame extends ApplicationAdapter {
 
 	private static ExpiriumGame game;
 
-	private GUIManager guiManager;
-
 	private ClientGateway clientGateway;
 	private GameServer server;
 
-	private Stage currentStage;
+	private ExpiStage currentExpiStage;
 
 	private final Object serverTickLock;
 	private boolean available;
+	private String clientIpAddress;
 
 	public ExpiriumGame() {
 		serverTickLock = new Object();
@@ -29,53 +27,32 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-
 		TextureManager.loadTextures();
-
-		guiManager = new GUIManager();
 		clientGateway = new ClientGateway(this);
-
-		if(true) {
-			server = new GameServer();
-			new Thread(server).start();
-		}
-
-		new Thread(clientGateway).start();
-
-		currentStage = new LauncherStage();
-
+		currentExpiStage = new LauncherStage();
 	}
 
 	public void update() {
-
 		checkServerMessages();
-
-		currentStage.update();
-
-		guiManager.update();
-
+		currentExpiStage.update();
 	}
 
 	@Override
 	public void render () {
-
 		update();
-
-		currentStage.render();
-
+		currentExpiStage.render();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		guiManager.onResize();
-		currentStage.resize();
+		currentExpiStage.resize();
 	}
-	
+
 	@Override
 	public void dispose () {
 
 		clientGateway.end();
-		currentStage.dispose();
+		currentExpiStage.dispose();
 
 		if(server != null) {
 			server.stop();
@@ -89,7 +66,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 			if(!available) return;
 			available = false;
 		}
-		currentStage.onServerUpdate(clientGateway.getServerActions());
+		currentExpiStage.onServerUpdate(clientGateway.getServerActions());
 	}
 
 	public ClientGateway getClientGateway() {
@@ -106,15 +83,26 @@ public class ExpiriumGame extends ApplicationAdapter {
 		}
 	}
 
-	public GUIManager getGui() {
-		return guiManager;
+	public ExpiStage getCurrentStage() {
+		return currentExpiStage;
 	}
 
-	public Stage getCurrentStage() {
-		return currentStage;
+	public void setCurrentStage(ExpiStage currentExpiStage) {
+		this.currentExpiStage = currentExpiStage;
 	}
 
-	public void setCurrentStage(Stage currentStage) {
-		this.currentStage = currentStage;
+	public void startServer() {
+		server = new GameServer();
+		new Thread(server).start();
 	}
+
+	public void startClient(String clientIpAddress) {
+		this.clientIpAddress = clientIpAddress;
+		new Thread(clientGateway).start();
+	}
+
+	public String getClientIpAddress() {
+		return clientIpAddress;
+	}
+
 }

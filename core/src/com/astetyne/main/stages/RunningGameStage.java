@@ -1,34 +1,34 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
+import com.astetyne.main.TextureManager;
 import com.astetyne.main.entity.Entity;
 import com.astetyne.main.entity.Player;
-import com.astetyne.main.gui.elements.TextElement;
 import com.astetyne.main.gui.elements.ThumbStick;
 import com.astetyne.main.net.client.actions.PlayerMoveActionC;
-import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.netobjects.SPlayer;
+import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import java.util.List;
 
-public class RunningGameStage extends Stage {
+public class RunningGameStage extends ExpiStage {
 
-    public static float PPM = 32;
+    public static float PPM = 64;
 
     private final GameWorld gameWorld;
     private final OrthographicCamera cameraWorld;
     private final ThumbStick thumbStick;
-    private final TextElement fpsTextE;
     private Player player;
+
+    Label fpsLabel;
 
     private final Box2DDebugRenderer b2dr;
 
@@ -38,10 +38,17 @@ public class RunningGameStage extends Stage {
 
         b2dr = new Box2DDebugRenderer();
 
-        thumbStick = new ThumbStick(10,10, 200);
-        fpsTextE = new TextElement(85, 90, 100, "fps:", 0.5f);
-        ExpiriumGame.getGame().getGui().addElement(fpsTextE);
-        ExpiriumGame.getGame().getGui().addElement(thumbStick);
+        thumbStick = new ThumbStick();
+        thumbStick.setWidth(200);
+        thumbStick.setHeight(200);
+
+        fpsLabel = new Label("", TextureManager.DEFAULT_SKIN);
+
+        fpsLabel.setX(Gdx.graphics.getWidth()/2.0f);
+        fpsLabel.setY(Gdx.graphics.getHeight()/8.0f);
+
+        stage.addActor(thumbStick);
+        stage.addActor(fpsLabel);
 
         gameWorld = new GameWorld(batch, this);
 
@@ -52,13 +59,12 @@ public class RunningGameStage extends Stage {
     @Override
     public void update() {
 
-        gameWorld.update();
-        fpsTextE.setText("fps: "+Gdx.graphics.getFramesPerSecond());
+        stage.act();
 
-        float xr = thumbStick.getXR();
-        float yr = thumbStick.getYR();
-        Vector2 center = player.getBody().getWorldCenter();
-        player.getBody().applyLinearImpulse(0.2f*xr, 0.2f*yr, center.x, center.y, true);
+        gameWorld.update();
+        fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
+
+        player.move(thumbStick.getHorz(), thumbStick.getVert());
 
         cameraCenter();
 
@@ -76,8 +82,9 @@ public class RunningGameStage extends Stage {
 
         batch.begin();
         gameWorld.render();
-        ExpiriumGame.getGame().getGui().render(batch);
         batch.end();
+
+        stage.draw();
 
     }
 

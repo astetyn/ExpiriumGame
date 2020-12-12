@@ -1,79 +1,89 @@
 package com.astetyne.main.gui.elements;
 
 import com.astetyne.main.TextureManager;
-import com.astetyne.main.gui.elements.ScreenElement;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
-public class ThumbStick extends ScreenElement {
+public class ThumbStick extends Widget {
 
     private int circleX, circleY;
-    private final float radius;
+    private float radius;
     private float xR, yR;
+    private boolean touched;
 
-    public ThumbStick(int xRatio, int yRatio, int size) {
-        super(xRatio, yRatio, size, size);
-        radius = width/2.0f;
-        circleX = x+width/2;
-        circleY = y+height/2;
+    public ThumbStick() {
+
         xR = 0;
         yR = 0;
+        touched = false;
 
-        setTouchable(new Touchable() {
+        addListener(new InputListener() {
+
             @Override
-            public void onTouch() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                radius = getWidth()/2.0f;
+                circleX = (int) (getX()+getWidth()/2);
+                circleY = (int) (getY()+getWidth()/2);
+                touched = true;
+                return true;
             }
 
             @Override
-            public void onRelease() {
-                circleX = x+width/2;
-                circleY = y+height/2;
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                circleX = (int) (getX()+getWidth()/2);
+                circleY = (int) (getY()+getHeight()/2);
                 xR = 0;
                 yR = 0;
+                touched = false;
             }
 
-            @Override
-            public void onFocus() {
-            }
-
-            @Override
-            public void onOutOfFocus() {
-
-            }
         });
 
     }
 
     @Override
-    public void update() {
+    public void act(float delta) {
+
+        super.act(delta);
 
         if(touched) {
             int xi = Gdx.input.getX();
             int yi = Gdx.input.getY();
 
-            Vector2 touch = new Vector2(xi - x - radius, Gdx.graphics.getHeight() - yi- y - height/2.0f);
+            Vector2 touch = new Vector2(xi - getX() - radius, Gdx.graphics.getHeight() - yi- getY() - getHeight()/2.0f);
             float angle = touch.angleDeg();
             float radiusMin = Math.min(touch.len(), radius);
-            circleX = (int) (x+width/2.0+Math.cos(Math.toRadians(angle))*radiusMin);
-            circleY = (int) (y+height/2.0+Math.sin(Math.toRadians(angle))*radiusMin);
-            xR = (circleX - (x+radius)) / (radius);
-            yR = (circleY - (y+height/2.0f)) / (height/2.0f);
+            circleX = (int) (getX()+getWidth()/2.0+Math.cos(Math.toRadians(angle))*radiusMin);
+            circleY = (int) (getY()+getHeight()/2.0+Math.sin(Math.toRadians(angle))*radiusMin);
+            xR = (circleX - (getX()+radius)) / (radius);
+            yR = (circleY - (getY()+getHeight()/2.0f)) / (getHeight()/2.0f);
         }
 
     }
 
     @Override
-    public void render(SpriteBatch batch) {
-        batch.draw(TextureManager.THUMB_STICK_DOWN, x, y, width, height);
-        batch.draw(TextureManager.THUMB_STICK_UP, circleX - width/4.0f, circleY - height/4.0f, radius, height/2.0f);
+    public void draw(Batch batch, float parentAlpha) {
+        batch.draw(TextureManager.THUMB_STICK_DOWN, getX(), getY(), getWidth(), getHeight());
+        batch.draw(TextureManager.THUMB_STICK_UP, circleX - getWidth()/4.0f, circleY - getHeight()/4.0f, radius, getHeight()/2.0f);
     }
 
-    public float getXR() {
+    @Override
+    public void sizeChanged() {
+        super.sizeChanged();
+        radius = getWidth()/2.0f;
+        circleX = (int) (getX()+getWidth()/2);
+        circleY = (int) (getY()+getWidth()/2);
+    }
+
+    public float getHorz() {
         return xR;
     }
 
-    public float getYR() {
+    public float getVert() {
         return yR;
     }
 }

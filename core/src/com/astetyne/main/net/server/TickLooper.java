@@ -6,8 +6,8 @@ import com.astetyne.main.net.client.actions.ChunkRequestActionC;
 import com.astetyne.main.net.client.actions.ClientAction;
 import com.astetyne.main.net.client.actions.JoinRequestActionC;
 import com.astetyne.main.net.client.actions.PlayerMoveActionC;
-import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.netobjects.SPlayer;
+import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.netobjects.SWorldChunk;
 import com.astetyne.main.net.server.actions.*;
 import com.badlogic.gdx.math.Vector2;
@@ -64,7 +64,7 @@ public class TickLooper extends TerminableLooper {
             // read init data from client
             for(ServerPlayerGateway gateway : server.getJoiningClients()) {
                 JoinRequestActionC jra = (JoinRequestActionC) gateway.getClientActions().get(0);
-                joiningPlayers.add(new ServerPlayer(new Vector2(5, 100), gateway, jra.getName()));
+                joiningPlayers.add(new ServerPlayer(new Vector2(5, 30), gateway, jra.getName()));
             }
             server.getJoiningClients().clear();
         }

@@ -31,6 +31,7 @@ public class GameWorld {
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Player> otherPlayers;
     private final RunningGameStage runningGameStage;
+    private final ExpiContactListener contactListener;
 
     public GameWorld(SpriteBatch batch, RunningGameStage runningGame) {
 
@@ -41,7 +42,7 @@ public class GameWorld {
         entitiesID = new HashMap<>();
         otherPlayers = new ArrayList<>();
 
-        world = new World(new Vector2(0, -5), false);
+        world = new World(new Vector2(0, -9.81f), false);
         loader = new BodyEditorLoader(Gdx.files.internal("shapes.json"));
         chunkArray = new WorldChunk[Constants.CHUNKS_NUMBER];
 
@@ -49,6 +50,10 @@ public class GameWorld {
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
         terrainBody = world.createBody(terrainDef);
+
+        contactListener = new ExpiContactListener();
+
+        world.setContactListener(contactListener);
 
     }
 
@@ -125,17 +130,26 @@ public class GameWorld {
         Body body = world.createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 5f;
-        fixtureDef.friction = 5f;
-        fixtureDef.restitution = 0.2f;
+        fixtureDef.density = 40f;
+        fixtureDef.friction = 3f;
+        fixtureDef.restitution = 0f;
 
         body.setFixedRotation(true);
 
-        loader.attachFixture(body, "player", fixtureDef, 1);
+        loader.attachFixture(body, "player", fixtureDef, 2);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(0.4f, 0.1f, new Vector2(0.45f, 0f), 0);
+        fixtureDef.density = 0f;
+        fixtureDef.shape = shape;
+        fixtureDef.isSensor = true;
+        Fixture jumpSensor = body.createFixture(fixtureDef);
+        shape.dispose();
 
         try {
 
             Entity entity = (Entity) entityClass.getConstructor(int.class, Body.class).newInstance(id, body);
+            contactListener.registerListener(jumpSensor, entity);
             entitiesID.put(id, entity);
             return entity;
 
@@ -230,5 +244,9 @@ public class GameWorld {
 
     public List<Player> getOtherPlayers() {
         return otherPlayers;
+    }
+
+    public ExpiContactListener getContactListener() {
+        return contactListener;
     }
 }

@@ -11,7 +11,6 @@ import com.astetyne.main.net.server.actions.ServerAction;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +36,7 @@ public class ClientGateway extends TerminableLooper {
 
             System.out.println("client connecting...");
 
-            socket = new Socket(InetAddress.getLocalHost(), Constants.SERVER_PORT);
+            socket = new Socket(ExpiriumGame.getGame().getClientIpAddress(), Constants.SERVER_PORT);
             //socket = new Socket("192.168.0.114", Constants.SERVER_PORT);
 
             System.out.println("connection done");
