@@ -10,4 +10,7 @@ public class Constants {
     public static final int TILES_WIDTH_CHUNK = 32;
     public static final int TILES_HEIGHT_CHUNK = 256;
 
+    public static final short GROUND_BIT = 1;
+    public static final short ENTITY_BIT = 2;
+
 }

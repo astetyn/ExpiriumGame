@@ -1,15 +1,13 @@
 package com.astetyne.main.net.netobjects;
 
-import com.astetyne.main.world.TileType;
-
 import java.io.Serializable;
 
 public class SWorldChunk implements Serializable {
 
     private final int id;
-    private final TileType[][] terrain;
+    private final STileData[][] terrain;
 
-    public SWorldChunk(int id, TileType[][] terrain) {
+    public SWorldChunk(int id, STileData[][] terrain) {
         this.id = id;
         this.terrain = terrain;
     }
@@ -18,7 +16,7 @@ public class SWorldChunk implements Serializable {
         return id;
     }
 
-    public TileType[][] getTerrain() {
+    public STileData[][] getTerrain() {
         return terrain;
     }
 }

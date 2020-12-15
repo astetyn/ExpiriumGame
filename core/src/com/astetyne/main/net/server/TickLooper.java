@@ -2,17 +2,16 @@ package com.astetyne.main.net.server;
 
 import com.astetyne.main.Constants;
 import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.ChunkRequestActionC;
-import com.astetyne.main.net.client.actions.ClientAction;
-import com.astetyne.main.net.client.actions.JoinRequestActionC;
-import com.astetyne.main.net.client.actions.PlayerMoveActionC;
+import com.astetyne.main.net.client.actions.*;
 import com.astetyne.main.net.netobjects.SPlayer;
+import com.astetyne.main.net.netobjects.STileData;
 import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.net.netobjects.SWorldChunk;
 import com.astetyne.main.net.server.actions.*;
-import com.badlogic.gdx.math.Vector2;
+import com.astetyne.main.world.TileType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class TickLooper extends TerminableLooper {
@@ -20,11 +19,13 @@ public class TickLooper extends TerminableLooper {
     private final Object tickLock;
     private final GameServer server;
     private final List<ServerAction> tickGeneratedActions;
+    private final List<ServerPlayer> players;
 
     public TickLooper() {
         tickLock = new Object();
         server = GameServer.getServer();
         tickGeneratedActions = new ArrayList<>();
+        players = server.getPlayers();
     }
 
     @Override
@@ -32,7 +33,9 @@ public class TickLooper extends TerminableLooper {
 
         try {
 
-            while(true) {
+            while(isRunning()) {
+
+                resolveLeavingPlayers();
 
                 resolveJoiningPlayers();
 
@@ -55,16 +58,36 @@ public class TickLooper extends TerminableLooper {
         }
     }
 
+    private void resolveLeavingPlayers() {
+
+        synchronized(server.getLeavingClients()) {
+            for(ServerPlayerGateway gateway : server.getLeavingClients()) {
+                Iterator<ServerPlayer> it = players.listIterator();
+                while(it.hasNext()) {
+                    ServerPlayer p = it.next();
+                    if(gateway == p.getGateway()) {
+                        it.remove();
+                        PlayerLeaveActionS pla = new PlayerLeaveActionS(p.getID());
+                        tickGeneratedActions.add(pla);
+                        System.out.println("Player "+p.getName()+" left the server.");
+                        server.getEntitiesID().remove(p.getID());
+                        break;
+                    }
+                }
+            }
+            server.getLeavingClients().clear();
+        }
+    }
+
     private void resolveJoiningPlayers() {
 
-        List<ServerPlayer> players = server.getPlayers();
         List<ServerPlayer> joiningPlayers = new ArrayList<>();
 
         synchronized(server.getJoiningClients()) {
             // read init data from client
             for(ServerPlayerGateway gateway : server.getJoiningClients()) {
                 JoinRequestActionC jra = (JoinRequestActionC) gateway.getClientActions().get(0);
-                joiningPlayers.add(new ServerPlayer(new Vector2(5, 30), gateway, jra.getName()));
+                joiningPlayers.add(new ServerPlayer(GameServer.getServer().getServerWorld().getSaveLocation(), gateway, jra.getName()));
             }
             server.getJoiningClients().clear();
         }
@@ -80,7 +103,7 @@ public class TickLooper extends TerminableLooper {
         for(ServerPlayer newPlayer : joiningPlayers) {
 
             // initial packet for new player
-            InitDataActionS ida = new InitDataActionS(newPlayer.getID(), new SVector(newPlayer.getLocation()), alreadyConnectedPlayers);
+            InitDataActionS ida = new InitDataActionS(newPlayer.getID(), new SVector(newPlayer.getLocation()), alreadyConnectedPlayers, Constants.CHUNKS_NUMBER);
             ChunkFeedActionS cfa = new ChunkFeedActionS(server.getServerWorld().getChunk(0));
             List<ServerAction> initActions = new ArrayList<>();
             initActions.add(ida);
@@ -118,6 +141,12 @@ public class TickLooper extends TerminableLooper {
                     e.getLocation().x = pma.getNewLocation().getX();
                     e.getLocation().y = pma.getNewLocation().getY();
                     tickGeneratedActions.add(new EntityMoveActionS(player.getID(), pma.getNewLocation(), pma.getVelocity()));
+                }else if(ca instanceof TileBreakActionC) {
+                    TileBreakActionC tba = (TileBreakActionC) ca;
+                    STileData tile = server.getServerWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
+                    if(tile.getType() == TileType.AIR) continue;
+                    tile.setType(TileType.AIR);
+                    tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY()));
                 }
             }
         }

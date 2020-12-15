@@ -1,32 +1,25 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.TextureManager;
-import com.astetyne.main.entity.Entity;
-import com.astetyne.main.entity.Player;
-import com.astetyne.main.gui.elements.ThumbStick;
-import com.astetyne.main.net.client.actions.PlayerMoveActionC;
-import com.astetyne.main.net.netobjects.SPlayer;
-import com.astetyne.main.net.netobjects.SVector;
+import com.astetyne.main.ResourceManager;
+import com.astetyne.main.entity.PlayerEntity;
+import com.astetyne.main.gui.ThumbStick;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
+import com.astetyne.main.world.WorldChunk;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 public class RunningGameStage extends ExpiStage {
 
-    public static float PPM = 64;
-
-    private final GameWorld gameWorld;
-    private final OrthographicCamera cameraWorld;
-    private final ThumbStick thumbStick;
-    private Player player;
+    private GameWorld gameWorld;
+    private final ThumbStick movementTS;
 
     Label fpsLabel;
 
@@ -34,23 +27,27 @@ public class RunningGameStage extends ExpiStage {
 
     public RunningGameStage() {
 
-        cameraWorld = new OrthographicCamera();
-
         b2dr = new Box2DDebugRenderer();
 
-        thumbStick = new ThumbStick();
-        thumbStick.setWidth(200);
-        thumbStick.setHeight(200);
+        System.out.println("DENSITY: "+Gdx.graphics.getDensity());
 
-        fpsLabel = new Label("", TextureManager.DEFAULT_SKIN);
+        Table table = new Table();
 
-        fpsLabel.setX(Gdx.graphics.getWidth()/2.0f);
-        fpsLabel.setY(Gdx.graphics.getHeight()/8.0f);
+        movementTS = new ThumbStick(ResourceManager.THUMB_STICK_STYLE);
+        fpsLabel = new Label("", ResourceManager.LABEL_STYLE);
 
-        stage.addActor(thumbStick);
-        stage.addActor(fpsLabel);
+        fpsLabel.setFontScale(0.5f);
 
-        gameWorld = new GameWorld(batch, this);
+        table.row();
+        table.add(fpsLabel).width(200);
+        table.row().expand();
+
+        table.add(movementTS).padBottom(30 * Gdx.graphics.getDensity()).padLeft(30 * Gdx.graphics.getDensity()).align(Align.bottomLeft);
+
+        table.setDebug(true);
+        table.setFillParent(true);
+
+        stage.addActor(table);
 
         resize();
 
@@ -64,10 +61,6 @@ public class RunningGameStage extends ExpiStage {
         gameWorld.update();
         fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
 
-        player.move(thumbStick.getHorz(), thumbStick.getVert());
-
-        cameraCenter();
-
         //System.out.println(player.getLocation());
 
     }
@@ -75,10 +68,10 @@ public class RunningGameStage extends ExpiStage {
     @Override
     public void render() {
 
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        b2dr.render(gameWorld.getWorld(), cameraWorld.combined.cpy().scl(PPM));
+        batch.enableBlending();
 
         batch.begin();
         gameWorld.render();
@@ -86,13 +79,17 @@ public class RunningGameStage extends ExpiStage {
 
         stage.draw();
 
+        b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined.cpy().scl(GameWorld.PPM));
+
     }
 
     @Override
     public void resize() {
 
-        cameraWorld.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cameraWorld.update();
+        if(gameWorld != null) gameWorld.resize();
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        //sightTS.resize((int) (Gdx.graphics.getWidth() - 200 * Gdx.graphics.getDensity()),(int) ( 100 * Gdx.graphics.getDensity()));
 
     }
 
@@ -109,55 +106,44 @@ public class RunningGameStage extends ExpiStage {
 
             if(serverAction instanceof InitDataActionS) {
                 InitDataActionS initData = (InitDataActionS) serverAction;
-                player = (Player) gameWorld.createEntity(initData.getPlayerID(), initData.getPlayerLocation().toVector(), Player.class);
-
-                SVector l = initData.getPlayerLocation();
-                player.getBody().setTransform(l.getX(), l.getY(), 0);
-                for(SPlayer p : initData.getPlayersEntities()) {
-                    if(p.getID() == player.getID()) continue;
-                    Player p2 = (Player) gameWorld.createEntity(p.getID(), p.getLocation().toVector(), Player.class);
-                    gameWorld.getOtherPlayers().add(p2);
-                }
+                gameWorld = new GameWorld(batch, this, initData);
 
             }else if(serverAction instanceof ChunkFeedActionS) {
                 ChunkFeedActionS action = (ChunkFeedActionS) serverAction;
                 gameWorld.feedChunk(action.getChunk());
-                //System.out.println("FEEDING ON CLIENT: "+action.getChunk().getId());
 
             }else if(serverAction instanceof PlayerJoinActionS) {
                 PlayerJoinActionS psa = (PlayerJoinActionS) serverAction;
-                Player p = (Player) gameWorld.createEntity(psa.getPlayerID(), psa.getLocation().toVector(), Player.class);
-                gameWorld.getOtherPlayers().add(p);
+                gameWorld.createPlayerEntity(psa.getPlayerID(), psa.getLocation().toVector());
 
             }else if(serverAction instanceof EntityMoveActionS) {
                 EntityMoveActionS ema = (EntityMoveActionS) serverAction;
-                if(ema.getEntityID() == player.getID()) continue;
-                Entity e = gameWorld.getEntitiesID().get(ema.getEntityID());
-                e.getTargetPosition().set(ema.getNewLocation().toVector());
-                e.setInterpolateDelta(0);
-                e.getBody().setLinearVelocity(ema.getVelocity().toVector());
+                gameWorld.onEntityMove(ema);
+            }else if(serverAction instanceof PlayerLeaveActionS) {
+                PlayerLeaveActionS pla = (PlayerLeaveActionS) serverAction;
+                PlayerEntity p = (PlayerEntity) gameWorld.getEntitiesID().get(pla.getPlayerID());
+                gameWorld.getOtherPlayers().remove(p);
+                gameWorld.destroyEntity(p);
+            }else if(serverAction instanceof TileBreakActionS) {
+                TileBreakActionS tba = (TileBreakActionS) serverAction;
+                WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
+                if(chunk == null) return;
+                chunk.getTerrain()[tba.getY()][tba.getX()].destroy();
             }
         }
 
         gameWorld.checkChunks();
 
-        ExpiriumGame.getGame().getClientGateway().addAction(new PlayerMoveActionC(new SVector(player.getLocation()), new SVector(player.getVelocity())));
+        ExpiriumGame.getGame().getClientGateway().addAction(gameWorld.getPlayer().generateMoveAction());
 
     }
 
-    public void cameraCenter() {
-        Vector3 position = cameraWorld.position;
-        position.x = player.getLocation().x * PPM;
-        position.y = player.getLocation().y * PPM;
-        cameraWorld.position.set(position);
-        cameraWorld.update();
+    @Override
+    public void onServerFail() {
+
     }
 
-    public OrthographicCamera getCamera() {
-        return cameraWorld;
-    }
-
-    public Player getPlayer() {
-        return player;
+    public ThumbStick getMovementTS() {
+        return movementTS;
     }
 }

@@ -11,6 +11,7 @@ import com.astetyne.main.net.server.actions.ServerAction;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,38 +20,51 @@ import java.util.List;
 public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
-    private final ExpiriumGame expiriumGame;
     private final List<ClientAction> clientActions;
     private final List<ServerAction> serverActions;
+    private final ExpiriumGame game;
+    private String ipAddress;
 
-    public ClientGateway(ExpiriumGame expiriumGame) {
-        this.expiriumGame = expiriumGame;
+    public ClientGateway() {
         clientActions = new ArrayList<>();
         serverActions = new ArrayList<>();
+        game = ExpiriumGame.getGame();
+        ipAddress = "127.0.0.1";
     }
 
     @Override
     public void run() {
 
+        System.out.println("Client connecting...");
+
         try {
 
-            System.out.println("client connecting...");
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ipAddress, Constants.SERVER_PORT), 10000);
 
-            socket = new Socket(ExpiriumGame.getGame().getClientIpAddress(), Constants.SERVER_PORT);
-            //socket = new Socket("192.168.0.114", Constants.SERVER_PORT);
+        } catch(IOException e) {
+            // cant connect to the server
+            System.out.println("Exception during connecting to server.");
+            game.getCurrentStage().onServerFail();
+            return;
+        }
 
-            System.out.println("connection done");
+        try {
+
+            System.out.println("Connection established.");
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
-            JoinRequestActionC jra = new JoinRequestActionC("palko");
+            JoinRequestActionC jra = new JoinRequestActionC(game.getPlayerName());
             ClientActionsPacket capInit = new ClientActionsPacket(Collections.<ClientAction>singletonList(jra));
             oos.writeObject(capInit);
 
+            socket.setSoTimeout(5000);
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
             while(isRunning()) {
 
+                socket.setSoTimeout(5000);
                 ServerActionsPacket sap = (ServerActionsPacket) ois.readObject();
 
                 synchronized(serverActions) {
@@ -64,12 +78,14 @@ public class ClientGateway extends TerminableLooper {
                 }
                 oos.writeObject(new ClientActionsPacket(copy));
 
-                expiriumGame.notifyServerTickLock();
+                game.notifyServerUpdate();
 
             }
 
         }catch(IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            // exception during playing on server
+            System.out.println("Exception during messaging with server.");
+            game.getCurrentStage().onServerFail();
         }
 
     }
@@ -97,6 +113,10 @@ public class ClientGateway extends TerminableLooper {
             serverActions.clear();
             return copy;
         }
+    }
+
+    public void setIpAddress(String address) {
+        ipAddress = address;
     }
 
 }

@@ -63,7 +63,6 @@ public class BodyEditorLoader {
         RigidBodyModel rbModel = model.rigidBodies.get(name);
         if (rbModel == null) throw new RuntimeException("Name '" + name + "' was not found.");
 
-        // TODO: Verify correct, updated method from mul to scl
         Vector2 origin = vec.set(rbModel.origin).scl(scale);
 
 

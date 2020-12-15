@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-public class Entity implements Collidable {
+public abstract class Entity implements Collidable {
 
     private final int ID;
     protected final Body body;
@@ -19,9 +19,11 @@ public class Entity implements Collidable {
         this.body = body;
         targetPosition = new Vector2(body.getPosition());
         interpolateDelta = 0;
-        onGround = true;
+        onGround = false;
         collisions = 0;
     }
+
+    public abstract void draw();
 
     public Vector2 getLocation() {
         return body.getPosition();
@@ -55,15 +57,11 @@ public class Entity implements Collidable {
     public void onCollisionBegin(Fixture fix) {
         collisions++;
         onGround = true;
-        System.out.println("GGG");
     }
 
     @Override
     public void onCollisionEnd(Fixture fix) {
         collisions--;
-        if(collisions == 0) {
-            onGround = false;
-            System.out.println("AAA");
-        }
+        if(collisions == 0) onGround = false;
     }
 }

@@ -7,9 +7,11 @@ import java.util.HashMap;
 public class ExpiContactListener implements ContactListener {
 
     private final HashMap<Fixture, Collidable> listeners;
+    private final HashMap<Collidable, Fixture> convenientMap;
 
     public ExpiContactListener() {
         listeners = new HashMap<>();
+        convenientMap = new HashMap<>();
     }
 
     @Override
@@ -50,9 +52,12 @@ public class ExpiContactListener implements ContactListener {
 
     public void registerListener(Fixture fix, Collidable collidable) {
         listeners.put(fix, collidable);
+        convenientMap.put(collidable, fix);
     }
 
-    public void unregisterListener(Fixture fix) {
-        listeners.remove(fix);
+    public void unregisterListener(Collidable collidable) {
+        Fixture key = convenientMap.get(collidable);
+        listeners.remove(key);
+        convenientMap.remove(collidable);
     }
 }

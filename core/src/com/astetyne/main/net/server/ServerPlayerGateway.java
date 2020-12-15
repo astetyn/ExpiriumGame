@@ -1,11 +1,13 @@
 package com.astetyne.main.net.server;
 
 import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.ClientAction;
 import com.astetyne.main.net.client.ClientActionsPacket;
+import com.astetyne.main.net.client.actions.ClientAction;
 import com.astetyne.main.net.server.actions.ServerAction;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +33,13 @@ public class ServerPlayerGateway extends TerminableLooper {
 
         try {
 
-            System.out.println("new client connected");
+            System.out.println("New client connected.");
 
+            client.setSoTimeout(5000);
             ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
 
+            client.setSoTimeout(5000);
             ClientActionsPacket initCap = (ClientActionsPacket) ois.readObject();
             synchronized(clientActions) {
                 clientActions.addAll(initCap.getList());
@@ -59,6 +63,7 @@ public class ServerPlayerGateway extends TerminableLooper {
                 oos.writeObject(new ServerActionsPacket(copy));
 
                 // listen for C actions packet
+                client.setSoTimeout(5000);
                 ClientActionsPacket cap = (ClientActionsPacket) ois.readObject();
                 synchronized(clientActions) {
                     clientActions.addAll(cap.getList());
@@ -70,7 +75,12 @@ public class ServerPlayerGateway extends TerminableLooper {
             }
 
         }catch(IOException | ClassNotFoundException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Connection with client failed.");
+            try {
+                client.close();
+            }catch(IOException ignored) {
+            }
+            gameServer.playerPreLeaveAsync(this);
         }
 
     }

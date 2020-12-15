@@ -31,7 +31,11 @@ public class ServerGateway extends TerminableLooper {
             }
 
         }catch(IOException e) {
-            e.printStackTrace();
+            try {
+                if(server != null) server.close();
+            }catch(IOException ignored) {
+            }
+            System.out.println("Server gateway closed.");
         }
     }
 

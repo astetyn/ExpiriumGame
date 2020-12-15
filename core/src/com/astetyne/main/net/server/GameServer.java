@@ -14,6 +14,7 @@ public class GameServer implements Runnable {
 
     private final HashMap<Integer, ServerEntity> entitiesID;
     private final List<ServerPlayerGateway> joiningClients;
+    private final List<ServerPlayerGateway> leavingClients;
     private final List<ServerPlayer> players;
 
     // you MUST create this object on dedicated thread, it will create endless loop
@@ -26,6 +27,7 @@ public class GameServer implements Runnable {
         System.out.println("booting server...");
 
         joiningClients = new ArrayList<>();
+        leavingClients = new ArrayList<>();
         players = new ArrayList<>();
 
         serverWorld = new ServerWorld("svet");
@@ -58,10 +60,10 @@ public class GameServer implements Runnable {
         }
     }
 
-    public void playerLeave(ServerPlayerGateway p) {
-        /*synchronized(connectedPlayersLock) {
-            connectedPlayers.remove(p);
-        }*/
+    public void playerPreLeaveAsync(ServerPlayerGateway p) {
+        synchronized(leavingClients) {
+            leavingClients.add(p);
+        }
     }
 
     public ServerWorld getServerWorld() {
@@ -82,6 +84,10 @@ public class GameServer implements Runnable {
 
     public List<ServerPlayerGateway> getJoiningClients() {
         return joiningClients;
+    }
+
+    public List<ServerPlayerGateway> getLeavingClients() {
+        return leavingClients;
     }
 
     public HashMap<Integer, ServerEntity> getEntitiesID() {
