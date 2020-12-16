@@ -81,7 +81,7 @@ public class GameWorld {
             createPlayerEntity(p.getID(), p.getLocation().toVector());
         }
 
-        worldListener = new WorldInputListener(this);
+        worldListener = new WorldInputListener(gameStage, this);
         runningGameStage.getMultiplexer().addProcessor(worldListener);
 
         resize();
@@ -119,11 +119,11 @@ public class GameWorld {
                 continue;
             }
             Tile[][] terrain = chunk.getTerrain();
-            for(int i = 0; i < Constants.TILES_HEIGHT_CHUNK; i++) {
-                for(int j = 0; j < Constants.TILES_WIDTH_CHUNK; j++) {
+            for(int i = 0; i < Constants.T_H_CH; i++) {
+                for(int j = 0; j < Constants.T_W_CH; j++) {
                     if(terrain[i][j].getType() != TileType.AIR) {
                         TextureRegion tex = terrain[i][j].getTexture();
-                        batch.draw(tex, j + chunk.getId()*Constants.TILES_WIDTH_CHUNK, i, 1, 1);
+                        batch.draw(tex, j + chunk.getId()*Constants.T_W_CH, i, 1, 1);
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class GameWorld {
 
         int renderDistance = 1;//(int) (Gdx.graphics.getWidth() / (Constants.TILES_WIDTH_CHUNK * ExpiriumGame.PPM)) + 1;
 
-        int currentChunk = (int) (player.getLocation().x / Constants.TILES_WIDTH_CHUNK);
+        int currentChunk = (int) (player.getLocation().x / Constants.T_W_CH);
 
         for(int i = 0; i < Constants.CHUNKS_NUMBER; i++) {
             WorldChunk chunk = chunkArray[i];
@@ -158,8 +158,8 @@ public class GameWorld {
                     requestedChunks.add(i);
                 }
             }else if(chunk != null) {
-                for(int k = 0; k < Constants.TILES_HEIGHT_CHUNK; k++) {
-                    for(int h = 0; h < Constants.TILES_WIDTH_CHUNK; h++) {
+                for(int k = 0; k < Constants.T_H_CH; k++) {
+                    for(int h = 0; h < Constants.T_W_CH; h++) {
                         com.astetyne.main.world.tiles.Tile t = chunk.getTerrain()[k][h];
                         for(Fixture f : t.getFixtures()) {
                             terrainBody.destroyFixture(f);
@@ -173,7 +173,7 @@ public class GameWorld {
 
     public MainPlayer createMainPlayer(int id, Vector2 location) {
         BodyInfo bodyInfo = createPlayerBody(location);
-        MainPlayer player = new MainPlayer(id, bodyInfo.body, batch, runningGameStage.getMovementTS());
+        MainPlayer player = new MainPlayer(id, bodyInfo.body, batch, runningGameStage.getGameGUI().getMovementTS());
         contactListener.registerListener(bodyInfo.jumpSensor, player);
         entitiesID.put(id, player);
         return player;
@@ -271,12 +271,12 @@ public class GameWorld {
 
         verts[0] = 0;
         verts[1] = 0;
-        verts[2] = Constants.CHUNKS_NUMBER * Constants.TILES_WIDTH_CHUNK;
+        verts[2] = Constants.CHUNKS_NUMBER * Constants.T_W_CH;
         verts[3] = 0;
-        verts[4] = Constants.CHUNKS_NUMBER * Constants.TILES_WIDTH_CHUNK;
-        verts[5] = Constants.CHUNKS_NUMBER * Constants.TILES_HEIGHT_CHUNK;
+        verts[4] = Constants.CHUNKS_NUMBER * Constants.T_W_CH;
+        verts[5] = Constants.CHUNKS_NUMBER * Constants.T_H_CH;
         verts[6] = 0;
-        verts[7] = Constants.CHUNKS_NUMBER * Constants.TILES_HEIGHT_CHUNK;
+        verts[7] = Constants.CHUNKS_NUMBER * Constants.T_H_CH;
         verts[8] = 0;
         verts[9] = 0;
 
@@ -291,6 +291,21 @@ public class GameWorld {
         position.y = player.getLocation().y * PPM;
         camera.position.set(position);
         camera.update();
+    }
+
+    public Tile getTileAt(Vector2 vec) {
+        int chunk = (int) (vec.x / Constants.T_W_CH);
+        int x = (int) (vec.x - (chunk * Constants.T_W_CH));
+        int y = (int) vec.y;
+        WorldChunk wch = chunkArray[chunk];
+        return wch == null ? null : wch.getTerrain()[y][x];
+    }
+
+    public Tile getTileAt(int xG, int yG) {
+        int chunk = xG / Constants.T_W_CH;
+        int x = xG - (chunk * Constants.T_W_CH);
+        WorldChunk wch = chunkArray[chunk];
+        return wch == null ? null : wch.getTerrain()[yG][x];
     }
 
     public OrthographicCamera getCamera() {

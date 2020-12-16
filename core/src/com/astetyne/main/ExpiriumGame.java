@@ -25,7 +25,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		ResourceManager.loadTextures();
+		Resources.loadTextures();
 		currentExpiStage = new LauncherStage();
 	}
 

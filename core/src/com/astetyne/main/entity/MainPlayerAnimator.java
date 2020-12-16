@@ -1,6 +1,6 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.ResourceManager;
+import com.astetyne.main.Resources;
 import com.astetyne.main.gui.ThumbStick;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -41,7 +41,7 @@ public class MainPlayerAnimator {
                     lastState = 0;
                     timer = 0;
                 }
-                batch.draw(ResourceManager.PLAYER_IDLE_ANIM_R.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
+                batch.draw(Resources.PLAYER_IDLE_ANIM_R.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
 
             // idle left
             }else if(lastState == 1 || lastState == 3) {
@@ -49,7 +49,7 @@ public class MainPlayerAnimator {
                     lastState = 1;
                     timer = 0;
                 }
-                batch.draw(ResourceManager.PLAYER_IDLE_ANIM_L.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
+                batch.draw(Resources.PLAYER_IDLE_ANIM_L.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
             }
 
         // run right
@@ -58,7 +58,7 @@ public class MainPlayerAnimator {
                 lastState = 2;
                 timer = 0;
             }
-            batch.draw(ResourceManager.PLAYER_RUN_ANIM_R.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
+            batch.draw(Resources.PLAYER_RUN_ANIM_R.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
 
         // run left
         }else {
@@ -66,7 +66,7 @@ public class MainPlayerAnimator {
                 lastState = 3;
                 timer = 0;
             }
-            batch.draw(ResourceManager.PLAYER_RUN_ANIM_L.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
+            batch.draw(Resources.PLAYER_RUN_ANIM_L.getKeyFrame(timer), loc.x, loc.y, 0.9f, 1.25f);
         }
 
     }

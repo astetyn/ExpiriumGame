@@ -1,5 +1,7 @@
 package com.astetyne.main;
 
+import com.astetyne.main.gui.HotBarSlot;
+import com.astetyne.main.gui.SwitchArrow;
 import com.astetyne.main.gui.ThumbStick;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -14,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class ResourceManager {
+public class Resources {
 
     // UI
 
@@ -23,6 +25,10 @@ public class ResourceManager {
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
     public static Label.LabelStyle LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
+    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_TOOL;
+    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_BUILD;
+    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_USE;
+    public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
 
     public static BitmapFont ARIAL_FONT;
 
@@ -52,14 +58,19 @@ public class ResourceManager {
         Drawable selection = new TextureRegionDrawable(uia.findRegion("selection"));
         Drawable textfield = new TextureRegionDrawable(uia.findRegion("textfield"));
         Drawable cursor = new TextureRegionDrawable(uia.findRegion("cursor"));
-        Drawable tsBack = new TextureRegionDrawable(uia.findRegion("thumb_stick_background"));
-        Drawable tsFore = new TextureRegionDrawable(uia.findRegion("thumb_stick_foreground"));
+        TextureRegion tsBack = uia.findRegion("thumb_stick_background");
+        TextureRegion tsFore = uia.findRegion("thumb_stick_foreground");
+        TextureRegion hbsBack = uia.findRegion("hot_bar_slot_background");
+        TextureRegion hbsFrame = uia.findRegion("hot_bar_slot_frame");
+        TextureRegion hbsDefaultTool = uia.findRegion("default_item_tool");
 
         BUTTON_STYLE = new Button.ButtonStyle(drd, dr, drd);
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(dr, drd, dr, ARIAL_FONT);
         TEXT_FIELD_STYLE = new TextField.TextFieldStyle(ARIAL_FONT, Color.WHITE, cursor, selection, textfield);
         LABEL_STYLE = new Label.LabelStyle(ARIAL_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
+        HOT_BAR_SLOT_STYLE_TOOL = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame, hbsDefaultTool);
+        SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(tsFore, tsBack);
 
         // animations
 

@@ -8,7 +8,7 @@ public class PlayerEntity extends Entity {
     private final PlayerEntityAnimator animator;
 
     public PlayerEntity(int id, Body body, SpriteBatch batch) {
-        super(id, body);
+        super(id, body, 0.9f, 1.25f);
         animator = new PlayerEntityAnimator(batch, this);
     }
 

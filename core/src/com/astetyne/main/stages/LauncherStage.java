@@ -1,7 +1,7 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.ResourceManager;
+import com.astetyne.main.Resources;
 import com.astetyne.main.net.server.actions.InitDataActionS;
 import com.astetyne.main.net.server.actions.ServerAction;
 import com.badlogic.gdx.Gdx;
@@ -27,10 +27,10 @@ public class LauncherStage extends ExpiStage {
 
         table = new Table();
 
-        TextField textField = new TextField("", ResourceManager.TEXT_FIELD_STYLE);
+        TextField textField = new TextField("", Resources.TEXT_FIELD_STYLE);
         textField.setMessageText("Enter your name");
 
-        final TextField textField2 = new TextField("127.0.0.1", ResourceManager.TEXT_FIELD_STYLE);
+        final TextField textField2 = new TextField("127.0.0.1", Resources.TEXT_FIELD_STYLE);
         textField2.setMessageText("Enter the ip address");
         textField2.setTextFieldFilter(new TextField.TextFieldFilter() {
             @Override
@@ -40,7 +40,7 @@ public class LauncherStage extends ExpiStage {
         });
         textField2.setVisible(false);
 
-        TextButton serverButton = new TextButton("Host a server.", ResourceManager.TEXT_BUTTON_STYLE);
+        TextButton serverButton = new TextButton("Host a server.", Resources.TEXT_BUTTON_STYLE);
         serverButton.setColor(Color.GREEN);
         serverButton.addListener(new ClickListener() {
             @Override
@@ -52,7 +52,7 @@ public class LauncherStage extends ExpiStage {
             }
         });
 
-        TextButton button = new TextButton("Connect", ResourceManager.TEXT_BUTTON_STYLE);
+        TextButton button = new TextButton("Connect", Resources.TEXT_BUTTON_STYLE);
 
         table.add(serverButton).width(500*Gdx.graphics.getDensity()).height(100*Gdx.graphics.getDensity());
         table.row();

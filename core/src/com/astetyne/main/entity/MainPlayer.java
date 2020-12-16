@@ -13,7 +13,7 @@ public class MainPlayer extends Entity {
     private final ThumbStick thumbStick;
 
     public MainPlayer(int id, Body body, SpriteBatch batch, ThumbStick thumbStick) {
-        super(id, body);
+        super(id, body, 0.9f, 1.25f);
         animator = new MainPlayerAnimator(batch, this, thumbStick);
         this.thumbStick = thumbStick;
     }

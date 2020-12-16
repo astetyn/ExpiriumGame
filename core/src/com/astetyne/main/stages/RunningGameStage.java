@@ -1,29 +1,27 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.ResourceManager;
 import com.astetyne.main.entity.PlayerEntity;
-import com.astetyne.main.gui.ThumbStick;
+import com.astetyne.main.gui.GameGUILayout;
+import com.astetyne.main.items.inventory.Inventory;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.WorldChunk;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 public class RunningGameStage extends ExpiStage {
 
     private GameWorld gameWorld;
-    private final ThumbStick movementTS;
 
-    Label fpsLabel;
+    private final Inventory inventory;
 
     private final Box2DDebugRenderer b2dr;
+
+    private final GameGUILayout gameGUI;
 
     public RunningGameStage() {
 
@@ -31,23 +29,11 @@ public class RunningGameStage extends ExpiStage {
 
         System.out.println("DENSITY: "+Gdx.graphics.getDensity());
 
-        Table table = new Table();
+        inventory = new Inventory(this);
 
-        movementTS = new ThumbStick(ResourceManager.THUMB_STICK_STYLE);
-        fpsLabel = new Label("", ResourceManager.LABEL_STYLE);
+        gameGUI = new GameGUILayout(this);
 
-        fpsLabel.setFontScale(0.5f);
-
-        table.row();
-        table.add(fpsLabel).width(200);
-        table.row().expand();
-
-        table.add(movementTS).padBottom(30 * Gdx.graphics.getDensity()).padLeft(30 * Gdx.graphics.getDensity()).align(Align.bottomLeft);
-
-        table.setDebug(true);
-        table.setFillParent(true);
-
-        stage.addActor(table);
+        stage.addActor(gameGUI.getTable());
 
         resize();
 
@@ -57,11 +43,8 @@ public class RunningGameStage extends ExpiStage {
     public void update() {
 
         stage.act();
-
         gameWorld.update();
-        fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
-
-        //System.out.println(player.getLocation());
+        gameGUI.update();
 
     }
 
@@ -88,8 +71,6 @@ public class RunningGameStage extends ExpiStage {
 
         if(gameWorld != null) gameWorld.resize();
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-
-        //sightTS.resize((int) (Gdx.graphics.getWidth() - 200 * Gdx.graphics.getDensity()),(int) ( 100 * Gdx.graphics.getDensity()));
 
     }
 
@@ -119,11 +100,13 @@ public class RunningGameStage extends ExpiStage {
             }else if(serverAction instanceof EntityMoveActionS) {
                 EntityMoveActionS ema = (EntityMoveActionS) serverAction;
                 gameWorld.onEntityMove(ema);
+
             }else if(serverAction instanceof PlayerLeaveActionS) {
                 PlayerLeaveActionS pla = (PlayerLeaveActionS) serverAction;
                 PlayerEntity p = (PlayerEntity) gameWorld.getEntitiesID().get(pla.getPlayerID());
                 gameWorld.getOtherPlayers().remove(p);
                 gameWorld.destroyEntity(p);
+
             }else if(serverAction instanceof TileBreakActionS) {
                 TileBreakActionS tba = (TileBreakActionS) serverAction;
                 WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
@@ -143,7 +126,19 @@ public class RunningGameStage extends ExpiStage {
 
     }
 
-    public ThumbStick getMovementTS() {
-        return movementTS;
+    public GameGUILayout getGameGUI() {
+        return gameGUI;
+    }
+
+    public Inventory getInv() {
+        return inventory;
+    }
+
+    public GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
+    public static int toPixels(int realLen) {
+        return (int) (realLen * Gdx.graphics.getDensity());
     }
 }

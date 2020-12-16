@@ -13,10 +13,13 @@ public abstract class Entity implements Collidable {
     private float interpolateDelta;
     protected boolean onGround;
     private int collisions;
+    private final float width, height;
 
-    public Entity(int id, Body body) {
+    public Entity(int id, Body body, float width, float height) {
         this.ID = id;
         this.body = body;
+        this.width = width;
+        this.height = height;
         targetPosition = new Vector2(body.getPosition());
         interpolateDelta = 0;
         onGround = false;
@@ -27,6 +30,10 @@ public abstract class Entity implements Collidable {
 
     public Vector2 getLocation() {
         return body.getPosition();
+    }
+
+    public Vector2 getCenterLocation() {
+        return getLocation().add(width/2, height/2);
     }
 
     public Vector2 getVelocity() {

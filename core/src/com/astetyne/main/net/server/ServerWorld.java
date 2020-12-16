@@ -55,8 +55,8 @@ public class ServerWorld implements Serializable {
 
         chunks = new SWorldChunk[Constants.CHUNKS_NUMBER];
 
-        int chunkWidth = Constants.TILES_WIDTH_CHUNK;
-        int chunkHeight = Constants.TILES_HEIGHT_CHUNK;
+        int chunkWidth = Constants.T_W_CH;
+        int chunkHeight = Constants.T_H_CH;
 
         for(int c = 0; c < chunks.length; c++) {
 
@@ -82,7 +82,7 @@ public class ServerWorld implements Serializable {
 
     public Vector2 getSaveLocation() {
         int i = 0;
-        while(i != Constants.TILES_HEIGHT_CHUNK && chunks[0].getTerrain()[i][10].getType() != TileType.AIR) {
+        while(i != Constants.T_H_CH && chunks[0].getTerrain()[i][10].getType() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);

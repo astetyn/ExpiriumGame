@@ -20,10 +20,10 @@ public class WorldChunk {
         this.world = world;
         this.id = chunk.getId();
 
-        terrain = new Tile[Constants.TILES_HEIGHT_CHUNK][Constants.TILES_WIDTH_CHUNK];
+        terrain = new Tile[Constants.T_H_CH][Constants.T_W_CH];
 
-        for(int i = 0; i < Constants.TILES_HEIGHT_CHUNK; i++) {
-            for(int j = 0; j < Constants.TILES_WIDTH_CHUNK; j++) {
+        for(int i = 0; i < Constants.T_H_CH; i++) {
+            for(int j = 0; j < Constants.T_W_CH; j++) {
                 terrain[i][j] = new Tile(this, j, i);
                 terrain[i][j].setTileExtraData(TileFactory.createExtraData(chunk.getTerrain()[i][j]));
             }
@@ -41,8 +41,8 @@ public class WorldChunk {
         fixDef.filter.categoryBits = Constants.GROUND_BIT;
         fixDef.filter.maskBits = Constants.ENTITY_BIT;
 
-        int w = Constants.TILES_WIDTH_CHUNK;
-        int h = Constants.TILES_HEIGHT_CHUNK;
+        int w = Constants.T_W_CH;
+        int h = Constants.T_H_CH;
 
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
@@ -82,8 +82,8 @@ public class WorldChunk {
 
     private void checkFixtures(int i, int j, EdgeShape shape, FixtureDef fixDef) {
 
-        int w = Constants.TILES_WIDTH_CHUNK;
-        int h = Constants.TILES_HEIGHT_CHUNK;
+        int w = Constants.T_W_CH;
+        int h = Constants.T_H_CH;
 
         if(i == -1 || i == h) return;
 
@@ -135,8 +135,8 @@ public class WorldChunk {
 
     private boolean isNotSolid(int chunkId, int i, int j) {
 
-        int w = Constants.TILES_WIDTH_CHUNK;
-        int h = Constants.TILES_HEIGHT_CHUNK;
+        int w = Constants.T_W_CH;
+        int h = Constants.T_H_CH;
 
         if(i == -1 || i == h) return false;
 
