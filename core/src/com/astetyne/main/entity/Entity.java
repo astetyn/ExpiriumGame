@@ -7,23 +7,22 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 public abstract class Entity implements Collidable {
 
-    private final int ID;
-    protected final Body body;
+    protected final int ID;
+    protected Body body;
     private final Vector2 targetPosition;
     private float interpolateDelta;
     protected boolean onGround;
     private int collisions;
-    private final float width, height;
+    protected final float width, height;
 
-    public Entity(int id, Body body, float width, float height) {
+    public Entity(int id, float width, float height) {
         this.ID = id;
-        this.body = body;
         this.width = width;
         this.height = height;
-        targetPosition = new Vector2(body.getPosition());
         interpolateDelta = 0;
         onGround = false;
         collisions = 0;
+        targetPosition = new Vector2(0,0);
     }
 
     public abstract void draw();

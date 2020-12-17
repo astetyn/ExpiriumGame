@@ -1,5 +1,9 @@
 package com.astetyne.main.net.server;
 
+import com.astetyne.main.net.server.entities.ServerDroppedItem;
+import com.astetyne.main.net.server.entities.ServerEntity;
+import com.astetyne.main.net.server.entities.ServerPlayer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +20,7 @@ public class GameServer implements Runnable {
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ServerPlayerGateway> leavingClients;
     private final List<ServerPlayer> players;
+    private final List<ServerDroppedItem> droppedItems;
 
     // you MUST create this object on dedicated thread, it will create endless loop
     public GameServer() {
@@ -29,6 +34,7 @@ public class GameServer implements Runnable {
         joiningClients = new ArrayList<>();
         leavingClients = new ArrayList<>();
         players = new ArrayList<>();
+        droppedItems = new ArrayList<>();
 
         serverWorld = new ServerWorld("svet");
 
@@ -92,5 +98,9 @@ public class GameServer implements Runnable {
 
     public HashMap<Integer, ServerEntity> getEntitiesID() {
         return entitiesID;
+    }
+
+    public List<ServerDroppedItem> getDroppedItems() {
+        return droppedItems;
     }
 }

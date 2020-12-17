@@ -41,4 +41,8 @@ public abstract class ExpiStage {
     public InputMultiplexer getMultiplexer() {
         return multiplexer;
     }
+
+    public SpriteBatch getBatch() {
+        return batch;
+    }
 }

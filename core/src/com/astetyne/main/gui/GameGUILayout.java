@@ -16,7 +16,7 @@ public class GameGUILayout {
     private final Table itemSelectTable;
 
     private final ThumbStick movementTS, breakTS;
-    private final Label fpsLabel, locationLabel, entityLabel;
+    private final Label fpsLabel, locationLabel, entityLabel, warnLabel;
 
     private final RunningGameStage gameStage;
 
@@ -36,6 +36,9 @@ public class GameGUILayout {
         locationLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
         entityLabel = new Label("", Resources.LABEL_STYLE);
         entityLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
+        warnLabel = new Label("pre-alpha", Resources.LABEL_STYLE);
+        warnLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
+        warnLabel.setColor(1,0.1f,0.1f,1);
 
         itemSelectTable.row();
         itemSelectTable.add(gameStage.getInv().getSwitchArrowUp()).padBottom(toPixels(6)).colspan(3);
@@ -89,6 +92,8 @@ public class GameGUILayout {
         mainTable.add(locationLabel).colspan(3).align(Align.left);
         mainTable.row();
         mainTable.add(entityLabel).colspan(3).align(Align.left);
+        mainTable.row();
+        mainTable.add(warnLabel).colspan(3).align(Align.left);
         mainTable.row().expand();
         mainTable.add(movementTS).align(Align.bottomLeft).padBottom(toPixels(30)).padLeft(toPixels(30)).uniformX();
         mainTable.add(itemSelectTable).align(Align.bottom).padBottom(toPixels(6));

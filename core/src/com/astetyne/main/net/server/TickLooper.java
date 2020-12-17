@@ -3,12 +3,13 @@ package com.astetyne.main.net.server;
 import com.astetyne.main.Constants;
 import com.astetyne.main.net.TerminableLooper;
 import com.astetyne.main.net.client.actions.*;
-import com.astetyne.main.net.netobjects.SPlayer;
-import com.astetyne.main.net.netobjects.STileData;
-import com.astetyne.main.net.netobjects.SVector;
-import com.astetyne.main.net.netobjects.SWorldChunk;
+import com.astetyne.main.net.netobjects.*;
 import com.astetyne.main.net.server.actions.*;
+import com.astetyne.main.net.server.entities.ServerDroppedItem;
+import com.astetyne.main.net.server.entities.ServerEntity;
+import com.astetyne.main.net.server.entities.ServerPlayer;
 import com.astetyne.main.world.TileType;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,6 +41,8 @@ public class TickLooper extends TerminableLooper {
                 resolveJoiningPlayers();
 
                 resolvePlayersActions();
+
+                recalculateDroppedItems();
 
                 //todo: ai? time? weather?
 
@@ -94,16 +97,19 @@ public class TickLooper extends TerminableLooper {
 
         players.addAll(joiningPlayers);
 
-        // create list of connected players (for new players)
-        List<SPlayer> alreadyConnectedPlayers = new ArrayList<>();
+        // create list of entities (for new players)
+        List<SEntity> alreadyExistingEntities = new ArrayList<>();
         for(ServerPlayer cp : players) {
-            alreadyConnectedPlayers.add(new SPlayer(cp.getID(), new SVector(cp.getLocation())));
+            alreadyExistingEntities.add(new SPlayer(cp));
+        }
+        for(ServerDroppedItem item : server.getDroppedItems()) {
+            alreadyExistingEntities.add(new SDroppedItem(item));
         }
 
         for(ServerPlayer newPlayer : joiningPlayers) {
 
             // initial packet for new player
-            InitDataActionS ida = new InitDataActionS(newPlayer.getID(), new SVector(newPlayer.getLocation()), alreadyConnectedPlayers, Constants.CHUNKS_NUMBER);
+            InitDataActionS ida = new InitDataActionS(newPlayer.getID(), new SVector(newPlayer.getLocation()), alreadyExistingEntities, Constants.CHUNKS_NUMBER);
             ChunkFeedActionS cfa = new ChunkFeedActionS(server.getServerWorld().getChunk(0));
             List<ServerAction> initActions = new ArrayList<>();
             initActions.add(ida);
@@ -146,10 +152,53 @@ public class TickLooper extends TerminableLooper {
                     STileData tile = server.getServerWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
                     if(tile.getType() == TileType.AIR) continue;
                     tile.setType(TileType.AIR);
-                    tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY()));
+                    float off = (1 - Constants.D_I_SIZE)/2;
+                    ServerDroppedItem droppedItem = new ServerDroppedItem(new Vector2(tba.getX()+off, tba.getY()+off), tba.getDropItem());
+                    server.getDroppedItems().add(droppedItem);
+                    tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY(), droppedItem.getID()));
+                }else if(ca instanceof PositionsFeedAction) {
+                    PositionsFeedAction pfa = (PositionsFeedAction) ca;
+                    for(SAdvPosition pos : pfa.getPositions()) {
+                        ServerDroppedItem item = (ServerDroppedItem) server.getEntitiesID().get(pos.getId());
+                        item.getLocation().set(pos.toVector());
+                        item.getVelocity().set(pos.getVelocity().toVector());
+                        item.setAngle(pos.getAngle());
+                        tickGeneratedActions.add(new EntityMoveActionS(pos.getId(), pos, pos.getVelocity()));
+                    }
                 }
             }
         }
+    }
+
+    private void recalculateDroppedItems() {
+
+        Iterator<ServerDroppedItem> it = server.getDroppedItems().iterator();
+        outer:
+        while(it.hasNext()) {
+            ServerDroppedItem item = it.next();
+            Vector2 center = item.getCenter();
+            for(ServerPlayer p : players) {
+                Vector2 dif = p.getCenter().sub(center);
+                if(dif.len() < Constants.D_I_PICK_DIST) {
+                    it.remove();
+                    p.getGateway().addServerAction(new ItemPickupAction(item.getType()));
+                    tickGeneratedActions.add(new ItemDespawnAction(item.getID(), item.getType()));
+                    continue outer;
+                }
+            }
+            int remainingTicks = item.getTicksToDespawn();
+            if(remainingTicks == 0) {
+                tickGeneratedActions.add(new ItemDespawnAction(item.getID(), item.getType()));
+                it.remove();
+                continue;
+            }
+            item.setTicksToDespawn(remainingTicks-1);
+        }
+
+        if(server.getPlayers().size() != 0) {
+            server.getPlayers().get(0).getGateway().addServerAction(new PositionsRequestAction());
+        }
+
     }
 
     private void sendGeneratedActions() {

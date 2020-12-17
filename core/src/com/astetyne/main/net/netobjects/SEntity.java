@@ -1,6 +1,6 @@
 package com.astetyne.main.net.netobjects;
 
-import com.astetyne.main.net.server.ServerEntity;
+import com.astetyne.main.net.server.entities.ServerEntity;
 
 import java.io.Serializable;
 

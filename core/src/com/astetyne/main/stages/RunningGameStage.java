@@ -1,16 +1,23 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
+import com.astetyne.main.entity.DroppedItemEntity;
+import com.astetyne.main.entity.Entity;
 import com.astetyne.main.entity.PlayerEntity;
 import com.astetyne.main.gui.GameGUILayout;
+import com.astetyne.main.items.ItemType;
 import com.astetyne.main.items.inventory.Inventory;
+import com.astetyne.main.net.client.actions.PositionsFeedAction;
+import com.astetyne.main.net.netobjects.SAdvPosition;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.WorldChunk;
+import com.astetyne.main.world.tiles.Tile;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RunningGameStage extends ExpiStage {
@@ -87,7 +94,8 @@ public class RunningGameStage extends ExpiStage {
 
             if(serverAction instanceof InitDataActionS) {
                 InitDataActionS initData = (InitDataActionS) serverAction;
-                gameWorld = new GameWorld(batch, this, initData);
+                gameWorld = new GameWorld(this, initData);
+                gameWorld.postSetup(initData);
 
             }else if(serverAction instanceof ChunkFeedActionS) {
                 ChunkFeedActionS action = (ChunkFeedActionS) serverAction;
@@ -95,7 +103,7 @@ public class RunningGameStage extends ExpiStage {
 
             }else if(serverAction instanceof PlayerJoinActionS) {
                 PlayerJoinActionS psa = (PlayerJoinActionS) serverAction;
-                gameWorld.createPlayerEntity(psa.getPlayerID(), psa.getLocation().toVector());
+                PlayerEntity pe = new PlayerEntity(psa.getPlayerID(), psa.getLocation().toVector(), this);
 
             }else if(serverAction instanceof EntityMoveActionS) {
                 EntityMoveActionS ema = (EntityMoveActionS) serverAction;
@@ -104,21 +112,41 @@ public class RunningGameStage extends ExpiStage {
             }else if(serverAction instanceof PlayerLeaveActionS) {
                 PlayerLeaveActionS pla = (PlayerLeaveActionS) serverAction;
                 PlayerEntity p = (PlayerEntity) gameWorld.getEntitiesID().get(pla.getPlayerID());
-                gameWorld.getOtherPlayers().remove(p);
                 gameWorld.destroyEntity(p);
 
             }else if(serverAction instanceof TileBreakActionS) {
                 TileBreakActionS tba = (TileBreakActionS) serverAction;
                 WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
                 if(chunk == null) return;
-                chunk.getTerrain()[tba.getY()][tba.getX()].destroy();
+                Tile t = chunk.getTerrain()[tba.getY()][tba.getX()];
+                t.destroy();
+                ItemType drop = t.getTileExtraData().getItemOnDrop();
+                int id = tba.getItemDropID();
+                DroppedItemEntity dip = new DroppedItemEntity(id, drop, this, tba.getItemAngleVel(), t.getCenterLoc());
+
+            }else if(serverAction instanceof ItemPickupAction) {
+                ItemPickupAction ipa = (ItemPickupAction) serverAction;
+                //todo: pridat vec do inventara
+
+            }else if(serverAction instanceof ItemDespawnAction) {
+                ItemDespawnAction ida = (ItemDespawnAction) serverAction;
+                DroppedItemEntity dip = (DroppedItemEntity) gameWorld.getEntitiesID().get(ida.getID());
+                gameWorld.destroyEntity(dip);
+
+            }else if(serverAction instanceof PositionsRequestAction) {
+
+                List<SAdvPosition> positions = new ArrayList<>();
+                for(Entity e : gameWorld.getEntities()) {
+                    if(e instanceof DroppedItemEntity) {
+                        System.out.println(e.getLocation());
+                        positions.add(new SAdvPosition(e));
+                    }
+                }
+                ExpiriumGame.getGame().getClientGateway().addAction(new PositionsFeedAction(positions));
             }
         }
-
         gameWorld.checkChunks();
-
         ExpiriumGame.getGame().getClientGateway().addAction(gameWorld.getPlayer().generateMoveAction());
-
     }
 
     @Override

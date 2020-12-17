@@ -5,6 +5,7 @@ import com.astetyne.main.world.WorldChunk;
 import com.astetyne.main.world.tiles.data.AirExtraData;
 import com.astetyne.main.world.tiles.data.TileExtraData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import java.util.ArrayList;
@@ -45,6 +46,10 @@ public class Tile {
 
     public int getY() {
         return y;
+    }
+
+    public Vector2 getCenterLoc() {
+        return new Vector2(x + 0.5f, y + 0.5f);
     }
 
     public void setTileExtraData(TileExtraData tileExtraData) {

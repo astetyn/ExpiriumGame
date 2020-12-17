@@ -10,7 +10,10 @@ public class Constants {
     public static final int T_W_CH = 32;
     public static final int T_H_CH = 256;
 
-    public static final short GROUND_BIT = 1;
-    public static final short ENTITY_BIT = 2;
+    public static final short DEFAULT_BIT = 1;
+    public static final short PLAYER_BIT = 2;
+
+    public static final float D_I_SIZE = 0.5f;
+    public static final float D_I_PICK_DIST = 1.3f;
 
 }

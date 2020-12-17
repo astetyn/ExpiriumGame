@@ -38,8 +38,7 @@ public class WorldChunk {
 
         fixDef.shape = shape;
         fixDef.friction = 0.2f;
-        fixDef.filter.categoryBits = Constants.GROUND_BIT;
-        fixDef.filter.maskBits = Constants.ENTITY_BIT;
+        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
 
         int w = Constants.T_W_CH;
         int h = Constants.T_H_CH;
@@ -69,8 +68,7 @@ public class WorldChunk {
 
         fixDef.shape = shape;
         fixDef.friction = 0.2f;
-        fixDef.filter.categoryBits = Constants.GROUND_BIT;
-        fixDef.filter.maskBits = Constants.ENTITY_BIT;
+        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
 
         checkFixtures(i-1, j, shape, fixDef);
         checkFixtures(i+1, j, shape, fixDef);
@@ -130,7 +128,6 @@ public class WorldChunk {
             shape.set(chunkId*w+j+1, i, chunkId*w+j+1,i+1);
             t.getFixtures().add(terrainBody.createFixture(fixDef));
         }
-
     }
 
     private boolean isNotSolid(int chunkId, int i, int j) {

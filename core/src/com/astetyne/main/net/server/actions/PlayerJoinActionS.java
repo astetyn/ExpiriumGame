@@ -1,7 +1,7 @@
 package com.astetyne.main.net.server.actions;
 
 import com.astetyne.main.net.netobjects.SVector;
-import com.astetyne.main.net.server.ServerPlayer;
+import com.astetyne.main.net.server.entities.ServerPlayer;
 
 public class PlayerJoinActionS extends ServerAction {
 

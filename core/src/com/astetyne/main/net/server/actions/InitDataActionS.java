@@ -1,6 +1,6 @@
 package com.astetyne.main.net.server.actions;
 
-import com.astetyne.main.net.netobjects.SPlayer;
+import com.astetyne.main.net.netobjects.SEntity;
 import com.astetyne.main.net.netobjects.SVector;
 
 import java.util.List;
@@ -9,13 +9,13 @@ public class InitDataActionS extends ServerAction {
 
     private final int playerID;
     private final SVector playerLocation;
-    private final List<SPlayer> playersEntities;
+    private final List<SEntity> entities;
     private final int numberOfChunks;
 
-    public InitDataActionS(int playerID, SVector playerLocation, List<SPlayer> playersEntities, int numberOfChunks) {
+    public InitDataActionS(int playerID, SVector playerLocation, List<SEntity> entities, int numberOfChunks) {
         this.playerID = playerID;
         this.playerLocation = playerLocation;
-        this.playersEntities = playersEntities;
+        this.entities = entities;
         this.numberOfChunks = numberOfChunks;
     }
 
@@ -23,8 +23,8 @@ public class InitDataActionS extends ServerAction {
         return playerLocation;
     }
 
-    public List<SPlayer> getPlayersEntities() {
-        return playersEntities;
+    public List<SEntity> getEntities() {
+        return entities;
     }
 
     public int getPlayerID() {
