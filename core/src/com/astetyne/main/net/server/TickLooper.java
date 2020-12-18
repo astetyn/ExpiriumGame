@@ -1,13 +1,16 @@
 package com.astetyne.main.net.server;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.*;
+import com.astetyne.main.net.client.actions.ChunkRequestActionC;
+import com.astetyne.main.net.client.actions.JoinRequestActionC;
+import com.astetyne.main.net.client.actions.PlayerMoveActionC;
+import com.astetyne.main.net.client.actions.TileBreakActionC;
 import com.astetyne.main.net.netobjects.*;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.net.server.entities.ServerDroppedItem;
 import com.astetyne.main.net.server.entities.ServerEntity;
 import com.astetyne.main.net.server.entities.ServerPlayer;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.TileType;
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,7 +22,7 @@ public class TickLooper extends TerminableLooper {
 
     private final Object tickLock;
     private final GameServer server;
-    private final List<ServerAction> tickGeneratedActions;
+    private final List<MessageAction> tickGeneratedActions;
     private final List<ServerPlayer> players;
 
     public TickLooper() {
@@ -111,7 +114,7 @@ public class TickLooper extends TerminableLooper {
             // initial packet for new player
             InitDataActionS ida = new InitDataActionS(newPlayer.getID(), new SVector(newPlayer.getLocation()), alreadyExistingEntities, Constants.CHUNKS_NUMBER);
             ChunkFeedActionS cfa = new ChunkFeedActionS(server.getServerWorld().getChunk(0));
-            List<ServerAction> initActions = new ArrayList<>();
+            List<MessageAction> initActions = new ArrayList<>();
             initActions.add(ida);
             initActions.add(cfa);
             newPlayer.getGateway().addServerActions(initActions);
@@ -135,7 +138,7 @@ public class TickLooper extends TerminableLooper {
     private void resolvePlayersActions() {
 
         for(ServerPlayer player : server.getPlayers()) {
-            for(ClientAction ca : player.getGateway().getClientActions()) {
+            for(MessageAction ca : player.getGateway().getClientActions()) {
                 if(ca instanceof ChunkRequestActionC) {
                     ChunkRequestActionC cra = (ChunkRequestActionC) ca;
                     SWorldChunk chunk = server.getServerWorld().getChunk(cra.getChunkId());
@@ -146,7 +149,7 @@ public class TickLooper extends TerminableLooper {
                     ServerEntity e = server.getEntitiesID().get(player.getID());
                     e.getLocation().x = pma.getNewLocation().getX();
                     e.getLocation().y = pma.getNewLocation().getY();
-                    tickGeneratedActions.add(new EntityMoveActionS(player.getID(), pma.getNewLocation(), pma.getVelocity()));
+                    tickGeneratedActions.add(new EntityMoveActionCS(player.getID(), pma.getNewLocation(), pma.getVelocity(), 0));
                 }else if(ca instanceof TileBreakActionC) {
                     TileBreakActionC tba = (TileBreakActionC) ca;
                     STileData tile = server.getServerWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
@@ -156,15 +159,13 @@ public class TickLooper extends TerminableLooper {
                     ServerDroppedItem droppedItem = new ServerDroppedItem(new Vector2(tba.getX()+off, tba.getY()+off), tba.getDropItem());
                     server.getDroppedItems().add(droppedItem);
                     tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY(), droppedItem.getID()));
-                }else if(ca instanceof PositionsFeedAction) {
-                    PositionsFeedAction pfa = (PositionsFeedAction) ca;
-                    for(SAdvPosition pos : pfa.getPositions()) {
-                        ServerDroppedItem item = (ServerDroppedItem) server.getEntitiesID().get(pos.getId());
-                        item.getLocation().set(pos.toVector());
-                        item.getVelocity().set(pos.getVelocity().toVector());
-                        item.setAngle(pos.getAngle());
-                        tickGeneratedActions.add(new EntityMoveActionS(pos.getId(), pos, pos.getVelocity()));
-                    }
+                }else if(ca instanceof EntityMoveActionCS) {
+                    EntityMoveActionCS ema = (EntityMoveActionCS) ca;
+                    ServerDroppedItem item = (ServerDroppedItem) server.getEntitiesID().get(ema.getEntityID());
+                    item.getLocation().set(ema.getNewLocation().toVector());
+                    item.getVelocity().set(ema.getVelocity().toVector());
+                    item.setAngle(ema.getAngle());
+                    tickGeneratedActions.add(ema);
                 }
             }
         }

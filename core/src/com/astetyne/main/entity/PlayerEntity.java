@@ -1,7 +1,7 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.Constants;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
+import com.astetyne.main.utils.Constants;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -12,10 +12,10 @@ public class PlayerEntity extends Entity {
 
     private final PlayerEntityAnimator animator;
 
-    public PlayerEntity(int id, Vector2 loc,  RunningGameStage game) {
+    public PlayerEntity(int id, Vector2 loc) {
         super(id, 0.9f, 1.25f);
-        animator = new PlayerEntityAnimator(game.getBatch(), this);
-        setupBody(loc, game);
+        animator = new PlayerEntityAnimator(GameStage.get().getBatch(), this);
+        setupBody(loc);
     }
 
     @Override
@@ -23,13 +23,13 @@ public class PlayerEntity extends Entity {
         animator.draw();
     }
 
-    private void setupBody(Vector2 loc, RunningGameStage game) {
+    private void setupBody(Vector2 loc) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        body = game.getGameWorld().getB2dWorld().createBody(bodyDef);
+        body = GameStage.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 30f;
@@ -71,9 +71,9 @@ public class PlayerEntity extends Entity {
 
         polyShape.dispose();
 
-        game.getGameWorld().getCL().registerListener(jumpSensor, this);
-        game.getGameWorld().getEntitiesID().put(ID, this);
-        game.getGameWorld().getEntities().add(this);
+        GameStage.get().getWorld().getCL().registerListener(jumpSensor, this);
+        GameStage.get().getWorld().getEntitiesID().put(ID, this);
+        GameStage.get().getWorld().getEntities().add(this);
 
     }
 }

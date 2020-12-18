@@ -1,8 +1,9 @@
 package com.astetyne.main.net.server.actions;
 
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.netobjects.SWorldChunk;
 
-public class ChunkFeedActionS extends ServerAction {
+public class ChunkFeedActionS extends MessageAction {
 
     private final SWorldChunk chunk;
 

@@ -1,7 +1,7 @@
 package com.astetyne.main.net.server.entities;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.items.ItemType;
+import com.astetyne.main.utils.Constants;
 import com.badlogic.gdx.math.Vector2;
 
 public class ServerDroppedItem extends ServerEntity {

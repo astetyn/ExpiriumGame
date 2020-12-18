@@ -1,10 +1,9 @@
 package com.astetyne.main.world.input;
 
-import com.astetyne.main.Constants;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.TileType;
-import com.astetyne.main.world.WorldChunk;
 import com.astetyne.main.world.tiles.Tile;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector3;
@@ -12,19 +11,14 @@ import com.badlogic.gdx.math.Vector3;
 public class WorldInputListener implements InputProcessor {
 
     private final GameWorld world;
-    private final RunningGameStage gameStage;
     private int validPointer;
 
-    public WorldInputListener(RunningGameStage gameStage) {
-        this.gameStage = gameStage;
-        this.world = gameStage.getGameWorld();
+    public WorldInputListener() {
+        this.world = GameStage.get().getWorld();
         validPointer = -1;
     }
 
     public void update() {
-
-
-
     }
 
     @Override
@@ -76,16 +70,10 @@ public class WorldInputListener implements InputProcessor {
         int w = Constants.T_W_CH;
         int h = Constants.T_H_CH;
 
-        if(blockX < 0 || blockX >= world.getChunks().length * w || blockY < 0 || blockY >= h) {
-            return null;
-        }
-        int chunkID = blockX / Constants.T_W_CH;
-        blockX -= chunkID * Constants.T_W_CH;
-        WorldChunk chunk = world.getChunks()[chunkID];
+        Tile t = world.getTileAt(blockX, blockY);
 
-        if(chunk == null) return null;
-        Tile t = chunk.getTerrain()[blockY][blockX];
         if(t.getType() == TileType.AIR) return null;
         return t;
     }
+
 }

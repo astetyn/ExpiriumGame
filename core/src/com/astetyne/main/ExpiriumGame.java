@@ -10,15 +10,15 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	private static ExpiriumGame game;
 	private GameServer server;
-	private ClientGateway clientGateway;
+	private final ClientGateway clientGateway;
 	private ExpiStage currentExpiStage;
 	private final Object serverTickLock;
 	private boolean available;
 	private String playerName;
 
 	public ExpiriumGame() {
-		available = false;
 		game = this;
+		available = false;
 		serverTickLock = new Object();
 		clientGateway = new ClientGateway();
 	}
@@ -53,6 +53,8 @@ public class ExpiriumGame extends ApplicationAdapter {
 		if(server != null) {
 			server.stop();
 		}
+		clientGateway.end();
+		Resources.dispose();
 
 	}
 
@@ -60,7 +62,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 		return clientGateway;
 	}
 
-	public static ExpiriumGame getGame() {
+	public static ExpiriumGame get() {
 		return game;
 	}
 

@@ -1,11 +1,12 @@
 package com.astetyne.main.net.server.actions;
 
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.netobjects.SEntity;
 import com.astetyne.main.net.netobjects.SVector;
 
 import java.util.List;
 
-public class InitDataActionS extends ServerAction {
+public class InitDataActionS extends MessageAction {
 
     private final int playerID;
     private final SVector playerLocation;

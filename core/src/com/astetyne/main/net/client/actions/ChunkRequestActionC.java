@@ -1,6 +1,8 @@
 package com.astetyne.main.net.client.actions;
 
-public class ChunkRequestActionC extends ClientAction {
+import com.astetyne.main.net.netobjects.MessageAction;
+
+public class ChunkRequestActionC extends MessageAction {
 
     private final int chunkId;
 

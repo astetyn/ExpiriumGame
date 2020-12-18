@@ -1,6 +1,8 @@
 package com.astetyne.main.net.client.actions;
 
-public class JoinRequestActionC extends ClientAction {
+import com.astetyne.main.net.netobjects.MessageAction;
+
+public class JoinRequestActionC extends MessageAction {
 
     private final String name;
 

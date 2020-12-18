@@ -1,11 +1,11 @@
 package com.astetyne.main.world.input;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.Resources;
 import com.astetyne.main.gui.ThumbStick;
 import com.astetyne.main.net.client.actions.TileBreakActionC;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.tiles.Tile;
 import com.badlogic.gdx.Gdx;
@@ -20,10 +20,10 @@ public class TileBreaker {
     private final GameWorld world;
     private final SpriteBatch batch;
 
-    public TileBreaker(RunningGameStage gameStage) {
-        this.world = gameStage.getGameWorld();
-        this.batch = gameStage.getBatch();
-        breakTS = gameStage.getGameGUI().getBreakTS();
+    public TileBreaker() {
+        this.world = GameStage.get().getWorld();
+        this.batch = GameStage.get().getBatch();
+        breakTS = GameStage.get().getGameGUI().getBreakTS();
         targetTile = null;
         timeAccumulator = 0;
     }
@@ -64,7 +64,7 @@ public class TileBreaker {
         if(targetTile != null) {
             timeAccumulator += Gdx.graphics.getDeltaTime();
             if(timeAccumulator >= targetTile.getTileExtraData().getDurability()) {
-                ExpiriumGame.getGame().getClientGateway().addAction(new TileBreakActionC(targetTile, targetTile.getTileExtraData().getItemOnDrop()));
+                ExpiriumGame.get().getClientGateway().addAction(new TileBreakActionC(targetTile, targetTile.getTileExtraData().getItemOnDrop()));
                 timeAccumulator = 0;
                 targetTile = null;
             }

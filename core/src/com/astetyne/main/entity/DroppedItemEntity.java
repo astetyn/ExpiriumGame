@@ -1,9 +1,9 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.Resources;
 import com.astetyne.main.items.ItemType;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
+import com.astetyne.main.utils.Constants;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -15,26 +15,26 @@ public class DroppedItemEntity extends Entity {
     private final ItemType type;
     private final SpriteBatch batch;
 
-    public DroppedItemEntity(int id, ItemType type, RunningGameStage game, float angleVel, Vector2 loc) {
+    public DroppedItemEntity(int id, ItemType type, float angleVel, Vector2 loc) {
         super(id, 0.5f, 0.5f);
         this.type = type;
-        this.batch = game.getBatch();
-        setupBody(angleVel, loc, game);
+        this.batch = GameStage.get().getBatch();
+        setupBody(angleVel, loc);
     }
 
     @Override
     public void draw() {
-        batch.draw(Resources.STONE_TEXTURE, getLocation().x - width/2, getLocation().y - height/2, width, height);
+        batch.draw(Resources.STONE_TEXTURE, getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (body.getAngle()*180/Math.PI));
     }
 
-    private void setupBody(float angleVel, Vector2 loc, RunningGameStage game) {
+    private void setupBody(float angleVel, Vector2 loc) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
         bodyDef.angularVelocity = angleVel;
 
-        body = game.getGameWorld().getB2dWorld().createBody(bodyDef);
+        body = GameStage.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         PolygonShape polyShape = new PolygonShape();
         polyShape.setAsBox(0.25f, 0.25f);
@@ -50,7 +50,7 @@ public class DroppedItemEntity extends Entity {
 
         getTargetPosition().set(loc);
 
-        game.getGameWorld().getEntitiesID().put(ID, this);
-        game.getGameWorld().getEntities().add(this);
+        GameStage.get().getWorld().getEntitiesID().put(ID, this);
+        GameStage.get().getWorld().getEntities().add(this);
     }
 }

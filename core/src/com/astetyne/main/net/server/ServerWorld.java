@@ -1,8 +1,8 @@
 package com.astetyne.main.net.server;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.net.netobjects.STileData;
 import com.astetyne.main.net.netobjects.SWorldChunk;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.Noise;
 import com.astetyne.main.world.TileType;
 import com.badlogic.gdx.Gdx;

@@ -1,6 +1,5 @@
 package com.astetyne.main.world;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.entity.DroppedItemEntity;
 import com.astetyne.main.entity.Entity;
@@ -8,10 +7,10 @@ import com.astetyne.main.entity.MainPlayer;
 import com.astetyne.main.entity.PlayerEntity;
 import com.astetyne.main.net.client.actions.ChunkRequestActionC;
 import com.astetyne.main.net.netobjects.*;
-import com.astetyne.main.net.server.actions.EntityMoveActionS;
 import com.astetyne.main.net.server.actions.InitDataActionS;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.BodyEditorLoader;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.input.WorldInputListener;
 import com.astetyne.main.world.tiles.Tile;
 import com.badlogic.gdx.Gdx;
@@ -39,16 +38,14 @@ public class GameWorld {
     private final HashSet<Integer> requestedChunks;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
-    private final RunningGameStage runningGameStage;
     private final ExpiContactListener contactListener;
     private MainPlayer player;
     private WorldInputListener worldListener;
     private final OrthographicCamera camera;
 
-    public GameWorld(RunningGameStage gameStage, InitDataActionS data) {
+    public GameWorld(InitDataActionS data) {
 
-        this.batch = gameStage.getBatch();
-        this.runningGameStage = gameStage;
+        this.batch = GameStage.get().getBatch();
 
         requestedChunks = new HashSet<>();
         entitiesID = new HashMap<>();
@@ -76,7 +73,7 @@ public class GameWorld {
 
     public void postSetup(InitDataActionS data) {
 
-        player = new MainPlayer(data.getPlayerID(), data.getPlayerLocation().toVector(), runningGameStage);
+        player = new MainPlayer(data.getPlayerID(), data.getPlayerLocation().toVector());
         SVector l = data.getPlayerLocation();
         player.getBody().setTransform(l.getX(), l.getY(), 0);
 
@@ -85,15 +82,15 @@ public class GameWorld {
                 SPlayer p = (SPlayer) e;
                 if(p.getID() == player.getID())
                     continue;
-                PlayerEntity pe = new PlayerEntity(p.getID(), p.getLocation().toVector(), runningGameStage);
+                PlayerEntity pe = new PlayerEntity(p.getID(), p.getLocation().toVector());
             }else if(e instanceof SDroppedItem) {
                 SDroppedItem di = (SDroppedItem) e;
-                DroppedItemEntity die = new DroppedItemEntity(di.getID(), di.getType(), runningGameStage, 0, di.getLocation().toVector());
+                DroppedItemEntity die = new DroppedItemEntity(di.getID(), di.getType(), 0, di.getLocation().toVector());
             }
         }
 
-        worldListener = new WorldInputListener(runningGameStage);
-        runningGameStage.getMultiplexer().addProcessor(worldListener);
+        worldListener = new WorldInputListener();
+        GameStage.get().getMultiplexer().addProcessor(worldListener);
 
     }
 
@@ -102,13 +99,7 @@ public class GameWorld {
         worldListener.update();
 
         for(Entity e : entities) {
-            if(e.getInterpolateDelta() == -1) continue;
-            e.getBody().setTransform(e.getLocation().lerp(e.getTargetPosition().cpy(), e.getInterpolateDelta()), 0);
-            e.setInterpolateDelta(e.getInterpolateDelta()+1.0f/Constants.SERVER_DEFAULT_TPS);
-            if(e.getInterpolateDelta() >= 1) {
-                e.getBody().setTransform(e.getTargetPosition(), 0);
-                e.setInterpolateDelta(-1);
-            }
+            e.move();
         }
 
         player.update();
@@ -120,19 +111,18 @@ public class GameWorld {
 
     public void render() {
 
-        batch.setProjectionMatrix(camera.combined.cpy().scl(PPM));
+        batch.setProjectionMatrix(camera.combined);
 
         // render world
         for(WorldChunk chunk : chunkArray) {
-            if(chunk == null) {
-                continue;
-            }
+            if(chunk == null) continue;
             Tile[][] terrain = chunk.getTerrain();
+            int offset = chunk.getId()*Constants.T_W_CH;
             for(int i = 0; i < Constants.T_H_CH; i++) {
                 for(int j = 0; j < Constants.T_W_CH; j++) {
                     if(terrain[i][j].getType() != TileType.AIR) {
                         TextureRegion tex = terrain[i][j].getTexture();
-                        batch.draw(tex, j + chunk.getId()*Constants.T_W_CH, i, 1, 1);
+                        batch.draw(tex, j + offset, i, 1, 1);
                     }
                 }
             }
@@ -144,11 +134,10 @@ public class GameWorld {
         }
 
         player.draw();
-
     }
 
     public void resize() {
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
         camera.update();
     }
 
@@ -162,7 +151,7 @@ public class GameWorld {
             WorldChunk chunk = chunkArray[i];
             if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
                 if(chunk == null && !requestedChunks.contains(i)) {
-                    ExpiriumGame.getGame().getClientGateway().addAction(new ChunkRequestActionC(i));
+                    ExpiriumGame.get().getClientGateway().addAction(new ChunkRequestActionC(i));
                     requestedChunks.add(i);
                 }
             }else if(chunk != null) {
@@ -196,15 +185,6 @@ public class GameWorld {
         requestedChunks.remove(worldChunk.getId());
     }
 
-    public void onEntityMove(EntityMoveActionS ema) {
-        if(ema.getEntityID() == player.getID()) return;
-        if(!entitiesID.containsKey(ema.getEntityID())) return;
-        Entity e = entitiesID.get(ema.getEntityID());
-        e.getTargetPosition().set(ema.getNewLocation().toVector());
-        e.setInterpolateDelta(0);
-        e.getBody().setLinearVelocity(ema.getVelocity().toVector());
-    }
-
     private void generateWorldBorders() {
 
         ChainShape chainShape = new ChainShape();
@@ -229,8 +209,8 @@ public class GameWorld {
 
     private void cameraCenter() {
         Vector3 position = camera.position;
-        position.x = camera.position.x  + (player.getLocation().x * PPM - camera.position.x) * .1f;
-        position.y = camera.position.y  + (player.getLocation().y * PPM - camera.position.y) * .1f;
+        position.x = camera.position.x  + (player.getLocation().x - camera.position.x) * .1f;
+        position.y = camera.position.y  + (player.getLocation().y - camera.position.y) * .1f;
         camera.position.set(position);
         camera.update();
     }

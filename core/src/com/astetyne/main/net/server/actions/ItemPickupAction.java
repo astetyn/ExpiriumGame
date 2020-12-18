@@ -1,8 +1,9 @@
 package com.astetyne.main.net.server.actions;
 
 import com.astetyne.main.items.ItemType;
+import com.astetyne.main.net.netobjects.MessageAction;
 
-public class ItemPickupAction extends ServerAction {
+public class ItemPickupAction extends MessageAction {
 
     private final ItemType item;
 

@@ -1,14 +1,14 @@
 package com.astetyne.main.gui;
 
 import com.astetyne.main.Resources;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
-import static com.astetyne.main.stages.RunningGameStage.toPixels;
+import static com.astetyne.main.stages.GameStage.toPixels;
 
 public class GameGUILayout {
 
@@ -18,11 +18,7 @@ public class GameGUILayout {
     private final ThumbStick movementTS, breakTS;
     private final Label fpsLabel, locationLabel, entityLabel, warnLabel;
 
-    private final RunningGameStage gameStage;
-
-    public GameGUILayout(RunningGameStage gameStage) {
-
-        this.gameStage = gameStage;
+    public GameGUILayout() {
 
         mainTable = new Table();
         itemSelectTable = new Table();
@@ -41,13 +37,13 @@ public class GameGUILayout {
         warnLabel.setColor(1,0.1f,0.1f,1);
 
         itemSelectTable.row();
-        itemSelectTable.add(gameStage.getInv().getSwitchArrowUp()).padBottom(toPixels(6)).colspan(3);
+        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowUp()).padBottom(toPixels(6)).colspan(3);
         itemSelectTable.row();
-        itemSelectTable.add(gameStage.getInv().getToolSlot()).padRight(toPixels(15));
-        itemSelectTable.add(gameStage.getInv().getBuildSlot()).padRight(toPixels(15));
-        itemSelectTable.add(gameStage.getInv().getUseSlot());
+        itemSelectTable.add(GameStage.get().getInv().getToolSlot()).padRight(toPixels(15));
+        itemSelectTable.add(GameStage.get().getInv().getBuildSlot()).padRight(toPixels(15));
+        itemSelectTable.add(GameStage.get().getInv().getUseSlot());
         itemSelectTable.row();
-        itemSelectTable.add(gameStage.getInv().getSwitchArrowDown()).padTop(toPixels(6)).colspan(3);
+        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(toPixels(6)).colspan(3);
 
         buildTableTool();
 
@@ -55,12 +51,12 @@ public class GameGUILayout {
 
     public void update() {
 
-        if(gameStage.getGameWorld() == null) return;
+        if(GameStage.get().getWorld() == null) return;
 
         fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
-        Vector2 loc = gameStage.getGameWorld().getPlayer().getLocation();
+        Vector2 loc = GameStage.get().getWorld().getPlayer().getLocation();
         locationLabel.setText("x: "+((int)loc.x)+" y: "+((int)loc.y));
-        entityLabel.setText("entities: "+gameStage.getGameWorld().getEntitiesID().keySet().size());
+        entityLabel.setText("entities: "+GameStage.get().getWorld().getEntitiesID().keySet().size());
 
     }
 

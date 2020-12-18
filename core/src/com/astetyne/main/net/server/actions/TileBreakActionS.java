@@ -1,6 +1,8 @@
 package com.astetyne.main.net.server.actions;
 
-public class TileBreakActionS extends ServerAction {
+import com.astetyne.main.net.netobjects.MessageAction;
+
+public class TileBreakActionS extends MessageAction {
 
     private final int chunkID, x, y;
     private final float itemAngleVel;

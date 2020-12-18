@@ -1,9 +1,10 @@
 package com.astetyne.main.net.client.actions;
 
 import com.astetyne.main.items.ItemType;
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.world.tiles.Tile;
 
-public class TileBreakActionC extends ClientAction {
+public class TileBreakActionC extends MessageAction {
 
     private final int chunkID, x, y;
     private final ItemType dropItem;

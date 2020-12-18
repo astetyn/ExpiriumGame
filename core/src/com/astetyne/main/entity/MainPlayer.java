@@ -1,10 +1,10 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.gui.ThumbStick;
 import com.astetyne.main.net.client.actions.PlayerMoveActionC;
 import com.astetyne.main.net.netobjects.SVector;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.input.TileBreaker;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -18,12 +18,12 @@ public class MainPlayer extends Entity {
     private final TileBreaker tileBreaker;
     private final ThumbStick movementTS;
 
-    public MainPlayer(int id, Vector2 loc, RunningGameStage game) {
+    public MainPlayer(int id, Vector2 loc) {
         super(id, 0.9f, 1.25f);
-        setupBody(loc, game);
-        tileBreaker = new TileBreaker(game);
-        movementTS = game.getGameGUI().getMovementTS();
-        animator = new MainPlayerAnimator(game.getBatch(), this, movementTS);
+        setupBody(loc);
+        tileBreaker = new TileBreaker();
+        movementTS = GameStage.get().getGameGUI().getMovementTS();
+        animator = new MainPlayerAnimator(GameStage.get().getBatch(), this, movementTS);
     }
 
     public void draw() {
@@ -31,13 +31,13 @@ public class MainPlayer extends Entity {
         animator.draw();
     }
 
-    private void setupBody(Vector2 loc, RunningGameStage game) {
+    private void setupBody(Vector2 loc) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        body = game.getGameWorld().getB2dWorld().createBody(bodyDef);
+        body = GameStage.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 30f;
@@ -79,8 +79,8 @@ public class MainPlayer extends Entity {
 
         polyShape.dispose();
 
-        game.getGameWorld().getCL().registerListener(jumpSensor, this);
-        game.getGameWorld().getEntitiesID().put(ID, this);
+        GameStage.get().getWorld().getCL().registerListener(jumpSensor, this);
+        GameStage.get().getWorld().getEntitiesID().put(ID, this);
 
     }
 

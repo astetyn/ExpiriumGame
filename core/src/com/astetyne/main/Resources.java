@@ -86,4 +86,8 @@ public class Resources {
         STONE_TEXTURE = ga.findRegion("stone");
     }
 
+    public static void dispose() {
+        ARIAL_FONT.dispose();
+    }
+
 }

@@ -2,8 +2,7 @@ package com.astetyne.main.net.server;
 
 import com.astetyne.main.net.TerminableLooper;
 import com.astetyne.main.net.client.ClientActionsPacket;
-import com.astetyne.main.net.client.actions.ClientAction;
-import com.astetyne.main.net.server.actions.ServerAction;
+import com.astetyne.main.net.netobjects.MessageAction;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,8 +15,8 @@ public class ServerPlayerGateway extends TerminableLooper {
 
     private final GameServer gameServer;
     private final Socket client;
-    private final List<ServerAction> serverActions;
-    private final List<ClientAction> clientActions;
+    private final List<MessageAction> serverActions;
+    private final List<MessageAction> clientActions;
     private final Object joinLock;
 
     public ServerPlayerGateway(Socket client) {
@@ -53,7 +52,7 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             while(isRunning()) {
 
-                List<ServerAction> copy;
+                List<MessageAction> copy;
                 synchronized(serverActions) {
                     copy = new ArrayList<>(serverActions);
                     serverActions.clear();
@@ -75,32 +74,41 @@ public class ServerPlayerGateway extends TerminableLooper {
             }
 
         }catch(IOException | ClassNotFoundException | InterruptedException e) {
-            System.out.println("Connection with client failed.");
+            System.out.println("Channel with client failed.");
             try {
                 client.close();
             }catch(IOException ignored) {
             }
             gameServer.playerPreLeaveAsync(this);
         }
-
     }
 
-    public void addServerAction(ServerAction action) {
+    @Override
+    public void end() {
+        super.end();
+        try {
+            client.close();
+        }catch(IOException ignored) {
+        }
+        System.out.println("Channel with client closed.");
+    }
+
+    public void addServerAction(MessageAction action) {
         synchronized(serverActions) {
             serverActions.add(action);
         }
     }
 
-    public void addServerActions(List<ServerAction> actions) {
+    public void addServerActions(List<MessageAction> actions) {
         synchronized(serverActions) {
             serverActions.addAll(actions);
         }
     }
 
     // call this only once per server tick as list will be cleared after the call
-    public List<ClientAction> getClientActions() {
+    public List<MessageAction> getClientActions() {
         synchronized(clientActions) {
-            List<ClientAction> copy = new ArrayList<>(clientActions);
+            List<MessageAction> copy = new ArrayList<>(clientActions);
             clientActions.clear();
             return copy;
         }

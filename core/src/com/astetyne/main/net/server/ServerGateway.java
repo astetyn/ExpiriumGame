@@ -1,7 +1,7 @@
 package com.astetyne.main.net.server;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.net.TerminableLooper;
+import com.astetyne.main.utils.Constants;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,10 +10,6 @@ import java.net.Socket;
 public class ServerGateway extends TerminableLooper {
 
     private ServerSocket server;
-
-    public ServerGateway() {
-
-    }
 
     @Override
     public void run() {
@@ -24,7 +20,7 @@ public class ServerGateway extends TerminableLooper {
 
             while(isRunning()) {
 
-                System.out.println("listening for incoming clients...");
+                System.out.println("Listening for incoming clients...");
                 Socket client = server.accept();
                 new Thread(new ServerPlayerGateway(client)).start();
 
@@ -35,7 +31,7 @@ public class ServerGateway extends TerminableLooper {
                 if(server != null) server.close();
             }catch(IOException ignored) {
             }
-            System.out.println("Server gateway closed.");
+            System.out.println("Server GW closed.");
         }
     }
 
@@ -44,8 +40,8 @@ public class ServerGateway extends TerminableLooper {
         super.end();
         try {
             server.close();
-        }catch(IOException e) {
-            e.printStackTrace();
+        }catch(IOException ignored) {
         }
+        System.out.println("Server GW closed.");
     }
 }

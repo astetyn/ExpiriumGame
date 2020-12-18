@@ -1,12 +1,11 @@
 package com.astetyne.main.net.client;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.ClientAction;
 import com.astetyne.main.net.client.actions.JoinRequestActionC;
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.server.ServerActionsPacket;
-import com.astetyne.main.net.server.actions.ServerAction;
+import com.astetyne.main.utils.Constants;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,15 +19,15 @@ import java.util.List;
 public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
-    private final List<ClientAction> clientActions;
-    private final List<ServerAction> serverActions;
+    private final List<MessageAction> clientActions;
+    private final List<MessageAction> serverActions;
     private final ExpiriumGame game;
     private String ipAddress;
 
     public ClientGateway() {
         clientActions = new ArrayList<>();
         serverActions = new ArrayList<>();
-        game = ExpiriumGame.getGame();
+        game = ExpiriumGame.get();
         ipAddress = "127.0.0.1";
     }
 
@@ -56,7 +55,7 @@ public class ClientGateway extends TerminableLooper {
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
             JoinRequestActionC jra = new JoinRequestActionC(game.getPlayerName());
-            ClientActionsPacket capInit = new ClientActionsPacket(Collections.<ClientAction>singletonList(jra));
+            ClientActionsPacket capInit = new ClientActionsPacket(Collections.<MessageAction>singletonList(jra));
             oos.writeObject(capInit);
 
             socket.setSoTimeout(5000);
@@ -71,11 +70,12 @@ public class ClientGateway extends TerminableLooper {
                     serverActions.addAll(sap.getList());
                 }
 
-                List<ClientAction> copy;
+                List<MessageAction> copy;
                 synchronized(clientActions) {
                     copy = new ArrayList<>(clientActions);
                     clientActions.clear();
                 }
+
                 oos.writeObject(new ClientActionsPacket(copy));
 
                 game.notifyServerUpdate();
@@ -94,22 +94,24 @@ public class ClientGateway extends TerminableLooper {
     public void end() {
         super.end();
         try {
-            socket.close();
-        }catch(IOException e) {
-            e.printStackTrace();
+            if(socket != null) {
+                socket.close();
+            }
+        }catch(IOException ignored) {
         }
+        System.out.println("Client successfully closed socket.");
     }
 
-    public void addAction(ClientAction action) {
+    public void addAction(MessageAction action) {
         synchronized(clientActions) {
             clientActions.add(action);
         }
     }
 
     // call this only once per server tick as list will be cleared after the call
-    public List<ServerAction> getServerActions() {
+    public List<MessageAction> getServerActions() {
         synchronized(serverActions) {
-            List<ServerAction> copy = new ArrayList<>(serverActions);
+            List<MessageAction> copy = new ArrayList<>(serverActions);
             serverActions.clear();
             return copy;
         }

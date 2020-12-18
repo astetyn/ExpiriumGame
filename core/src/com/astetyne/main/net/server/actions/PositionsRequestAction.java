@@ -1,4 +1,6 @@
 package com.astetyne.main.net.server.actions;
 
-public class PositionsRequestAction extends ServerAction {
+import com.astetyne.main.net.netobjects.MessageAction;
+
+public class PositionsRequestAction extends MessageAction {
 }

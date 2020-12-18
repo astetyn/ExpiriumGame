@@ -1,6 +1,6 @@
 package com.astetyne.main.gui;
 
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -92,12 +92,12 @@ public class ThumbStick extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return RunningGameStage.toPixels(150);
+        return GameStage.toPixels(150);
     }
 
     @Override
     public float getPrefHeight() {
-        return RunningGameStage.toPixels(150);
+        return GameStage.toPixels(150);
     }
 
     public float getHorz() {

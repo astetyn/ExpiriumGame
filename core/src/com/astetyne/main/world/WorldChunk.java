@@ -1,7 +1,7 @@
 package com.astetyne.main.world;
 
-import com.astetyne.main.Constants;
 import com.astetyne.main.net.netobjects.SWorldChunk;
+import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.tiles.Tile;
 import com.astetyne.main.world.tiles.TileFactory;
 import com.astetyne.main.world.tiles.data.AirExtraData;

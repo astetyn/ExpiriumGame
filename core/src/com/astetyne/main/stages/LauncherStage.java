@@ -2,8 +2,8 @@ package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.Resources;
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.server.actions.InitDataActionS;
-import com.astetyne.main.net.server.actions.ServerAction;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -32,12 +32,7 @@ public class LauncherStage extends ExpiStage {
 
         final TextField textField2 = new TextField("127.0.0.1", Resources.TEXT_FIELD_STYLE);
         textField2.setMessageText("Enter the ip address");
-        textField2.setTextFieldFilter(new TextField.TextFieldFilter() {
-            @Override
-            public boolean acceptChar(TextField textField1, char c) {
-                return Character.toString(c).matches("^[0-9.]");
-            }
-        });
+        textField2.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9.]"));
         textField2.setVisible(false);
 
         TextButton serverButton = new TextButton("Host a server.", Resources.TEXT_BUTTON_STYLE);
@@ -68,7 +63,7 @@ public class LauncherStage extends ExpiStage {
         textField.setAlignment(Align.center);
 
         table.setFillParent(true);
-        //table.setDebug(true);
+        table.setDebug(true);
 
         stage.addActor(table);
 
@@ -76,10 +71,10 @@ public class LauncherStage extends ExpiStage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(hostingServer) {
-                    ExpiriumGame.getGame().startServer();
-                    ExpiriumGame.getGame().startClient("127.0.0.1", textField.getText());
+                    ExpiriumGame.get().startServer();
+                    ExpiriumGame.get().startClient("127.0.0.1", textField.getText());
                 }else {
-                    ExpiriumGame.getGame().startClient(textField2.getText(), textField.getText());
+                    ExpiriumGame.get().startClient(textField2.getText(), textField.getText());
                 }
                 table.setVisible(false);
             }
@@ -112,12 +107,12 @@ public class LauncherStage extends ExpiStage {
     }
 
     @Override
-    public void onServerUpdate(List<ServerAction> actions) {
+    public void onServerUpdate(List<MessageAction> actions) {
 
-        for(ServerAction serverAction : actions) {
+        for(MessageAction serverAction : actions) {
             if(serverAction instanceof InitDataActionS) {
-                ExpiriumGame.getGame().setCurrentStage(new RunningGameStage());
-                ExpiriumGame.getGame().getCurrentStage().onServerUpdate(actions);
+                ExpiriumGame.get().setCurrentStage(new GameStage());
+                ExpiriumGame.get().getCurrentStage().onServerUpdate(actions);
                 return;
             }
         }

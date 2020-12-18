@@ -3,17 +3,14 @@ package com.astetyne.main.items.inventory;
 import com.astetyne.main.Resources;
 import com.astetyne.main.gui.HotBarSlot;
 import com.astetyne.main.gui.SwitchArrow;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
 
 public class Inventory {
 
     private HotBarSlot toolSlot, buildSlot, useSlot;
     private final SwitchArrow switchArrowUp, switchArrowDown;
-    private RunningGameStage gameStage;
 
-    public Inventory(RunningGameStage gameStage) {
-
-        this.gameStage = gameStage;
+    public Inventory() {
 
         toolSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusTool);
         buildSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusBuild);
@@ -30,21 +27,21 @@ public class Inventory {
         System.out.println("Clicked on tool slot.");
         buildSlot.setFocus(false);
         useSlot.setFocus(false);
-        gameStage.getGameGUI().buildTableTool();
+        GameStage.get().getGameGUI().buildTableTool();
     };
 
     private final Runnable onFocusBuild = () -> {
         System.out.println("Clicked on build slot.");
         toolSlot.setFocus(false);
         useSlot.setFocus(false);
-        gameStage.getGameGUI().buildTableBuild();
+        GameStage.get().getGameGUI().buildTableBuild();
     };
 
     private final Runnable onFocusUse = () -> {
         System.out.println("Clicked on use slot.");
         toolSlot.setFocus(false);
         buildSlot.setFocus(false);
-        gameStage.getGameGUI().buildTableUse();
+        GameStage.get().getGameGUI().buildTableUse();
     };
 
     private final Runnable onSwitch = () -> {

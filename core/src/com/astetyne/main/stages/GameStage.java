@@ -7,8 +7,7 @@ import com.astetyne.main.entity.PlayerEntity;
 import com.astetyne.main.gui.GameGUILayout;
 import com.astetyne.main.items.ItemType;
 import com.astetyne.main.items.inventory.Inventory;
-import com.astetyne.main.net.client.actions.PositionsFeedAction;
-import com.astetyne.main.net.netobjects.SAdvPosition;
+import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.WorldChunk;
@@ -17,10 +16,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class RunningGameStage extends ExpiStage {
+public class GameStage extends ExpiStage {
+
+    private static GameStage game;
 
     private GameWorld gameWorld;
 
@@ -30,15 +30,17 @@ public class RunningGameStage extends ExpiStage {
 
     private final GameGUILayout gameGUI;
 
-    public RunningGameStage() {
+    public GameStage() {
+
+        game = this;
 
         b2dr = new Box2DDebugRenderer();
 
         System.out.println("DENSITY: "+Gdx.graphics.getDensity());
 
-        inventory = new Inventory(this);
+        inventory = new Inventory();
 
-        gameGUI = new GameGUILayout(this);
+        gameGUI = new GameGUILayout();
 
         stage.addActor(gameGUI.getTable());
 
@@ -61,15 +63,13 @@ public class RunningGameStage extends ExpiStage {
         Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.enableBlending();
-
         batch.begin();
         gameWorld.render();
         batch.end();
 
         stage.draw();
 
-        b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined.cpy().scl(GameWorld.PPM));
+        b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
 
     }
 
@@ -88,13 +88,13 @@ public class RunningGameStage extends ExpiStage {
     }
 
     @Override
-    public void onServerUpdate(List<ServerAction> actions) {
+    public void onServerUpdate(List<MessageAction> actions) {
 
-        for(ServerAction serverAction : actions) {
+        for(MessageAction serverAction : actions) {
 
             if(serverAction instanceof InitDataActionS) {
                 InitDataActionS initData = (InitDataActionS) serverAction;
-                gameWorld = new GameWorld(this, initData);
+                gameWorld = new GameWorld(initData);
                 gameWorld.postSetup(initData);
 
             }else if(serverAction instanceof ChunkFeedActionS) {
@@ -103,11 +103,13 @@ public class RunningGameStage extends ExpiStage {
 
             }else if(serverAction instanceof PlayerJoinActionS) {
                 PlayerJoinActionS psa = (PlayerJoinActionS) serverAction;
-                PlayerEntity pe = new PlayerEntity(psa.getPlayerID(), psa.getLocation().toVector(), this);
+                PlayerEntity pe = new PlayerEntity(psa.getPlayerID(), psa.getLocation().toVector());
 
-            }else if(serverAction instanceof EntityMoveActionS) {
-                EntityMoveActionS ema = (EntityMoveActionS) serverAction;
-                gameWorld.onEntityMove(ema);
+            }else if(serverAction instanceof EntityMoveActionCS) {
+                EntityMoveActionCS ema = (EntityMoveActionCS) serverAction;
+                int id = ema.getEntityID();
+                if(id == gameWorld.getPlayer().getID() || !gameWorld.getEntitiesID().containsKey(id)) continue;
+                gameWorld.getEntitiesID().get(ema.getEntityID()).onMoveAction(ema);
 
             }else if(serverAction instanceof PlayerLeaveActionS) {
                 PlayerLeaveActionS pla = (PlayerLeaveActionS) serverAction;
@@ -117,12 +119,12 @@ public class RunningGameStage extends ExpiStage {
             }else if(serverAction instanceof TileBreakActionS) {
                 TileBreakActionS tba = (TileBreakActionS) serverAction;
                 WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
-                if(chunk == null) return;
+                if(chunk == null) continue;
                 Tile t = chunk.getTerrain()[tba.getY()][tba.getX()];
                 t.destroy();
                 ItemType drop = t.getTileExtraData().getItemOnDrop();
                 int id = tba.getItemDropID();
-                DroppedItemEntity dip = new DroppedItemEntity(id, drop, this, tba.getItemAngleVel(), t.getCenterLoc());
+                DroppedItemEntity dip = new DroppedItemEntity(id, drop, tba.getItemAngleVel(), t.getCenterLoc());
 
             }else if(serverAction instanceof ItemPickupAction) {
                 ItemPickupAction ipa = (ItemPickupAction) serverAction;
@@ -135,18 +137,15 @@ public class RunningGameStage extends ExpiStage {
 
             }else if(serverAction instanceof PositionsRequestAction) {
 
-                List<SAdvPosition> positions = new ArrayList<>();
                 for(Entity e : gameWorld.getEntities()) {
                     if(e instanceof DroppedItemEntity) {
-                        System.out.println(e.getLocation());
-                        positions.add(new SAdvPosition(e));
+                        ExpiriumGame.get().getClientGateway().addAction(new EntityMoveActionCS(e));
                     }
                 }
-                ExpiriumGame.getGame().getClientGateway().addAction(new PositionsFeedAction(positions));
             }
         }
         gameWorld.checkChunks();
-        ExpiriumGame.getGame().getClientGateway().addAction(gameWorld.getPlayer().generateMoveAction());
+        ExpiriumGame.get().getClientGateway().addAction(gameWorld.getPlayer().generateMoveAction());
     }
 
     @Override
@@ -162,11 +161,15 @@ public class RunningGameStage extends ExpiStage {
         return inventory;
     }
 
-    public GameWorld getGameWorld() {
+    public GameWorld getWorld() {
         return gameWorld;
     }
 
     public static int toPixels(int realLen) {
         return (int) (realLen * Gdx.graphics.getDensity());
+    }
+
+    public static GameStage get() {
+        return game;
     }
 }

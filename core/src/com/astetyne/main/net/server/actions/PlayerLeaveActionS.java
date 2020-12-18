@@ -1,6 +1,8 @@
 package com.astetyne.main.net.server.actions;
 
-public class PlayerLeaveActionS extends ServerAction {
+import com.astetyne.main.net.netobjects.MessageAction;
+
+public class PlayerLeaveActionS extends MessageAction {
 
     private final int playerID;
 

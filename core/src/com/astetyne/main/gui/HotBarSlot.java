@@ -1,7 +1,7 @@
 package com.astetyne.main.gui;
 
 import com.astetyne.main.items.ItemStack;
-import com.astetyne.main.stages.RunningGameStage;
+import com.astetyne.main.stages.GameStage;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -48,12 +48,12 @@ public class HotBarSlot extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return RunningGameStage.toPixels(80);
+        return GameStage.toPixels(80);
     }
 
     @Override
     public float getPrefHeight() {
-        return RunningGameStage.toPixels(80);
+        return GameStage.toPixels(80);
     }
 
     public ItemStack getItemStack() {

@@ -1,10 +1,10 @@
-package com.astetyne.main;
+package com.astetyne.main.utils;
 
 public class Constants {
 
     public static final int SERVER_PORT = 1414;
 
-    public static final int SERVER_DEFAULT_TPS = 20;
+    public static final int SERVER_DEFAULT_TPS = 65;
 
     public static final int CHUNKS_NUMBER = 128;
     public static final int T_W_CH = 32;
