@@ -156,7 +156,8 @@ public class TickLooper extends TerminableLooper {
                     if(tile.getType() == TileType.AIR) continue;
                     tile.setType(TileType.AIR);
                     float off = (1 - Constants.D_I_SIZE)/2;
-                    ServerDroppedItem droppedItem = new ServerDroppedItem(new Vector2(tba.getX()+off, tba.getY()+off), tba.getDropItem());
+                    Vector2 loc = new Vector2(tba.getX()+off, tba.getY()+off);
+                    ServerDroppedItem droppedItem = new ServerDroppedItem(loc, tba.getDropItem(), Constants.SERVER_DEFAULT_TPS);
                     server.getDroppedItems().add(droppedItem);
                     tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY(), droppedItem.getID()));
                 }else if(ca instanceof EntityMoveActionCS) {
@@ -177,6 +178,10 @@ public class TickLooper extends TerminableLooper {
         outer:
         while(it.hasNext()) {
             ServerDroppedItem item = it.next();
+            if(item.getCooldown() != 0) {
+                item.reduceCooldown();
+                continue;
+            }
             Vector2 center = item.getCenter();
             for(ServerPlayer p : players) {
                 Vector2 dif = p.getCenter().sub(center);

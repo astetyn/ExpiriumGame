@@ -39,7 +39,7 @@ public class HotBarSlot extends Widget {
         if(itemStack == null) {
             batch.draw(style.defaultItemTexture, getX(), getY(), getWidth(), getHeight());
         }else {
-            batch.draw(itemStack.getTexture(), getX(), getY(), getWidth(), getHeight());
+            batch.draw(itemStack.getItem().getTexture(), getX(), getY(), getWidth(), getHeight());
             //todo: napisat na to kvantitu (kolko toho este je)
         }
         batch.draw(style.frame, getX(), getY(), getWidth(), getHeight());
@@ -66,6 +66,10 @@ public class HotBarSlot extends Widget {
 
     public void setFocus(boolean focused) {
         this.focused = focused;
+    }
+
+    public boolean isFocused() {
+        return focused;
     }
 
     public static class HotBarSlotStyle {

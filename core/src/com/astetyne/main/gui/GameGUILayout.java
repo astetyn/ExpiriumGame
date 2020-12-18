@@ -40,8 +40,8 @@ public class GameGUILayout {
         itemSelectTable.add(GameStage.get().getInv().getSwitchArrowUp()).padBottom(toPixels(6)).colspan(3);
         itemSelectTable.row();
         itemSelectTable.add(GameStage.get().getInv().getToolSlot()).padRight(toPixels(15));
-        itemSelectTable.add(GameStage.get().getInv().getBuildSlot()).padRight(toPixels(15));
-        itemSelectTable.add(GameStage.get().getInv().getUseSlot());
+        itemSelectTable.add(GameStage.get().getInv().getMaterialSlot()).padRight(toPixels(15));
+        itemSelectTable.add(GameStage.get().getInv().getConsumableSlot());
         itemSelectTable.row();
         itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(toPixels(6)).colspan(3);
 

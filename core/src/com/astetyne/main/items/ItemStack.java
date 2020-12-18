@@ -1,17 +1,24 @@
 package com.astetyne.main.items;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 public class ItemStack {
 
-    private ItemType type;
-    private TextureRegion texture;
+    private final Item item;
+    private int amount;
 
-    public ItemType getType() {
-        return type;
+    public ItemStack(Item item, int amount) {
+        this.item = item;
+        this.amount = amount;
     }
 
-    public TextureRegion getTexture() {
-        return texture;
+    public Item getItem() {
+        return item;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 }

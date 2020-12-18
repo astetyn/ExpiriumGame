@@ -128,7 +128,7 @@ public class GameStage extends ExpiStage {
 
             }else if(serverAction instanceof ItemPickupAction) {
                 ItemPickupAction ipa = (ItemPickupAction) serverAction;
-                //todo: pridat vec do inventara
+                inventory.onItemPick(ipa.getItem());
 
             }else if(serverAction instanceof ItemDespawnAction) {
                 ItemDespawnAction ida = (ItemDespawnAction) serverAction;

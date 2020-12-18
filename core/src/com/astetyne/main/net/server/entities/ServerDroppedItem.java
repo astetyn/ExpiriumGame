@@ -8,11 +8,13 @@ public class ServerDroppedItem extends ServerEntity {
 
     private int ticksToDespawn;
     private final ItemType type;
+    private int cooldown;
 
-    public ServerDroppedItem(Vector2 location, ItemType type) {
+    public ServerDroppedItem(Vector2 location, ItemType type, int cooldown) {
         super(location, Constants.D_I_SIZE, Constants.D_I_SIZE);
         ticksToDespawn = Constants.SERVER_DEFAULT_TPS * 60;
         this.type = type;
+        this.cooldown = cooldown;
     }
 
     public int getTicksToDespawn() {
@@ -25,5 +27,13 @@ public class ServerDroppedItem extends ServerEntity {
 
     public ItemType getType() {
         return type;
+    }
+
+    public void reduceCooldown() {
+        cooldown--;
+    }
+
+    public int getCooldown() {
+        return cooldown;
     }
 }
