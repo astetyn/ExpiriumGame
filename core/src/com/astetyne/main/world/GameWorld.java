@@ -11,7 +11,6 @@ import com.astetyne.main.net.server.actions.InitDataActionS;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.BodyEditorLoader;
 import com.astetyne.main.utils.Constants;
-import com.astetyne.main.world.input.WorldInputListener;
 import com.astetyne.main.world.tiles.Tile;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -40,7 +39,6 @@ public class GameWorld {
     private final List<Entity> entities;
     private final ExpiContactListener contactListener;
     private MainPlayer player;
-    private WorldInputListener worldListener;
     private final OrthographicCamera camera;
 
     public GameWorld(InitDataActionS data) {
@@ -85,18 +83,13 @@ public class GameWorld {
                 PlayerEntity pe = new PlayerEntity(p.getID(), p.getLocation().toVector());
             }else if(e instanceof SDroppedItem) {
                 SDroppedItem di = (SDroppedItem) e;
-                DroppedItemEntity die = new DroppedItemEntity(di.getID(), di.getType(), 0, di.getLocation().toVector());
+                DroppedItemEntity die = new DroppedItemEntity(di.getID(), di.getType().initItem(), 0, di.getLocation().toVector());
             }
         }
-
-        worldListener = new WorldInputListener();
-        GameStage.get().getMultiplexer().addProcessor(worldListener);
 
     }
 
     public void update() {
-
-        worldListener.update();
 
         for(Entity e : entities) {
             e.move();

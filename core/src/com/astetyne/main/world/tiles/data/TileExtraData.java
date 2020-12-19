@@ -12,7 +12,7 @@ public abstract class TileExtraData {
 
     public abstract TileType getType();
 
-    public abstract float getDurability();
+    public abstract float getBreakTime();
 
     public abstract ItemType getItemOnDrop();
 

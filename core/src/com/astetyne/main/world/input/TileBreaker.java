@@ -63,7 +63,7 @@ public class TileBreaker {
         }
         if(targetTile != null) {
             timeAccumulator += Gdx.graphics.getDeltaTime();
-            if(timeAccumulator >= targetTile.getTileExtraData().getDurability()) {
+            if(timeAccumulator >= targetTile.getTileExtraData().getBreakTime()) {
                 ExpiriumGame.get().getClientGateway().addAction(new TileBreakActionC(targetTile, targetTile.getTileExtraData().getItemOnDrop()));
                 timeAccumulator = 0;
                 targetTile = null;
@@ -76,11 +76,11 @@ public class TileBreaker {
         return v.x >= 0 && v.x < world.getChunks().length * Constants.T_W_CH && v.y >= 0 && v.y < Constants.T_H_CH;
     }
 
-    public void renderBreakingTile() {
+    public void render() {
 
         if(targetTile == null) return;
 
-        float durability = timeAccumulator / targetTile.getTileExtraData().getDurability();
+        float durability = timeAccumulator / targetTile.getTileExtraData().getBreakTime();
         int x = targetTile.getX() + Constants.T_W_CH * targetTile.getChunk().getId();
         batch.draw(Resources.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
     }

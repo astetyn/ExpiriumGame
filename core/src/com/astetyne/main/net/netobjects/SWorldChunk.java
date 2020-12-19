@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class SWorldChunk implements Serializable {
 
     private final int id;
-    private final STileData[][] terrain;
+    private final STile[][] terrain;
 
-    public SWorldChunk(int id, STileData[][] terrain) {
+    public SWorldChunk(int id, STile[][] terrain) {
         this.id = id;
         this.terrain = terrain;
     }
@@ -16,7 +16,7 @@ public class SWorldChunk implements Serializable {
         return id;
     }
 
-    public STileData[][] getTerrain() {
+    public STile[][] getTerrain() {
         return terrain;
     }
 }

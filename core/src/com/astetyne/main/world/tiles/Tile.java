@@ -18,6 +18,7 @@ public class Tile {
     private final int x, y;
     private TileExtraData tileExtraData;
     private TileType type;
+    private int stability;
 
     public Tile(WorldChunk chunk, int x, int y) {
         this.fixtures = new ArrayList<>();
@@ -26,6 +27,7 @@ public class Tile {
         this.y = y;
         tileExtraData = new AirExtraData();
         type = tileExtraData.getType();
+        stability = type.getDefaultStability();
     }
 
     public TileType getType() {
@@ -71,5 +73,13 @@ public class Tile {
 
     public void destroy() {
         chunk.destroyTile(this);
+    }
+
+    public int getStability() {
+        return stability;
+    }
+
+    public void setStability(int stability) {
+        this.stability = stability;
     }
 }

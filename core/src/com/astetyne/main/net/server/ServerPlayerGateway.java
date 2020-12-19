@@ -59,6 +59,8 @@ public class ServerPlayerGateway extends TerminableLooper {
                 }
 
                 // send S actions packet
+                /*System.out.println("Server packet size: "+Utils.sizeof(new ServerActionsPacket(copy)));
+                System.out.println("Server packet elements: "+copy.size());*/
                 oos.writeObject(new ServerActionsPacket(copy));
 
                 // listen for C actions packet

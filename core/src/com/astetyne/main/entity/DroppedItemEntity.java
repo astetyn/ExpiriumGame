@@ -1,7 +1,6 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.Resources;
-import com.astetyne.main.items.ItemType;
+import com.astetyne.main.items.Item;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.Constants;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,19 +11,19 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 public class DroppedItemEntity extends Entity {
 
-    private final ItemType type;
+    private final Item item;
     private final SpriteBatch batch;
 
-    public DroppedItemEntity(int id, ItemType type, float angleVel, Vector2 loc) {
+    public DroppedItemEntity(int id, Item item, float angleVel, Vector2 loc) {
         super(id, 0.5f, 0.5f);
-        this.type = type;
+        this.item = item;
         this.batch = GameStage.get().getBatch();
         setupBody(angleVel, loc);
     }
 
     @Override
     public void draw() {
-        batch.draw(Resources.STONE_TEXTURE, getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (body.getAngle()*180/Math.PI));
+        batch.draw(item.getTexture(), getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (body.getAngle()*180/Math.PI));
     }
 
     private void setupBody(float angleVel, Vector2 loc) {

@@ -1,39 +1,40 @@
 package com.astetyne.main.world.tiles.data;
 
+import com.astetyne.main.Resources;
 import com.astetyne.main.items.ItemType;
 import com.astetyne.main.net.netobjects.STile;
 import com.astetyne.main.world.TileType;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class AirExtraData extends TileExtraData {
+public class DirtExtraData extends TileExtraData {
 
-    public AirExtraData() {}
+    public DirtExtraData() {}
 
-    public AirExtraData(STile data) {}
+    public DirtExtraData(STile data) {}
 
     @Override
     public TextureRegion getTexture() {
-        return null;
+        return Resources.DIRT_TEXTURE;
     }
 
     @Override
     public boolean isSolid() {
-        return false;
+        return true;
     }
 
     @Override
     public TileType getType() {
-        return TileType.AIR;
+        return TileType.DIRT;
     }
 
     @Override
     public float getBreakTime() {
-        return 0;
+        return 0.1f;
     }
 
     @Override
     public ItemType getItemOnDrop() {
-        return null;
+        return ItemType.DIRT;
     }
 
 }

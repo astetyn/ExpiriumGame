@@ -44,6 +44,8 @@ public class Resources {
     // tiles
 
     public static TextureRegion STONE_TEXTURE;
+    public static TextureRegion GRASS_TEXTURE;
+    public static TextureRegion DIRT_TEXTURE;
 
     public static void loadTextures() {
 
@@ -84,6 +86,8 @@ public class Resources {
 
         // tiles
         STONE_TEXTURE = ga.findRegion("stone");
+        GRASS_TEXTURE = ga.findRegion("grass");
+        DIRT_TEXTURE = ga.findRegion("dirt");
     }
 
     public static void dispose() {

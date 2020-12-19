@@ -21,4 +21,12 @@ public class ItemStack {
     public int getAmount() {
         return amount;
     }
+
+    public void increaseAmount() {
+        amount++;
+    }
+
+    public void decreaseAmount() {
+        amount--;
+    }
 }

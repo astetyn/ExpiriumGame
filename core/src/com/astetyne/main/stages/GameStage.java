@@ -7,11 +7,13 @@ import com.astetyne.main.entity.PlayerEntity;
 import com.astetyne.main.gui.GameGUILayout;
 import com.astetyne.main.items.ItemType;
 import com.astetyne.main.items.inventory.Inventory;
+import com.astetyne.main.net.client.actions.TilePlaceActionCS;
 import com.astetyne.main.net.netobjects.MessageAction;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.WorldChunk;
 import com.astetyne.main.world.tiles.Tile;
+import com.astetyne.main.world.tiles.data.TileExtraData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -121,14 +123,14 @@ public class GameStage extends ExpiStage {
                 WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
                 if(chunk == null) continue;
                 Tile t = chunk.getTerrain()[tba.getY()][tba.getX()];
-                t.destroy();
                 ItemType drop = t.getTileExtraData().getItemOnDrop();
+                t.destroy();
                 int id = tba.getItemDropID();
-                DroppedItemEntity dip = new DroppedItemEntity(id, drop, tba.getItemAngleVel(), t.getCenterLoc());
+                DroppedItemEntity dip = new DroppedItemEntity(id, drop.initItem(), tba.getItemAngleVel(), t.getCenterLoc());
 
             }else if(serverAction instanceof ItemPickupAction) {
                 ItemPickupAction ipa = (ItemPickupAction) serverAction;
-                inventory.onItemPick(ipa.getItem());
+                inventory.onItemPick(ipa.getItem().initItem());
 
             }else if(serverAction instanceof ItemDespawnAction) {
                 ItemDespawnAction ida = (ItemDespawnAction) serverAction;
@@ -136,12 +138,22 @@ public class GameStage extends ExpiStage {
                 gameWorld.destroyEntity(dip);
 
             }else if(serverAction instanceof PositionsRequestAction) {
-
                 for(Entity e : gameWorld.getEntities()) {
                     if(e instanceof DroppedItemEntity) {
                         ExpiriumGame.get().getClientGateway().addAction(new EntityMoveActionCS(e));
                     }
                 }
+
+            }else if(serverAction instanceof TilePlaceActionCS) {
+                TilePlaceActionCS tpa = (TilePlaceActionCS) serverAction;
+                if(gameWorld.getPlayer().getID() == tpa.getPlayerID()) {
+                    inventory.removeItem(tpa.getPlacedItem());
+                }
+                WorldChunk wch = gameWorld.getChunks()[tpa.getChunkID()];
+                if(wch == null) continue;
+                Tile t = wch.getTerrain()[tpa.getY()][tpa.getX()];
+                TileExtraData data = tpa.getPlacedItem().initDefaultData();
+                wch.changeTile(t.getX(), t.getY(), data);
             }
         }
         gameWorld.checkChunks();

@@ -3,9 +3,9 @@ package com.astetyne.main.items.inventory;
 import com.astetyne.main.Resources;
 import com.astetyne.main.gui.HotBarSlot;
 import com.astetyne.main.gui.SwitchArrow;
+import com.astetyne.main.items.Item;
 import com.astetyne.main.items.ItemStack;
 import com.astetyne.main.items.ItemType;
-import com.astetyne.main.items.material.StoneItem;
 import com.astetyne.main.stages.GameStage;
 
 import java.util.ArrayList;
@@ -42,28 +42,24 @@ public class Inventory {
     }
 
     private final Runnable onFocusTool = () -> {
-        System.out.println("Clicked on tool slot.");
         materialSlot.setFocus(false);
         consumableSlot.setFocus(false);
         GameStage.get().getGameGUI().buildTableTool();
     };
 
     private final Runnable onFocusBuild = () -> {
-        System.out.println("Clicked on build slot.");
         toolSlot.setFocus(false);
         consumableSlot.setFocus(false);
         GameStage.get().getGameGUI().buildTableBuild();
     };
 
     private final Runnable onFocusUse = () -> {
-        System.out.println("Clicked on use slot.");
         toolSlot.setFocus(false);
         materialSlot.setFocus(false);
         GameStage.get().getGameGUI().buildTableUse();
     };
 
     private final Runnable onSwitchUp = () -> {
-        System.out.println("Clicked on up switch.");
         if(toolSlot.isFocused()) {
             if(toolsSwitchIndex >= tools.size()-1) {
                 toolsSwitchIndex = 0;
@@ -83,10 +79,10 @@ public class Inventory {
                 consumablesSwitchIndex++;
             }
         }
+        setItemsToSlots();
     };
 
     private final Runnable onSwitchDown = () -> {
-        System.out.println("Clicked on down switch.");
         if(toolSlot.isFocused()) {
             if(toolsSwitchIndex == 0) {
                 toolsSwitchIndex = Math.max(tools.size()-1, 0);
@@ -106,26 +102,38 @@ public class Inventory {
                 consumablesSwitchIndex--;
             }
         }
+        setItemsToSlots();
     };
 
-    public void onItemPick(ItemType item) {
+    public void onItemPick(Item item) {
 
-        switch(item) {
+        for(ItemStack is : materials) {
+            if(is.getItem().getType() == item.getType()) {
+                is.increaseAmount();
+                return;
+            }
+        }
+        materials.add(new ItemStack(item, 1));
+        //todo: spravit aj pre ostatne typy
+        setItemsToSlots();
+    }
 
-            case STONE:
-                for(ItemStack is : materials) {
-                    if(is.getItem().getType() == ItemType.STONE) {
-                        is.setAmount(is.getAmount()+1);
-                        break;
-                    }
+    public void removeItem(ItemType type) {
+
+        if(type.getCategory() == 0) {
+
+        }else if(type.getCategory() == 1) {
+
+            for(ItemStack is : materials) {
+                if(is.getItem().getType() == type) {
+                    is.decreaseAmount();
+                    //todo: kontrola ci je 0 - prazdny
                 }
-                materials.add(new ItemStack(new StoneItem(), 1));
-                break;
+            }
+
+        }else if(type.getCategory() == 2) {
 
         }
-
-        setItemsToSlots();
-
     }
 
     private void setItemsToSlots() {

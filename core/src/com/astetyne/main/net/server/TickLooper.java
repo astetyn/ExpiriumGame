@@ -1,10 +1,7 @@
 package com.astetyne.main.net.server;
 
 import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.ChunkRequestActionC;
-import com.astetyne.main.net.client.actions.JoinRequestActionC;
-import com.astetyne.main.net.client.actions.PlayerMoveActionC;
-import com.astetyne.main.net.client.actions.TileBreakActionC;
+import com.astetyne.main.net.client.actions.*;
 import com.astetyne.main.net.netobjects.*;
 import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.net.server.entities.ServerDroppedItem;
@@ -152,7 +149,7 @@ public class TickLooper extends TerminableLooper {
                     tickGeneratedActions.add(new EntityMoveActionCS(player.getID(), pma.getNewLocation(), pma.getVelocity(), 0));
                 }else if(ca instanceof TileBreakActionC) {
                     TileBreakActionC tba = (TileBreakActionC) ca;
-                    STileData tile = server.getServerWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
+                    STile tile = server.getServerWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
                     if(tile.getType() == TileType.AIR) continue;
                     tile.setType(TileType.AIR);
                     float off = (1 - Constants.D_I_SIZE)/2;
@@ -160,6 +157,7 @@ public class TickLooper extends TerminableLooper {
                     ServerDroppedItem droppedItem = new ServerDroppedItem(loc, tba.getDropItem(), Constants.SERVER_DEFAULT_TPS);
                     server.getDroppedItems().add(droppedItem);
                     tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY(), droppedItem.getID()));
+                    server.getServerWorld().onTileBreak(tba);
                 }else if(ca instanceof EntityMoveActionCS) {
                     EntityMoveActionCS ema = (EntityMoveActionCS) ca;
                     ServerDroppedItem item = (ServerDroppedItem) server.getEntitiesID().get(ema.getEntityID());
@@ -167,6 +165,11 @@ public class TickLooper extends TerminableLooper {
                     item.getVelocity().set(ema.getVelocity().toVector());
                     item.setAngle(ema.getAngle());
                     tickGeneratedActions.add(ema);
+                }else if(ca instanceof TilePlaceActionCS) {
+                    TilePlaceActionCS tpa = (TilePlaceActionCS) ca;
+                    STile tile = server.getServerWorld().getChunk(tpa.getChunkID()).getTerrain()[tpa.getY()][tpa.getX()];
+                    if(tile.getType() != TileType.AIR) continue;
+                    server.getServerWorld().tryToPlaceTile(tpa);
                 }
             }
         }
@@ -222,5 +225,9 @@ public class TickLooper extends TerminableLooper {
     public void end() {
         super.end();
         GameServer.getServer().getServerGateway().end();
+    }
+
+    public List<MessageAction> getTickActions() {
+        return tickGeneratedActions;
     }
 }

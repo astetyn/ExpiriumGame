@@ -3,8 +3,8 @@ package com.astetyne.main.world;
 import com.astetyne.main.net.netobjects.SWorldChunk;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.tiles.Tile;
-import com.astetyne.main.world.tiles.TileFactory;
 import com.astetyne.main.world.tiles.data.AirExtraData;
+import com.astetyne.main.world.tiles.data.TileExtraData;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -25,7 +25,7 @@ public class WorldChunk {
         for(int i = 0; i < Constants.T_H_CH; i++) {
             for(int j = 0; j < Constants.T_W_CH; j++) {
                 terrain[i][j] = new Tile(this, j, i);
-                terrain[i][j].setTileExtraData(TileFactory.createExtraData(chunk.getTerrain()[i][j]));
+                terrain[i][j].setTileExtraData(chunk.getTerrain()[i][j].getType().initDefaultData());
             }
         }
         generateFixtures();
@@ -49,6 +49,34 @@ public class WorldChunk {
             }
         }
         shape.dispose();
+    }
+
+    public void changeTile(int x, int y, TileExtraData data) {
+
+        Tile t = terrain[y][x];
+
+        if(!data.isSolid()) {
+            destroyTile(t);
+            t.setTileExtraData(data);
+            return;
+        }
+
+        t.setTileExtraData(data);
+
+        EdgeShape shape = new EdgeShape();
+        FixtureDef fixDef = new FixtureDef();
+        fixDef.shape = shape;
+        fixDef.friction = 0.2f;
+        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
+
+        checkFixtures(y, x, shape, fixDef);
+        checkFixtures(y-1, x, shape, fixDef);
+        checkFixtures(y+1, x, shape, fixDef);
+        checkFixtures(y, x-1, shape, fixDef);
+        checkFixtures(y, x+1, shape, fixDef);
+
+        shape.dispose();
+
     }
 
     public void destroyTile(Tile t) {

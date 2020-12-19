@@ -6,6 +6,7 @@ import com.astetyne.main.net.netobjects.SVector;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.input.TileBreaker;
+import com.astetyne.main.world.input.TilePlacer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -16,18 +17,21 @@ public class MainPlayer extends Entity {
 
     private final MainPlayerAnimator animator;
     private final TileBreaker tileBreaker;
+    private final TilePlacer tilePlacer;
     private final ThumbStick movementTS;
 
     public MainPlayer(int id, Vector2 loc) {
         super(id, 0.9f, 1.25f);
         setupBody(loc);
         tileBreaker = new TileBreaker();
+        tilePlacer = new TilePlacer();
+        GameStage.get().getMultiplexer().addProcessor(tilePlacer);
         movementTS = GameStage.get().getGameGUI().getMovementTS();
         animator = new MainPlayerAnimator(GameStage.get().getBatch(), this, movementTS);
     }
 
     public void draw() {
-        tileBreaker.renderBreakingTile();
+        tileBreaker.render();
         animator.draw();
     }
 

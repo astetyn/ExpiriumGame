@@ -4,11 +4,12 @@ import com.astetyne.main.world.TileType;
 
 import java.io.Serializable;
 
-public class STileData implements Serializable {
+public class STile implements Serializable {
 
     private TileType type;
+    private int stability;
 
-    public STileData(TileType type) {
+    public STile(TileType type) {
         this.type = type;
     }
 
@@ -18,5 +19,13 @@ public class STileData implements Serializable {
 
     public TileType getType() {
         return type;
+    }
+
+    public int getStability() {
+        return stability;
+    }
+
+    public void setStability(int stability) {
+        this.stability = stability;
     }
 }

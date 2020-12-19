@@ -51,8 +51,6 @@ public class GameGUILayout {
 
     public void update() {
 
-        if(GameStage.get().getWorld() == null) return;
-
         fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
         Vector2 loc = GameStage.get().getWorld().getPlayer().getLocation();
         locationLabel.setText("x: "+((int)loc.x)+" y: "+((int)loc.y));
@@ -67,12 +65,12 @@ public class GameGUILayout {
 
     public void buildTableBuild() {
         preBuildTable();
-        mainTable.add(fpsLabel).align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
+        mainTable.add().align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
     }
 
     public void buildTableUse() {
         preBuildTable();
-        mainTable.add(entityLabel).align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
+        mainTable.add().align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
     }
 
     private void preBuildTable() {

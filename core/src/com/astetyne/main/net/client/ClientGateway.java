@@ -39,6 +39,7 @@ public class ClientGateway extends TerminableLooper {
         try {
 
             socket = new Socket();
+            socket.setPerformancePreferences(0,10,0);
             socket.connect(new InetSocketAddress(ipAddress, Constants.SERVER_PORT), 10000);
 
         } catch(IOException e) {
@@ -76,6 +77,8 @@ public class ClientGateway extends TerminableLooper {
                     clientActions.clear();
                 }
 
+                /*System.out.println("Client packet size: "+ Utils.sizeof(new ClientActionsPacket(copy)));
+                System.out.println("Client packet elements: "+ copy.size());*/
                 oos.writeObject(new ClientActionsPacket(copy));
 
                 game.notifyServerUpdate();

@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class SEntity implements Serializable {
 
     private final int ID;
-    private final SVector location;
+    transient private final SVector location;
 
     public SEntity(ServerEntity entity) {
         this.ID = entity.getID();
