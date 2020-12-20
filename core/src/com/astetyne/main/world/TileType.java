@@ -1,33 +1,49 @@
 package com.astetyne.main.world;
 
-import com.astetyne.main.world.tiles.data.*;
+import com.astetyne.main.Resources;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import java.util.HashMap;
 
 public enum TileType {
 
-    AIR(AirExtraData.class, 0),
-    STONE(StoneExtraData.class, 3),
-    GRASS(GrassExtraData.class, 1),
-    DIRT(DirtExtraData.class, 1);
+    AIR(0, false, null),
+    STONE(1, true, Resources.STONE_TEXTURE),
+    GRASS(2, true, Resources.GRASS_TEXTURE),
+    DIRT(3, true, Resources.DIRT_TEXTURE);
 
-    Class<? extends TileExtraData> clazz;
-    int stability;
+    private static final HashMap<Integer, TileType> map;
 
-    TileType(Class<? extends TileExtraData> clazz, int stability) {
-        this.clazz = clazz;
-        this.stability = stability;
-    }
-
-    public TileExtraData initDefaultData() {
-        try {
-            return clazz.newInstance();
-        }catch(InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+    static {
+        map = new HashMap<>();
+        for(TileType tt : TileType.values()) {
+            map.put(tt.id, tt);
         }
-        return new AirExtraData();
     }
 
-    public int getDefaultStability() {
-        return stability;
+    public static TileType getType(int id) {
+        return map.get(id);
     }
 
+    int id;
+    boolean solid;
+    TextureRegion texture;
+
+    TileType(int id, boolean solid, TextureRegion texture) {
+        this.id = id;
+        this.solid = solid;
+        this.texture = texture;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public boolean isSolid() {
+        return solid;
+    }
+
+    public TextureRegion getTexture() {
+        return texture;
+    }
 }

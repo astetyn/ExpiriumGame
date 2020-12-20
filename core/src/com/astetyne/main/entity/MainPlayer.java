@@ -1,8 +1,7 @@
 package com.astetyne.main.entity;
 
 import com.astetyne.main.gui.ThumbStick;
-import com.astetyne.main.net.client.actions.PlayerMoveActionC;
-import com.astetyne.main.net.netobjects.SVector;
+import com.astetyne.main.net.client.packets.PlayerMovePacket;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.input.TileBreaker;
@@ -111,8 +110,8 @@ public class MainPlayer extends Entity {
 
     }
 
-    public PlayerMoveActionC generateMoveAction() {
-        return new PlayerMoveActionC(new SVector(getLocation()), new SVector(getVelocity()));
+    public PlayerMovePacket generateMoveAction() {
+        return new PlayerMovePacket(getLocation(), getVelocity());
     }
 
 }

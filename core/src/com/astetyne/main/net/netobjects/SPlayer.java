@@ -1,10 +1,10 @@
 package com.astetyne.main.net.netobjects;
 
-import com.astetyne.main.net.server.entities.ServerEntity;
+import com.astetyne.server.api.entities.ExpiEntity;
 
 public class SPlayer extends SEntity {
 
-    public SPlayer(ServerEntity entity) {
+    public SPlayer(ExpiEntity entity) {
         super(entity.getID(), new SVector(entity.getLocation()));
     }
 

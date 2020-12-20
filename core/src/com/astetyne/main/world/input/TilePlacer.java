@@ -1,9 +1,7 @@
 package com.astetyne.main.world.input;
 
-import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.items.ItemType;
 import com.astetyne.main.items.inventory.Inventory;
-import com.astetyne.main.net.client.actions.TilePlaceActionCS;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.world.GameWorld;
 import com.astetyne.main.world.TileType;
@@ -81,7 +79,7 @@ public class TilePlacer implements InputProcessor {
         int chID = t.getChunk().getId();
         ItemType item = inv.getMaterialSlot().getItemStack().getItem().getType();
 
-        ExpiriumGame.get().getClientGateway().addAction(new TilePlaceActionCS(pID, chID, t.getX(), t.getY(), item));
+        //ExpiriumGame.get().getClientGateway().addSubPacket(new TilePlaceActionCS(pID, chID, t.getX(), t.getY(), item));
         return true;
     }
 }

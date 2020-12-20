@@ -1,6 +1,6 @@
 package com.astetyne.main.net.netobjects;
 
-import com.astetyne.main.net.server.entities.ServerEntity;
+import com.astetyne.server.api.entities.ExpiEntity;
 
 import java.io.Serializable;
 
@@ -9,7 +9,7 @@ public class SEntity implements Serializable {
     private final int ID;
     transient private final SVector location;
 
-    public SEntity(ServerEntity entity) {
+    public SEntity(ExpiEntity entity) {
         this.ID = entity.getID();
         this.location = new SVector(entity.getLocation());
     }

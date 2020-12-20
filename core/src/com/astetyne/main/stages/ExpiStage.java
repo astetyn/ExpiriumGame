@@ -1,7 +1,7 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.Resources;
-import com.astetyne.main.net.netobjects.MessageAction;
+import com.astetyne.server.backend.IncomingPacket;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -36,7 +36,7 @@ public abstract class ExpiStage {
         Resources.dispose();
     }
 
-    public abstract void onServerUpdate(List<MessageAction> actions);
+    public abstract void onServerUpdate(List<IncomingPacket> actions);
 
     public abstract void onServerFail();
 

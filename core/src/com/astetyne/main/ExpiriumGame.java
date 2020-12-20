@@ -1,9 +1,9 @@
 package com.astetyne.main;
 
 import com.astetyne.main.net.client.ClientGateway;
-import com.astetyne.main.net.server.GameServer;
 import com.astetyne.main.stages.ExpiStage;
 import com.astetyne.main.stages.LauncherStage;
+import com.astetyne.server.GameServer;
 import com.badlogic.gdx.ApplicationAdapter;
 
 public class ExpiriumGame extends ApplicationAdapter {
@@ -85,7 +85,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 			if(!available) return;
 			available = false;
 		}
-		currentExpiStage.onServerUpdate(clientGateway.getServerActions());
+		currentExpiStage.onServerUpdate(clientGateway.getServerPackets());
 	}
 
 	public void startServer() {

@@ -1,34 +1,37 @@
 package com.astetyne.main.net.client;
 
 import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.net.TerminableLooper;
-import com.astetyne.main.net.client.actions.JoinRequestActionC;
-import com.astetyne.main.net.netobjects.MessageAction;
-import com.astetyne.main.net.server.ServerActionsPacket;
+import com.astetyne.main.net.client.packets.JoinRequestPacket;
 import com.astetyne.main.utils.Constants;
+import com.astetyne.server.backend.IncomingPacket;
+import com.astetyne.server.backend.Packable;
+import com.astetyne.server.backend.TerminableLooper;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
-    private final List<MessageAction> clientActions;
-    private final List<MessageAction> serverActions;
+    private final List<Packable> clientSubPackets;
+    private final List<IncomingPacket> serverIncomingPackets;
     private final ExpiriumGame game;
     private String ipAddress;
+    private final byte[] inputBuffer;
 
     public ClientGateway() {
-        clientActions = new ArrayList<>();
-        serverActions = new ArrayList<>();
+        clientSubPackets = new ArrayList<>();
+        serverIncomingPackets = new ArrayList<>();
         game = ExpiriumGame.get();
         ipAddress = "127.0.0.1";
+        inputBuffer = new byte[65536];
     }
 
     @Override
@@ -53,39 +56,45 @@ public class ClientGateway extends TerminableLooper {
 
             System.out.println("Connection established.");
 
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
 
-            JoinRequestActionC jra = new JoinRequestActionC(game.getPlayerName());
-            ClientActionsPacket capInit = new ClientActionsPacket(Collections.<MessageAction>singletonList(jra));
-            oos.writeObject(capInit);
-
-            socket.setSoTimeout(5000);
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            JoinRequestPacket jra = new JoinRequestPacket(game.getPlayerName());
+            bos.write(jra.toByteArray());
+            System.out.println("C: flush: "+jra.toByteArray().length);
+            bos.flush();
 
             while(isRunning()) {
 
                 socket.setSoTimeout(5000);
-                ServerActionsPacket sap = (ServerActionsPacket) ois.readObject();
+                int readBytes = bis.read(inputBuffer);
 
-                synchronized(serverActions) {
-                    serverActions.addAll(sap.getList());
+                //System.out.println("Client read: "+readBytes);
+
+                synchronized(serverIncomingPackets) {
+                    serverIncomingPackets.add(new IncomingPacket(Arrays.copyOf(inputBuffer, readBytes)));
                 }
 
-                List<MessageAction> copy;
-                synchronized(clientActions) {
-                    copy = new ArrayList<>(clientActions);
-                    clientActions.clear();
+                List<Packable> copy;
+                synchronized(clientSubPackets) {
+                    copy = new ArrayList<>(clientSubPackets);
+                    clientSubPackets.clear();
                 }
 
-                /*System.out.println("Client packet size: "+ Utils.sizeof(new ClientActionsPacket(copy)));
-                System.out.println("Client packet elements: "+ copy.size());*/
-                oos.writeObject(new ClientActionsPacket(copy));
+                ByteBuffer bb = ByteBuffer.allocate(4);
+                bb.putInt(copy.size());
+                bos.write(bb.array());
+
+                for(Packable p : copy) {
+                    bos.write(p.toByteArray());
+                }
+                bos.flush();
 
                 game.notifyServerUpdate();
 
             }
 
-        }catch(IOException | ClassNotFoundException e) {
+        }catch(IOException e) {
             // exception during playing on server
             System.out.println("Exception during messaging with server.");
             game.getCurrentStage().onServerFail();
@@ -105,17 +114,17 @@ public class ClientGateway extends TerminableLooper {
         System.out.println("Client successfully closed socket.");
     }
 
-    public void addAction(MessageAction action) {
-        synchronized(clientActions) {
-            clientActions.add(action);
+    public void addSubPacket(Packable subPacket) {
+        synchronized(clientSubPackets) {
+            clientSubPackets.add(subPacket);
         }
     }
 
     // call this only once per server tick as list will be cleared after the call
-    public List<MessageAction> getServerActions() {
-        synchronized(serverActions) {
-            List<MessageAction> copy = new ArrayList<>(serverActions);
-            serverActions.clear();
+    public List<IncomingPacket> getServerPackets() {
+        synchronized(serverIncomingPackets) {
+            List<IncomingPacket> copy = new ArrayList<>(serverIncomingPackets);
+            serverIncomingPackets.clear();
             return copy;
         }
     }

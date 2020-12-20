@@ -1,15 +1,15 @@
 package com.astetyne.main.net.netobjects;
 
 import com.astetyne.main.items.ItemType;
-import com.astetyne.main.net.server.entities.ServerDroppedItem;
+import com.astetyne.server.api.entities.ExpiDroppedItem;
 
 public class SDroppedItem extends SEntity {
 
     private final ItemType type;
 
-    public SDroppedItem(ServerDroppedItem entity) {
+    public SDroppedItem(ExpiDroppedItem entity) {
         super(entity);
-        this.type = entity.getType();
+        this.type = entity.getItemType();
     }
 
     public ItemType getType() {

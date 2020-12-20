@@ -1,13 +1,9 @@
 package com.astetyne.main.world;
 
-import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.entity.DroppedItemEntity;
-import com.astetyne.main.entity.Entity;
-import com.astetyne.main.entity.MainPlayer;
-import com.astetyne.main.entity.PlayerEntity;
-import com.astetyne.main.net.client.actions.ChunkRequestActionC;
-import com.astetyne.main.net.netobjects.*;
-import com.astetyne.main.net.server.actions.InitDataActionS;
+import com.astetyne.main.Resources;
+import com.astetyne.main.entity.*;
+import com.astetyne.main.items.Item;
+import com.astetyne.main.items.ItemType;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.BodyEditorLoader;
 import com.astetyne.main.utils.Constants;
@@ -20,32 +16,32 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 64;
+    public static float PPM = 32;
 
     private final World b2dWorld;
     private final SpriteBatch batch;
     private final WorldChunk[] chunkArray;
     private BodyEditorLoader loader;
     private final Body terrainBody;
-    private final HashSet<Integer> requestedChunks;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
     private final ExpiContactListener contactListener;
     private MainPlayer player;
     private final OrthographicCamera camera;
+    private final HashMap<Integer, Fixture> fixturesID;
 
-    public GameWorld(InitDataActionS data) {
+    public GameWorld(int numberOfChunks) {
 
         this.batch = GameStage.get().getBatch();
 
-        requestedChunks = new HashSet<>();
+        fixturesID = new HashMap<>();
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
 
@@ -53,7 +49,7 @@ public class GameWorld {
 
         b2dWorld = new World(new Vector2(0, -9.81f), false);
         //loader = new BodyEditorLoader(Gdx.files.internal("shapes.json"));
-        chunkArray = new WorldChunk[data.getNumberOfChunks()];
+        chunkArray = new WorldChunk[numberOfChunks];
 
         BodyDef terrainDef = new BodyDef();
         terrainDef.type = BodyDef.BodyType.StaticBody;
@@ -69,21 +65,28 @@ public class GameWorld {
 
     }
 
-    public void postSetup(InitDataActionS data) {
+    public void postSetup(ByteBuffer bb) {
 
-        player = new MainPlayer(data.getPlayerID(), data.getPlayerLocation().toVector());
-        SVector l = data.getPlayerLocation();
-        player.getBody().setTransform(l.getX(), l.getY(), 0);
+        int pID = bb.getInt();
+        Vector2 loc = new Vector2(bb.getFloat(), bb.getFloat());
 
-        for(SEntity e : data.getEntities()) {
-            if(e instanceof SPlayer) {
-                SPlayer p = (SPlayer) e;
-                if(p.getID() == player.getID())
-                    continue;
-                PlayerEntity pe = new PlayerEntity(p.getID(), p.getLocation().toVector());
-            }else if(e instanceof SDroppedItem) {
-                SDroppedItem di = (SDroppedItem) e;
-                DroppedItemEntity die = new DroppedItemEntity(di.getID(), di.getType().initItem(), 0, di.getLocation().toVector());
+        player = new MainPlayer(pID, loc);
+        player.getBody().setTransform(loc, 0);
+
+        int size = bb.getInt();
+
+        for(int i = 0; i < size; i++) {
+
+            int id = bb.getInt();
+            EntityType type = EntityType.getType(bb.getInt());
+            Vector2 loc2 = new Vector2(bb.getFloat(), bb.getFloat());
+
+            if(type == EntityType.PLAYER) {
+                if(id == player.getID()) continue;
+                PlayerEntity pe = new PlayerEntity(id, loc2);
+            }else if(type == EntityType.DROPPED_ITEM) {
+                DroppedItemEntity die = new DroppedItemEntity(id, new Item(ItemType.DIRT, Resources.DIRT_TEXTURE), 0, loc2);
+                //todo: spravit v packete list pre kazdy typ entity?
             }
         }
 
@@ -134,33 +137,6 @@ public class GameWorld {
         camera.update();
     }
 
-    public void checkChunks() {
-
-        int renderDistance = 1;//(int) (Gdx.graphics.getWidth() / (Constants.TILES_WIDTH_CHUNK * ExpiriumGame.PPM)) + 1;
-
-        int currentChunk = (int) (player.getLocation().x / Constants.T_W_CH);
-
-        for(int i = 0; i < Constants.CHUNKS_NUMBER; i++) {
-            WorldChunk chunk = chunkArray[i];
-            if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
-                if(chunk == null && !requestedChunks.contains(i)) {
-                    ExpiriumGame.get().getClientGateway().addAction(new ChunkRequestActionC(i));
-                    requestedChunks.add(i);
-                }
-            }else if(chunk != null) {
-                for(int k = 0; k < Constants.T_H_CH; k++) {
-                    for(int h = 0; h < Constants.T_W_CH; h++) {
-                        Tile t = chunk.getTerrain()[k][h];
-                        for(Fixture f : t.getFixtures()) {
-                            terrainBody.destroyFixture(f);
-                        }
-                    }
-                }
-                chunkArray[i] = null;
-            }
-        }
-    }
-
     public void destroyEntity(Entity entity) {
         entities.remove(entity);
         entitiesID.remove(entity.getID());
@@ -172,10 +148,24 @@ public class GameWorld {
         b2dWorld.dispose();
     }
 
-    public void feedChunk(SWorldChunk chunk) {
-        WorldChunk worldChunk = new WorldChunk(this, chunk);
+    public void feedChunk(ByteBuffer bb) {
+
+        WorldChunk worldChunk = new WorldChunk(bb);
         chunkArray[worldChunk.getId()] = worldChunk;
-        requestedChunks.remove(worldChunk.getId());
+
+        int size = bb.getInt();
+        EdgeShape shape = new EdgeShape();
+        FixtureDef def = new FixtureDef();
+        def.shape = shape;
+        def.friction = 0.2f;
+        def.filter.categoryBits = Constants.DEFAULT_BIT;
+
+        for(int i = 0; i < size; i++) {
+            int id = bb.getInt();
+            shape.set(bb.getFloat(), bb.getFloat(),bb.getFloat(), bb.getFloat());
+            Fixture f = terrainBody.createFixture(def);
+            fixturesID.put(id, f);
+        }
     }
 
     private void generateWorldBorders() {
@@ -186,12 +176,12 @@ public class GameWorld {
 
         verts[0] = 0;
         verts[1] = 0;
-        verts[2] = Constants.CHUNKS_NUMBER * Constants.T_W_CH;
+        verts[2] = chunkArray.length * Constants.T_W_CH;
         verts[3] = 0;
-        verts[4] = Constants.CHUNKS_NUMBER * Constants.T_W_CH;
-        verts[5] = Constants.CHUNKS_NUMBER * Constants.T_H_CH;
+        verts[5] = Constants.T_H_CH;
+        verts[4] = chunkArray.length * Constants.T_W_CH;
         verts[6] = 0;
-        verts[7] = Constants.CHUNKS_NUMBER * Constants.T_H_CH;
+        verts[7] = Constants.T_H_CH;
         verts[8] = 0;
         verts[9] = 0;
 
@@ -253,5 +243,9 @@ public class GameWorld {
 
     public ExpiContactListener getCL() {
         return contactListener;
+    }
+
+    public HashMap<Integer, Fixture> getFixturesID() {
+        return fixturesID;
     }
 }

@@ -1,8 +1,8 @@
 package com.astetyne.main.entity;
 
-import com.astetyne.main.net.server.actions.EntityMoveActionCS;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.Collidable;
+import com.astetyne.server.backend.packets.EntityMoveActionCS;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;

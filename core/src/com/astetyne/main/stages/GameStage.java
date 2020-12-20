@@ -1,23 +1,14 @@
 package com.astetyne.main.stages;
 
-import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.entity.DroppedItemEntity;
-import com.astetyne.main.entity.Entity;
-import com.astetyne.main.entity.PlayerEntity;
 import com.astetyne.main.gui.GameGUILayout;
-import com.astetyne.main.items.ItemType;
 import com.astetyne.main.items.inventory.Inventory;
-import com.astetyne.main.net.client.actions.TilePlaceActionCS;
-import com.astetyne.main.net.netobjects.MessageAction;
-import com.astetyne.main.net.server.actions.*;
 import com.astetyne.main.world.GameWorld;
-import com.astetyne.main.world.WorldChunk;
-import com.astetyne.main.world.tiles.Tile;
-import com.astetyne.main.world.tiles.data.TileExtraData;
+import com.astetyne.server.backend.IncomingPacket;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class GameStage extends ExpiStage {
@@ -90,36 +81,51 @@ public class GameStage extends ExpiStage {
     }
 
     @Override
-    public void onServerUpdate(List<MessageAction> actions) {
+    public void onServerUpdate(List<IncomingPacket> packets) {
 
-        for(MessageAction serverAction : actions) {
+        for(IncomingPacket packet : packets) {
 
-            if(serverAction instanceof InitDataActionS) {
-                InitDataActionS initData = (InitDataActionS) serverAction;
-                gameWorld = new GameWorld(initData);
-                gameWorld.postSetup(initData);
+            ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
+            int subPackets = bb.getInt();
+            System.out.println("C: subapackets: "+subPackets);
 
-            }else if(serverAction instanceof ChunkFeedActionS) {
-                ChunkFeedActionS action = (ChunkFeedActionS) serverAction;
-                gameWorld.feedChunk(action.getChunk());
+            for(int i = 0; i < subPackets; i++) {
 
-            }else if(serverAction instanceof PlayerJoinActionS) {
-                PlayerJoinActionS psa = (PlayerJoinActionS) serverAction;
+                int packetID = bb.getInt();
+                System.out.println("C: PID: "+packetID);
+
+                switch(packetID) {
+
+                    case 11: //InitDataPacket
+                        int numberOfChunks = bb.getInt();
+                        gameWorld = new GameWorld(numberOfChunks);
+                        gameWorld.postSetup(bb);
+                        break;
+                    case 13: //ChunkFeedPacket
+                        gameWorld.feedChunk(bb);
+                        break;
+
+                }
+
+            }
+
+            /*if(packet instanceof PlayerJoinActionS) {
+                PlayerJoinActionS psa = (PlayerJoinActionS) packet;
                 PlayerEntity pe = new PlayerEntity(psa.getPlayerID(), psa.getLocation().toVector());
 
-            }else if(serverAction instanceof EntityMoveActionCS) {
-                EntityMoveActionCS ema = (EntityMoveActionCS) serverAction;
+            }else if(packet instanceof EntityMoveActionCS) {
+                EntityMoveActionCS ema = (EntityMoveActionCS) packet;
                 int id = ema.getEntityID();
                 if(id == gameWorld.getPlayer().getID() || !gameWorld.getEntitiesID().containsKey(id)) continue;
                 gameWorld.getEntitiesID().get(ema.getEntityID()).onMoveAction(ema);
 
-            }else if(serverAction instanceof PlayerLeaveActionS) {
-                PlayerLeaveActionS pla = (PlayerLeaveActionS) serverAction;
+            }else if(packet instanceof PlayerLeaveActionS) {
+                PlayerLeaveActionS pla = (PlayerLeaveActionS) packet;
                 PlayerEntity p = (PlayerEntity) gameWorld.getEntitiesID().get(pla.getPlayerID());
                 gameWorld.destroyEntity(p);
 
-            }else if(serverAction instanceof TileBreakActionS) {
-                TileBreakActionS tba = (TileBreakActionS) serverAction;
+            }else if(packet instanceof TileBreakActionS) {
+                TileBreakActionS tba = (TileBreakActionS) packet;
                 WorldChunk chunk = gameWorld.getChunks()[tba.getChunkID()];
                 if(chunk == null) continue;
                 Tile t = chunk.getTerrain()[tba.getY()][tba.getX()];
@@ -128,24 +134,24 @@ public class GameStage extends ExpiStage {
                 int id = tba.getItemDropID();
                 DroppedItemEntity dip = new DroppedItemEntity(id, drop.initItem(), tba.getItemAngleVel(), t.getCenterLoc());
 
-            }else if(serverAction instanceof ItemPickupAction) {
-                ItemPickupAction ipa = (ItemPickupAction) serverAction;
+            }else if(packet instanceof ItemPickupAction) {
+                ItemPickupAction ipa = (ItemPickupAction) packet;
                 inventory.onItemPick(ipa.getItem().initItem());
 
-            }else if(serverAction instanceof ItemDespawnAction) {
-                ItemDespawnAction ida = (ItemDespawnAction) serverAction;
+            }else if(packet instanceof ItemDespawnAction) {
+                ItemDespawnAction ida = (ItemDespawnAction) packet;
                 DroppedItemEntity dip = (DroppedItemEntity) gameWorld.getEntitiesID().get(ida.getID());
                 gameWorld.destroyEntity(dip);
 
-            }else if(serverAction instanceof PositionsRequestAction) {
+            }else if(packet instanceof PositionsRequestAction) {
                 for(Entity e : gameWorld.getEntities()) {
                     if(e instanceof DroppedItemEntity) {
-                        ExpiriumGame.get().getClientGateway().addAction(new EntityMoveActionCS(e));
+                        ExpiriumGame.get().getClientGateway().addSubPacket(new EntityMoveActionCS(e));
                     }
                 }
 
-            }else if(serverAction instanceof TilePlaceActionCS) {
-                TilePlaceActionCS tpa = (TilePlaceActionCS) serverAction;
+            }else if(packet instanceof TilePlaceActionCS) {
+                TilePlaceActionCS tpa = (TilePlaceActionCS) packet;
                 if(gameWorld.getPlayer().getID() == tpa.getPlayerID()) {
                     inventory.removeItem(tpa.getPlacedItem());
                 }
@@ -154,10 +160,9 @@ public class GameStage extends ExpiStage {
                 Tile t = wch.getTerrain()[tpa.getY()][tpa.getX()];
                 TileExtraData data = tpa.getPlacedItem().initDefaultData();
                 wch.changeTile(t.getX(), t.getY(), data);
-            }
+            }*/
         }
-        gameWorld.checkChunks();
-        ExpiriumGame.get().getClientGateway().addAction(gameWorld.getPlayer().generateMoveAction());
+        //ExpiriumGame.get().getClientGateway().addSubPacket(gameWorld.getPlayer().generateMoveAction());
     }
 
     @Override
