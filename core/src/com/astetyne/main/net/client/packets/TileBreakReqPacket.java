@@ -5,11 +5,11 @@ import com.astetyne.server.backend.Packable;
 
 import java.nio.ByteBuffer;
 
-public class TileBreakPacket implements Packable {
+public class TileBreakReqPacket implements Packable {
 
     private final int chunkID, x, y;
 
-    public TileBreakPacket(Tile t) {
+    public TileBreakReqPacket(Tile t) {
         this.chunkID = t.getChunk().getId();
         this.x = t.getX();
         this.y = t.getY();

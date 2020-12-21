@@ -1,4 +1,4 @@
-package com.astetyne.main.world;
+package com.astetyne.main.world.tiles;
 
 import com.astetyne.main.Resources;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -7,10 +7,10 @@ import java.util.HashMap;
 
 public enum TileType {
 
-    AIR(0, false, null),
-    STONE(1, true, Resources.STONE_TEXTURE),
-    GRASS(2, true, Resources.GRASS_TEXTURE),
-    DIRT(3, true, Resources.DIRT_TEXTURE);
+    AIR(0, false, null, 0),
+    STONE(1, true, Resources.STONE_TEXTURE, 1),
+    GRASS(2, true, Resources.GRASS_TEXTURE, 1),
+    DIRT(3, true, Resources.DIRT_TEXTURE, 1);
 
     private static final HashMap<Integer, TileType> map;
 
@@ -28,11 +28,13 @@ public enum TileType {
     int id;
     boolean solid;
     TextureRegion texture;
+    float breakTime;
 
-    TileType(int id, boolean solid, TextureRegion texture) {
+    TileType(int id, boolean solid, TextureRegion texture, float breakTime) {
         this.id = id;
         this.solid = solid;
         this.texture = texture;
+        this.breakTime = breakTime;
     }
 
     public int getID() {
@@ -45,5 +47,9 @@ public enum TileType {
 
     public TextureRegion getTexture() {
         return texture;
+    }
+
+    public float getBreakTime() {
+        return breakTime;
     }
 }

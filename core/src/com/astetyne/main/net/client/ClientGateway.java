@@ -1,7 +1,7 @@
 package com.astetyne.main.net.client;
 
 import com.astetyne.main.ExpiriumGame;
-import com.astetyne.main.net.client.packets.JoinRequestPacket;
+import com.astetyne.main.net.client.packets.JoinReqPacket;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.server.backend.IncomingPacket;
 import com.astetyne.server.backend.Packable;
@@ -31,7 +31,7 @@ public class ClientGateway extends TerminableLooper {
         serverIncomingPackets = new ArrayList<>();
         game = ExpiriumGame.get();
         ipAddress = "127.0.0.1";
-        inputBuffer = new byte[65536];
+        inputBuffer = new byte[262144];
     }
 
     @Override
@@ -59,17 +59,14 @@ public class ClientGateway extends TerminableLooper {
             BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
             BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
 
-            JoinRequestPacket jra = new JoinRequestPacket(game.getPlayerName());
+            JoinReqPacket jra = new JoinReqPacket(game.getPlayerName());
             bos.write(jra.toByteArray());
-            System.out.println("C: flush: "+jra.toByteArray().length);
             bos.flush();
 
             while(isRunning()) {
 
                 socket.setSoTimeout(5000);
                 int readBytes = bis.read(inputBuffer);
-
-                //System.out.println("Client read: "+readBytes);
 
                 synchronized(serverIncomingPackets) {
                     serverIncomingPackets.add(new IncomingPacket(Arrays.copyOf(inputBuffer, readBytes)));

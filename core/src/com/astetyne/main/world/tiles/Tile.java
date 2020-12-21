@@ -1,6 +1,5 @@
 package com.astetyne.main.world.tiles;
 
-import com.astetyne.main.world.TileType;
 import com.astetyne.main.world.WorldChunk;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -10,12 +9,16 @@ public class Tile {
     private final WorldChunk chunk;
     private final int x, y;
     private int stability;
-    private final TileType type;
+    private TileType type;
 
     public Tile(WorldChunk chunk, int x, int y, TileType type) {
         this.chunk = chunk;
         this.x = x;
         this.y = y;
+        this.type = type;
+    }
+
+    public void setType(TileType type) {
         this.type = type;
     }
 

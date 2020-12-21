@@ -1,19 +1,24 @@
 package com.astetyne.server.api.entities;
 
+import com.astetyne.main.entity.EntityBodyFactory;
 import com.astetyne.main.entity.EntityType;
 import com.astetyne.server.GameServer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public abstract class ExpiEntity {
 
     private final int ID;
-    private final Vector2 location;
-    private final Vector2 velocity;
     private final float width, height;
     private float angle;
     protected EntityType type;
+    protected Body body;
 
-    public ExpiEntity(Vector2 location, float width, float height) {
+    public ExpiEntity(EntityType type, Vector2 loc, float width, float height) {
+
+        this.type = type;
+
+        body = EntityBodyFactory.createBody(type, loc, GameServer.get().getWorld().getBox2dWorld());
 
         int randomID;
         do {
@@ -22,8 +27,6 @@ public abstract class ExpiEntity {
         GameServer.get().getEntitiesID().put(randomID, this);
 
         this.ID = randomID;
-        this.location = location;
-        velocity = new Vector2();
         this.width = width;
         this.height = height;
         this.angle = 0;
@@ -34,15 +37,15 @@ public abstract class ExpiEntity {
     }
 
     public Vector2 getLocation() {
-        return location;
+        return body.getPosition();
     }
 
     public Vector2 getCenter() {
-        return new Vector2(location.x + width/2, location.y + height/2);
+        return new Vector2(body.getPosition().x + width/2, body.getPosition().y + height/2);
     }
 
     public Vector2 getVelocity() {
-        return velocity;
+        return body.getLinearVelocity();
     }
 
     public float getWidth() {
@@ -61,5 +64,11 @@ public abstract class ExpiEntity {
         return angle;
     }
 
-    public abstract EntityType getType();
+    public EntityType getType() {
+        return type;
+    }
+
+    public Body getBody() {
+        return body;
+    }
 }

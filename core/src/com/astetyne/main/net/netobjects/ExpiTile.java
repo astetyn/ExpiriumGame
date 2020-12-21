@@ -1,6 +1,6 @@
 package com.astetyne.main.net.netobjects;
 
-import com.astetyne.main.world.TileType;
+import com.astetyne.main.world.tiles.TileType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ public class ExpiTile {
     private final ExpiChunk chunk;
     private final int x, y;
     private int stability;
+    //todo: meta
 
     public ExpiTile(TileType type, ExpiChunk chunk, int x, int y) {
         this.type = type;

@@ -1,5 +1,6 @@
 package com.astetyne.main.stages;
 
+import com.astetyne.main.ExpiriumGame;
 import com.astetyne.main.gui.GameGUILayout;
 import com.astetyne.main.items.inventory.Inventory;
 import com.astetyne.main.world.GameWorld;
@@ -87,12 +88,9 @@ public class GameStage extends ExpiStage {
 
             ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
             int subPackets = bb.getInt();
-            System.out.println("C: subapackets: "+subPackets);
-
             for(int i = 0; i < subPackets; i++) {
 
                 int packetID = bb.getInt();
-                System.out.println("C: PID: "+packetID);
 
                 switch(packetID) {
 
@@ -101,8 +99,17 @@ public class GameStage extends ExpiStage {
                         gameWorld = new GameWorld(numberOfChunks);
                         gameWorld.postSetup(bb);
                         break;
+
+                    case 12: //ChunkDestroyPacket
+                        gameWorld.onDestroyChunkEvent(bb);
+                        break;
+
                     case 13: //ChunkFeedPacket
-                        gameWorld.feedChunk(bb);
+                        gameWorld.onFeedChunkEvent(bb);
+                        break;
+
+                    case 17: //BreakTileAckPacket
+                        gameWorld.onBreakTileEvent(bb);
                         break;
 
                 }
@@ -143,13 +150,6 @@ public class GameStage extends ExpiStage {
                 DroppedItemEntity dip = (DroppedItemEntity) gameWorld.getEntitiesID().get(ida.getID());
                 gameWorld.destroyEntity(dip);
 
-            }else if(packet instanceof PositionsRequestAction) {
-                for(Entity e : gameWorld.getEntities()) {
-                    if(e instanceof DroppedItemEntity) {
-                        ExpiriumGame.get().getClientGateway().addSubPacket(new EntityMoveActionCS(e));
-                    }
-                }
-
             }else if(packet instanceof TilePlaceActionCS) {
                 TilePlaceActionCS tpa = (TilePlaceActionCS) packet;
                 if(gameWorld.getPlayer().getID() == tpa.getPlayerID()) {
@@ -162,7 +162,7 @@ public class GameStage extends ExpiStage {
                 wch.changeTile(t.getX(), t.getY(), data);
             }*/
         }
-        //ExpiriumGame.get().getClientGateway().addSubPacket(gameWorld.getPlayer().generateMoveAction());
+        ExpiriumGame.get().getClientGateway().addSubPacket(gameWorld.getPlayer().generateMoveAction());
     }
 
     @Override

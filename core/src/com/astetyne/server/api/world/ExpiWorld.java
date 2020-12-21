@@ -1,16 +1,17 @@
 package com.astetyne.server.api.world;
 
-import com.astetyne.main.net.client.packets.TileBreakPacket;
-import com.astetyne.main.net.client.packets.TilePlaceActionCS;
+import com.astetyne.main.items.ItemType;
 import com.astetyne.main.net.netobjects.ExpiChunk;
 import com.astetyne.main.net.netobjects.ExpiTile;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.Noise;
-import com.astetyne.main.world.TileType;
-import com.astetyne.main.world.tiles.data.TileExtraData;
+import com.astetyne.main.world.tiles.TileType;
 import com.astetyne.server.GameServer;
+import com.astetyne.server.api.entities.ExpiDroppedItem;
 import com.astetyne.server.api.entities.ExpiPlayer;
+import com.astetyne.server.backend.packets.ChunkDestroyPacket;
 import com.astetyne.server.backend.packets.ChunkFeedPacket;
+import com.astetyne.server.backend.packets.TileBreakAckPacket;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
@@ -67,7 +68,8 @@ public class ExpiWorld {
                         p.getActiveChunks().add(i);
                     }
                 }else if(p.getActiveChunks().contains(i)) {
-
+                    p.getGateway().addSubPacket(new ChunkDestroyPacket(chunks[i]));
+                    p.getActiveChunks().remove(i);
                 }
             }
         }
@@ -119,16 +121,24 @@ public class ExpiWorld {
 
     }
 
-    public void onTileBreak(TileBreakPacket tba) {
+    public void onTileBreakReq(int c, int x, int y, ExpiPlayer p) {
         //todo: prepocitat stabilitu okolitych policok a podla toho vygenerovat TileBreakActions
+        ExpiTile tile = chunks[c].getTerrain()[y][x];
+        if(tile.getType() == TileType.AIR) return;
+        tile.setType(TileType.AIR);
+        float off = (1 - Constants.D_I_SIZE)/2;
+        Vector2 loc = new Vector2(x+off, y+off);
+        ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, ItemType.DIRT, Constants.SERVER_DEFAULT_TPS);
+        GameServer.get().getDroppedItems().add(droppedItem);
+        p.getGateway().addSubPacket(new TileBreakAckPacket(c, x, y, droppedItem));
     }
 
-    public void tryToPlaceTile(TilePlaceActionCS tpa) {
+    public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
 
         //todo: prepocitat stabilitu ci je mozne tam policko postavit
 
         //in case of success
-        ExpiTile t = chunks[tpa.getChunkID()].getTerrain()[tpa.getY()][tpa.getX()];
+        //ExpiTile t = chunks[tpa.getChunkID()].getTerrain()[tpa.getY()][tpa.getX()];
         //t.setType(tpa.getPlacedItem().initDefaultData().getType());
         //GameServer.get().getTickLooper().getTickActions().add(tpa);
 
@@ -166,7 +176,7 @@ public class ExpiWorld {
         return terrainBody;
     }
 
-    public void changeTile(int c, int x, int y, TileExtraData data) {
+    /*public void changeTile(int c, int x, int y, TileExtraData data) {
 
         ExpiTile t = chunks[c].getTerrain()[y][x];
 
@@ -192,7 +202,7 @@ public class ExpiWorld {
 
         shape.dispose();
 
-    }
+    }*/
 
     public void destroyTile(ExpiTile t) {
 
@@ -333,5 +343,9 @@ public class ExpiWorld {
 
     public HashMap<Fixture, Integer> getFixturesID() {
         return fixturesID;
+    }
+
+    public World getBox2dWorld() {
+        return box2dWorld;
     }
 }

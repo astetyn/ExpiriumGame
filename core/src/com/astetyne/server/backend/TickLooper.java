@@ -1,11 +1,11 @@
 package com.astetyne.server.backend;
 
-import com.astetyne.main.net.client.packets.JoinRequestPacket;
+import com.astetyne.main.items.ItemType;
+import com.astetyne.main.net.client.packets.JoinReqPacket;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.server.GameServer;
 import com.astetyne.server.api.entities.ExpiPlayer;
 import com.astetyne.server.backend.packables.PackableEntity;
-import com.astetyne.server.backend.packets.ChunkFeedPacket;
 import com.astetyne.server.backend.packets.InitDataPacket;
 
 import java.nio.ByteBuffer;
@@ -37,9 +37,11 @@ public class TickLooper extends TerminableLooper {
 
                 resolveJoiningPlayers();
 
-                //resolvePlayersActions();
+                resolvePlayersActions();
 
                 //recalculateDroppedItems();
+
+                server.getWorld().onTick();
 
                 //todo: ai? time? weather?
 
@@ -88,7 +90,7 @@ public class TickLooper extends TerminableLooper {
             for(ServerPlayerGateway gateway : server.getJoiningClients()) {
                 ByteBuffer bb = ByteBuffer.wrap(gateway.getClientIncomingPackets().get(0).bytes);
                 int packetID = bb.getInt();
-                JoinRequestPacket jra = new JoinRequestPacket(bb);
+                JoinReqPacket jra = new JoinReqPacket(bb);
                 joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocation(), gateway, jra.getName()));
             }
             server.getJoiningClients().clear();
@@ -107,10 +109,8 @@ public class TickLooper extends TerminableLooper {
 
             // initial packet for new player
             InitDataPacket ida = new InitDataPacket(Constants.CHUNKS_NUMBER, newPlayer.getID(), newPlayer.getLocation(), alreadyExistingEntities);
-            ChunkFeedPacket cfa = new ChunkFeedPacket(server.getWorld().getChunk(0));
             List<Packable> initActions = new ArrayList<>();
             initActions.add(ida);
-            initActions.add(cfa);
             newPlayer.getGateway().addSubPackets(initActions);
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
@@ -129,45 +129,39 @@ public class TickLooper extends TerminableLooper {
         joiningPlayers.clear();
     }
 
-    /*private void resolvePlayersActions() {
+    private void resolvePlayersActions() {
 
-        for(ExpiPlayer player : server.getPlayers()) {
-            for(IncomingPacket ca : player.getGateway().getClientIncomingPackets()) {
-                if(ca instanceof PlayerMoveActionC) {
-                    PlayerMoveActionC pma = (PlayerMoveActionC) ca;
-                    ExpiEntity e = server.getEntitiesID().get(player.getID());
-                    e.getLocation().x = pma.getNewLocation().getX();
-                    e.getLocation().y = pma.getNewLocation().getY();
-                    tickGeneratedActions.add(new EntityMoveActionCS(player.getID(), pma.getNewLocation(), pma.getVelocity(), 0));
-                }else if(ca instanceof TileBreakActionC) {
-                    TileBreakActionC tba = (TileBreakActionC) ca;
-                    ExpiTile tile = server.getWorld().getChunk(tba.getChunkID()).getTerrain()[tba.getY()][tba.getX()];
-                    if(tile.getType() == TileType.AIR) continue;
-                    tile.setType(TileType.AIR);
-                    float off = (1 - Constants.D_I_SIZE)/2;
-                    Vector2 loc = new Vector2(tba.getX()+off, tba.getY()+off);
-                    ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tba.getDropItem(), Constants.SERVER_DEFAULT_TPS);
-                    server.getDroppedItems().add(droppedItem);
-                    tickGeneratedActions.add(new TileBreakActionS(tba.getChunkID(), tba.getX(), tba.getY(), droppedItem.getID()));
-                    server.getWorld().onTileBreak(tba);
-                }else if(ca instanceof EntityMoveActionCS) {
-                    EntityMoveActionCS ema = (EntityMoveActionCS) ca;
-                    ExpiDroppedItem item = (ExpiDroppedItem) server.getEntitiesID().get(ema.getEntityID());
-                    item.getLocation().set(ema.getNewLocation().toVector());
-                    item.getVelocity().set(ema.getVelocity().toVector());
-                    item.setAngle(ema.getAngle());
-                    tickGeneratedActions.add(ema);
-                }else if(ca instanceof TilePlaceActionCS) {
-                    TilePlaceActionCS tpa = (TilePlaceActionCS) ca;
-                    ExpiTile tile = server.getWorld().getChunk(tpa.getChunkID()).getTerrain()[tpa.getY()][tpa.getX()];
-                    if(tile.getType() != TileType.AIR) continue;
-                    server.getWorld().tryToPlaceTile(tpa);
+        for(ExpiPlayer p : players) {
+            for(IncomingPacket packet : p.getGateway().getClientIncomingPackets()) {
+
+                ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
+                int subPackets = bb.getInt();
+                for(int i = 0; i < subPackets; i++) {
+
+                    int packetID = bb.getInt();
+                    //System.out.println("S: PID: " + packetID);
+
+                    switch(packetID) {
+
+                        case 14: //PlayerMovePacket
+                            ExpiPlayer e = (ExpiPlayer) server.getEntitiesID().get(p.getID());
+                            e.onMove(bb.getFloat(), bb.getFloat(), bb.getFloat(), bb.getFloat());
+                            break;
+
+                        case 15: //TileBreakReqPacket
+                            server.getWorld().onTileBreakReq(bb.getInt(), bb.getInt(), bb.getInt(), p);
+                            break;
+
+                        case 16: //TilePlaceReqPacket
+                            server.getWorld().onTilePlaceReq(bb.getInt(), bb.getInt(), bb.getInt(), ItemType.getType(bb.getInt()), p);
+                            break;
+                    }
                 }
             }
         }
     }
 
-    private void recalculateDroppedItems() {
+    /*private void recalculateDroppedItems() {
 
         Iterator<ExpiDroppedItem> it = server.getDroppedItems().iterator();
         outer:

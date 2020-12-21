@@ -21,6 +21,7 @@ public class ChunkFeedPacket implements Packable {
     private final List<PackableFixture> fixtures;
 
     public ChunkFeedPacket(ExpiChunk chunk) {
+
         chunkID = chunk.getId();
         terrain = new int[Constants.T_H_CH][Constants.T_W_CH];
         fixtures = new ArrayList<>();
@@ -51,7 +52,7 @@ public class ChunkFeedPacket implements Packable {
     @Override
     public byte[] toByteArray() {
 
-        ByteBuffer bb = ByteBuffer.allocate(4 + Constants.T_H_CH*Constants.T_W_CH*5 + 4 + fixtures.size()*4);
+        ByteBuffer bb = ByteBuffer.allocate(4 + 4 + Constants.T_H_CH*Constants.T_W_CH*4 + 4 + fixtures.size()*5*4);
         bb.putInt(getPacketID());
         bb.putInt(chunkID);
         for(int i = 0; i < Constants.T_H_CH; i++) {
@@ -61,7 +62,6 @@ public class ChunkFeedPacket implements Packable {
         }
         bb.putInt(fixtures.size());
         for(PackableFixture pf : fixtures) {
-            System.out.println("fix: "+pf.x1 +" "+ pf.y1+" "+pf.x2+" "+pf.y2);
             bb.putInt(pf.id);
             bb.putFloat(pf.x1);
             bb.putFloat(pf.y1);

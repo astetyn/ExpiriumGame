@@ -1,32 +1,41 @@
 package com.astetyne.main.items;
 
 import com.astetyne.main.Resources;
-import com.astetyne.main.world.tiles.data.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import java.util.HashMap;
 
 public enum ItemType {
 
-    STONE(StoneExtraData.class, Resources.STONE_TEXTURE, 1),
-    GRASS(GrassExtraData.class, Resources.GRASS_TEXTURE, 1),
-    DIRT(DirtExtraData.class, Resources.DIRT_TEXTURE, 1);
+    STONE(0, Resources.STONE_TEXTURE, 1),
+    GRASS(1, Resources.GRASS_TEXTURE, 1),
+    DIRT(2, Resources.DIRT_TEXTURE, 1);
 
-    Class<? extends TileExtraData> clazz;
+    private static final HashMap<Integer, ItemType> map;
+
+    static {
+        map = new HashMap<>();
+        for(ItemType it : ItemType.values()) {
+            map.put(it.id, it);
+        }
+    }
+
+    public static ItemType getType(int id) {
+        return map.get(id);
+    }
+
+    int id;
     TextureRegion itemTexture;
     int category;
 
-    ItemType(Class<? extends TileExtraData> clazz, TextureRegion itemTexture, int category) {
-        this.clazz = clazz;
+    ItemType(int id, TextureRegion itemTexture, int category) {
+        this.id = id;
         this.itemTexture = itemTexture;
         this.category = category;
     }
 
-    public TileExtraData initDefaultData() {
-        try {
-            return clazz.newInstance();
-        }catch(InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return new AirExtraData();
+    public int getId() {
+        return id;
     }
 
     public Item initItem() {

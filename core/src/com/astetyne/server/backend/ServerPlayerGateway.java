@@ -19,6 +19,7 @@ public class ServerPlayerGateway extends TerminableLooper {
     private final List<IncomingPacket> clientIncomingPackets;
     private final Object joinLock;
     private final byte[] inputBuffer;
+    private final ByteBuffer outputBuffer;
 
     public ServerPlayerGateway(Socket client) {
         this.gameServer = GameServer.get();
@@ -27,6 +28,7 @@ public class ServerPlayerGateway extends TerminableLooper {
         clientIncomingPackets = new ArrayList<>();
         joinLock = new Object();
         inputBuffer = new byte[65536];
+        outputBuffer = ByteBuffer.allocate(262144);
     }
 
     @Override
@@ -41,7 +43,6 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             client.setSoTimeout(5000);
             int readBytes = bis.read(inputBuffer);
-            System.out.println("S: read: "+readBytes);
 
             synchronized(clientIncomingPackets) {
                 clientIncomingPackets.add(new IncomingPacket(Arrays.copyOf(inputBuffer, readBytes)));
@@ -61,14 +62,15 @@ public class ServerPlayerGateway extends TerminableLooper {
                     serverSubPackets.clear();
                 }
 
-                ByteBuffer bb = ByteBuffer.allocate(65536);
-                bb.putInt(copy.size());
+                outputBuffer.putInt(copy.size());
                 for(Packable p : copy) {
-                    bb.put(p.toByteArray());
+                    outputBuffer.put(p.toByteArray());
                 }
                 //System.out.println("S: write: "+bb.position());
-                bos.write(bb.array(), 0, bb.position());
+                bos.write(outputBuffer.array(), 0, outputBuffer.position());
                 bos.flush();
+
+                outputBuffer.rewind();
                 //System.out.println("S: FLUSH");
 
                 client.setSoTimeout(5000);

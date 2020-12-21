@@ -8,6 +8,7 @@ import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.BodyEditorLoader;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.tiles.Tile;
+import com.astetyne.main.world.tiles.TileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 32;
+    public static float PPM = 64;
 
     private final World b2dWorld;
     private final SpriteBatch batch;
@@ -148,10 +149,12 @@ public class GameWorld {
         b2dWorld.dispose();
     }
 
-    public void feedChunk(ByteBuffer bb) {
+    public void onFeedChunkEvent(ByteBuffer bb) {
 
         WorldChunk worldChunk = new WorldChunk(bb);
         chunkArray[worldChunk.getId()] = worldChunk;
+
+        System.out.println("FEED: "+worldChunk.getId());
 
         int size = bb.getInt();
         EdgeShape shape = new EdgeShape();
@@ -166,6 +169,41 @@ public class GameWorld {
             Fixture f = terrainBody.createFixture(def);
             fixturesID.put(id, f);
         }
+    }
+
+    public void onDestroyChunkEvent(ByteBuffer bb) {
+
+        int chunkID = bb.getInt();
+        chunkArray[chunkID] = null;
+
+        System.out.println("DESTROY: "+chunkID);
+
+        int size = bb.getInt();
+        for(int i = 0; i < size; i++) {
+            int fixID = bb.getInt();
+            Fixture f = fixturesID.get(fixID);
+            terrainBody.destroyFixture(f);
+            fixturesID.remove(fixID);
+        }
+    }
+
+    public void onBreakTileEvent(ByteBuffer bb) {
+
+        int c = bb.getInt();
+        int x = bb.getInt();
+        int y = bb.getInt();
+        int eID = bb.getInt();
+        int it = bb.getInt();
+        float av = bb.getFloat();
+
+        Tile t = chunkArray[c].getTerrain()[y][x];
+        t.setType(TileType.AIR);
+
+        float off = (1 - Constants.D_I_SIZE)/2;
+        Vector2 center = new Vector2(x + off, y + off);
+
+        DroppedItemEntity die = new DroppedItemEntity(eID, ItemType.getType(it).initItem(), av, center);
+
     }
 
     private void generateWorldBorders() {

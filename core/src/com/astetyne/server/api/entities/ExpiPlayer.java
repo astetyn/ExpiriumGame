@@ -13,10 +13,18 @@ public class ExpiPlayer extends ExpiEntity {
     private final HashSet<Integer> activeChunks;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
-        super(location, 0.9f, 1.25f);
+        super(EntityType.PLAYER, location, 0.9f, 1.25f);
         this.gateway = gateway;
         this.name = name;
         activeChunks = new HashSet<>();
+    }
+
+    public void onMove(float x, float y, float v1, float v2) {
+
+        body.setTransform(x, y, 0);
+        body.setLinearVelocity(v1, v2);
+        //todo: oznamit to aj ostatnym
+
     }
 
     public ServerPlayerGateway getGateway() {

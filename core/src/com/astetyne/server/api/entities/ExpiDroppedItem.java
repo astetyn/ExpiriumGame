@@ -12,10 +12,11 @@ public class ExpiDroppedItem extends ExpiEntity {
     private int cooldown;
 
     public ExpiDroppedItem(Vector2 location, ItemType type, int cooldown) {
-        super(location, Constants.D_I_SIZE, Constants.D_I_SIZE);
+        super(EntityType.DROPPED_ITEM, location, Constants.D_I_SIZE, Constants.D_I_SIZE);
         ticksToDespawn = Constants.SERVER_DEFAULT_TPS * 60;
         this.type = type;
         this.cooldown = cooldown;
+        body.setAngularVelocity(((float)Math.random()-0.5f)*10);
     }
 
     public int getTicksToDespawn() {
@@ -38,9 +39,4 @@ public class ExpiDroppedItem extends ExpiEntity {
         return cooldown;
     }
 
-
-    @Override
-    public EntityType getType() {
-        return EntityType.DROPPED_ITEM;
-    }
 }

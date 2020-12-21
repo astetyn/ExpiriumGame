@@ -2,6 +2,7 @@ package com.astetyne.main.world;
 
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.tiles.Tile;
+import com.astetyne.main.world.tiles.TileType;
 
 import java.nio.ByteBuffer;
 
@@ -12,7 +13,7 @@ public class WorldChunk {
 
     public WorldChunk(ByteBuffer bb) {
 
-        this.id = bb.getInt();
+        id = bb.getInt();
 
         terrain = new Tile[Constants.T_H_CH][Constants.T_W_CH];
 

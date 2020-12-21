@@ -1,5 +1,6 @@
 package com.astetyne.main.entity;
 
+import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.Collidable;
 import com.astetyne.server.backend.packets.EntityMoveActionCS;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 public abstract class Entity implements Collidable {
 
+    protected EntityType type;
     protected final int ID;
     protected Body body;
     private final Vector2 targetPosition;
@@ -18,15 +20,22 @@ public abstract class Entity implements Collidable {
     private int collisions;
     protected final float width, height;
 
-    public Entity(int id, float width, float height) {
+    public Entity(EntityType type, int id, Vector2 loc, float width, float height) {
+
+        this.type = type;
         this.ID = id;
         this.width = width;
         this.height = height;
+        body = EntityBodyFactory.createBody(type, loc, GameStage.get().getWorld().getB2dWorld());
         intpolDelta = 0;
         targetAngle = 0;
         onGround = false;
         collisions = 0;
-        targetPosition = new Vector2(0,0);
+        targetPosition = loc;
+
+        GameStage.get().getWorld().getEntitiesID().put(ID, this);
+        GameStage.get().getWorld().getEntities().add(this);
+
     }
 
     public abstract void draw();
