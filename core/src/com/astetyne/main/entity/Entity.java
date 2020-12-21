@@ -3,12 +3,13 @@ package com.astetyne.main.entity;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.main.world.Collidable;
-import com.astetyne.server.backend.packets.EntityMoveActionCS;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-public abstract class Entity implements Collidable {
+import java.nio.ByteBuffer;
+
+public abstract class Entity implements Collidable, MetaReadable {
 
     protected EntityType type;
     protected final int ID;
@@ -54,12 +55,13 @@ public abstract class Entity implements Collidable {
         }
     }
 
-    public void onMoveAction(EntityMoveActionCS ema) {
+    public void onMove(ByteBuffer bb) {
 
-        targetPosition.set(ema.getNewLocation().toVector());
+        targetPosition.set(bb.getFloat(), bb.getFloat());
         intpolDelta = 0;
-        body.setLinearVelocity(ema.getVelocity().toVector());
-        targetAngle = ema.getAngle();
+        body.setLinearVelocity(bb.getFloat(), bb.getFloat());
+        targetAngle = bb.getFloat();
+        body.setAngularVelocity(bb.getFloat());
 
     }
 

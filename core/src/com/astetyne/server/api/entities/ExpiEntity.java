@@ -2,11 +2,12 @@ package com.astetyne.server.api.entities;
 
 import com.astetyne.main.entity.EntityBodyFactory;
 import com.astetyne.main.entity.EntityType;
+import com.astetyne.main.entity.Metaable;
 import com.astetyne.server.GameServer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-public abstract class ExpiEntity {
+public abstract class ExpiEntity implements Metaable {
 
     private final int ID;
     private final float width, height;
@@ -25,6 +26,7 @@ public abstract class ExpiEntity {
             randomID = (int)(Math.random()*Integer.MAX_VALUE);
         } while(GameServer.get().getEntitiesID().containsKey(randomID));
         GameServer.get().getEntitiesID().put(randomID, this);
+        GameServer.get().getEntities().add(this);
 
         this.ID = randomID;
         this.width = width;
@@ -71,4 +73,5 @@ public abstract class ExpiEntity {
     public Body getBody() {
         return body;
     }
+
 }

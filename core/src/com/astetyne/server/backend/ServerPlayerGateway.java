@@ -64,14 +64,12 @@ public class ServerPlayerGateway extends TerminableLooper {
 
                 outputBuffer.putInt(copy.size());
                 for(Packable p : copy) {
-                    outputBuffer.put(p.toByteArray());
+                    outputBuffer.putInt(p.getPacketID());
+                    p.populateWithData(outputBuffer);
                 }
-                //System.out.println("S: write: "+bb.position());
                 bos.write(outputBuffer.array(), 0, outputBuffer.position());
                 bos.flush();
-
-                outputBuffer.rewind();
-                //System.out.println("S: FLUSH");
+                outputBuffer.clear();
 
                 client.setSoTimeout(5000);
                 readBytes = bis.read(inputBuffer);

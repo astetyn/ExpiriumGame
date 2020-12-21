@@ -25,6 +25,7 @@ public class ClientGateway extends TerminableLooper {
     private final ExpiriumGame game;
     private String ipAddress;
     private final byte[] inputBuffer;
+    private final ByteBuffer outputBuffer;
 
     public ClientGateway() {
         clientSubPackets = new ArrayList<>();
@@ -32,6 +33,7 @@ public class ClientGateway extends TerminableLooper {
         game = ExpiriumGame.get();
         ipAddress = "127.0.0.1";
         inputBuffer = new byte[262144];
+        outputBuffer = ByteBuffer.allocate(262144);
     }
 
     @Override
@@ -60,8 +62,11 @@ public class ClientGateway extends TerminableLooper {
             BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
 
             JoinReqPacket jra = new JoinReqPacket(game.getPlayerName());
-            bos.write(jra.toByteArray());
+            outputBuffer.putInt(jra.getPacketID());
+            jra.populateWithData(outputBuffer);
+            bos.write(outputBuffer.array(), 0, outputBuffer.position());
             bos.flush();
+            outputBuffer.clear();
 
             while(isRunning()) {
 
@@ -78,14 +83,14 @@ public class ClientGateway extends TerminableLooper {
                     clientSubPackets.clear();
                 }
 
-                ByteBuffer bb = ByteBuffer.allocate(4);
-                bb.putInt(copy.size());
-                bos.write(bb.array());
-
+                outputBuffer.putInt(copy.size());
                 for(Packable p : copy) {
-                    bos.write(p.toByteArray());
+                    outputBuffer.putInt(p.getPacketID());
+                    p.populateWithData(outputBuffer);
                 }
+                bos.write(outputBuffer.array(), 0, outputBuffer.position());
                 bos.flush();
+                outputBuffer.clear();
 
                 game.notifyServerUpdate();
 

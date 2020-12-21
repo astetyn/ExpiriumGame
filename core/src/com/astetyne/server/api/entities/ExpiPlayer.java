@@ -4,12 +4,13 @@ import com.astetyne.main.entity.EntityType;
 import com.astetyne.server.backend.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
 
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 
 public class ExpiPlayer extends ExpiEntity {
 
     private final ServerPlayerGateway gateway;
-    private final String name;
+    private String name;
     private final HashSet<Integer> activeChunks;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
@@ -42,5 +43,23 @@ public class ExpiPlayer extends ExpiEntity {
     @Override
     public EntityType getType() {
         return EntityType.PLAYER;
+    }
+
+    @Override
+    public void readMeta(ByteBuffer bb) {
+        int nameLen = bb.getInt();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < nameLen; i++) {
+            sb.append(bb.getChar());
+        }
+        name = sb.toString();
+    }
+
+    @Override
+    public void writeMeta(ByteBuffer bb) {
+        bb.putInt(name.length());
+        for(char c : name.toCharArray()) {
+            bb.putChar(c);
+        }
     }
 }

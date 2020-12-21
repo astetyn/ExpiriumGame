@@ -1,11 +1,12 @@
 package com.astetyne.server.backend;
 
 import com.astetyne.main.items.ItemType;
-import com.astetyne.main.net.client.packets.JoinReqPacket;
 import com.astetyne.main.utils.Constants;
 import com.astetyne.server.GameServer;
+import com.astetyne.server.api.entities.ExpiEntity;
 import com.astetyne.server.api.entities.ExpiPlayer;
 import com.astetyne.server.backend.packables.PackableEntity;
+import com.astetyne.server.backend.packets.EntitySpawnPacket;
 import com.astetyne.server.backend.packets.InitDataPacket;
 
 import java.nio.ByteBuffer;
@@ -90,22 +91,26 @@ public class TickLooper extends TerminableLooper {
             for(ServerPlayerGateway gateway : server.getJoiningClients()) {
                 ByteBuffer bb = ByteBuffer.wrap(gateway.getClientIncomingPackets().get(0).bytes);
                 int packetID = bb.getInt();
-                JoinReqPacket jra = new JoinReqPacket(bb);
-                joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocation(), gateway, jra.getName()));
+                int nameLen = bb.getInt();
+                StringBuilder sb = new StringBuilder();
+                for(int i = 0; i < nameLen; i++) {
+                    sb.append(bb.getChar());
+                }
+                joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocation(), gateway, sb.toString()));
             }
             server.getJoiningClients().clear();
         }
 
         players.addAll(joiningPlayers);
 
-        // create list of entities (for new players)
-        List<PackableEntity> alreadyExistingEntities = new ArrayList<>();
-        for(ExpiPlayer ep : players) {
-            alreadyExistingEntities.add(new PackableEntity(ep));
-        }
-        //todo: aj pre dropped items
-
         for(ExpiPlayer newPlayer : joiningPlayers) {
+
+            // create list of entities (for new players)
+            List<PackableEntity> alreadyExistingEntities = new ArrayList<>();
+            for(ExpiEntity e : GameServer.get().getEntities()) {
+                if(e == newPlayer) continue;
+                alreadyExistingEntities.add(new PackableEntity(e));
+            }
 
             // initial packet for new player
             InitDataPacket ida = new InitDataPacket(Constants.CHUNKS_NUMBER, newPlayer.getID(), newPlayer.getLocation(), alreadyExistingEntities);
@@ -118,13 +123,11 @@ public class TickLooper extends TerminableLooper {
             }
 
             // notify all players about new players
-            /*PlayerJoinActionS psa = new PlayerJoinActionS(newPlayer);
-            for(ExpiPlayer cp : players) {
-                if(cp == newPlayer) {
-                    continue;
-                }
-                cp.getGateway().addSubPacket(psa);
-            }*/
+            EntitySpawnPacket esp = new EntitySpawnPacket(newPlayer);
+            for(ExpiPlayer p : players) {
+                if(p == newPlayer) continue;
+                p.getGateway().addSubPacket(esp);
+            }
         }
         joiningPlayers.clear();
     }
@@ -135,7 +138,7 @@ public class TickLooper extends TerminableLooper {
             for(IncomingPacket packet : p.getGateway().getClientIncomingPackets()) {
 
                 ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
-                int subPackets = bb.getInt();
+                int subPackets = bb.getInt(); //System.out.println("S: incoming subpackets: "+subPackets);
                 for(int i = 0; i < subPackets; i++) {
 
                     int packetID = bb.getInt();
@@ -197,8 +200,8 @@ public class TickLooper extends TerminableLooper {
     }*/
 
     private void sendGeneratedActions() {
-        for(ExpiPlayer player : server.getPlayers()) {
-            player.getGateway().addSubPackets(tickSubPackets);
+        for(ExpiPlayer p : server.getPlayers()) {
+            p.getGateway().addSubPackets(tickSubPackets);
         }
         tickSubPackets.clear();
     }

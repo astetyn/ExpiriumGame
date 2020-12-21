@@ -27,20 +27,14 @@ public class InitDataPacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-        ByteBuffer bb = ByteBuffer.allocate(4 + 8 + 8 + 4 + 4*4*entities.size());
-        bb.putInt(getPacketID());
+    public void populateWithData(ByteBuffer bb) {
         bb.putInt(numberOfChunks);
         bb.putInt(playerID);
         bb.putFloat(location.x);
         bb.putFloat(location.y);
         bb.putInt(entities.size());
         for(PackableEntity ped : entities) {
-            bb.putInt(ped.id);
-            bb.putInt(ped.type);
-            bb.putFloat(ped.x);
-            bb.putFloat(ped.y);
+            ped.populateWithData(bb);
         }
-        return bb.array();
     }
 }

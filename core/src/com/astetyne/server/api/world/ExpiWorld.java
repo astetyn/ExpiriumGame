@@ -8,10 +8,10 @@ import com.astetyne.main.world.Noise;
 import com.astetyne.main.world.tiles.TileType;
 import com.astetyne.server.GameServer;
 import com.astetyne.server.api.entities.ExpiDroppedItem;
+import com.astetyne.server.api.entities.ExpiEntity;
 import com.astetyne.server.api.entities.ExpiPlayer;
-import com.astetyne.server.backend.packets.ChunkDestroyPacket;
-import com.astetyne.server.backend.packets.ChunkFeedPacket;
-import com.astetyne.server.backend.packets.TileBreakAckPacket;
+import com.astetyne.server.backend.FixturePack;
+import com.astetyne.server.backend.packets.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
@@ -39,7 +39,7 @@ public class ExpiWorld {
 
         fixturesID = new HashMap<>();
 
-        box2dWorld = new World(new Vector2(0, 9.81f), false);
+        box2dWorld = new World(new Vector2(0, -9.81f), false);
         BodyDef terrainDef = new BodyDef();
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
@@ -55,6 +55,26 @@ public class ExpiWorld {
     }
 
     public void onTick() {
+
+        for(int i = 0; i < 3; i++) {
+            box2dWorld.step(1 / 60f, 6, 2);
+        }
+
+        checkChunks();
+
+        for(ExpiEntity ee : GameServer.get().getEntities()) {
+
+            EntityMovePacket emp = new EntityMovePacket(ee);
+
+            for(ExpiPlayer p : GameServer.get().getPlayers()) {
+                if(p == ee) continue;
+                p.getGateway().addSubPacket(emp);
+            }
+        }
+
+    }
+
+    private void checkChunks() {
 
         for(ExpiPlayer p : GameServer.get().getPlayers()) {
 
@@ -89,6 +109,8 @@ public class ExpiWorld {
 
             ExpiTile[][] terrain = new ExpiTile[chunkHeight][chunkWidth];
 
+            chunks[c] = new ExpiChunk(c, terrain);
+
             for(int j = 0; j < chunkWidth; j++) {
 
                 int h = (int) (50 + Noise.noise((c*chunkWidth+j) / 32.0f, 0, 0) * 20);
@@ -105,7 +127,6 @@ public class ExpiWorld {
                     }
                 }
             }
-            chunks[c] = new ExpiChunk(c, terrain);
         }
 
         System.out.println("Creating fixtures...");
@@ -125,12 +146,14 @@ public class ExpiWorld {
         //todo: prepocitat stabilitu okolitych policok a podla toho vygenerovat TileBreakActions
         ExpiTile tile = chunks[c].getTerrain()[y][x];
         if(tile.getType() == TileType.AIR) return;
-        tile.setType(TileType.AIR);
         float off = (1 - Constants.D_I_SIZE)/2;
         Vector2 loc = new Vector2(x+off, y+off);
-        ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, ItemType.DIRT, Constants.SERVER_DEFAULT_TPS);
+        ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tile.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
         GameServer.get().getDroppedItems().add(droppedItem);
-        p.getGateway().addSubPacket(new TileBreakAckPacket(c, x, y, droppedItem));
+
+        FixturePack fp = destroyTile(tile);
+        GameServer.get().getTickLooper().getTickSubPackets().add(new TileBreakAckPacket(c, x, y, fp));
+        GameServer.get().getTickLooper().getTickSubPackets().add(new EntitySpawnPacket(droppedItem));
     }
 
     public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
@@ -204,10 +227,13 @@ public class ExpiWorld {
 
     }*/
 
-    public void destroyTile(ExpiTile t) {
+    public FixturePack destroyTile(ExpiTile t) {
+
+        FixturePack fp = new FixturePack();
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
+            fp.removedFixtures.add(fixturesID.get(f));
             fixturesID.remove(f);
         }
         t.getFixtures().clear();
@@ -225,12 +251,14 @@ public class ExpiWorld {
         fixDef.friction = 0.2f;
         fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
 
-        checkFixtures(c, i-1, j, shape, fixDef);
-        checkFixtures(c, i+1, j, shape, fixDef);
-        checkFixtures(c, i, j-1, shape, fixDef);
-        checkFixtures(c, i, j+1, shape, fixDef);
+        fp.addAll(checkFixtures(c, i-1, j, shape, fixDef));
+        fp.addAll(checkFixtures(c, i+1, j, shape, fixDef));
+        fp.addAll(checkFixtures(c, i, j-1, shape, fixDef));
+        fp.addAll(checkFixtures(c, i, j+1, shape, fixDef));
+
         shape.dispose();
 
+        return fp;
     }
 
     public void generateFixtures() {
@@ -255,23 +283,26 @@ public class ExpiWorld {
         shape.dispose();
     }
 
-    private void checkFixtures(int c, int i, int j, EdgeShape shape, FixtureDef fixDef) {
+    // This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)
+    private FixturePack checkFixtures(int c, int i, int j, EdgeShape shape, FixtureDef fixDef) {
+
+        FixturePack fp = new FixturePack();
 
         int w = Constants.T_W_CH;
         int h = Constants.T_H_CH;
 
-        if(i == -1 || i == h) return;
+        if(i == -1 || i == h) return fp;
 
         ExpiTile t;
         int chunkId;
 
         if(j == -1) {
-            if(c == 0) return;
+            if(c == 0) return fp;
             j = w-1;
             t = chunks[c-1].getTerrain()[i][j];
             chunkId = c-1;
         }else if(j == w) {
-            if(c == chunks.length-1) return;
+            if(c == chunks.length-1) return fp;
             j = 0;
             t = chunks[c+1].getTerrain()[i][j];
             chunkId = c+1;
@@ -280,10 +311,11 @@ public class ExpiWorld {
             chunkId = c;
         }
 
-        if(!t.getType().isSolid()) return;
+        if(!t.getType().isSolid()) return fp;
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
+            fp.removedFixtures.add(fixturesID.get(f));
             fixturesID.remove(f);
         }
         t.getFixtures().clear();
@@ -291,27 +323,33 @@ public class ExpiWorld {
         if(isNotSolid(chunkId, c, i-1, j)) {
             shape.set(chunkId*w+j, i, chunkId*w+j+1,i);
             Fixture f = terrainBody.createFixture(fixDef);
+            fp.addedFixtures.add(f);
             t.getFixtures().add(f);
             addUniqueFixture(f);
         }
         if(isNotSolid(chunkId, c, i+1, j)) {
             shape.set(chunkId*w+j, i+1, chunkId*w+j+1,i+1);
             Fixture f = terrainBody.createFixture(fixDef);
+            fp.addedFixtures.add(f);
             t.getFixtures().add(f);
             addUniqueFixture(f);
         }
         if(isNotSolid(chunkId, c, i, j-1)) {
             shape.set(chunkId*w+j, i, chunkId*w+j,i+1);
             Fixture f = terrainBody.createFixture(fixDef);
+            fp.addedFixtures.add(f);
             t.getFixtures().add(f);
             addUniqueFixture(f);
         }
         if(isNotSolid(chunkId, c, i, j+1)) {
             shape.set(chunkId*w+j+1, i, chunkId*w+j+1,i+1);
             Fixture f = terrainBody.createFixture(fixDef);
+            fp.addedFixtures.add(f);
             t.getFixtures().add(f);
             addUniqueFixture(f);
         }
+
+        return fp;
     }
 
     private boolean isNotSolid(int chunkId, int c, int i, int j) {

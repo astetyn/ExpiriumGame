@@ -1,9 +1,8 @@
 package com.astetyne.main.world;
 
-import com.astetyne.main.Resources;
-import com.astetyne.main.entity.*;
-import com.astetyne.main.items.Item;
-import com.astetyne.main.items.ItemType;
+import com.astetyne.main.entity.Entity;
+import com.astetyne.main.entity.EntityType;
+import com.astetyne.main.entity.MainPlayer;
 import com.astetyne.main.stages.GameStage;
 import com.astetyne.main.utils.BodyEditorLoader;
 import com.astetyne.main.utils.Constants;
@@ -75,20 +74,8 @@ public class GameWorld {
         player.getBody().setTransform(loc, 0);
 
         int size = bb.getInt();
-
         for(int i = 0; i < size; i++) {
-
-            int id = bb.getInt();
-            EntityType type = EntityType.getType(bb.getInt());
-            Vector2 loc2 = new Vector2(bb.getFloat(), bb.getFloat());
-
-            if(type == EntityType.PLAYER) {
-                if(id == player.getID()) continue;
-                PlayerEntity pe = new PlayerEntity(id, loc2);
-            }else if(type == EntityType.DROPPED_ITEM) {
-                DroppedItemEntity die = new DroppedItemEntity(id, new Item(ItemType.DIRT, Resources.DIRT_TEXTURE), 0, loc2);
-                //todo: spravit v packete list pre kazdy typ entity?
-            }
+            EntityType.getType(bb.getInt()).initEntity(bb);
         }
 
     }
@@ -153,9 +140,31 @@ public class GameWorld {
 
         WorldChunk worldChunk = new WorldChunk(bb);
         chunkArray[worldChunk.getId()] = worldChunk;
+        parseFixtures(bb);
+    }
 
-        System.out.println("FEED: "+worldChunk.getId());
+    public void onDestroyChunkEvent(ByteBuffer bb) {
 
+        int chunkID = bb.getInt();
+        chunkArray[chunkID] = null;
+        parseOldFixtures(bb);
+    }
+
+    public void onBreakTileEvent(ByteBuffer bb) {
+
+        int c = bb.getInt();
+        int x = bb.getInt();
+        int y = bb.getInt();
+
+        parseFixtures(bb);
+        parseOldFixtures(bb);
+
+        Tile t = chunkArray[c].getTerrain()[y][x];
+        t.setType(TileType.AIR);
+
+    }
+
+    private void parseFixtures(ByteBuffer bb) {
         int size = bb.getInt();
         EdgeShape shape = new EdgeShape();
         FixtureDef def = new FixtureDef();
@@ -171,13 +180,7 @@ public class GameWorld {
         }
     }
 
-    public void onDestroyChunkEvent(ByteBuffer bb) {
-
-        int chunkID = bb.getInt();
-        chunkArray[chunkID] = null;
-
-        System.out.println("DESTROY: "+chunkID);
-
+    private void parseOldFixtures(ByteBuffer bb) {
         int size = bb.getInt();
         for(int i = 0; i < size; i++) {
             int fixID = bb.getInt();
@@ -185,25 +188,6 @@ public class GameWorld {
             terrainBody.destroyFixture(f);
             fixturesID.remove(fixID);
         }
-    }
-
-    public void onBreakTileEvent(ByteBuffer bb) {
-
-        int c = bb.getInt();
-        int x = bb.getInt();
-        int y = bb.getInt();
-        int eID = bb.getInt();
-        int it = bb.getInt();
-        float av = bb.getFloat();
-
-        Tile t = chunkArray[c].getTerrain()[y][x];
-        t.setType(TileType.AIR);
-
-        float off = (1 - Constants.D_I_SIZE)/2;
-        Vector2 center = new Vector2(x + off, y + off);
-
-        DroppedItemEntity die = new DroppedItemEntity(eID, ItemType.getType(it).initItem(), av, center);
-
     }
 
     private void generateWorldBorders() {

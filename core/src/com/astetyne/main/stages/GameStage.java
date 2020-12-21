@@ -1,6 +1,8 @@
 package com.astetyne.main.stages;
 
 import com.astetyne.main.ExpiriumGame;
+import com.astetyne.main.entity.Entity;
+import com.astetyne.main.entity.EntityType;
 import com.astetyne.main.gui.GameGUILayout;
 import com.astetyne.main.items.inventory.Inventory;
 import com.astetyne.main.world.GameWorld;
@@ -87,10 +89,10 @@ public class GameStage extends ExpiStage {
         for(IncomingPacket packet : packets) {
 
             ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
-            int subPackets = bb.getInt();
+            int subPackets = bb.getInt(); //System.out.println("C: incoming subpackets: "+subPackets);
             for(int i = 0; i < subPackets; i++) {
 
-                int packetID = bb.getInt();
+                int packetID = bb.getInt(); System.out.println("PID: "+packetID);
 
                 switch(packetID) {
 
@@ -112,21 +114,25 @@ public class GameStage extends ExpiStage {
                         gameWorld.onBreakTileEvent(bb);
                         break;
 
+                    case 19: //EntityMovePacket
+                        int eID = bb.getInt();
+                        Entity e = gameWorld.getEntitiesID().get(eID);
+                        if(e != null) {
+                            e.onMove(bb);
+                        }else {
+                            bb.position(bb.position()+6*4);
+                        }
+                        break;
+
+                    case 20: //EntitySpawnPacket
+                        EntityType.getType(bb.getInt()).initEntity(bb);
+                        break;
+
                 }
 
             }
 
-            /*if(packet instanceof PlayerJoinActionS) {
-                PlayerJoinActionS psa = (PlayerJoinActionS) packet;
-                PlayerEntity pe = new PlayerEntity(psa.getPlayerID(), psa.getLocation().toVector());
-
-            }else if(packet instanceof EntityMoveActionCS) {
-                EntityMoveActionCS ema = (EntityMoveActionCS) packet;
-                int id = ema.getEntityID();
-                if(id == gameWorld.getPlayer().getID() || !gameWorld.getEntitiesID().containsKey(id)) continue;
-                gameWorld.getEntitiesID().get(ema.getEntityID()).onMoveAction(ema);
-
-            }else if(packet instanceof PlayerLeaveActionS) {
+            /*if(packet instanceof PlayerLeaveActionS) {
                 PlayerLeaveActionS pla = (PlayerLeaveActionS) packet;
                 PlayerEntity p = (PlayerEntity) gameWorld.getEntitiesID().get(pla.getPlayerID());
                 gameWorld.destroyEntity(p);

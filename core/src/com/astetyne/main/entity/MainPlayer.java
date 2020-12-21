@@ -7,6 +7,8 @@ import com.astetyne.main.world.input.TileBreaker;
 import com.astetyne.main.world.input.TilePlacer;
 import com.badlogic.gdx.math.Vector2;
 
+import java.nio.ByteBuffer;
+
 public class MainPlayer extends Entity {
 
     private final MainPlayerAnimator animator;
@@ -56,4 +58,8 @@ public class MainPlayer extends Entity {
         return new PlayerMovePacket(getLocation(), getVelocity());
     }
 
+    @Override
+    public void readMeta(ByteBuffer bb) {
+
+    }
 }

@@ -21,15 +21,9 @@ public class TileBreakReqPacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-
-        ByteBuffer bb = ByteBuffer.allocate(4 + 3*4);
-        bb.putInt(getPacketID());
-
+    public void populateWithData(ByteBuffer bb) {
         bb.putInt(chunkID);
         bb.putInt(x);
         bb.putInt(y);
-
-        return bb.array();
     }
 }

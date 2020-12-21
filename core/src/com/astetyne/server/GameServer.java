@@ -23,6 +23,7 @@ public class GameServer implements Runnable {
     private final HashMap<Integer, ExpiEntity> entitiesID;
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ServerPlayerGateway> leavingClients;
+    private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
     private final List<ExpiDroppedItem> droppedItems;
 
@@ -37,6 +38,7 @@ public class GameServer implements Runnable {
 
         joiningClients = new ArrayList<>();
         leavingClients = new ArrayList<>();
+        entities = new ArrayList<>();
         players = new ArrayList<>();
         droppedItems = new ArrayList<>();
 
@@ -58,6 +60,10 @@ public class GameServer implements Runnable {
         for(ExpiPlayer p : players) {
             p.getGateway().end();
         }
+    }
+
+    public List<ExpiEntity> getEntities() {
+        return entities;
     }
 
     public List<ExpiPlayer> getPlayers() {

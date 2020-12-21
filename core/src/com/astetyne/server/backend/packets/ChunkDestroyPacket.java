@@ -37,17 +37,11 @@ public class ChunkDestroyPacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-
-        ByteBuffer bb = ByteBuffer.allocate(4 + 4 + 4 + fixturesID.size()*4);
-        bb.putInt(getPacketID());
-
+    public void populateWithData(ByteBuffer bb) {
         bb.putInt(chunkID);
         bb.putInt(fixturesID.size());
         for(int e : fixturesID) {
             bb.putInt(e);
         }
-
-        return bb.array();
     }
 }

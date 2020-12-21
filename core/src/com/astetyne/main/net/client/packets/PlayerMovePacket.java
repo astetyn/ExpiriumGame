@@ -22,16 +22,10 @@ public class PlayerMovePacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-
-        ByteBuffer bb = ByteBuffer.allocate(4 + 4*4);
-        bb.putInt(getPacketID());
-
+    public void populateWithData(ByteBuffer bb) {
         bb.putFloat(x);
         bb.putFloat(y);
         bb.putFloat(v1);
         bb.putFloat(v2);
-
-        return bb.array();
     }
 }

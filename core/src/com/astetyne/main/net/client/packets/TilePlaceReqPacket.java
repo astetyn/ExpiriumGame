@@ -23,15 +23,10 @@ public class TilePlaceReqPacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-
-        ByteBuffer bb = ByteBuffer.allocate(4 + 4*4);
-        bb.putInt(getPacketID());
+    public void populateWithData(ByteBuffer bb) {
         bb.putInt(chunkID);
         bb.putInt(x);
         bb.putInt(y);
         bb.putInt(placedItem.getId());
-
-        return new byte[0];
     }
 }

@@ -5,10 +5,12 @@ import com.astetyne.main.items.ItemType;
 import com.astetyne.main.utils.Constants;
 import com.badlogic.gdx.math.Vector2;
 
+import java.nio.ByteBuffer;
+
 public class ExpiDroppedItem extends ExpiEntity {
 
     private int ticksToDespawn;
-    private final ItemType type;
+    private ItemType type;
     private int cooldown;
 
     public ExpiDroppedItem(Vector2 location, ItemType type, int cooldown) {
@@ -39,4 +41,13 @@ public class ExpiDroppedItem extends ExpiEntity {
         return cooldown;
     }
 
+    @Override
+    public void readMeta(ByteBuffer bb) {
+        type = ItemType.getType(bb.getInt());
+    }
+
+    @Override
+    public void writeMeta(ByteBuffer bb) {
+        bb.putInt(type.getId());
+    }
 }

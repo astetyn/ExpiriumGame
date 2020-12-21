@@ -50,10 +50,7 @@ public class ChunkFeedPacket implements Packable {
     }
 
     @Override
-    public byte[] toByteArray() {
-
-        ByteBuffer bb = ByteBuffer.allocate(4 + 4 + Constants.T_H_CH*Constants.T_W_CH*4 + 4 + fixtures.size()*5*4);
-        bb.putInt(getPacketID());
+    public void populateWithData(ByteBuffer bb) {
         bb.putInt(chunkID);
         for(int i = 0; i < Constants.T_H_CH; i++) {
             for(int j = 0; j < Constants.T_W_CH; j++) {
@@ -68,6 +65,5 @@ public class ChunkFeedPacket implements Packable {
             bb.putFloat(pf.x2);
             bb.putFloat(pf.y2);
         }
-        return bb.array();
     }
 }
