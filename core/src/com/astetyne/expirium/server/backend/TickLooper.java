@@ -131,10 +131,20 @@ public class TickLooper extends TerminableLooper {
         joiningPlayers.clear();
     }
 
+    int traffic = 0;
+    long time  = System.currentTimeMillis();
+
     private void resolvePlayersActions() {
 
         for(ExpiPlayer p : players) {
             for(IncomingPacket packet : p.getGateway().getClientIncomingPackets()) {
+
+                traffic += packet.bytes.length;
+                if(time + 2000 < System.currentTimeMillis()) {
+                    time = System.currentTimeMillis();
+                    System.out.println("Server traffic: "+traffic);
+                    traffic = 0;
+                }
 
                 ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
                 int subPackets = bb.getInt(); //System.out.println("S: incoming subpackets: "+subPackets);

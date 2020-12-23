@@ -5,11 +5,11 @@ import com.astetyne.expirium.server.api.world.ExpiTile;
 
 import java.nio.ByteBuffer;
 
-public class PackableBrokenTile {
+public class PackableChangedTile {
 
     private final int c, x, y;
 
-    public PackableBrokenTile(ExpiTile t) {
+    public PackableChangedTile(ExpiTile t) {
         this.c = t.getX() / Constants.T_W_CH;
         this.x = t.getX() - c*Constants.T_W_CH;
         this.y = t.getY();

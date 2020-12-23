@@ -9,7 +9,7 @@ import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.astetyne.expirium.server.backend.Packable;
-import com.astetyne.expirium.server.backend.packables.PackableBrokenTile;
+import com.astetyne.expirium.server.backend.packables.PackableChangedTile;
 import com.astetyne.expirium.server.backend.packets.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -162,17 +162,20 @@ public class ExpiWorld {
         float off = (1 - Constants.D_I_SIZE)/2;
         Vector2 loc = new Vector2();
         FixturePack fp = new FixturePack();
-        List<PackableBrokenTile> brokenTiles = new ArrayList<>();
+        List<PackableChangedTile> brokenTiles = new ArrayList<>();
 
         // destroy origin tile first
         loc.set(tile.getX()+off, tile.getY()+off);
         ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tile.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
         subPackets.add(new EntitySpawnPacket(droppedItem));
-        fixtureCalc.clearTile(tile, fp);
-        brokenTiles.add(new PackableBrokenTile(tile));
+        tile.setType(TileType.AIR);
+        fixtureCalc.clearTileFixtures(tile, fp);
+        brokenTiles.add(new PackableChangedTile(tile));
 
         // recalculate all affected tiles
         HashSet<ExpiTile> affectedTiles = stabilityCalc.clearStabilityAndRecalculate(tile);
+
+        float dropChance = 1.0f/affectedTiles.size();
 
         // destroy affected tiles
         Iterator<ExpiTile> it = affectedTiles.iterator();
@@ -180,10 +183,14 @@ public class ExpiWorld {
             ExpiTile t = it.next();
             if(t.getStability() == 0 && t != tile) {
                 loc.set(t.getX()+off, t.getY()+off);
-                droppedItem = new ExpiDroppedItem(loc, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
-                subPackets.add(new EntitySpawnPacket(droppedItem));
-                fixtureCalc.clearTile(t, fp);
-                brokenTiles.add(new PackableBrokenTile(t));
+                //if(Math.random() < dropChance) { // todo: toto je strasne mala sanca, treba nastavit vacsiu
+                if(Math.random() < 1) {
+                    droppedItem = new ExpiDroppedItem(loc, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
+                    subPackets.add(new EntitySpawnPacket(droppedItem));
+                }
+                t.setType(TileType.AIR);
+                fixtureCalc.clearTileFixtures(t, fp);
+                brokenTiles.add(new PackableChangedTile(t));
                 it.remove();
             }
         }
@@ -192,12 +199,45 @@ public class ExpiWorld {
 
     public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
 
-        //todo: prepocitat stabilitu ci je mozne tam policko postavit
         ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
-        FixturePack fp = new FixturePack();
-        fixtureCalc.changeTileTo(c*Constants.T_W_CH + x, y, item.getBuildTile(), fp);
-        subPackets.add(new TilePlaceAckPacket(t, fp));
+        if(t.getType() != TileType.AIR) return;
 
+        if(!isPlaceFree(x, y)) return;
+
+        FixturePack fp = new FixturePack();
+
+        t.setType(item.getBuildTile());
+
+        int newStability = stabilityCalc.getActualStability(t);
+        if(newStability == 0) {
+            t.setType(TileType.AIR);
+            return;
+        }
+
+        fixtureCalc.recalcTileFixturesPlus(t, fp);
+        t.setStability(newStability);
+        HashSet<ExpiTile> changedTiles = new HashSet<>();
+        changedTiles.add(t);
+        stabilityCalc.recalculateStabilityForNearbyTiles(t, changedTiles);
+        subPackets.add(new TilePlaceAckPacket(t, fp, changedTiles));
+
+    }
+
+    private boolean isPlaceFree(int x, int y) {
+
+        for(ExpiEntity p : GameServer.get().getEntities()) {
+
+            float px = p.getLocation().x;
+            float py = p.getLocation().y;
+            float pxe = px + p.getWidth();
+            float pye = py + p.getHeight();
+
+            if(((px > x && px < x+1) || (px < x && x < pxe) || (pxe > x && pxe < x+1)) && //check if x collide
+                    ((py > y && py < y+1) || (py < y && y < pye) || (pye > y && pye < y+1))) { //check if y collide
+                return false;
+            }
+        }
+        return true;
     }
 
     public Vector2 getSaveLocationForSpawn() {

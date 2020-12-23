@@ -12,21 +12,23 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class TilePlaceAckPacket implements Packable {
 
-    private final int chunkID, x, y;
+    private final HashSet<ExpiTile> changedTiles;
+    private final ExpiTile changedTile;
     private final int tileType;
     private final List<PackableFixture> newFixtures;
     private final List<Integer> destroyedFixtures;
 
-    public TilePlaceAckPacket(ExpiTile t, FixturePack fp) {
+    public TilePlaceAckPacket(ExpiTile t, FixturePack fp, HashSet<ExpiTile> changedTiles) {
 
-        this.chunkID = t.getX() / Constants.T_W_CH;
-        this.x = t.getX();
-        this.y = t.getY();
         tileType = t.getType().getID();
+        changedTile = t;
+
+        this.changedTiles = changedTiles;
 
         newFixtures = new ArrayList<>();
         Vector2 v1 = new Vector2();
@@ -49,10 +51,17 @@ public class TilePlaceAckPacket implements Packable {
 
     @Override
     public void populateWithData(ByteBuffer bb) {
-        bb.putInt(chunkID);
-        bb.putInt(x);
-        bb.putInt(y);
         bb.putInt(tileType);
+        bb.putInt(changedTile.getX() / Constants.T_W_CH);
+        bb.putInt(changedTile.getX());
+        bb.putInt(changedTile.getY());
+        bb.putInt(changedTiles.size());
+        for(ExpiTile t : changedTiles) {
+            bb.putInt(t.getX() / Constants.T_W_CH);
+            bb.putInt(t.getX());
+            bb.putInt(t.getY());
+            bb.putInt(t.getStability());
+        }
         bb.putInt(newFixtures.size());
         for(PackableFixture pf : newFixtures) {
             pf.populateWithData(bb);

@@ -172,18 +172,26 @@ public class GameWorld {
     }
 
     public void onPlaceTileEvent(ByteBuffer bb) {
+        int type = bb.getInt();
+        int ct = bb.getInt();
+        int xt = bb.getInt();
+        int yt = bb.getInt();
 
-        int c = bb.getInt();
-        int x = bb.getInt();
-        int y = bb.getInt();
-        TileType type = TileType.getType(bb.getInt());
+        Tile t = chunkArray[ct].getTerrain()[yt][xt];
+        t.setType(TileType.getType(type));
+
+        int changed = bb.getInt();
+        for(int i = 0; i < changed; i++) {
+            int c = bb.getInt();
+            int x = bb.getInt();
+            int y = bb.getInt();
+            int stab = bb.getInt();
+            t = chunkArray[c].getTerrain()[y][x];
+            t.setStability(stab);
+        }
 
         parseFixtures(bb);
         parseOldFixtures(bb);
-
-        Tile t = chunkArray[c].getTerrain()[y][x];
-        t.setType(type);
-
     }
 
     private void parseFixtures(ByteBuffer bb) {

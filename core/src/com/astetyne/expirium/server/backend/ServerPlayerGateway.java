@@ -27,7 +27,7 @@ public class ServerPlayerGateway extends TerminableLooper {
         serverSubPackets = new ArrayList<>();
         clientIncomingPackets = new ArrayList<>();
         joinLock = new Object();
-        inputBuffer = new byte[65536];
+        inputBuffer = new byte[262144];
         outputBuffer = ByteBuffer.allocate(262144);
     }
 

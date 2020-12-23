@@ -42,8 +42,9 @@ public class StabilityCalculator {
 
         findStrongConnections(tile, pack);
 
+        HashSet<ExpiTile> ignored = new HashSet<>();
         for(ExpiTile t : pack.strongTiles) {
-            recalculateStabilityForNearbyTiles(t);
+            recalculateStabilityForNearbyTiles(t, ignored);
         }
         return pack.changedTiles;
     }
@@ -105,28 +106,29 @@ public class StabilityCalculator {
         return Math.min(t.getType().getStability(), maxAvailStab);
     }
 
-    private void recalculateStabilityForNearbyTiles(ExpiTile t) {
+    public void recalculateStabilityForNearbyTiles(ExpiTile t, HashSet<ExpiTile> changed) {
 
         int x = t.getX();
         int y = t.getY();
 
         // left tile
-        if(x != 0) checkRealStability(worldTerrain[y][x-1]);
+        if(x != 0) checkRealStability(worldTerrain[y][x-1], changed);
         // top tile
-        if(y != h-1) checkRealStability(worldTerrain[y+1][x]);
+        if(y != h-1) checkRealStability(worldTerrain[y+1][x], changed);
         // right tile
-        if(x != w-1) checkRealStability(worldTerrain[y][x+1]);
+        if(x != w-1) checkRealStability(worldTerrain[y][x+1], changed);
         // bottom tile
-        if(y != 0) checkRealStability(worldTerrain[y-1][x]);
+        if(y != 0) checkRealStability(worldTerrain[y-1][x], changed);
 
     }
 
-    private void checkRealStability(ExpiTile t) {
+    private void checkRealStability(ExpiTile t, HashSet<ExpiTile> changed) {
         if(t.getType() == TileType.AIR) return;
         int realStability = getActualStability(t);
         if(realStability > t.getStability()) {
             t.setStability(realStability);
-            recalculateStabilityForNearbyTiles(t);
+            changed.add(t);
+            recalculateStabilityForNearbyTiles(t, changed);
         }
     }
 

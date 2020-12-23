@@ -1,7 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.main.utils.Constants;
-import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
@@ -16,6 +15,8 @@ public class FixtureCalculator {
     private final int w, h;
     private final Body terrainBody;
     private final HashMap<Fixture, Integer> fixturesID;
+    private final EdgeShape shape;
+    private final FixtureDef fixDef;
 
     public FixtureCalculator(ExpiTile[][] worldTerrain, Body terrainBody) {
         this.worldTerrain = worldTerrain;
@@ -23,56 +24,46 @@ public class FixtureCalculator {
         this.w = worldTerrain[0].length;
         this.terrainBody = terrainBody;
         fixturesID = new HashMap<>();
-    }
 
-    public void generateWorldFixtures() {
-
-        EdgeShape shape = new EdgeShape();
-        FixtureDef fixDef = new FixtureDef();
-
+        shape = new EdgeShape();
+        fixDef = new FixtureDef();
         fixDef.shape = shape;
         fixDef.friction = 0.2f;
         fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
+    }
+
+    public void generateWorldFixtures() {
 
         FixturePack fp = new FixturePack();
 
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
-                checkFixtures(i, j, shape, fixDef, fp);
+                recalcTileFixtures(i, j, shape, fixDef, fp);
             }
         }
-        shape.dispose();
     }
 
-    public void changeTileTo(int x, int y, TileType type, FixturePack fp) {
+    // This method will check all nearby tiles and create his own fixtures + impact nearby tiles if solid
+    public void recalcTileFixturesPlus(ExpiTile t, FixturePack fp) {
 
-        ExpiTile t = worldTerrain[y][x];
+        int x = t.getX();
+        int y = t.getY();
 
-        if(!type.isSolid()) {
-            clearTile(t, fp);
-            t.setType(type);
+        if(!t.getType().isSolid()) {
+            clearTileFixtures(t, fp);
             return;
         }
 
-        t.setType(type);
-
-        EdgeShape shape = new EdgeShape();
-        FixtureDef fixDef = new FixtureDef();
-        fixDef.shape = shape;
-        fixDef.friction = 0.2f;
-        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
-
-        checkFixtures(y, x, shape, fixDef, fp);
-        if(y != 0) checkFixtures(y-1, x, shape, fixDef, fp);
-        if(y != h-1) checkFixtures(y+1, x, shape, fixDef, fp);
-        if(x != 0) checkFixtures(y, x-1, shape, fixDef, fp);
-        if(x != w-1) checkFixtures(y, x+1, shape, fixDef, fp);
-
-        shape.dispose();
+        recalcTileFixtures(y, x, shape, fixDef, fp);
+        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef, fp);
+        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef, fp);
+        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef, fp);
+        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef, fp);
 
     }
 
-    public void clearTile(ExpiTile t, FixturePack fp) {
+    // This method will remove all fixtures from given tile and also updates nearby tiles fixtures
+    public void clearTileFixtures(ExpiTile t, FixturePack fp) {
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
@@ -88,30 +79,17 @@ public class FixtureCalculator {
         int y = t.getY();
         int x = t.getX();
 
-        t.setType(TileType.AIR);
-
-        EdgeShape shape = new EdgeShape();
-        FixtureDef fixDef = new FixtureDef();
-
-        fixDef.shape = shape;
-        fixDef.friction = 0.2f;
-        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
-
         // updates nearby tiles fixtures
-        if(y != 0) checkFixtures(y-1, x, shape, fixDef, fp);
-        if(y != h-1) checkFixtures(y+1, x, shape, fixDef, fp);
-        if(x != 0) checkFixtures(y, x-1, shape, fixDef, fp);
-        if(x != w-1) checkFixtures(y, x+1, shape, fixDef, fp);
-
-        shape.dispose();
+        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef, fp);
+        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef, fp);
+        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef, fp);
+        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef, fp);
     }
 
     // This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)
-    private void checkFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef, FixturePack fp) {
+    private void recalcTileFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef, FixturePack fp) {
 
         ExpiTile t = worldTerrain[y][x];
-
-        if(!t.getType().isSolid()) return;
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
@@ -123,6 +101,8 @@ public class FixtureCalculator {
             fixturesID.remove(f);
         }
         t.getFixtures().clear();
+
+        if(!t.getType().isSolid()) return;
 
         if(y != 0 && !worldTerrain[y-1][x].getType().isSolid()) {
             shape.set(x, y, x+1,y);
@@ -153,7 +133,6 @@ public class FixtureCalculator {
             randomID = (int)(Math.random()*Integer.MAX_VALUE);
         } while(fixturesID.containsKey(f));
         fixturesID.put(f, randomID);
-
     }
 
     public HashMap<Fixture, Integer> getFixturesID() {

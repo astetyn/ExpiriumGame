@@ -84,10 +84,20 @@ public class GameStage extends ExpiStage {
         gameWorld.dispose();
     }
 
+    int traffic = 0;
+    long time  = System.currentTimeMillis();
+
     @Override
     public void onServerUpdate(List<IncomingPacket> packets) {
 
         for(IncomingPacket packet : packets) {
+
+            traffic += packet.bytes.length;
+            if(time + 2000 < System.currentTimeMillis()) {
+                time = System.currentTimeMillis();
+                System.out.println("Client traffic: "+traffic);
+                traffic = 0;
+            }
 
             ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
             int subPackets = bb.getInt(); //System.out.println("C: incoming subpackets: "+subPackets);

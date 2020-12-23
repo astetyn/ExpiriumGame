@@ -75,8 +75,8 @@ public class ClientGateway extends TerminableLooper {
                 if(readBytes == -1) end();
 
                 byte[] copyArr = Arrays.copyOf(inputBuffer, readBytes); //todo: toto je velmi pomale
+
                 synchronized(serverIncomingPackets) {
-                    //System.out.println("read: "+readBytes);
                     serverIncomingPackets.add(new IncomingPacket(copyArr));
                 }
 
