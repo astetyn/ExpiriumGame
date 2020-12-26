@@ -1,39 +1,33 @@
 package com.astetyne.expirium.main.net.client;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.net.client.packets.JoinReqPacket;
 import com.astetyne.expirium.main.utils.Constants;
-import com.astetyne.expirium.server.backend.IncomingPacket;
-import com.astetyne.expirium.server.backend.Packable;
+import com.astetyne.expirium.server.backend.PacketInputStream;
+import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.TerminableLooper;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
-    private final List<Packable> clientSubPackets;
-    private final List<IncomingPacket> serverIncomingPackets;
     private final ExpiriumGame game;
     private String ipAddress;
-    private final byte[] inputBuffer;
-    private final ByteBuffer outputBuffer;
+    private PacketInputStream in;
+    private PacketOutputStream out;
+    private ClientPacketManager packetManager;
+    private final Object nextReadLock;
+    private int traffic;
+    private long time;
 
     public ClientGateway() {
-        clientSubPackets = new ArrayList<>();
-        serverIncomingPackets = new ArrayList<>();
         game = ExpiriumGame.get();
         ipAddress = "127.0.0.1";
-        inputBuffer = new byte[262144];
-        outputBuffer = ByteBuffer.allocate(262144);
+        nextReadLock = new Object();
+        traffic = 0;
+        time = 0;
     }
 
     @Override
@@ -42,13 +36,10 @@ public class ClientGateway extends TerminableLooper {
         System.out.println("Client connecting...");
 
         try {
-
             socket = new Socket();
             socket.setPerformancePreferences(0,10,0);
             socket.connect(new InetSocketAddress(ipAddress, Constants.SERVER_PORT), 10000);
-
         } catch(IOException e) {
-            // cant connect to the server
             System.out.println("Exception during connecting to server.");
             game.getCurrentStage().onServerFail();
             return;
@@ -58,51 +49,40 @@ public class ClientGateway extends TerminableLooper {
 
             System.out.println("Connection established.");
 
-            BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+            in = new PacketInputStream(socket.getInputStream());
+            out = new PacketOutputStream(socket.getOutputStream());
 
-            JoinReqPacket jra = new JoinReqPacket(game.getPlayerName());
-            outputBuffer.putInt(jra.getPacketID());
-            jra.populateWithData(outputBuffer);
-            bos.write(outputBuffer.array(), 0, outputBuffer.position());
-            bos.flush();
-            outputBuffer.clear();
+            packetManager = new ClientPacketManager(in, out);
+
+            packetManager.putJoinReqPacket(ExpiriumGame.get().getPlayerName());
+            out.swap();
+            out.flush();
+            out.reset();
+            //System.out.println("Client flushing.");
 
             while(isRunning()) {
 
                 socket.setSoTimeout(5000);
-                int readBytes = bis.read(inputBuffer);
-                if(readBytes == -1) end();
+                int readBytes = in.fillBuffer();//System.out.println("Client reading: "+readBytes);
+                out.flush(); //System.out.println("Client flushing.");
 
-                byte[] copyArr = Arrays.copyOf(inputBuffer, readBytes); //todo: toto je velmi pomale
-
-                synchronized(serverIncomingPackets) {
-                    serverIncomingPackets.add(new IncomingPacket(copyArr));
+                traffic += readBytes;
+                if(time + 5000 < System.currentTimeMillis()) {
+                    time = System.currentTimeMillis();
+                    System.out.println("Client traffic: "+traffic);
+                    traffic = 0;
                 }
 
-                List<Packable> copy;
-                synchronized(clientSubPackets) {
-                    copy = new ArrayList<>(clientSubPackets);
-                    clientSubPackets.clear();
+                synchronized(nextReadLock) {
+                    game.notifyServerUpdate();
+                    nextReadLock.wait();
                 }
-
-                outputBuffer.putInt(copy.size());
-                for(Packable p : copy) {
-                    outputBuffer.putInt(p.getPacketID());
-                    p.populateWithData(outputBuffer);
-                }
-                bos.write(outputBuffer.array(), 0, outputBuffer.position());
-                bos.flush();
-                outputBuffer.clear();
-
-                game.notifyServerUpdate();
-
             }
-
         }catch(IOException e) {
-            // exception during playing on server
             System.out.println("Exception during messaging with server.");
             game.getCurrentStage().onServerFail();
+        }catch(InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
@@ -119,18 +99,12 @@ public class ClientGateway extends TerminableLooper {
         System.out.println("Client successfully closed socket.");
     }
 
-    public void addSubPacket(Packable subPacket) {
-        synchronized(clientSubPackets) {
-            clientSubPackets.add(subPacket);
-        }
-    }
-
-    // call this only once per server tick as list will be cleared after the call
-    public List<IncomingPacket> getServerPackets() {
-        synchronized(serverIncomingPackets) {
-            List<IncomingPacket> copy = new ArrayList<>(serverIncomingPackets);
-            serverIncomingPackets.clear();
-            return copy;
+    // call this only once per server tick as active buffer will be switched and overwritten.
+    public void swapBuffers() {
+        out.swap();
+        in.swap();
+        synchronized(nextReadLock) {
+            nextReadLock.notify();
         }
     }
 
@@ -138,4 +112,15 @@ public class ClientGateway extends TerminableLooper {
         ipAddress = address;
     }
 
+    public ClientPacketManager getPacketManager() {
+        return packetManager;
+    }
+
+    public PacketInputStream getIn() {
+        return in;
+    }
+
+    public PacketOutputStream getOut() {
+        return out;
+    }
 }

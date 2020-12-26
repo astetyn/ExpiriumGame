@@ -2,7 +2,6 @@ package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
-import com.astetyne.expirium.server.backend.IncomingPacket;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,9 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-
-import java.nio.ByteBuffer;
-import java.util.List;
 
 public class LauncherStage extends ExpiStage {
 
@@ -107,29 +103,8 @@ public class LauncherStage extends ExpiStage {
     }
 
     @Override
-    public void onServerUpdate(List<IncomingPacket> packets) {
+    public void onServerUpdate() {
 
-        for(IncomingPacket packet : packets) {
-
-            ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
-            int subPackets = bb.getInt();
-
-            for(int i = 0; i < subPackets; i++) {
-
-                int packetID = bb.getInt();
-
-                switch(packetID) {
-
-                    case 11:
-                        ExpiriumGame.get().setCurrentStage(new GameStage());
-                        ExpiriumGame.get().getCurrentStage().onServerUpdate(packets);
-                        //todo: toto posle aj nechcene packety
-                        return;
-
-                }
-
-            }
-        }
     }
 
     @Override

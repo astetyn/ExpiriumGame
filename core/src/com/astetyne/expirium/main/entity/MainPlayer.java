@@ -1,13 +1,12 @@
 package com.astetyne.expirium.main.entity;
 
+import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.gui.ThumbStick;
-import com.astetyne.expirium.main.net.client.packets.PlayerMovePacket;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.world.input.TileBreaker;
 import com.astetyne.expirium.main.world.input.TilePlacer;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
-
-import java.nio.ByteBuffer;
 
 public class MainPlayer extends Entity {
 
@@ -54,12 +53,12 @@ public class MainPlayer extends Entity {
 
     }
 
-    public PlayerMovePacket generateMoveAction() {
-        return new PlayerMovePacket(getLocation(), getVelocity());
+    public void generateMovePacket() {
+        ExpiriumGame.get().getClientGateway().getPacketManager().putPlayerMovePacket(getLocation(), getVelocity());
     }
 
     @Override
-    public void readMeta(ByteBuffer bb) {
+    public void readMeta(PacketInputStream in) {
 
     }
 

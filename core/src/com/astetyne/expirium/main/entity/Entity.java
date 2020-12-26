@@ -3,11 +3,10 @@ package com.astetyne.expirium.main.entity;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.Collidable;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-
-import java.nio.ByteBuffer;
 
 public abstract class Entity implements Collidable, MetaReadable {
 
@@ -55,13 +54,13 @@ public abstract class Entity implements Collidable, MetaReadable {
         }
     }
 
-    public void onMove(ByteBuffer bb) {
+    public void onMove(PacketInputStream in) {
 
-        targetPosition.set(bb.getFloat(), bb.getFloat());
+        targetPosition.set(in.getFloat(), in.getFloat());
         intpolDelta = 0;
-        body.setLinearVelocity(bb.getFloat(), bb.getFloat());
-        targetAngle = bb.getFloat();
-        body.setAngularVelocity(bb.getFloat());
+        body.setLinearVelocity(in.getFloat(), in.getFloat());
+        targetAngle = in.getFloat();
+        body.setAngularVelocity(in.getFloat());
 
     }
 

@@ -1,9 +1,9 @@
 package com.astetyne.expirium.main.entity;
 
-import java.nio.ByteBuffer;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 
 public interface MetaReadable {
 
-    void readMeta(ByteBuffer bb);
+    void readMeta(PacketInputStream in);
 
 }

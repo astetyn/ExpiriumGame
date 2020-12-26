@@ -9,8 +9,6 @@ import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.astetyne.expirium.server.backend.Packable;
-import com.astetyne.expirium.server.backend.packables.PackableChangedTile;
-import com.astetyne.expirium.server.backend.packets.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
@@ -70,8 +68,6 @@ public class ExpiWorld {
 
     public void onTick() {
 
-        subPackets = GameServer.get().getTickLooper().getTickSubPackets();
-
         for(int i = 0; i < 60/Constants.SERVER_DEFAULT_TPS; i++) {
             box2dWorld.step(1 / 60f, 6, 2);
         }
@@ -81,10 +77,9 @@ public class ExpiWorld {
         recalculateDroppedItems();
 
         for(ExpiEntity ee : GameServer.get().getEntities()) {
-            EntityMovePacket emp = new EntityMovePacket(ee);
             for(ExpiPlayer p : GameServer.get().getPlayers()) {
                 if(p == ee) continue;
-                p.getGateway().addSubPacket(emp);
+                p.getGateway().getPacketManager().putEntityMovePacket(ee);
             }
         }
 
@@ -105,15 +100,19 @@ public class ExpiWorld {
                 Vector2 dif = p.getCenter().sub(center);
                 if(dif.len() < Constants.D_I_PICK_DIST) {
                     it.remove();
-                    p.getGateway().addSubPacket(new ItemPickupPacket(item.getItemType()));
-                    subPackets.add(new EntityDespawnPacket(item));
+                    p.getGateway().getPacketManager().putItemPickupPacket(item.getItemType());
+                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                        pp.getGateway().getPacketManager().putEntityDespawnPacket(item);
+                    }
                     item.destroySafe();
                     continue outer;
                 }
             }
             int remainingTicks = item.getTicksToDespawn();
             if(remainingTicks == 0) {
-                subPackets.add(new EntityDespawnPacket(item));
+                for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                    pp.getGateway().getPacketManager().putEntityDespawnPacket(item);
+                }
                 it.remove();
                 item.destroySafe();
                 continue;
@@ -133,11 +132,11 @@ public class ExpiWorld {
             for(int i = 0; i < Constants.CHUNKS_NUMBER; i++) {
                 if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
                     if(!p.getActiveChunks().contains(i)) {
-                        p.getGateway().addSubPacket(new ChunkFeedPacket(worldTerrain, i));
+                        p.getGateway().getPacketManager().putChunkFeedPacket(worldTerrain, i);
                         p.getActiveChunks().add(i);
                     }
                 }else if(p.getActiveChunks().contains(i)) {
-                    p.getGateway().addSubPacket(new ChunkDestroyPacket(worldTerrain, i));
+                    p.getGateway().getPacketManager().putChunkDestroyPacket(worldTerrain, i);
                     p.getActiveChunks().remove(i);
                 }
             }
@@ -162,15 +161,17 @@ public class ExpiWorld {
         float off = (1 - Constants.D_I_SIZE)/2;
         Vector2 loc = new Vector2();
         FixturePack fp = new FixturePack();
-        List<PackableChangedTile> brokenTiles = new ArrayList<>();
+        List<ExpiTile> brokenTiles = new ArrayList<>();
 
         // destroy origin tile first
         loc.set(tile.getX()+off, tile.getY()+off);
         ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tile.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
-        subPackets.add(new EntitySpawnPacket(droppedItem));
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            pp.getGateway().getPacketManager().putEntitySpawnPacket(droppedItem);
+        }
         tile.setType(TileType.AIR);
         fixtureCalc.clearTileFixtures(tile, fp);
-        brokenTiles.add(new PackableChangedTile(tile));
+        brokenTiles.add(tile);
 
         // recalculate all affected tiles
         HashSet<ExpiTile> affectedTiles = stabilityCalc.clearStabilityAndRecalculate(tile);
@@ -186,15 +187,19 @@ public class ExpiWorld {
                 //if(Math.random() < dropChance) { // todo: toto je strasne mala sanca, treba nastavit vacsiu
                 if(Math.random() < 1) {
                     droppedItem = new ExpiDroppedItem(loc, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
-                    subPackets.add(new EntitySpawnPacket(droppedItem));
+                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                        pp.getGateway().getPacketManager().putEntitySpawnPacket(droppedItem);
+                    }
                 }
                 t.setType(TileType.AIR);
                 fixtureCalc.clearTileFixtures(t, fp);
-                brokenTiles.add(new PackableChangedTile(t));
+                brokenTiles.add(t);
                 it.remove();
             }
         }
-        subPackets.add(new TileBreakAckPacket(brokenTiles, fp, affectedTiles));
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            pp.getGateway().getPacketManager().putTileBreakAckPacket(brokenTiles, fp, affectedTiles);
+        }
     }
 
     public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
@@ -216,10 +221,12 @@ public class ExpiWorld {
 
         fixtureCalc.recalcTileFixturesPlus(t, fp);
         t.setStability(newStability);
-        HashSet<ExpiTile> changedTiles = new HashSet<>();
-        changedTiles.add(t);
-        stabilityCalc.recalculateStabilityForNearbyTiles(t, changedTiles);
-        subPackets.add(new TilePlaceAckPacket(t, fp, changedTiles));
+        HashSet<ExpiTile> affectedTiles = new HashSet<>();
+        affectedTiles.add(t);
+        stabilityCalc.recalculateStabilityForNearbyTiles(t, affectedTiles);
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            pp.getGateway().getPacketManager().putTilePlaceAckPacket(t, fp, affectedTiles);
+        }
 
     }
 

@@ -2,10 +2,11 @@ package com.astetyne.expirium.server.api.entities;
 
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.backend.PacketInputStream;
+import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
 
-import java.nio.ByteBuffer;
 import java.util.HashSet;
 
 public class ExpiPlayer extends ExpiEntity {
@@ -57,20 +58,12 @@ public class ExpiPlayer extends ExpiEntity {
     }
 
     @Override
-    public void readMeta(ByteBuffer bb) {
-        int nameLen = bb.getInt();
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < nameLen; i++) {
-            sb.append(bb.getChar());
-        }
-        name = sb.toString();
+    public void readMeta(PacketInputStream in) {
+        name = in.getString();
     }
 
     @Override
-    public void writeMeta(ByteBuffer bb) {
-        bb.putInt(name.length());
-        for(char c : name.toCharArray()) {
-            bb.putChar(c);
-        }
+    public void writeMeta(PacketOutputStream out) {
+        out.putString(name);
     }
 }

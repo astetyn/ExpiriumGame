@@ -1,9 +1,10 @@
 package com.astetyne.expirium.main.entity;
 
+import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 public enum EntityType {
@@ -34,11 +35,12 @@ public enum EntityType {
         return id;
     }
 
-    public Entity initEntity(ByteBuffer bb) {
+    public Entity initEntity() {
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
         try {
-            int id = bb.getInt();
-            Vector2 loc = new Vector2(bb.getFloat(), bb.getFloat());
-            return entityClazz.getConstructor(int.class, Vector2.class, ByteBuffer.class).newInstance(id, loc, bb);
+            int id = in.getInt();
+            Vector2 loc = new Vector2(in.getFloat(), in.getFloat());
+            return entityClazz.getConstructor(int.class, Vector2.class, PacketInputStream.class).newInstance(id, loc, in);
         }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }

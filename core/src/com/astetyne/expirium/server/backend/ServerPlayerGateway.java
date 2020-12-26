@@ -2,33 +2,26 @@ package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.server.GameServer;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ServerPlayerGateway extends TerminableLooper {
 
     private final GameServer gameServer;
     private final Socket client;
-    private final List<Packable> serverSubPackets;
-    private final List<IncomingPacket> clientIncomingPackets;
     private final Object joinLock;
-    private final byte[] inputBuffer;
-    private final ByteBuffer outputBuffer;
+    private PacketInputStream in;
+    private PacketOutputStream out;
+    private ServerPacketManager packetManager;
+    private int traffic;
+    private long time;
 
     public ServerPlayerGateway(Socket client) {
         this.gameServer = GameServer.get();
         this.client = client;
-        serverSubPackets = new ArrayList<>();
-        clientIncomingPackets = new ArrayList<>();
         joinLock = new Object();
-        inputBuffer = new byte[262144];
-        outputBuffer = ByteBuffer.allocate(262144);
+        traffic = 0;
+        time = 0;
     }
 
     @Override
@@ -38,15 +31,16 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             System.out.println("New client connected.");
 
-            BufferedInputStream bis = new BufferedInputStream(client.getInputStream());
-            BufferedOutputStream bos = new BufferedOutputStream(client.getOutputStream());
+            in = new PacketInputStream(client.getInputStream());
+            out = new PacketOutputStream(client.getOutputStream());
+
+            packetManager = new ServerPacketManager(in, out);
 
             client.setSoTimeout(5000);
-            int readBytes = bis.read(inputBuffer);
+            int readBytes = in.fillBuffer();
+            if(readBytes == -1) end();
 
-            synchronized(clientIncomingPackets) {
-                clientIncomingPackets.add(new IncomingPacket(Arrays.copyOf(inputBuffer, readBytes)));
-            }
+            //System.out.println("Server reading init: "+readBytes);
 
             gameServer.playerPreJoinAsync(this);
 
@@ -54,29 +48,21 @@ public class ServerPlayerGateway extends TerminableLooper {
                 joinLock.wait(); // wait until main looper recognize new player and populate init actions
             }
 
+            in.reset();
+
             while(isRunning()) {
 
-                List<Packable> copy;
-                synchronized(serverSubPackets) {
-                    copy = new ArrayList<>(serverSubPackets);
-                    serverSubPackets.clear();
-                }
-
-                outputBuffer.putInt(copy.size());
-                for(Packable p : copy) {
-                    outputBuffer.putInt(p.getPacketID());
-                    p.populateWithData(outputBuffer);
-                }
-                bos.write(outputBuffer.array(), 0, outputBuffer.position());
-                bos.flush();
-                outputBuffer.clear();
-
+                out.flush();
+                //System.out.println("Server flushing.");
                 client.setSoTimeout(5000);
-                readBytes = bis.read(inputBuffer);
-                if(readBytes == -1) end();
-                //System.out.println("S: read: "+readBytes);
-                synchronized(clientIncomingPackets) {
-                    clientIncomingPackets.add(new IncomingPacket(Arrays.copyOf(inputBuffer, readBytes)));
+                readBytes = in.fillBuffer();
+                if(readBytes == -1) end();//System.out.println("Server reading: "+readBytes+"\n"+in);
+
+                traffic += readBytes;
+                if(time + 5000 < System.currentTimeMillis()) {
+                    time = System.currentTimeMillis();
+                    System.out.println("Server traffic: "+traffic);
+                    traffic = 0;
                 }
 
                 synchronized(gameServer.getTickLooper().getTickLock()) {
@@ -104,28 +90,19 @@ public class ServerPlayerGateway extends TerminableLooper {
         System.out.println("Channel with client closed.");
     }
 
-    public void addSubPacket(Packable subPacket) {
-        synchronized(serverSubPackets) {
-            serverSubPackets.add(subPacket);
-        }
-    }
-
-    public void addSubPackets(List<Packable> subPackets) {
-        synchronized(serverSubPackets) {
-            serverSubPackets.addAll(subPackets);
-        }
-    }
-
-    // call this only once per server tick as list will be cleared after the call
-    public List<IncomingPacket> getClientIncomingPackets() {
-        synchronized(clientIncomingPackets) {
-            List<IncomingPacket> copy = new ArrayList<>(clientIncomingPackets);
-            clientIncomingPackets.clear();
-            return copy;
-        }
+    public ServerPacketManager getPacketManager() {
+        return packetManager;
     }
 
     public Object getJoinLock() {
         return joinLock;
+    }
+
+    public PacketInputStream getIn() {
+        return in;
+    }
+
+    public PacketOutputStream getOut() {
+        return out;
     }
 }

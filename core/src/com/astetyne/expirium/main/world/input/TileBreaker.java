@@ -3,7 +3,6 @@ package com.astetyne.expirium.main.world.input;
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
 import com.astetyne.expirium.main.gui.ThumbStick;
-import com.astetyne.expirium.main.net.client.packets.TileBreakReqPacket;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.GameWorld;
@@ -64,7 +63,7 @@ public class TileBreaker {
         if(targetTile != null) {
             timeAccumulator += Gdx.graphics.getDeltaTime();
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
-                ExpiriumGame.get().getClientGateway().addSubPacket(new TileBreakReqPacket(targetTile));
+                ExpiriumGame.get().getClientGateway().getPacketManager().putTileBreakReqPacket(targetTile);
                 timeAccumulator = 0;
                 targetTile = null;
             }

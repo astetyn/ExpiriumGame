@@ -4,7 +4,6 @@ import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.items.inventory.Inventory;
-import com.astetyne.expirium.main.net.client.packets.TilePlaceReqPacket;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.GameWorld;
@@ -98,9 +97,8 @@ public class TilePlacer implements InputProcessor {
         Tile t = world.getTileAt((int)vec.x, (int)vec.y);
         if(t.getType() != TileType.AIR) return false;
 
-        int chID = t.getChunk().getId();
         ItemType item = inv.getMaterialSlot().getItemStack().getItem().getType();
-        ExpiriumGame.get().getClientGateway().addSubPacket(new TilePlaceReqPacket(chID, t.getX(), t.getY(), item));
+        ExpiriumGame.get().getClientGateway().getPacketManager().putTilePlaceReqPacket(t, item);
         return true;
     }
 }

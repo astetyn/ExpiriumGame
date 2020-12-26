@@ -1,5 +1,6 @@
 package com.astetyne.expirium.main.world;
 
+import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.MainPlayer;
@@ -8,6 +9,7 @@ import com.astetyne.expirium.main.utils.BodyEditorLoader;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,7 +17,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,17 +66,19 @@ public class GameWorld {
 
     }
 
-    public void postSetup(ByteBuffer bb) {
+    public void postSetup() {
 
-        int pID = bb.getInt();
-        Vector2 loc = new Vector2(bb.getFloat(), bb.getFloat());
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int pID = in.getInt();
+        Vector2 loc = in.getVector();
 
         player = new MainPlayer(pID, loc);
         player.getBody().setTransform(loc, 0);
 
-        int size = bb.getInt();
+        int size = in.getInt();
         for(int i = 0; i < size; i++) {
-            EntityType.getType(bb.getInt()).initEntity(bb);
+            EntityType.getType(in.getInt()).initEntity();
         }
 
     }
@@ -133,69 +136,81 @@ public class GameWorld {
         b2dWorld.dispose();
     }
 
-    public void onFeedChunkEvent(ByteBuffer bb) {
+    public void onFeedChunkEvent() {
 
-        WorldChunk worldChunk = new WorldChunk(bb);
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        WorldChunk worldChunk = new WorldChunk(in);
         chunkArray[worldChunk.getId()] = worldChunk;
-        parseFixtures(bb);
+        parseFixtures();
     }
 
-    public void onDestroyChunkEvent(ByteBuffer bb) {
+    public void onDestroyChunkEvent() {
 
-        int chunkID = bb.getInt();
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int chunkID = in.getInt();
         chunkArray[chunkID] = null;
-        parseOldFixtures(bb);
+        parseOldFixtures();
     }
 
-    public void onBreakTileEvent(ByteBuffer bb) {
+    public void onBreakTileEvent() {
 
-        int brokenTiles = bb.getInt();
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int brokenTiles = in.getInt();
         for(int i = 0; i < brokenTiles; i++) {
-            int c = bb.getInt();
-            int x = bb.getInt();
-            int y = bb.getInt();
+            int c = in.getInt();
+            int x = in.getInt();
+            int y = in.getInt();
             chunkArray[c].getTerrain()[y][x].setType(TileType.AIR);
         }
 
-        parseFixtures(bb);
-        parseOldFixtures(bb);
+        parseFixtures();
+        parseOldFixtures();
 
-        int size = bb.getInt();
+        int size = in.getInt();
         for(int i = 0; i < size; i++) {
-            int c2 = bb.getInt();
-            int x2 = bb.getInt();
-            int y2 = bb.getInt();
-            int stability = bb.getInt();
+            int c2 = in.getInt();
+            int x2 = in.getInt();
+            int y2 = in.getInt();
+            int stability = in.getInt();
             chunkArray[c2].getTerrain()[y2][x2].setStability(stability);
         }
 
     }
 
-    public void onPlaceTileEvent(ByteBuffer bb) {
-        int type = bb.getInt();
-        int ct = bb.getInt();
-        int xt = bb.getInt();
-        int yt = bb.getInt();
+    public void onPlaceTileEvent() {
+
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int type = in.getInt();
+        int ct = in.getInt();
+        int xt = in.getInt();
+        int yt = in.getInt();
 
         Tile t = chunkArray[ct].getTerrain()[yt][xt];
         t.setType(TileType.getType(type));
 
-        int changed = bb.getInt();
+        int changed = in.getInt();
         for(int i = 0; i < changed; i++) {
-            int c = bb.getInt();
-            int x = bb.getInt();
-            int y = bb.getInt();
-            int stab = bb.getInt();
+            int c = in.getInt();
+            int x = in.getInt();
+            int y = in.getInt();
+            int stab = in.getInt();
             t = chunkArray[c].getTerrain()[y][x];
             t.setStability(stab);
         }
 
-        parseFixtures(bb);
-        parseOldFixtures(bb);
+        parseFixtures();
+        parseOldFixtures();
     }
 
-    private void parseFixtures(ByteBuffer bb) {
-        int size = bb.getInt();
+    private void parseFixtures() {
+
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int size = in.getInt();
         EdgeShape shape = new EdgeShape();
         FixtureDef def = new FixtureDef();
         def.shape = shape;
@@ -203,17 +218,20 @@ public class GameWorld {
         def.filter.categoryBits = Constants.DEFAULT_BIT;
 
         for(int i = 0; i < size; i++) {
-            int id = bb.getInt();
-            shape.set(bb.getFloat(), bb.getFloat(),bb.getFloat(), bb.getFloat());
+            int id = in.getInt();
+            shape.set(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
             Fixture f = terrainBody.createFixture(def);
             fixturesID.put(id, f);
         }
     }
 
-    private void parseOldFixtures(ByteBuffer bb) {
-        int size = bb.getInt();
+    private void parseOldFixtures() {
+
+        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+
+        int size = in.getInt();
         for(int i = 0; i < size; i++) {
-            int fixID = bb.getInt();
+            int fixID = in.getInt();
             Fixture f = fixturesID.get(fixID);
             terrainBody.destroyFixture(f);
             fixturesID.remove(fixID);

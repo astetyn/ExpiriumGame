@@ -4,9 +4,9 @@ import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.backend.PacketInputStream;
+import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
-
-import java.nio.ByteBuffer;
 
 public class ExpiDroppedItem extends ExpiEntity {
 
@@ -53,12 +53,12 @@ public class ExpiDroppedItem extends ExpiEntity {
     }
 
     @Override
-    public void readMeta(ByteBuffer bb) {
-        type = ItemType.getType(bb.getInt());
+    public void readMeta(PacketInputStream in) {
+        type = ItemType.getType(in.getInt());
     }
 
     @Override
-    public void writeMeta(ByteBuffer bb) {
-        bb.putInt(type.getId());
+    public void writeMeta(PacketOutputStream out) {
+        out.putInt(type.getId());
     }
 }

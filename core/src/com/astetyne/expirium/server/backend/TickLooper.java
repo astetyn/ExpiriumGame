@@ -5,12 +5,7 @@ import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
-import com.astetyne.expirium.server.backend.packables.PackableEntity;
-import com.astetyne.expirium.server.backend.packets.EntityDespawnPacket;
-import com.astetyne.expirium.server.backend.packets.EntitySpawnPacket;
-import com.astetyne.expirium.server.backend.packets.InitDataPacket;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,13 +14,11 @@ public class TickLooper extends TerminableLooper {
 
     private final Object tickLock;
     private final GameServer server;
-    private final List<Packable> tickSubPackets;
     private final List<ExpiPlayer> players;
 
     public TickLooper() {
         tickLock = new Object();
         server = GameServer.get();
-        tickSubPackets = new ArrayList<>();
         players = server.getPlayers();
     }
 
@@ -46,7 +39,10 @@ public class TickLooper extends TerminableLooper {
 
                 //todo: ai? time? weather?
 
-                sendGeneratedActions();
+                for(ExpiPlayer pp : players) {
+                    pp.getGateway().getOut().swap();
+                    pp.getGateway().getIn().swap();
+                }
 
                 // wakes up all clients threads and send new actions
                 synchronized(tickLock) {
@@ -70,9 +66,10 @@ public class TickLooper extends TerminableLooper {
                     ExpiPlayer p = it.next();
                     if(gateway == p.getGateway()) {
                         it.remove();
-                        EntityDespawnPacket edp = new EntityDespawnPacket(p);
+                        for(ExpiPlayer pp : players) {
+                            pp.getGateway().getPacketManager().putEntityDespawnPacket(p);
+                        }
                         p.destroySafe();
-                        tickSubPackets.add(edp);
                         System.out.println("Player "+p.getName()+" left the server.");
                         server.getEntitiesID().remove(p.getID());
                         break;
@@ -90,14 +87,10 @@ public class TickLooper extends TerminableLooper {
         synchronized(server.getJoiningClients()) {
             // read init data from client
             for(ServerPlayerGateway gateway : server.getJoiningClients()) {
-                ByteBuffer bb = ByteBuffer.wrap(gateway.getClientIncomingPackets().get(0).bytes);
-                int packetID = bb.getInt();
-                int nameLen = bb.getInt();
-                StringBuilder sb = new StringBuilder();
-                for(int i = 0; i < nameLen; i++) {
-                    sb.append(bb.getChar());
-                }
-                joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, sb.toString()));
+                PacketInputStream in = gateway.getIn();
+                int packetID = in.getInt();
+                String name = in.getString();
+                joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name));
             }
             server.getJoiningClients().clear();
         }
@@ -105,79 +98,60 @@ public class TickLooper extends TerminableLooper {
         for(ExpiPlayer newPlayer : joiningPlayers) {
 
             // create list of entities (for new players)
-            List<PackableEntity> alreadyExistingEntities = new ArrayList<>();
+            List<ExpiEntity> alreadyExistingEntities = new ArrayList<>();
             for(ExpiEntity e : GameServer.get().getEntities()) {
                 if(e == newPlayer) continue;
-                alreadyExistingEntities.add(new PackableEntity(e));
+                alreadyExistingEntities.add(e);
             }
 
             // initial packet for new player
-            InitDataPacket ida = new InitDataPacket(Constants.CHUNKS_NUMBER, newPlayer.getID(), newPlayer.getLocation(), alreadyExistingEntities);
-            List<Packable> initActions = new ArrayList<>();
-            initActions.add(ida);
-            newPlayer.getGateway().addSubPackets(initActions);
+            newPlayer.getGateway().getPacketManager().putInitDataPacket(Constants.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
+
+            newPlayer.getGateway().getOut().swap();
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
                 newPlayer.getGateway().getJoinLock().notify();
             }
 
             // notify all players about new players
-            EntitySpawnPacket esp = new EntitySpawnPacket(newPlayer);
             for(ExpiPlayer p : players) {
                 if(p == newPlayer) continue;
-                p.getGateway().addSubPacket(esp);
+                p.getGateway().getPacketManager().putEntitySpawnPacket(newPlayer);
             }
         }
         joiningPlayers.clear();
     }
 
-    int traffic = 0;
-    long time  = System.currentTimeMillis();
-
     private void resolvePlayersActions() {
 
         for(ExpiPlayer p : players) {
-            for(IncomingPacket packet : p.getGateway().getClientIncomingPackets()) {
 
-                traffic += packet.bytes.length;
-                if(time + 2000 < System.currentTimeMillis()) {
-                    time = System.currentTimeMillis();
-                    System.out.println("Server traffic: "+traffic);
-                    traffic = 0;
-                }
+            PacketInputStream in = p.getGateway().getIn();
 
-                ByteBuffer bb = ByteBuffer.wrap(packet.bytes);
-                int subPackets = bb.getInt(); //System.out.println("S: incoming subpackets: "+subPackets);
-                for(int i = 0; i < subPackets; i++) {
+            //System.out.println("Server avail packets: "+in.getAvailablePackets());
 
-                    int packetID = bb.getInt();
-                    //System.out.println("S: PID: " + packetID);
+            for(int i = 0; i < in.getAvailablePackets(); i++) {
 
-                    switch(packetID) {
+                int packetID = in.getInt();
+                //System.out.println("S: PID: " + packetID);
 
-                        case 14: //PlayerMovePacket
-                            ExpiPlayer e = (ExpiPlayer) server.getEntitiesID().get(p.getID());
-                            e.onMove(bb.getFloat(), bb.getFloat(), bb.getFloat(), bb.getFloat());
-                            break;
+                switch(packetID) {
 
-                        case 15: //TileBreakReqPacket
-                            server.getWorld().onTileBreakReq(bb.getInt(), bb.getInt(), bb.getInt(), p);
-                            break;
+                    case 14: //PlayerMovePacket
+                        ExpiPlayer e = (ExpiPlayer) server.getEntitiesID().get(p.getID());
+                        e.onMove(in.getFloat(), in.getFloat(), in.getFloat(), in.getFloat());
+                        break;
 
-                        case 16: //TilePlaceReqPacket
-                            server.getWorld().onTilePlaceReq(bb.getInt(), bb.getInt(), bb.getInt(), ItemType.getType(bb.getInt()), p);
-                            break;
-                    }
+                    case 15: //TileBreakReqPacket
+                        server.getWorld().onTileBreakReq(in.getInt(), in.getInt(), in.getInt(), p);
+                        break;
+
+                    case 16: //TilePlaceReqPacket
+                        server.getWorld().onTilePlaceReq(in.getInt(), in.getInt(), in.getInt(), ItemType.getType(in.getInt()), p);
+                        break;
                 }
             }
         }
-    }
-
-    private void sendGeneratedActions() {
-        for(ExpiPlayer p : server.getPlayers()) {
-            p.getGateway().addSubPackets(tickSubPackets);
-        }
-        tickSubPackets.clear();
     }
 
     public Object getTickLock() {
@@ -188,9 +162,5 @@ public class TickLooper extends TerminableLooper {
     public void end() {
         super.end();
         GameServer.get().getServerGateway().end();
-    }
-
-    public List<Packable> getTickSubPackets() {
-        return tickSubPackets;
     }
 }

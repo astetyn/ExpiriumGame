@@ -1,14 +1,11 @@
 package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.Resources;
-import com.astetyne.expirium.server.backend.IncomingPacket;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.util.List;
 
 public abstract class ExpiStage {
 
@@ -36,7 +33,7 @@ public abstract class ExpiStage {
         Resources.dispose();
     }
 
-    public abstract void onServerUpdate(List<IncomingPacket> actions);
+    public abstract void onServerUpdate();
 
     public abstract void onServerFail();
 
