@@ -46,6 +46,9 @@ public class Resources {
     public static TextureRegion STONE_TEXTURE;
     public static TextureRegion GRASS_TEXTURE;
     public static TextureRegion DIRT_TEXTURE;
+    public static TextureRegion WOOD_TEXTURE;
+    public static TextureRegion TREE_TOP_TEXTURE;
+    public static TextureRegion WHITE_TILE;
 
     public static void loadTextures() {
 
@@ -60,11 +63,13 @@ public class Resources {
         Drawable selection = new TextureRegionDrawable(uia.findRegion("selection"));
         Drawable textfield = new TextureRegionDrawable(uia.findRegion("textfield"));
         Drawable cursor = new TextureRegionDrawable(uia.findRegion("cursor"));
-        TextureRegion tsBack = uia.findRegion("thumb_stick_background");
-        TextureRegion tsFore = uia.findRegion("thumb_stick_foreground");
+        TextureRegion tsBack = uia.findRegion("thumb_stick_down");
+        TextureRegion tsFore = uia.findRegion("thumb_stick_up");
         TextureRegion hbsBack = uia.findRegion("hot_bar_slot_background");
         TextureRegion hbsFrame = uia.findRegion("hot_bar_slot_frame");
         TextureRegion hbsDefaultTool = uia.findRegion("default_item_tool");
+        TextureRegion switchArrowUp = uia.findRegion("switch_arrow_up");
+        TextureRegion switchArrowUpPressed = uia.findRegion("switch_arrow_up_pressed");
 
         BUTTON_STYLE = new Button.ButtonStyle(drd, dr, drd);
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(dr, drd, dr, ARIAL_FONT);
@@ -72,7 +77,7 @@ public class Resources {
         LABEL_STYLE = new Label.LabelStyle(ARIAL_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         HOT_BAR_SLOT_STYLE_TOOL = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame, hbsDefaultTool);
-        SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(tsFore, tsBack);
+        SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
 
         // animations
 
@@ -88,6 +93,9 @@ public class Resources {
         STONE_TEXTURE = ga.findRegion("stone");
         GRASS_TEXTURE = ga.findRegion("grass");
         DIRT_TEXTURE = ga.findRegion("dirt");
+        WOOD_TEXTURE = ga.findRegion("wood");
+        TREE_TOP_TEXTURE = ga.findRegion("tree_top");
+        WHITE_TILE = ga.findRegion("white_tile");
     }
 
     public static void dispose() {

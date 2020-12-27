@@ -67,6 +67,8 @@ public class ServerPlayerGateway extends TerminableLooper {
 
                 synchronized(gameServer.getTickLooper().getTickLock()) {
                     gameServer.getTickLooper().getTickLock().wait();
+                    in.swap();
+                    out.swap();
                 }
             }
 
@@ -87,6 +89,7 @@ public class ServerPlayerGateway extends TerminableLooper {
             client.close();
         }catch(IOException ignored) {
         }
+        gameServer.playerPreLeaveAsync(this);
         System.out.println("Channel with client closed.");
     }
 

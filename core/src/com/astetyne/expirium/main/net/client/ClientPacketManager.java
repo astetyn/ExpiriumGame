@@ -40,7 +40,7 @@ public class ClientPacketManager {
     }
 
     public void putTilePlaceReqPacket(Tile t, ItemType placedItem) {
-        out.startPacket(15);
+        out.startPacket(16);
         out.putInt(t.getChunk().getId());
         out.putInt(t.getX());
         out.putInt(t.getY());
@@ -69,7 +69,7 @@ public class ClientPacketManager {
                     game.initGameStage();
                     ExpiriumGame.get().setCurrentStage(game);
                     world = GameStage.get().getWorld();
-
+                    break;
                 case 12: //ChunkDestroyPacket
                     world.onDestroyChunkEvent();
                     break;

@@ -8,7 +8,6 @@ import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.backend.FixturePack;
-import com.astetyne.expirium.server.backend.Packable;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
@@ -26,7 +25,6 @@ public class ExpiWorld {
     private final long seed;
     private final World box2dWorld;
     private final Body terrainBody;
-    private List<Packable> subPackets;
     private final int w, h;
     private final WorldGenerator worldGenerator;
     private final StabilityCalculator stabilityCalc;
@@ -68,7 +66,7 @@ public class ExpiWorld {
 
     public void onTick() {
 
-        for(int i = 0; i < 60/Constants.SERVER_DEFAULT_TPS; i++) {
+        for(int i = 0; i < 60.0/Constants.SERVER_DEFAULT_TPS; i++) {
             box2dWorld.step(1 / 60f, 6, 2);
         }
 
@@ -207,7 +205,7 @@ public class ExpiWorld {
         ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
         if(t.getType() != TileType.AIR) return;
 
-        if(!isPlaceFree(x, y)) return;
+        if(item.getBuildTile().isSolid() && !isPlaceFree(x, y)) return;
 
         FixturePack fp = new FixturePack();
 

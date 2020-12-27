@@ -9,9 +9,10 @@ import java.util.HashMap;
 public enum TileType {
 
     AIR(0, false, null, 0, null, 0),
-    STONE(1, true, Resources.STONE_TEXTURE, 0.1f, ItemType.STONE, 3),
-    GRASS(2, true, Resources.GRASS_TEXTURE, 0.1f, ItemType.GRASS, 2),
-    DIRT(3, true, Resources.DIRT_TEXTURE, 0.1f, ItemType.DIRT, 2);
+    STONE(1, true, Resources.STONE_TEXTURE, 1f, ItemType.STONE, 3),
+    GRASS(2, true, Resources.GRASS_TEXTURE, 0.5f, ItemType.GRASS, 2),
+    DIRT(3, true, Resources.DIRT_TEXTURE, 0.5f, ItemType.DIRT, 2),
+    WOOD(4, false, Resources.WOOD_TEXTURE, 0.3f, ItemType.RAW_WOOD, 2);
 
     private static final HashMap<Integer, TileType> map;
 

@@ -79,6 +79,7 @@ public class PacketOutputStream {
     public void flush() throws IOException {
         readBuffer.putInt(0, lastPacketCounter);
         //System.out.println("packets: "+lastPacketCounter+" pos: "+readBuffer.position()+" packet counter: "+lastPacketCounter);
+        //System.out.println("Flushing: "+readBuffer.position());
         out.write(readBuffer.array(), 0, readBuffer.position());
         out.flush();
     }

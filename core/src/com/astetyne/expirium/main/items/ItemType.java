@@ -10,7 +10,8 @@ public enum ItemType {
 
     STONE(0, Resources.STONE_TEXTURE, 1, 1),
     GRASS(1, Resources.GRASS_TEXTURE, 1, 2),
-    DIRT(2, Resources.DIRT_TEXTURE, 1, 3);
+    DIRT(2, Resources.DIRT_TEXTURE, 1, 3),
+    RAW_WOOD(3, Resources.WOOD_TEXTURE, 1, 4);
 
     private static final HashMap<Integer, ItemType> map;
 

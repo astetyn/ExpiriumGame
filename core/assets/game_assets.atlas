@@ -13,14 +13,14 @@ corundum
   index: -1
 dirt
   rotate: false
-  xy: 398, 182
+  xy: 134, 2
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 332, 116
+  xy: 398, 182
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -118,15 +118,36 @@ tile_break
   index: 1
 tile_break
   rotate: false
-  xy: 134, 2
+  xy: 398, 116
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 3
 tile_break
   rotate: false
-  xy: 398, 116
+  xy: 332, 50
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
+tree_top
+  rotate: false
+  xy: 332, 116
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+white_tile
+  rotate: false
+  xy: 200, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+wood
+  rotate: false
+  xy: 266, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

@@ -53,6 +53,7 @@ public class PacketInputStream {
     public int fillBuffer() throws IOException {
         int readBytes =  in.read(writeBuffer.array(), 0, writeBuffer.capacity());
         availablePackets = writeBuffer.getInt();
+        //System.out.println("Reading: "+readBytes);
         return readBytes;
     }
 

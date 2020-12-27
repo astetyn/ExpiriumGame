@@ -11,11 +11,13 @@ public class SwitchArrow extends Widget {
 
     private final SwitchArrowStyle style;
     private boolean pressed;
+    private final boolean rotated;
 
-    public SwitchArrow(SwitchArrowStyle style, Runnable onClick) {
+    public SwitchArrow(SwitchArrowStyle style, Runnable onClick, boolean rotated) {
 
         this.style = style;
         pressed = false;
+        this.rotated = rotated;
 
         addListener(new InputListener() {
             @Override
@@ -35,9 +37,17 @@ public class SwitchArrow extends Widget {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if(pressed) {
-            batch.draw(style.pressed, getX(), getY(), getWidth(), getHeight());
+            if(rotated) {
+                batch.draw(style.pressed, getX(), getY(), getWidth()/2, getHeight()/2, getWidth(), getHeight(), 1,1, 180);
+            }else {
+                batch.draw(style.pressed, getX(), getY(), getWidth(), getHeight());
+            }
         }else {
-            batch.draw(style.unpressed, getX(), getY(), getWidth(), getHeight());
+            if(rotated) {
+                batch.draw(style.unpressed, getX(), getY(), getWidth()/2, getHeight()/2, getWidth(), getHeight(), 1,1, 180);
+            }else {
+                batch.draw(style.unpressed, getX(), getY(), getWidth(), getHeight());
+            }
         }
     }
 

@@ -10,24 +10,35 @@ import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class TilePlacer implements InputProcessor {
 
     private final SpriteBatch batch;
     private final Inventory inv;
     private final GameWorld world;
-    private final GlyphLayout gl;
+    private final ImageButton stabilityButton;
+    private boolean stabilityShowActive;
 
     public TilePlacer() {
 
         batch = GameStage.get().getBatch();
         inv = GameStage.get().getInv();
         world = GameStage.get().getWorld();
-        gl = new GlyphLayout();
-        Resources.ARIAL_FONT.getData().setScale(0.02f);
+        stabilityShowActive = false;
+
+        stabilityButton = new ImageButton(new TextureRegionDrawable(Resources.DIRT_TEXTURE));
+        stabilityButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                stabilityShowActive = !stabilityShowActive;
+            }
+        });
 
     }
 
@@ -35,18 +46,22 @@ public class TilePlacer implements InputProcessor {
 
         if(t.getType() == TileType.AIR) return;
 
-        if(t.getStability() == 1) {
-            batch.setColor(1f, 0.2f, 0f, 1);
-        }else if(t.getStability() == 2) {
-            batch.setColor(0.6f, 0.6f, 0f, 1);
-        }else if(t.getStability() == 3) {
-            batch.setColor(0.4f, 0.8f, 0f, 1);
-        }else if(t.getStability() == 4) {
-            batch.setColor(0f, 1, 0f, 1);
+        if(stabilityShowActive) {
+
+            if(t.getStability() == 1) {
+                batch.setColor(0.9f, 0f, 0f, 1);
+            }else if(t.getStability() == 2) {
+                batch.setColor(0.9f, 0.3f, 0f, 1);
+            }else if(t.getStability() == 3) {
+                batch.setColor(0.9f, 0.6f, 0f, 1);
+            }else if(t.getStability() == 4) {
+                batch.setColor(0.9f, 0.9f, 0f, 1);
+            }
+            batch.draw(Resources.WHITE_TILE, t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.setColor(1, 1, 1, 1);
+        }else {
+            batch.draw(t.getTexture(), t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
         }
-        batch.draw(t.getTexture(), t.getChunk().getId()* Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
-        Resources.ARIAL_FONT.draw(batch, t.getStability()+"", t.getChunk().getId()* Constants.T_W_CH + t.getX(), t.getY()+1);
-        batch.setColor(1,1,1,1);
 
     }
 
@@ -100,5 +115,9 @@ public class TilePlacer implements InputProcessor {
         ItemType item = inv.getMaterialSlot().getItemStack().getItem().getType();
         ExpiriumGame.get().getClientGateway().getPacketManager().putTilePlaceReqPacket(t, item);
         return true;
+    }
+
+    public ImageButton getStabilityButton() {
+        return stabilityButton;
     }
 }

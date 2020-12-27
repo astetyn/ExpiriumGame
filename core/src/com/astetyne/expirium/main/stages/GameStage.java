@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.gui.GUILayout;
 import com.astetyne.expirium.main.gui.GameGUILayout;
 import com.astetyne.expirium.main.items.inventory.Inventory;
 import com.astetyne.expirium.main.world.GameWorld;
@@ -15,23 +16,18 @@ public class GameStage extends ExpiStage {
     private GameWorld gameWorld;
     private final Inventory inventory;
     private final Box2DDebugRenderer b2dr;
-    private final GameGUILayout gameGUI;
+    private final GameGUILayout gameGuiLayout;
+    private GUILayout guiLayout;
 
     public GameStage() {
 
         game = this;
-
         b2dr = new Box2DDebugRenderer();
-
         System.out.println("Display density: "+Gdx.graphics.getDensity());
-
         inventory = new Inventory();
-
-        gameGUI = new GameGUILayout();
-
-        stage.addActor(gameGUI.getTable());
-
         resize();
+
+        gameGuiLayout = new GameGUILayout();
 
     }
 
@@ -40,7 +36,7 @@ public class GameStage extends ExpiStage {
 
         stage.act();
         gameWorld.update();
-        gameGUI.update();
+        guiLayout.update();
 
     }
 
@@ -78,6 +74,12 @@ public class GameStage extends ExpiStage {
         int numberOfChunks = ExpiriumGame.get().getClientGateway().getIn().getInt();
         gameWorld = new GameWorld(numberOfChunks);
         gameWorld.postSetup();
+        setActiveGuiLayout(gameGuiLayout);
+    }
+
+    public void setActiveGuiLayout(GUILayout layout) {
+        guiLayout = layout;
+        guiLayout.build(stage);
     }
 
     @Override
@@ -90,8 +92,8 @@ public class GameStage extends ExpiStage {
 
     }
 
-    public GameGUILayout getGameGUI() {
-        return gameGUI;
+    public GUILayout getGuiLayout() {
+        return guiLayout;
     }
 
     public Inventory getInv() {
@@ -108,5 +110,9 @@ public class GameStage extends ExpiStage {
 
     public static GameStage get() {
         return game;
+    }
+
+    public GameGUILayout getGameGuiLayout() {
+        return gameGuiLayout;
     }
 }

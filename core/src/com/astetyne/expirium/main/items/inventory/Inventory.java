@@ -1,20 +1,29 @@
 package com.astetyne.expirium.main.items.inventory;
 
 import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.gui.GameGUILayout;
 import com.astetyne.expirium.main.gui.HotBarSlot;
+import com.astetyne.expirium.main.gui.InvGUILayout;
 import com.astetyne.expirium.main.gui.SwitchArrow;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Inventory {
 
+    private final InvGUILayout invGUILayout;
+
     private HotBarSlot toolSlot, materialSlot, consumableSlot;
     private final SwitchArrow switchArrowUp, switchArrowDown;
+    private final ImageButton inventoryButton, consumeButton;
 
     private List<ItemStack> tools;
     private List<ItemStack> materials;
@@ -26,14 +35,25 @@ public class Inventory {
 
     public Inventory() {
 
+        invGUILayout = new InvGUILayout();
+
         toolSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusTool);
         materialSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusBuild);
         consumableSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusUse);
 
         toolSlot.setFocus(true);
 
-        switchArrowUp = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchUp);
-        switchArrowDown = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchDown);
+        switchArrowUp = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchUp, false);
+        switchArrowDown = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchDown, true);
+        inventoryButton = new ImageButton(new TextureRegionDrawable(Resources.WOOD_TEXTURE));
+        consumeButton = new ImageButton(new TextureRegionDrawable(Resources.WOOD_TEXTURE));
+
+        inventoryButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                GameStage.get().setActiveGuiLayout(invGUILayout);
+            }
+        });
 
         tools = new ArrayList<>();
         materials = new ArrayList<>();
@@ -44,19 +64,19 @@ public class Inventory {
     private final Runnable onFocusTool = () -> {
         materialSlot.setFocus(false);
         consumableSlot.setFocus(false);
-        GameStage.get().getGameGUI().buildTableTool();
+        ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableTool();
     };
 
     private final Runnable onFocusBuild = () -> {
         toolSlot.setFocus(false);
         consumableSlot.setFocus(false);
-        GameStage.get().getGameGUI().buildTableBuild();
+        ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableBuild();
     };
 
     private final Runnable onFocusUse = () -> {
         toolSlot.setFocus(false);
         materialSlot.setFocus(false);
-        GameStage.get().getGameGUI().buildTableUse();
+        ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableUse();
     };
 
     private final Runnable onSwitchUp = () -> {
@@ -176,5 +196,13 @@ public class Inventory {
 
     public SwitchArrow getSwitchArrowDown() {
         return switchArrowDown;
+    }
+
+    public ImageButton getInventoryButton() {
+        return inventoryButton;
+    }
+
+    public ImageButton getConsumeButton() {
+        return consumeButton;
     }
 }

@@ -39,11 +39,6 @@ public class TickLooper extends TerminableLooper {
 
                 //todo: ai? time? weather?
 
-                for(ExpiPlayer pp : players) {
-                    pp.getGateway().getOut().swap();
-                    pp.getGateway().getIn().swap();
-                }
-
                 // wakes up all clients threads and send new actions
                 synchronized(tickLock) {
                     tickLock.notifyAll();

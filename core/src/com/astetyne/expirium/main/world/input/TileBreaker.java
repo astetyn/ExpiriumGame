@@ -7,6 +7,7 @@ import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
+import com.astetyne.expirium.main.world.tiles.TileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -22,7 +23,7 @@ public class TileBreaker {
     public TileBreaker() {
         this.world = GameStage.get().getWorld();
         this.batch = GameStage.get().getBatch();
-        breakTS = GameStage.get().getGameGUI().getBreakTS();
+        breakTS = new ThumbStick(Resources.THUMB_STICK_STYLE);
         targetTile = null;
         timeAccumulator = 0;
     }
@@ -51,7 +52,7 @@ public class TileBreaker {
                 targetTile = null;
                 break;
             }
-            if(newTarget.isSolid()) {
+            if(newTarget.getType() != TileType.AIR) {
                 if(newTarget != targetTile) {
                     targetTile = newTarget;
                     timeAccumulator = 0;
@@ -82,5 +83,9 @@ public class TileBreaker {
         float durability = timeAccumulator / targetTile.getType().getBreakTime();
         int x = targetTile.getX() + Constants.T_W_CH * targetTile.getChunk().getId();
         batch.draw(Resources.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
+    }
+
+    public ThumbStick getBreakTS() {
+        return breakTS;
     }
 }
