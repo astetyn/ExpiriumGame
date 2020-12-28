@@ -19,5 +19,10 @@ public class Constants {
     public static final float D_I_SIZE = 0.5f;
     public static final float D_I_PICK_DIST = 1.3f;
 
+    // player
+    public static final int PLAYER_INV_COLUMNS = 10;
+    public static final int PLAYER_INV_ROWS = 10;
+    public static final int PLAYER_INV_MAX_WEIGHT = 10;
+
 
 }

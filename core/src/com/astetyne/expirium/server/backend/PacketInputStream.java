@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.IntVector2;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;
@@ -48,6 +49,10 @@ public class PacketInputStream {
 
     public Vector2 getVector() {
         return new Vector2(readBuffer.getFloat(), readBuffer.getFloat());
+    }
+
+    public IntVector2 getIntVector() {
+        return new IntVector2(readBuffer.getInt(), readBuffer.getInt());
     }
 
     public int fillBuffer() throws IOException {

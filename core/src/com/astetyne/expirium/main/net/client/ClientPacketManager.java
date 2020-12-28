@@ -5,6 +5,7 @@ import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -45,6 +46,18 @@ public class ClientPacketManager {
         out.putInt(t.getX());
         out.putInt(t.getY());
         out.putInt(placedItem.getId());
+    }
+
+    public void putInvOpenReqPacket(int id) {
+        out.startPacket(23);
+        out.putInt(id);
+    }
+
+    public void putInvItemMoveReqPacket(int id, IntVector2 pos1, IntVector2 pos2) {
+        out.startPacket(25);
+        out.putInt(id);
+        out.putIntVector(pos1);
+        out.putIntVector(pos2);
     }
 
     public void processIncomingPackets() {
@@ -105,8 +118,12 @@ public class ClientPacketManager {
                     world.getEntitiesID().get(id).destroy();
                     break;
 
-                case 22: //ItemPickupPacket
-                    GameStage.get().getInv().onItemPick(ItemType.getType(in.getInt()).initItem());
+                case 24: //InvFeedPacket
+                    GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvFeed(in);
+                    break;
+
+                case 26: //InvItemMoveAckPacket
+                    GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvItemMove(in);
                     break;
             }
         }

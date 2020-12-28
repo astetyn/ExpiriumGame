@@ -2,6 +2,7 @@ package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
@@ -144,6 +145,23 @@ public class TickLooper extends TerminableLooper {
                     case 16: //TilePlaceReqPacket
                         server.getWorld().onTilePlaceReq(in.getInt(), in.getInt(), in.getInt(), ItemType.getType(in.getInt()), p);
                         break;
+
+                    case 23: {//InvOpenReqPacket
+                        int invID = in.getInt();
+                        if(server.getInventoriesID().containsKey(invID)) {
+                            p.getGateway().getPacketManager().putInvFeedPacket(server.getInventoriesID().get(invID));
+                        }
+                        break;
+                    }
+                    case 25: {//InvItemMoveReqPacket
+                        int invID = in.getInt();
+                        IntVector2 pos1 = in.getIntVector();
+                        IntVector2 pos2 = in.getIntVector();
+                        if(server.getInventoriesID().containsKey(invID)) {
+                            server.getInventoriesID().get(invID).onMoveReq(p, pos1, pos2);
+                        }
+                        break;
+                    }
                 }
             }
         }

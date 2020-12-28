@@ -82,7 +82,7 @@ public class TilePlacer implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return checkPlace(screenX, screenY);
+        return canBePlaced(screenX, screenY);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class TilePlacer implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return checkPlace(screenX, screenY);
+        return canBePlaced(screenX, screenY);
     }
 
     @Override
@@ -105,14 +105,15 @@ public class TilePlacer implements InputProcessor {
         return false;
     }
 
-    private boolean checkPlace(int screenX, int screenY) {
+    private boolean canBePlaced(int screenX, int screenY) {
         if(!inv.getMaterialSlot().isFocused()) return false;
 
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         Tile t = world.getTileAt((int)vec.x, (int)vec.y);
         if(t.getType() != TileType.AIR) return false;
+        if(inv.getMaterialSlot().getItemStack() == null) return false;
 
-        ItemType item = inv.getMaterialSlot().getItemStack().getItem().getType();
+        ItemType item = inv.getMaterialSlot().getItemStack().getItem();
         ExpiriumGame.get().getClientGateway().getPacketManager().putTilePlaceReqPacket(t, item);
         return true;
     }

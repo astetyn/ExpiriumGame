@@ -1,8 +1,10 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.ExpiInventory;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
@@ -26,6 +28,7 @@ public class ServerPacketManager {
 
     public void putInitDataPacket(int numberOfChunks, ExpiPlayer p, List<ExpiEntity> entities) {
         out.startPacket(11);
+        out.putInt(p.getInv().getId());
         out.putInt(numberOfChunks);
         out.putInt(p.getID());
         out.putFloat(p.getLocation().x);
@@ -110,9 +113,22 @@ public class ServerPacketManager {
         out.putInt(e.getID());
     }
 
-    public void putItemPickupPacket(ItemType item) {
-        out.startPacket(22);
-        out.putInt(item.getId());
+    public void putInvFeedPacket(ExpiInventory inv) {
+        out.startPacket(24);
+        out.putInt(inv.getId());
+        out.putInt(inv.getItems().size());
+        for(ItemStack is : inv.getItems()) {
+            out.putInt(is.getItem().getId());
+            out.putInt(is.getAmount());
+            out.putIntVector(is.getGridPos());
+        }
+    }
+
+    public void putInvMoveAckPacket(int id, IntVector2 pos1, IntVector2 pos2) {
+        out.startPacket(26);
+        out.putInt(id);
+        out.putIntVector(pos1);
+        out.putIntVector(pos2);
     }
 
     public void putTileBreakAckPacket(List<ExpiTile> brokenTiles, FixturePack fp, HashSet<ExpiTile> at) {

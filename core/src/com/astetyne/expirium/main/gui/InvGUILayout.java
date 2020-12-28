@@ -27,7 +27,6 @@ public class InvGUILayout extends GUILayout {
 
         this.rootTable = new Table();
         rootTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        rootTable.add(returnButton);
 
         rootTable.setDebug(true);
     }
@@ -46,5 +45,9 @@ public class InvGUILayout extends GUILayout {
     public void build(Stage stage) {
         stage.clear();
         stage.addActor(rootTable);
+
+        rootTable.clear();
+        rootTable.add(returnButton);
+        rootTable.add(GameStage.get().getInv().getInventoryGrid());
     }
 }

@@ -8,10 +8,10 @@ import java.util.HashMap;
 
 public enum ItemType {
 
-    STONE(0, Resources.STONE_TEXTURE, 1, 1),
-    GRASS(1, Resources.GRASS_TEXTURE, 1, 2),
-    DIRT(2, Resources.DIRT_TEXTURE, 1, 3),
-    RAW_WOOD(3, Resources.WOOD_TEXTURE, 1, 4);
+    STONE(0, 1, 1, 1, 1, 0.5f, Resources.STONE_TEXTURE, Resources.STONE_TEXTURE),
+    GRASS(1, 1, 2, 1, 1, 0.5f, Resources.GRASS_TEXTURE, Resources.GRASS_TEXTURE),
+    DIRT(2, 1, 3, 1, 1, 0.5f, Resources.DIRT_TEXTURE, Resources.DIRT_TEXTURE),
+    RAW_WOOD(3, 1, 4, 1, 1, 0.5f, Resources.WOOD_TEXTURE, Resources.WOOD_TEXTURE);
 
     private static final HashMap<Integer, ItemType> map;
 
@@ -27,15 +27,23 @@ public enum ItemType {
     }
 
     int id;
-    TextureRegion itemTexture;
     int category;
     int buildTileID;
+    int gridWidth;
+    int gridHeight;
+    float weight;
+    TextureRegion itemTexture;
+    TextureRegion itemTextureInGrid;
 
-    ItemType(int id, TextureRegion itemTexture, int category, int buildTileID) {
+    ItemType(int id, int cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2) {
         this.id = id;
-        this.itemTexture = itemTexture;
-        this.category = category;
-        this.buildTileID = buildTileID;
+        category = cat;
+        buildTileID = tileID;
+        gridWidth = gw;
+        gridHeight = gh;
+        this.weight = weight;
+        this.itemTexture = tex;
+        itemTextureInGrid = tex2;
     }
 
     public int getId() {
@@ -43,7 +51,7 @@ public enum ItemType {
     }
 
     public Item initItem() {
-        return new Item(this, itemTexture);
+        return new Item(this);
     }
 
     public int getCategory() {
@@ -52,5 +60,25 @@ public enum ItemType {
 
     public TileType getBuildTile() {
         return TileType.getType(buildTileID);
+    }
+
+    public int getGridWidth() {
+        return gridWidth;
+    }
+
+    public int getGridHeight() {
+        return gridHeight;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public TextureRegion getItemTexture() {
+        return itemTexture;
+    }
+
+    public TextureRegion getItemTextureInGrid() {
+        return itemTextureInGrid;
     }
 }

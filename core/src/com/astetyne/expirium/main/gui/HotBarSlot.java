@@ -39,7 +39,7 @@ public class HotBarSlot extends Widget {
         if(itemStack == null) {
             batch.draw(style.defaultItemTexture, getX(), getY(), getWidth(), getHeight());
         }else {
-            batch.draw(itemStack.getItem().getTexture(), getX(), getY(), getWidth(), getHeight());
+            batch.draw(itemStack.getItem().getItemTexture(), getX(), getY(), getWidth(), getHeight());
             //todo: napisat na to kvantitu (kolko toho este je)
         }
         batch.draw(style.frame, getX(), getY(), getWidth(), getHeight());

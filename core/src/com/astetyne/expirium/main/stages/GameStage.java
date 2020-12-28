@@ -22,6 +22,7 @@ public class GameStage extends ExpiStage {
     public GameStage() {
 
         game = this;
+
         b2dr = new Box2DDebugRenderer();
         System.out.println("Display density: "+Gdx.graphics.getDensity());
         inventory = new Inventory();
@@ -71,6 +72,8 @@ public class GameStage extends ExpiStage {
     }
 
     public void initGameStage() {
+        int invID = ExpiriumGame.get().getClientGateway().getIn().getInt();
+        inventory.getInventoryGrid().setId(invID);
         int numberOfChunks = ExpiriumGame.get().getClientGateway().getIn().getInt();
         gameWorld = new GameWorld(numberOfChunks);
         gameWorld.postSetup();

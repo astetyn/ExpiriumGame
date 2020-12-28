@@ -5,11 +5,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Item {
 
     private final ItemType type;
-    private final TextureRegion texture;
 
-    public Item(ItemType type, TextureRegion texture) {
+    public Item(ItemType type) {
         this.type = type;
-        this.texture = texture;
     }
 
     public ItemType getType() {
@@ -17,6 +15,6 @@ public class Item {
     }
 
     public TextureRegion getTexture() {
-        return texture;
+        return type.getItemTexture();
     }
 }

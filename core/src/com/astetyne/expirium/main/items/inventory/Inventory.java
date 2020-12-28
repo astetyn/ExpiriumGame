@@ -1,21 +1,17 @@
 package com.astetyne.expirium.main.items.inventory;
 
+import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
-import com.astetyne.expirium.main.gui.GameGUILayout;
-import com.astetyne.expirium.main.gui.HotBarSlot;
-import com.astetyne.expirium.main.gui.InvGUILayout;
-import com.astetyne.expirium.main.gui.SwitchArrow;
-import com.astetyne.expirium.main.items.Item;
+import com.astetyne.expirium.main.gui.*;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class Inventory {
 
@@ -24,16 +20,21 @@ public class Inventory {
     private HotBarSlot toolSlot, materialSlot, consumableSlot;
     private final SwitchArrow switchArrowUp, switchArrowDown;
     private final ImageButton inventoryButton, consumeButton;
-
-    private List<ItemStack> tools;
-    private List<ItemStack> materials;
-    private List<ItemStack> consumables;
+    private StorageGrid inventoryGrid;
 
     private int toolsSwitchIndex = 0;
     private int materialsSwitchIndex = 0;
     private int consumablesSwitchIndex = 0;
 
+    private final HashMap<Integer, StorageGrid> storageGridIDs;
+
     public Inventory() {
+
+        storageGridIDs = new HashMap<>();
+
+        int c = Constants.PLAYER_INV_COLUMNS;
+        int r = Constants.PLAYER_INV_ROWS;
+        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Resources.WHITE_TILE), reloadSlotItems);
 
         invGUILayout = new InvGUILayout();
 
@@ -51,13 +52,13 @@ public class Inventory {
         inventoryButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if(inventoryGrid.getId() == -1) {
+                    return;
+                }
                 GameStage.get().setActiveGuiLayout(invGUILayout);
+                ExpiriumGame.get().getClientGateway().getPacketManager().putInvOpenReqPacket(inventoryGrid.getId());
             }
         });
-
-        tools = new ArrayList<>();
-        materials = new ArrayList<>();
-        consumables = new ArrayList<>();
 
     }
 
@@ -79,104 +80,76 @@ public class Inventory {
         ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableUse();
     };
 
-    private final Runnable onSwitchUp = () -> {
-        if(toolSlot.isFocused()) {
-            if(toolsSwitchIndex >= tools.size()-1) {
-                toolsSwitchIndex = 0;
-            }else {
-                toolsSwitchIndex++;
-            }
-        }else if(materialSlot.isFocused()) {
-            if(materialsSwitchIndex >= materials.size()-1) {
-                materialsSwitchIndex = 0;
-            }else {
-                materialsSwitchIndex++;
-            }
-        }else if(consumableSlot.isFocused()) {
-            if(consumablesSwitchIndex >= consumables.size()-1) {
-                consumablesSwitchIndex = 0;
-            }else {
-                consumablesSwitchIndex++;
+    private final Runnable reloadSlotItems = () -> {
+
+        System.out.println("inv reload");
+
+        int toolsCount = 0;
+        int materialsCount = 0;
+        int consumableCount = 0;
+
+        ItemStack lastTool = null, lastMaterial = null, lastConsumable = null;
+
+        for(ItemStack is : inventoryGrid.getItems()) {
+            if(is.getItem().getCategory() == 0) {
+                if(toolsSwitchIndex == toolsCount) {
+                    toolSlot.setItemStack(is);
+                }
+                lastTool = is;
+                toolsCount++;
+            }else if(is.getItem().getCategory() == 1) {
+                System.out.println("ind: "+materialsSwitchIndex+" count: "+materialsCount);
+                if(materialsSwitchIndex == materialsCount) {
+                    materialSlot.setItemStack(is);
+                }
+                lastMaterial = is;
+                materialsCount++;
+            }else if(is.getItem().getCategory() == 2) {
+                if(consumablesSwitchIndex == consumableCount) {
+                    consumableSlot.setItemStack(is);
+                }
+                lastConsumable = is;
+                consumableCount++;
             }
         }
-        setItemsToSlots();
+
+        if(toolsSwitchIndex >= toolsCount) {
+            toolsSwitchIndex = Math.max(toolsCount-1, 0);
+            toolSlot.setItemStack(lastTool);
+        }
+        if(materialsSwitchIndex >= materialsCount) {
+            materialsSwitchIndex = Math.max(materialsCount-1, 0);
+            materialSlot.setItemStack(lastMaterial);
+        }
+        if(consumablesSwitchIndex >= consumableCount) {
+            consumablesSwitchIndex = Math.max(consumableCount-1, 0);
+            consumableSlot.setItemStack(lastConsumable);
+        }
+
     };
 
     private final Runnable onSwitchDown = () -> {
+
         if(toolSlot.isFocused()) {
-            if(toolsSwitchIndex == 0) {
-                toolsSwitchIndex = Math.max(tools.size()-1, 0);
-            }else {
-                toolsSwitchIndex--;
-            }
+            if(toolsSwitchIndex > 0) toolsSwitchIndex--;
         }else if(materialSlot.isFocused()) {
-            if(materialsSwitchIndex == 0) {
-                materialsSwitchIndex = Math.max(materials.size()-1, 0);
-            }else {
-                materialsSwitchIndex--;
-            }
+            if(materialsSwitchIndex > 0) materialsSwitchIndex--;
         }else if(consumableSlot.isFocused()) {
-            if(consumablesSwitchIndex == 0) {
-                consumablesSwitchIndex = Math.max(consumables.size()-1, 0);
-            }else {
-                consumablesSwitchIndex--;
-            }
+            if(consumablesSwitchIndex > 0) consumablesSwitchIndex--;
         }
-        setItemsToSlots();
+        reloadSlotItems.run();
     };
 
-    public void onItemPick(Item item) {
-
-        for(ItemStack is : materials) {
-            if(is.getItem().getType() == item.getType()) {
-                is.increaseAmount();
-                return;
-            }
+    private final Runnable onSwitchUp = () -> {
+        if(toolSlot.isFocused()) {
+            toolsSwitchIndex++;
+        }else if(materialSlot.isFocused()) {
+            materialsSwitchIndex++;
+        }else if(consumableSlot.isFocused()) {
+            consumablesSwitchIndex++;
         }
-        materials.add(new ItemStack(item, 1));
-        //todo: spravit aj pre ostatne typy
-        setItemsToSlots();
-    }
-
-    public void removeItem(ItemType type) {
-
-        if(type.getCategory() == 0) {
-
-        }else if(type.getCategory() == 1) {
-
-            for(ItemStack is : materials) {
-                if(is.getItem().getType() == type) {
-                    is.decreaseAmount();
-                    //todo: kontrola ci je 0 - prazdny
-                }
-            }
-
-        }else if(type.getCategory() == 2) {
-
-        }
-    }
-
-    private void setItemsToSlots() {
-
-        if(tools.size() != 0) {
-            toolSlot.setItemStack(tools.get(toolsSwitchIndex));
-        }else {
-            toolSlot.setItemStack(null);
-        }
-
-        if(materials.size() != 0) {
-            materialSlot.setItemStack(materials.get(materialsSwitchIndex));
-        }else {
-            materialSlot.setItemStack(null);
-        }
-
-        if(consumables.size() != 0) {
-            consumableSlot.setItemStack(consumables.get(consumablesSwitchIndex));
-        }else {
-            consumableSlot.setItemStack(null);
-        }
-
-    }
+        reloadSlotItems.run();
+    };
 
     public HotBarSlot getToolSlot() {
         return toolSlot;
@@ -204,5 +177,13 @@ public class Inventory {
 
     public ImageButton getConsumeButton() {
         return consumeButton;
+    }
+
+    public StorageGrid getInventoryGrid() {
+        return inventoryGrid;
+    }
+
+    public HashMap<Integer, StorageGrid> getStorageGridIDs() {
+        return storageGridIDs;
     }
 }

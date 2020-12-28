@@ -1,7 +1,9 @@
 package com.astetyne.expirium.server.api.entities;
 
 import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.ExpiInventory;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
@@ -14,6 +16,7 @@ public class ExpiPlayer extends ExpiEntity {
     private final ServerPlayerGateway gateway;
     private String name;
     private final HashSet<Integer> activeChunks;
+    private final ExpiInventory inventory;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
         super(EntityType.PLAYER, location, 0.9f, 1.25f);
@@ -21,14 +24,12 @@ public class ExpiPlayer extends ExpiEntity {
         this.name = name;
         activeChunks = new HashSet<>();
         GameServer.get().getPlayers().add(this);
+        inventory = new ExpiInventory(Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_ROWS);
     }
 
     public void onMove(float x, float y, float v1, float v2) {
-
         body.setTransform(x, y, 0);
         body.setLinearVelocity(v1, v2);
-        //todo: oznamit to aj ostatnym
-
     }
 
     public ServerPlayerGateway getGateway() {
@@ -65,5 +66,9 @@ public class ExpiPlayer extends ExpiEntity {
     @Override
     public void writeMeta(PacketOutputStream out) {
         out.putString(name);
+    }
+
+    public ExpiInventory getInv() {
+        return inventory;
     }
 }

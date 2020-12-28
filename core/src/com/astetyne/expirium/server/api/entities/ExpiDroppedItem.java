@@ -31,7 +31,7 @@ public class ExpiDroppedItem extends ExpiEntity {
         this.ticksToDespawn = ticksToDespawn;
     }
 
-    public ItemType getItemType() {
+    public ItemType getItem() {
         return type;
     }
 

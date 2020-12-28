@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.badlogic.gdx.math.Vector2;
 
@@ -58,6 +59,11 @@ public class PacketOutputStream {
     public void putVector(Vector2 vec) {
         putFloat(vec.x);
         putFloat(vec.y);
+    }
+
+    public void putIntVector(IntVector2 vec) {
+        putInt(vec.x);
+        putInt(vec.y);
     }
 
     public void putEntity(ExpiEntity e) {

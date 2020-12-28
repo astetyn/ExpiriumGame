@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server;
 
+import com.astetyne.expirium.server.api.ExpiInventory;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
@@ -21,6 +22,7 @@ public class GameServer implements Runnable {
     private final TickLooper tickLooper;
 
     private final HashMap<Integer, ExpiEntity> entitiesID;
+    private final HashMap<Integer, ExpiInventory> inventoriesID;
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ServerPlayerGateway> leavingClients;
     private final List<ExpiEntity> entities;
@@ -33,6 +35,7 @@ public class GameServer implements Runnable {
         server = this;
 
         entitiesID = new HashMap<>();
+        inventoriesID = new HashMap<>();
 
         System.out.println("Booting server...");
 
@@ -108,6 +111,10 @@ public class GameServer implements Runnable {
 
     public HashMap<Integer, ExpiEntity> getEntitiesID() {
         return entitiesID;
+    }
+
+    public HashMap<Integer, ExpiInventory> getInventoriesID() {
+        return inventoriesID;
     }
 
     public List<ExpiDroppedItem> getDroppedItems() {

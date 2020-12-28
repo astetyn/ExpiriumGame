@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
+import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.tiles.TileType;
@@ -88,34 +89,37 @@ public class ExpiWorld {
         Iterator<ExpiDroppedItem> it = GameServer.get().getDroppedItems().iterator();
         outer:
         while(it.hasNext()) {
-            ExpiDroppedItem item = it.next();
-            if(item.getCooldown() != 0) {
-                item.reduceCooldown();
+            ExpiDroppedItem droppedItem = it.next();
+            if(droppedItem.getCooldown() != 0) {
+                droppedItem.reduceCooldown();
                 continue;
             }
-            Vector2 center = item.getCenter();
+            Vector2 center = droppedItem.getCenter();
             for(ExpiPlayer p : GameServer.get().getPlayers()) {
                 Vector2 dif = p.getCenter().sub(center);
-                if(dif.len() < Constants.D_I_PICK_DIST) {
+                if(dif.len() < Constants.D_I_PICK_DIST && p.getInv().canBeAdded(droppedItem.getItem())) {
                     it.remove();
-                    p.getGateway().getPacketManager().putItemPickupPacket(item.getItemType());
+
+                    p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1));
+                    p.getGateway().getPacketManager().putInvFeedPacket(p.getInv());
+
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getPacketManager().putEntityDespawnPacket(item);
+                        pp.getGateway().getPacketManager().putEntityDespawnPacket(droppedItem);
                     }
-                    item.destroySafe();
+                    droppedItem.destroySafe();
                     continue outer;
                 }
             }
-            int remainingTicks = item.getTicksToDespawn();
+            int remainingTicks = droppedItem.getTicksToDespawn();
             if(remainingTicks == 0) {
                 for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                    pp.getGateway().getPacketManager().putEntityDespawnPacket(item);
+                    pp.getGateway().getPacketManager().putEntityDespawnPacket(droppedItem);
                 }
                 it.remove();
-                item.destroySafe();
+                droppedItem.destroySafe();
                 continue;
             }
-            item.setTicksToDespawn(remainingTicks-1);
+            droppedItem.setTicksToDespawn(remainingTicks-1);
         }
 
     }
@@ -156,6 +160,7 @@ public class ExpiWorld {
         ExpiTile tile = worldTerrain[y][c*Constants.T_W_CH + x];
         if(tile.getType() == TileType.AIR) return;
 
+        // confirmed from here
         float off = (1 - Constants.D_I_SIZE)/2;
         Vector2 loc = new Vector2();
         FixturePack fp = new FixturePack();
@@ -202,6 +207,8 @@ public class ExpiWorld {
 
     public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
 
+        if(!p.getInv().contain(item)) return;
+
         ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
         if(t.getType() != TileType.AIR) return;
 
@@ -217,6 +224,9 @@ public class ExpiWorld {
             return;
         }
 
+        // confirmed from here
+        p.getInv().removeItem(new ItemStack(item, 1));
+        p.getGateway().getPacketManager().putInvFeedPacket(p.getInv());
         fixtureCalc.recalcTileFixturesPlus(t, fp);
         t.setStability(newStability);
         HashSet<ExpiTile> affectedTiles = new HashSet<>();
