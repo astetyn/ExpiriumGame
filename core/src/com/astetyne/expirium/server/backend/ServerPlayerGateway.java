@@ -93,7 +93,7 @@ public class ServerPlayerGateway extends TerminableLooper {
         System.out.println("Channel with client closed.");
     }
 
-    public ServerPacketManager getPacketManager() {
+    public ServerPacketManager getManager() {
         return packetManager;
     }
 

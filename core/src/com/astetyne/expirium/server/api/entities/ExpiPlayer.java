@@ -24,7 +24,7 @@ public class ExpiPlayer extends ExpiEntity {
         this.name = name;
         activeChunks = new HashSet<>();
         GameServer.get().getPlayers().add(this);
-        inventory = new ExpiInventory(Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_ROWS);
+        inventory = new ExpiInventory(Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_MAX_WEIGHT);
     }
 
     public void onMove(float x, float y, float v1, float v2) {

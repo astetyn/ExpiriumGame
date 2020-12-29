@@ -3,7 +3,9 @@ package com.astetyne.expirium.main.items.inventory;
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
 import com.astetyne.expirium.main.gui.*;
+import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,7 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Inventory {
 
@@ -22,6 +26,8 @@ public class Inventory {
     private final ImageButton inventoryButton, consumeButton;
     private StorageGrid inventoryGrid;
 
+    private final List<ItemRecipe> itemRecipes;
+
     private int toolsSwitchIndex = 0;
     private int materialsSwitchIndex = 0;
     private int consumablesSwitchIndex = 0;
@@ -30,11 +36,14 @@ public class Inventory {
 
     public Inventory() {
 
+        itemRecipes = new ArrayList<>();
+        fillRecipes();
+
         storageGridIDs = new HashMap<>();
 
         int c = Constants.PLAYER_INV_COLUMNS;
         int r = Constants.PLAYER_INV_ROWS;
-        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Resources.WHITE_TILE), reloadSlotItems);
+        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Resources.INV_TILE_TEX), reloadSlotItems);
 
         invGUILayout = new InvGUILayout();
 
@@ -46,7 +55,7 @@ public class Inventory {
 
         switchArrowUp = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchUp, false);
         switchArrowDown = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchDown, true);
-        inventoryButton = new ImageButton(new TextureRegionDrawable(Resources.WOOD_TEXTURE));
+        inventoryButton = new ImageButton(new TextureRegionDrawable(Resources.INVENTORY_TEXTURE));
         consumeButton = new ImageButton(new TextureRegionDrawable(Resources.WOOD_TEXTURE));
 
         inventoryButton.addListener(new ClickListener(){
@@ -56,7 +65,7 @@ public class Inventory {
                     return;
                 }
                 GameStage.get().setActiveGuiLayout(invGUILayout);
-                ExpiriumGame.get().getClientGateway().getPacketManager().putInvOpenReqPacket(inventoryGrid.getId());
+                ExpiriumGame.get().getClientGateway().getManager().putInvOpenReqPacket(inventoryGrid.getId());
             }
         });
 
@@ -82,8 +91,6 @@ public class Inventory {
 
     private final Runnable reloadSlotItems = () -> {
 
-        System.out.println("inv reload");
-
         int toolsCount = 0;
         int materialsCount = 0;
         int consumableCount = 0;
@@ -98,7 +105,6 @@ public class Inventory {
                 lastTool = is;
                 toolsCount++;
             }else if(is.getItem().getCategory() == 1) {
-                System.out.println("ind: "+materialsSwitchIndex+" count: "+materialsCount);
                 if(materialsSwitchIndex == materialsCount) {
                     materialSlot.setItemStack(is);
                 }
@@ -151,6 +157,15 @@ public class Inventory {
         reloadSlotItems.run();
     };
 
+    private void fillRecipes() {
+        ItemRecipe torch = new ItemRecipe(new ItemStack(ItemType.RAW_WOOD));
+        itemRecipes.add(torch);
+        itemRecipes.add(torch);
+        itemRecipes.add(torch);
+        itemRecipes.add(torch);
+        itemRecipes.add(torch);
+    }
+
     public HotBarSlot getToolSlot() {
         return toolSlot;
     }
@@ -185,5 +200,9 @@ public class Inventory {
 
     public HashMap<Integer, StorageGrid> getStorageGridIDs() {
         return storageGridIDs;
+    }
+
+    public List<ItemRecipe> getItemRecipes() {
+        return itemRecipes;
     }
 }

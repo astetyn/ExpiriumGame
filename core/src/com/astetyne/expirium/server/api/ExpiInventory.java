@@ -2,8 +2,10 @@ package com.astetyne.expirium.server.api;
 
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 
 import java.util.ArrayList;
@@ -15,8 +17,10 @@ public class ExpiInventory {
     private final List<ItemStack> items;
     private final int id;
     private final ItemStack[][] grid;
+    private float totalWeight;
+    private final float maxWeight;
 
-    public ExpiInventory(int columns, int rows) {
+    public ExpiInventory(int columns, int rows, float maxWeight) {
         items = new ArrayList<>();
         int randomID;
         do {
@@ -25,10 +29,15 @@ public class ExpiInventory {
         GameServer.get().getInventoriesID().put(randomID, this);
         id = randomID;
         grid = new ItemStack[rows][columns];
+        totalWeight = 0;
+        this.maxWeight = maxWeight;
     }
 
     public boolean canBeAdded(ItemType item) {
-        //todo: check space + weight
+        if(totalWeight + item.getWeight() > maxWeight) return false;
+
+
+
         return true;
     }
 
@@ -41,37 +50,41 @@ public class ExpiInventory {
         }
         int w = addIS.getItem().getGridWidth();
         int h = addIS.getItem().getGridHeight();
-        for(int i = h-1; i < grid.length; i--) {
-            columer:
+        for(int i = grid.length - h; i >= 0; i--) {
             for(int j = 0; j <= grid[0].length - w; j++) {
-                for(int ii = i; ii < i + h; ii++) {
-                    for(int jj = j; jj < j + w; jj++) {
-                        if(grid[ii][jj] != null) {
-                            continue columer;
-                        }
-                    }
-                }
-                addIS.getGridPos().set(i, j);
-                for(int ii = i; ii < i + h; ii++) {
-                    for(int jj = j; jj < j + w; jj++) {
-                        grid[ii][jj] = addIS;
-                    }
-                }
+                if(!isPlaceFor(addIS, j, i)) continue;
+                addIS.getGridPos().set(j, i);
+                insertToGrid(addIS);
                 items.add(addIS);
+                totalWeight += addIS.getItem().getWeight();
                 return;
             }
         }
     }
 
     public void onMoveReq(ExpiPlayer p, IntVector2 pos1, IntVector2 pos2) {
-        //todo: vygenerovat moveAck
+        ItemStack is = grid[pos1.y][pos1.x];
+        if(is == null) return;
+        if(pos2.x == -1) {
+            removeItem(is);
+            for(ExpiPlayer p2 : GameServer.get().getPlayers()) {
+                //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
+                ExpiDroppedItem edi = new ExpiDroppedItem(p.getCenter(), is.getItem(), Constants.SERVER_DEFAULT_TPS);
+                p2.getGateway().getManager().putEntitySpawnPacket(edi);
+            }
+            p.getGateway().getManager().putInvFeedPacket(this);
+            return;
+        }
+        if(!isPlaceFor(is, pos2.x, pos2.y)) return;
+        cleanGridFrom(is);
+        is.getGridPos().set(pos2);
+        insertToGrid(is);
+        p.getGateway().getManager().putInvFeedPacket(this);
     }
 
     public boolean contain(ItemType item) {
         for(ItemStack is : items) {
-            if(is.getItem() == item) {
-                return true;
-            }
+            if(is.getItem() == item) return true;
         }
         return false;
     }
@@ -84,19 +97,39 @@ public class ExpiInventory {
                 is.decreaseAmount(remIS.getAmount());
                 if(is.getAmount() <= 0) {
                     it.remove();
-                    int i = is.getGridPos().x;
-                    int j = is.getGridPos().y;
-                    int w = is.getItem().getGridWidth();
-                    int h = is.getItem().getGridHeight();
-                    for(int ii = i; ii < i + h; ii++) {
-                        for(int jj = j; jj < j + w; jj++) {
-                            grid[ii][jj] = null;
-                        }
-                    }
+                    cleanGridFrom(is);
+                    totalWeight -= remIS.getItem().getWeight();
                     break;
                 }
             }
         }
+    }
+
+    private void insertToGrid(ItemStack is) {
+        for(int i = 0; i < is.getItem().getGridHeight(); i++) {
+            for(int j = 0; j < is.getItem().getGridWidth(); j++) {
+                grid[is.getGridPos().y+i][is.getGridPos().x+j] = is;
+            }
+        }
+    }
+
+    private void cleanGridFrom(ItemStack is) {
+        for(int i = 0; i < is.getItem().getGridHeight(); i++) {
+            for(int j = 0; j < is.getItem().getGridWidth(); j++) {
+                grid[is.getGridPos().y+i][is.getGridPos().x+j] = null;
+            }
+        }
+    }
+
+    private boolean isPlaceFor(ItemStack is, int c, int r) {
+        for(int i = 0; i < is.getItem().getGridHeight(); i++) {
+            for(int j = 0; j < is.getItem().getGridWidth(); j++) {
+                if(grid[r+i][c+j] != null && grid[r+i][c+j] != is) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public int getId() {
@@ -105,5 +138,13 @@ public class ExpiInventory {
 
     public List<ItemStack> getItems() {
         return items;
+    }
+
+    public float getTotalWeight() {
+        return totalWeight;
+    }
+
+    public float getMaxWeight() {
+        return maxWeight;
     }
 }

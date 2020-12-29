@@ -2,6 +2,7 @@ package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -59,7 +60,7 @@ public class LauncherStage extends ExpiStage {
         textField.setAlignment(Align.center);
 
         table.setFillParent(true);
-        table.setDebug(true);
+        if(Constants.DEBUG) table.setDebug(true);
 
         stage.addActor(table);
 

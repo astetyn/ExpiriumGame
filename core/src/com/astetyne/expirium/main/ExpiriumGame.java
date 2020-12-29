@@ -86,7 +86,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 			available = false;
 		}
 		clientGateway.swapBuffers();
-		clientGateway.getPacketManager().processIncomingPackets();
+		clientGateway.getManager().processIncomingPackets();
 		currentExpiStage.onServerUpdate();
 	}
 

@@ -1,152 +1,180 @@
 
 game_assets.png
-size: 512,256
+size: 1024,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+campfire
+  rotate: false
+  xy: 464, 156
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 corundum
   rotate: false
-  xy: 332, 182
+  xy: 398, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 dirt
   rotate: false
-  xy: 134, 2
+  xy: 596, 156
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 398, 182
+  xy: 530, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
+inventory
+  rotate: false
+  xy: 332, 66
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+pickaxe
+  rotate: false
+  xy: 662, 156
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+pickaxe_grid
+  rotate: false
+  xy: 2, 92
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
 player
   rotate: false
-  xy: 68, 158
+  xy: 68, 42
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: -1
 player_right_idle
   rotate: false
-  xy: 68, 158
+  xy: 68, 42
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_idle
   rotate: false
-  xy: 2, 158
+  xy: 2, 2
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_idle
   rotate: false
-  xy: 200, 158
+  xy: 200, 42
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_left_run
   rotate: false
-  xy: 68, 68
+  xy: 134, 132
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_run
   rotate: false
-  xy: 134, 68
+  xy: 200, 132
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 3
 player_left_run
   rotate: false
-  xy: 266, 68
+  xy: 332, 132
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_right_idle
   rotate: false
-  xy: 266, 158
+  xy: 266, 42
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_right_run
   rotate: false
-  xy: 2, 68
+  xy: 68, 132
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_right_run
   rotate: false
-  xy: 134, 158
+  xy: 134, 42
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 3
 player_right_run
   rotate: false
-  xy: 200, 68
+  xy: 266, 132
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 stone
   rotate: false
-  xy: 2, 2
+  xy: 398, 156
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 tile_break
   rotate: false
-  xy: 68, 2
+  xy: 464, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
 tile_break
   rotate: false
-  xy: 398, 116
+  xy: 596, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 3
 tile_break
   rotate: false
-  xy: 332, 50
+  xy: 728, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
 tree_top
   rotate: false
-  xy: 332, 116
+  xy: 530, 156
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 white_tile
   rotate: false
-  xy: 200, 2
+  xy: 662, 90
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 wood
   rotate: false
-  xy: 266, 2
+  xy: 728, 156
   size: 64, 64
   orig: 64, 64
   offset: 0, 0

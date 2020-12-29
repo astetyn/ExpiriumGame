@@ -63,7 +63,7 @@ public class TickLooper extends TerminableLooper {
                     if(gateway == p.getGateway()) {
                         it.remove();
                         for(ExpiPlayer pp : players) {
-                            pp.getGateway().getPacketManager().putEntityDespawnPacket(p);
+                            pp.getGateway().getManager().putEntityDespawnPacket(p);
                         }
                         p.destroySafe();
                         System.out.println("Player "+p.getName()+" left the server.");
@@ -101,7 +101,7 @@ public class TickLooper extends TerminableLooper {
             }
 
             // initial packet for new player
-            newPlayer.getGateway().getPacketManager().putInitDataPacket(Constants.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
+            newPlayer.getGateway().getManager().putInitDataPacket(Constants.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
 
             newPlayer.getGateway().getOut().swap();
 
@@ -112,7 +112,7 @@ public class TickLooper extends TerminableLooper {
             // notify all players about new players
             for(ExpiPlayer p : players) {
                 if(p == newPlayer) continue;
-                p.getGateway().getPacketManager().putEntitySpawnPacket(newPlayer);
+                p.getGateway().getManager().putEntitySpawnPacket(newPlayer);
             }
         }
         joiningPlayers.clear();
@@ -149,7 +149,7 @@ public class TickLooper extends TerminableLooper {
                     case 23: {//InvOpenReqPacket
                         int invID = in.getInt();
                         if(server.getInventoriesID().containsKey(invID)) {
-                            p.getGateway().getPacketManager().putInvFeedPacket(server.getInventoriesID().get(invID));
+                            p.getGateway().getManager().putInvFeedPacket(server.getInventoriesID().get(invID));
                         }
                         break;
                     }

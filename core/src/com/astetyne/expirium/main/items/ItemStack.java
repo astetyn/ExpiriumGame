@@ -8,6 +8,10 @@ public class ItemStack {
     private int amount;
     private final IntVector2 gridPos;
 
+    public ItemStack(ItemType item) {
+        this(item, 1, new IntVector2(0,0));
+    }
+
     public ItemStack(ItemType item, int amount) {
         this(item, amount, new IntVector2(0,0));
     }

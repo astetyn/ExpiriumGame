@@ -2,6 +2,8 @@ package com.astetyne.expirium.main.utils;
 
 public class Constants {
 
+    public static final boolean DEBUG = false;
+
     // networking
     public static final int SERVER_PORT = 1414;
     public static final int BUFFER_SIZE = 262144;
@@ -20,8 +22,8 @@ public class Constants {
     public static final float D_I_PICK_DIST = 1.3f;
 
     // player
-    public static final int PLAYER_INV_COLUMNS = 10;
-    public static final int PLAYER_INV_ROWS = 10;
+    public static final int PLAYER_INV_COLUMNS = 6;
+    public static final int PLAYER_INV_ROWS = 6;
     public static final int PLAYER_INV_MAX_WEIGHT = 10;
 
 

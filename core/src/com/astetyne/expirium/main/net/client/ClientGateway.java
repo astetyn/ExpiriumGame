@@ -84,7 +84,6 @@ public class ClientGateway extends TerminableLooper {
         }catch(InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -112,7 +111,7 @@ public class ClientGateway extends TerminableLooper {
         ipAddress = address;
     }
 
-    public ClientPacketManager getPacketManager() {
+    public ClientPacketManager getManager() {
         return packetManager;
     }
 

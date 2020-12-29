@@ -8,11 +8,11 @@ import java.util.HashMap;
 
 public enum TileType {
 
-    AIR(0, false, null, 0, null, 0),
-    STONE(1, true, Resources.STONE_TEXTURE, 1f, ItemType.STONE, 3),
-    GRASS(2, true, Resources.GRASS_TEXTURE, 0.5f, ItemType.GRASS, 2),
-    DIRT(3, true, Resources.DIRT_TEXTURE, 0.5f, ItemType.DIRT, 2),
-    WOOD(4, false, Resources.WOOD_TEXTURE, 0.3f, ItemType.RAW_WOOD, 2);
+    AIR(0, false, null, 0, null, 0, false),
+    STONE(1, true, Resources.STONE_TEXTURE, 1f, ItemType.STONE, 3, false),
+    GRASS(2, true, Resources.GRASS_TEXTURE, 0.5f, ItemType.GRASS, 2, false),
+    DIRT(3, true, Resources.DIRT_TEXTURE, 0.5f, ItemType.DIRT, 2, false),
+    WOOD(4, false, Resources.WOOD_TEXTURE, 0.3f, ItemType.RAW_WOOD, 2, false);
 
     private static final HashMap<Integer, TileType> map;
 
@@ -33,14 +33,16 @@ public enum TileType {
     float breakTime;
     ItemType dropItem;
     int stability;
+    boolean onlyOnSolid;
 
-    TileType(int id, boolean solid, TextureRegion texture, float breakTime, ItemType dropItem, int stability) {
+    TileType(int id, boolean solid, TextureRegion tex, float breakTime, ItemType dropItem, int stability, boolean b) {
         this.id = id;
         this.solid = solid;
-        this.texture = texture;
+        this.texture = tex;
         this.breakTime = breakTime;
         this.dropItem = dropItem;
         this.stability = stability;
+        onlyOnSolid = b;
     }
 
     public int getID() {

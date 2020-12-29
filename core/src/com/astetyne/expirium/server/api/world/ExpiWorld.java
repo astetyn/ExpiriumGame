@@ -78,7 +78,7 @@ public class ExpiWorld {
         for(ExpiEntity ee : GameServer.get().getEntities()) {
             for(ExpiPlayer p : GameServer.get().getPlayers()) {
                 if(p == ee) continue;
-                p.getGateway().getPacketManager().putEntityMovePacket(ee);
+                p.getGateway().getManager().putEntityMovePacket(ee);
             }
         }
 
@@ -101,10 +101,10 @@ public class ExpiWorld {
                     it.remove();
 
                     p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1));
-                    p.getGateway().getPacketManager().putInvFeedPacket(p.getInv());
+                    p.getGateway().getManager().putInvFeedPacket(p.getInv());
 
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getPacketManager().putEntityDespawnPacket(droppedItem);
+                        pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
                     }
                     droppedItem.destroySafe();
                     continue outer;
@@ -113,7 +113,7 @@ public class ExpiWorld {
             int remainingTicks = droppedItem.getTicksToDespawn();
             if(remainingTicks == 0) {
                 for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                    pp.getGateway().getPacketManager().putEntityDespawnPacket(droppedItem);
+                    pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
                 }
                 it.remove();
                 droppedItem.destroySafe();
@@ -134,11 +134,11 @@ public class ExpiWorld {
             for(int i = 0; i < Constants.CHUNKS_NUMBER; i++) {
                 if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
                     if(!p.getActiveChunks().contains(i)) {
-                        p.getGateway().getPacketManager().putChunkFeedPacket(worldTerrain, i);
+                        p.getGateway().getManager().putChunkFeedPacket(worldTerrain, i);
                         p.getActiveChunks().add(i);
                     }
                 }else if(p.getActiveChunks().contains(i)) {
-                    p.getGateway().getPacketManager().putChunkDestroyPacket(worldTerrain, i);
+                    p.getGateway().getManager().putChunkDestroyPacket(worldTerrain, i);
                     p.getActiveChunks().remove(i);
                 }
             }
@@ -170,7 +170,7 @@ public class ExpiWorld {
         loc.set(tile.getX()+off, tile.getY()+off);
         ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tile.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getPacketManager().putEntitySpawnPacket(droppedItem);
+            pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
         }
         tile.setType(TileType.AIR);
         fixtureCalc.clearTileFixtures(tile, fp);
@@ -191,7 +191,7 @@ public class ExpiWorld {
                 if(Math.random() < 1) {
                     droppedItem = new ExpiDroppedItem(loc, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getPacketManager().putEntitySpawnPacket(droppedItem);
+                        pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
                     }
                 }
                 t.setType(TileType.AIR);
@@ -201,7 +201,7 @@ public class ExpiWorld {
             }
         }
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getPacketManager().putTileBreakAckPacket(brokenTiles, fp, affectedTiles);
+            pp.getGateway().getManager().putTileBreakAckPacket(brokenTiles, fp, affectedTiles);
         }
     }
 
@@ -226,14 +226,14 @@ public class ExpiWorld {
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
-        p.getGateway().getPacketManager().putInvFeedPacket(p.getInv());
+        p.getGateway().getManager().putInvFeedPacket(p.getInv());
         fixtureCalc.recalcTileFixturesPlus(t, fp);
         t.setStability(newStability);
         HashSet<ExpiTile> affectedTiles = new HashSet<>();
         affectedTiles.add(t);
         stabilityCalc.recalculateStabilityForNearbyTiles(t, affectedTiles);
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getPacketManager().putTilePlaceAckPacket(t, fp, affectedTiles);
+            pp.getGateway().getManager().putTilePlaceAckPacket(t, fp, affectedTiles);
         }
 
     }

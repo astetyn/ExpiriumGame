@@ -1,5 +1,6 @@
 package com.astetyne.expirium.main.gui;
 
+import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
@@ -19,10 +20,11 @@ public class StorageGrid extends Widget {
 
     private final StorageGridStyle style;
     private final List<ItemStack> items;
-    private ItemStack selectedItem;
+    private ItemStack selItem;
     private final Vector2 selItemVec;
     private int id, columns, rows;
     private final Runnable onInvUpdate;
+    private float totalWeight, maxWeight;
 
     public StorageGrid(int columns, int rows, StorageGridStyle style, Runnable onInvUpdate) {
         this(-1, columns, rows, style, onInvUpdate);
@@ -35,6 +37,8 @@ public class StorageGrid extends Widget {
         this.rows = rows;
         this.style = style;
         this.onInvUpdate = onInvUpdate;
+        totalWeight = 0;
+        maxWeight = 0;
 
         items = new ArrayList<>();
 
@@ -44,19 +48,29 @@ public class StorageGrid extends Widget {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                selectedItem = getItemAt((int)x, (int) y);
+                selItem = getItemAt((int)x, (int) y);
+                if(selItem == null) return false;
                 selItemVec.set(getX() + x, getY() + y);
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                selectedItem = null;
+                if(isInsideGrid((int)x, (int) y)) {
+                    x /= (getWidth() / columns);
+                    y /= (getHeight() / rows);
+                }else {
+                    x = -1;
+                    y = -1;
+                }
+                IntVector2 pos2 = new IntVector2((int)x, (int)y);
+                ExpiriumGame.get().getClientGateway().getManager().putInvItemMoveReqPacket(getId(), selItem.getGridPos(), pos2);
+                selItem = null;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if(selectedItem != null) {
+                if(selItem != null) {
                     selItemVec.set(getX() + x, getY() + y);
                 }
             }
@@ -78,21 +92,23 @@ public class StorageGrid extends Widget {
             TextureRegion tex = is.getItem().getItemTextureInGrid();
             int w = is.getItem().getGridWidth();
             int h = is.getItem().getGridHeight();
-            if(is == selectedItem) {
+            if(is == selItem) {
                 batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
             }
-            batch.draw(tex, getX() + pos.y * tileSize, getY() + (rows - pos.x - 1) * tileSize, w * tileSize, h * tileSize);
+            batch.draw(tex, getX() + pos.x * tileSize, getY() + pos.y * tileSize, w * tileSize, h * tileSize);
             batch.setColor(1,1,1,1);
         }
-        if(selectedItem != null) {
-            TextureRegion tex = selectedItem.getItem().getItemTexture();
-            int w = selectedItem.getItem().getGridWidth();
-            int h = selectedItem.getItem().getGridHeight();
+        if(selItem != null) {
+            TextureRegion tex = selItem.getItem().getItemTexture();
+            int w = selItem.getItem().getGridWidth();
+            int h = selItem.getItem().getGridHeight();
             batch.draw(tex, selItemVec.x, selItemVec.y, w*tileSize*2, h*tileSize*2);
         }
     }
 
     public void onInvFeed(PacketInputStream in) {
+        totalWeight = in.getFloat();
+        maxWeight = in.getFloat();
         items.clear();
         int itemsNumber = in.getInt();
         for(int i = 0; i < itemsNumber; i++) {
@@ -104,18 +120,14 @@ public class StorageGrid extends Widget {
         onInvUpdate.run();
     }
 
-    public void onInvItemMove(PacketInputStream in) {
-
-    }
-
     @Override
     public float getPrefWidth() {
-        return GameStage.toPixels(30) * columns;
+        return GameStage.toPixels(50) * columns;
     }
 
     @Override
     public float getPrefHeight() {
-        return GameStage.toPixels(30) * rows;
+        return GameStage.toPixels(50) * rows;
     }
 
     private ItemStack getItemAt(int x, int y) {
@@ -131,6 +143,18 @@ public class StorageGrid extends Widget {
             }
         }
         return null;
+    }
+
+    private boolean isInsideGrid(int x, int y) {
+        if(selItem == null) return false;
+
+        x /= (getWidth() / columns);
+        y /= (getHeight() / rows);
+
+        int sw = selItem.getItem().getGridWidth();
+        int sh = selItem.getItem().getGridHeight();
+
+        return x >= 0 && x + sw <= columns && y >= 0 && y + sh <= rows;
     }
 
     public static class StorageGridStyle {

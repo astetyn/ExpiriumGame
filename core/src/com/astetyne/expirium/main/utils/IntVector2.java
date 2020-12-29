@@ -14,6 +14,11 @@ public class IntVector2 {
         this.y = y;
     }
 
+    public void set(IntVector2 vec) {
+        this.x = vec.x;
+        this.y = vec.y;
+    }
+
     @Override
     public String toString() {
         return "x: "+x+" y: "+y;

@@ -121,10 +121,6 @@ public class ClientPacketManager {
                 case 24: //InvFeedPacket
                     GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvFeed(in);
                     break;
-
-                case 26: //InvItemMoveAckPacket
-                    GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvItemMove(in);
-                    break;
             }
         }
     }

@@ -4,6 +4,7 @@ import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.gui.GUILayout;
 import com.astetyne.expirium.main.gui.GameGUILayout;
 import com.astetyne.expirium.main.items.inventory.Inventory;
+import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -53,7 +54,7 @@ public class GameStage extends ExpiStage {
 
         stage.draw();
 
-        b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
+        if(Constants.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
 
     }
 

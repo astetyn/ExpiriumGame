@@ -55,7 +55,7 @@ public class MainPlayer extends Entity {
     }
 
     public void generateMovePacket() {
-        ExpiriumGame.get().getClientGateway().getPacketManager().putPlayerMovePacket(getLocation(), getVelocity());
+        ExpiriumGame.get().getClientGateway().getManager().putPlayerMovePacket(getLocation(), getVelocity());
     }
 
     @Override

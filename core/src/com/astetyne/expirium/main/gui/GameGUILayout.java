@@ -2,6 +2,7 @@ package com.astetyne.expirium.main.gui;
 
 import com.astetyne.expirium.main.Resources;
 import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -56,12 +57,14 @@ public class GameGUILayout extends GUILayout {
         itemSelectTable.row();
         itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(toPixels(6)).colspan(3);
 
-        debugInfoTable.add(fpsLabel).left();
-        debugInfoTable.row();
-        debugInfoTable.add(locationLabel).left();
-        debugInfoTable.row();
-        debugInfoTable.add(entityLabel).left();
-        debugInfoTable.row();
+        if(Constants.DEBUG) {
+            debugInfoTable.add(fpsLabel).left();
+            debugInfoTable.row();
+            debugInfoTable.add(locationLabel).left();
+            debugInfoTable.row();
+            debugInfoTable.add(entityLabel).left();
+            debugInfoTable.row();
+        }
         debugInfoTable.add(warnLabel).left();
 
         int iconSize = toPixels(30);
@@ -75,7 +78,7 @@ public class GameGUILayout extends GUILayout {
         playerStatsTable.add(tempImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
 
-        rootTable.debugCell();
+        if(Constants.DEBUG) rootTable.debugCell();
         //mainTable.setDebug(true);
 
     }

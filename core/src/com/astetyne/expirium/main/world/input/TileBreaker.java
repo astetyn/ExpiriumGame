@@ -64,7 +64,7 @@ public class TileBreaker {
         if(targetTile != null) {
             timeAccumulator += Gdx.graphics.getDeltaTime();
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
-                ExpiriumGame.get().getClientGateway().getPacketManager().putTileBreakReqPacket(targetTile);
+                ExpiriumGame.get().getClientGateway().getManager().putTileBreakReqPacket(targetTile);
                 timeAccumulator = 0;
                 targetTile = null;
             }

@@ -21,6 +21,7 @@ public class Resources {
     // UI
 
     public static Button.ButtonStyle BUTTON_STYLE;
+    public static TextureRegion CROSS_TEXTURE;
     public static TextButton.TextButtonStyle TEXT_BUTTON_STYLE;
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
     public static Label.LabelStyle LABEL_STYLE;
@@ -49,6 +50,15 @@ public class Resources {
     public static TextureRegion WOOD_TEXTURE;
     public static TextureRegion TREE_TOP_TEXTURE;
     public static TextureRegion WHITE_TILE;
+    public static TextureRegion CAMPFIRE_TEXTURE;
+
+    // items
+    public static TextureRegion PICKAXE_TEXTURE;
+
+    // inventory / grid
+    public static TextureRegion INVENTORY_TEXTURE;
+    public static TextureRegion INV_TILE_TEX;
+    public static TextureRegion RECIPE_BACK;
 
     public static void loadTextures() {
 
@@ -58,29 +68,28 @@ public class Resources {
         ARIAL_FONT = new BitmapFont(Gdx.files.internal("ui/arial_big.fnt"));
 
         // UI
-        Drawable drd = new TextureRegionDrawable(uia.findRegion("default-round-down"));
-        Drawable dr = new TextureRegionDrawable(uia.findRegion("default-round"));
+        Drawable up = new TextureRegionDrawable(uia.findRegion("button_base"));
+        Drawable down = new TextureRegionDrawable(uia.findRegion("button_pressed"));
         Drawable selection = new TextureRegionDrawable(uia.findRegion("selection"));
-        Drawable textfield = new TextureRegionDrawable(uia.findRegion("textfield"));
         Drawable cursor = new TextureRegionDrawable(uia.findRegion("cursor"));
-        TextureRegion tsBack = uia.findRegion("thumb_stick_down");
-        TextureRegion tsFore = uia.findRegion("thumb_stick_up");
+        TextureRegion tsBack = uia.findRegion("thumb_stick_back");
+        TextureRegion tsFore = uia.findRegion("thumb_stick_fore");
         TextureRegion hbsBack = uia.findRegion("hot_bar_slot_background");
         TextureRegion hbsFrame = uia.findRegion("hot_bar_slot_frame");
-        TextureRegion hbsDefaultTool = uia.findRegion("default_item_tool");
+        TextureRegion hbsDefaultTool = uia.findRegion("empty_hotbar_tools");
         TextureRegion switchArrowUp = uia.findRegion("switch_arrow_up");
         TextureRegion switchArrowUpPressed = uia.findRegion("switch_arrow_up_pressed");
+        CROSS_TEXTURE = uia.findRegion("cross");
 
-        BUTTON_STYLE = new Button.ButtonStyle(drd, dr, drd);
-        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(dr, drd, dr, ARIAL_FONT);
-        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(ARIAL_FONT, Color.WHITE, cursor, selection, textfield);
+        BUTTON_STYLE = new Button.ButtonStyle(up, down, up);
+        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(up, down, up, ARIAL_FONT);
+        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(ARIAL_FONT, Color.WHITE, cursor, selection, up);
         LABEL_STYLE = new Label.LabelStyle(ARIAL_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         HOT_BAR_SLOT_STYLE_TOOL = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame, hbsDefaultTool);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
 
         // animations
-
         Animation.PlayMode pm = Animation.PlayMode.LOOP_PINGPONG;
         PLAYER_IDLE_ANIM_R = new Animation<>(0.5f, ga.findRegions("player_right_idle"), pm);
         PLAYER_IDLE_ANIM_L = new Animation<>(0.5f, ga.findRegions("player_left_idle"), pm);
@@ -96,6 +105,16 @@ public class Resources {
         WOOD_TEXTURE = ga.findRegion("wood");
         TREE_TOP_TEXTURE = ga.findRegion("tree_top");
         WHITE_TILE = ga.findRegion("white_tile");
+        CAMPFIRE_TEXTURE = ga.findRegion("campfire");
+
+        // items
+        PICKAXE_TEXTURE  = ga.findRegion("pickaxe");
+
+        // inventory / grid
+        INVENTORY_TEXTURE = ga.findRegion("inventory");
+        INV_TILE_TEX = uia.findRegion("inv_tile");
+        RECIPE_BACK = uia.findRegion("recipe_list_background");
+
     }
 
     public static void dispose() {
