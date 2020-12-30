@@ -1,6 +1,8 @@
 package com.astetyne.expirium.server.api.entities;
 
 import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.main.items.ItemRecipe;
+import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.ExpiInventory;
@@ -30,6 +32,17 @@ public class ExpiPlayer extends ExpiEntity {
     public void onMove(float x, float y, float v1, float v2) {
         body.setTransform(x, y, 0);
         body.setLinearVelocity(v1, v2);
+    }
+
+    public void wantsToMakeItem(ItemRecipe recipe) {
+        for(ItemStack is : recipe.getRequiredItems()) {
+            if(!inventory.contain(is)) return;
+        }
+        for(ItemStack is : recipe.getRequiredItems()) {
+            inventory.removeItem(is);
+        }
+        inventory.addItem(recipe.getProduct());
+        gateway.getManager().putInvFeedPacket(inventory);
     }
 
     public ServerPlayerGateway getGateway() {

@@ -19,6 +19,7 @@ public abstract class Entity implements Collidable, MetaReadable {
     protected boolean onGround;
     private int collisions;
     protected final float width, height;
+    private final Vector2 centerLoc;
 
     public Entity(EntityType type, int id, Vector2 loc, float width, float height) {
 
@@ -32,6 +33,7 @@ public abstract class Entity implements Collidable, MetaReadable {
         onGround = false;
         collisions = 0;
         targetPosition = loc;
+        centerLoc = new Vector2();
 
         GameStage.get().getWorld().getEntitiesID().put(ID, this);
         GameStage.get().getWorld().getEntities().add(this);
@@ -55,13 +57,11 @@ public abstract class Entity implements Collidable, MetaReadable {
     }
 
     public void onMove(PacketInputStream in) {
-
         targetPosition.set(in.getFloat(), in.getFloat());
         intpolDelta = 0;
         body.setLinearVelocity(in.getFloat(), in.getFloat());
         targetAngle = in.getFloat();
         body.setAngularVelocity(in.getFloat());
-
     }
 
     public Vector2 getLocation() {
@@ -69,7 +69,7 @@ public abstract class Entity implements Collidable, MetaReadable {
     }
 
     public Vector2 getCenterLocation() {
-        return getLocation().add(width/2, height/2);
+        return centerLoc.set(getLocation()).add(width/2, height/2);
     }
 
     public Vector2 getVelocity() {

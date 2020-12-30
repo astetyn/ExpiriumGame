@@ -3,6 +3,7 @@ package com.astetyne.expirium.main.gui;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -73,8 +74,8 @@ public class GameGUILayout extends GUILayout {
 
         rootTable.setBounds(0, 0, 1000, 1000);
 
-        if(Constants.DEBUG) rootTable.debugCell();
-        //mainTable.setDebug(true);
+        //if(Constants.DEBUG) rootTable.debugCell();
+        rootTable.setDebug(true);
 
     }
 
@@ -105,6 +106,11 @@ public class GameGUILayout extends GUILayout {
         warnLabel.invalidateHierarchy();
     }
 
+    @Override
+    public boolean isDimmed() {
+        return false;
+    }
+
     public void buildTableTool() {
         preBuildTable();
         ThumbStick breakTS = GameStage.get().getWorld().getPlayer().getTileBreaker().getBreakTS();
@@ -119,8 +125,8 @@ public class GameGUILayout extends GUILayout {
 
     public void buildTableUse() {
         preBuildTable();
-        ImageButton but = GameStage.get().getInv().getConsumeButton();
-        rootTable.add(but).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
+        Image img = GameStage.get().getInv().getConsumeButton();
+        rootTable.add(img).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
     }
 
     private void preBuildTable() {
@@ -131,7 +137,7 @@ public class GameGUILayout extends GUILayout {
         rootTable.add();
         rootTable.add(playerStatsTable).align(Align.topRight);
         rootTable.row();
-        rootTable.add(GameStage.get().getInv().getInventoryButton()).width(100).height(100).align(Align.right).colspan(3);
+        rootTable.add(GameStage.get().getInv().getInventoryButton()).width(64).height(Utils.percFromW(64)).align(Align.right).colspan(3).padTop(50);
         rootTable.row().expand();
         ThumbStick movementTS = GameStage.get().getWorld().getPlayer().getMovementTS();
         rootTable.add(movementTS).align(Align.bottomLeft).padBottom(fromCMToPercW(1)).padLeft(fromCMToPercW(1)).uniformX();

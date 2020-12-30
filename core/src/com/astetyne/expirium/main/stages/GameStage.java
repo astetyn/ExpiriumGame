@@ -51,6 +51,11 @@ public class GameStage extends ExpiStage {
 
         batch.begin();
         gameWorld.render();
+        if(guiLayout.isDimmed()) {
+            batch.setColor(0, 0, 0, 0.5f);
+            batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.setColor(1,1,1,1);
+        }
         batch.end();
 
         stage.draw();

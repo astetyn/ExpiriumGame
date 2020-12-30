@@ -3,7 +3,8 @@ package com.astetyne.expirium.main.net.client;
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.Item;
+import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
@@ -40,7 +41,7 @@ public class ClientPacketManager {
         out.putInt(t.getY());
     }
 
-    public void putTilePlaceReqPacket(Tile t, ItemType placedItem) {
+    public void putTilePlaceReqPacket(Tile t, Item placedItem) {
         out.startPacket(16);
         out.putInt(t.getChunk().getId());
         out.putInt(t.getX());
@@ -58,6 +59,11 @@ public class ClientPacketManager {
         out.putInt(id);
         out.putIntVector(pos1);
         out.putIntVector(pos2);
+    }
+
+    public void putInvItemMakeReqPacket(ItemRecipe recipe) {
+        out.startPacket(26);
+        out.putInt(recipe.getId());
     }
 
     public void processIncomingPackets() {

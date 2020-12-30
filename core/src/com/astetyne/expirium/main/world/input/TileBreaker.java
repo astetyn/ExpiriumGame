@@ -19,6 +19,8 @@ public class TileBreaker {
     private final ThumbStick breakTS;
     private final GameWorld world;
     private final SpriteBatch batch;
+    private final Vector2 tempVec;
+    private final Vector2 tempVec2;
 
     public TileBreaker() {
         this.world = GameStage.get().getWorld();
@@ -26,6 +28,8 @@ public class TileBreaker {
         breakTS = new ThumbStick(Res.THUMB_STICK_STYLE);
         targetTile = null;
         timeAccumulator = 0;
+        tempVec = new Vector2();
+        tempVec2 = new Vector2();
     }
 
     public void update() {
@@ -37,10 +41,10 @@ public class TileBreaker {
             return;
         }
 
-        Vector2 vec2 = new Vector2(breakTS.getHorz()*2, breakTS.getVert()*2).scl(0.2f);
-        Vector2 tempVec = new Vector2(world.getPlayer().getCenterLocation());
+        tempVec.set(world.getPlayer().getCenterLocation());
+        tempVec2.set(breakTS.getHorz()*2, breakTS.getVert()*2).scl(1.0f/(Constants.BREAKING_PRECISION-1));
 
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i < Constants.BREAKING_PRECISION; i++) {
             if(!isInWorld(tempVec)) {
                 timeAccumulator = 0;
                 targetTile = null;
@@ -59,10 +63,15 @@ public class TileBreaker {
                 }
                 break;
             }
-            tempVec.add(vec2);
+            tempVec.add(tempVec2);
         }
         if(targetTile != null) {
-            timeAccumulator += Gdx.graphics.getDeltaTime();
+            float speedCoef = 1;
+            if(GameStage.get().getInv().getItemInHand() != null) {
+                speedCoef = GameStage.get().getInv().getItemInHand().getItem().getSpeedCoef();
+            }
+            if(Constants.DEBUG) speedCoef = 50;
+            timeAccumulator += Gdx.graphics.getDeltaTime() * speedCoef;
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
                 ExpiriumGame.get().getClientGateway().getManager().putTileBreakReqPacket(targetTile);
                 timeAccumulator = 0;

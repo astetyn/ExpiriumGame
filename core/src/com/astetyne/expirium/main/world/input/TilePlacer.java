@@ -2,7 +2,7 @@ package com.astetyne.expirium.main.world.input;
 
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.inventory.Inventory;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
@@ -113,7 +113,7 @@ public class TilePlacer implements InputProcessor {
         if(t.getType() != TileType.AIR) return false;
         if(inv.getMaterialSlot().getItemStack() == null) return false;
 
-        ItemType item = inv.getMaterialSlot().getItemStack().getItem();
+        Item item = inv.getMaterialSlot().getItemStack().getItem();
         ExpiriumGame.get().getClientGateway().getManager().putTilePlaceReqPacket(t, item);
         return true;
     }

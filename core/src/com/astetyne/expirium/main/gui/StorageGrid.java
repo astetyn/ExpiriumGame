@@ -1,8 +1,8 @@
 package com.astetyne.expirium.main.gui;
 
 import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -116,7 +116,7 @@ public class StorageGrid extends Widget {
             int itemID = in.getInt();
             int amount = in.getInt();
             IntVector2 pos = in.getIntVector();
-            items.add(new ItemStack(ItemType.getType(itemID), amount, pos));
+            items.add(new ItemStack(Item.getType(itemID), amount, pos));
         }
         onInvUpdate.run();
     }
@@ -125,7 +125,7 @@ public class StorageGrid extends Widget {
         x /= (getWidth() / columns);
         y /= (getHeight() / rows);
         for(ItemStack is : items) {
-            ItemType item = is.getItem();
+            Item item = is.getItem();
             IntVector2 pos = is.getGridPos();
             int w = item.getGridWidth();
             int h = item.getGridHeight();

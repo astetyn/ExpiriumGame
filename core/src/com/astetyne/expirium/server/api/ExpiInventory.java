@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api;
 
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
@@ -33,7 +33,7 @@ public class ExpiInventory {
         this.maxWeight = maxWeight;
     }
 
-    public boolean canBeAdded(ItemType item) {
+    public boolean canBeAdded(Item item) {
         if(totalWeight + item.getWeight() > maxWeight) return false;
 
 
@@ -42,21 +42,23 @@ public class ExpiInventory {
     }
 
     public void addItem(ItemStack addIS) {
+        ItemStack copyIS = new ItemStack(addIS);
+
         for(ItemStack is : items) {
-            if(is.getItem() == addIS.getItem()) {
-                is.increaseAmount(addIS.getAmount());
+            if(is.getItem() == copyIS.getItem()) {
+                is.increaseAmount(copyIS.getAmount());
                 return;
             }
         }
-        int w = addIS.getItem().getGridWidth();
-        int h = addIS.getItem().getGridHeight();
+        int w = copyIS.getItem().getGridWidth();
+        int h = copyIS.getItem().getGridHeight();
         for(int i = grid.length - h; i >= 0; i--) {
             for(int j = 0; j <= grid[0].length - w; j++) {
-                if(!isPlaceFor(addIS, j, i)) continue;
-                addIS.getGridPos().set(j, i);
-                insertToGrid(addIS);
-                items.add(addIS);
-                totalWeight += addIS.getItem().getWeight();
+                if(!isPlaceFor(copyIS, j, i)) continue;
+                copyIS.getGridPos().set(j, i);
+                insertToGrid(copyIS);
+                items.add(copyIS);
+                totalWeight += copyIS.getItem().getWeight();
                 return;
             }
         }
@@ -82,9 +84,16 @@ public class ExpiInventory {
         p.getGateway().getManager().putInvFeedPacket(this);
     }
 
-    public boolean contain(ItemType item) {
+    public boolean contain(Item item) {
         for(ItemStack is : items) {
             if(is.getItem() == item) return true;
+        }
+        return false;
+    }
+
+    public boolean contain(ItemStack conIS) {
+        for(ItemStack is : items) {
+            if(is.getItem() == conIS.getItem() && is.getAmount() >= conIS.getAmount()) return true;
         }
         return false;
     }

@@ -4,25 +4,31 @@ import com.astetyne.expirium.main.utils.IntVector2;
 
 public class ItemStack {
 
-    private final ItemType item;
+    private final Item item;
     private int amount;
     private final IntVector2 gridPos;
 
-    public ItemStack(ItemType item) {
+    public ItemStack(ItemStack is) {
+        this.item = is.getItem();
+        this.amount = is.getAmount();
+        this.gridPos = is.getGridPos();
+    }
+
+    public ItemStack(Item item) {
         this(item, 1, new IntVector2(0,0));
     }
 
-    public ItemStack(ItemType item, int amount) {
+    public ItemStack(Item item, int amount) {
         this(item, amount, new IntVector2(0,0));
     }
 
-    public ItemStack(ItemType item, int amount, IntVector2 pos) {
+    public ItemStack(Item item, int amount, IntVector2 pos) {
         this.item = item;
         this.amount = amount;
         gridPos = pos;
     }
 
-    public ItemType getItem() {
+    public Item getItem() {
         return item;
     }
 

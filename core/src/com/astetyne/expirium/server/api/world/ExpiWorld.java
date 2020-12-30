@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.world;
 
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
@@ -205,7 +205,7 @@ public class ExpiWorld {
         }
     }
 
-    public void onTilePlaceReq(int c, int x, int y, ItemType item, ExpiPlayer p) {
+    public void onTilePlaceReq(int c, int x, int y, Item item, ExpiPlayer p) {
 
         if(!p.getInv().contain(item)) return;
 

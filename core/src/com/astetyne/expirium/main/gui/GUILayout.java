@@ -13,4 +13,6 @@ public abstract class GUILayout {
 
     public abstract void resize(int w, int h);
 
+    public abstract boolean isDimmed();
+
 }

@@ -1,7 +1,6 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,12 +19,12 @@ public class DroppedItemEntity extends Entity {
 
     @Override
     public void draw() {
-        batch.draw(dropItem.getTexture(), getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (body.getAngle()*180/Math.PI));
+        batch.draw(dropItem.getItemTexture(), getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (body.getAngle()*180/Math.PI));
     }
 
     @Override
     public void readMeta(PacketInputStream in) {
-        dropItem = ItemType.getType(in.getInt()).initItem();
+        dropItem = Item.getType(in.getInt());
     }
 
 }

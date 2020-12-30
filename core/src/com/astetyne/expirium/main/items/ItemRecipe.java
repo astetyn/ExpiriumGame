@@ -1,18 +1,36 @@
 package com.astetyne.expirium.main.items;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-public class ItemRecipe {
+public enum ItemRecipe {
 
-    private final ItemStack product;
-    private final List<ItemStack> requiredItems;
-    private String description;
+    PICKAXE(new ItemStack(Item.PICKAXE), Arrays.asList(new ItemStack(Item.RAW_WOOD), new ItemStack(Item.RAW_WOOD), new ItemStack(Item.RAW_WOOD)), "lol");
 
-    public ItemRecipe(ItemStack product) {
+    private static final HashMap<Integer, ItemRecipe> map;
+    static {
+        map = new HashMap<>();
+        int i = 0;
+        for(ItemRecipe it : ItemRecipe.values()) {
+            it.id = i;
+            map.put(it.id, it);
+        }
+    }
+
+    int id;
+    ItemStack product;
+    List<ItemStack> requiredItems;
+    String description;
+
+    ItemRecipe(ItemStack product, List<ItemStack> reqItems, String desc) {
         this.product = product;
-        this.requiredItems = new ArrayList<>();
-        this.description = "No description.";
+        this.requiredItems = reqItems;
+        this.description = desc;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public ItemStack getProduct() {
@@ -27,7 +45,7 @@ public class ItemRecipe {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public static ItemRecipe getRecipe(int id) {
+        return map.get(id);
     }
 }

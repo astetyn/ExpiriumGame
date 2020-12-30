@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.entities;
 
 import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -11,10 +11,10 @@ import com.badlogic.gdx.math.Vector2;
 public class ExpiDroppedItem extends ExpiEntity {
 
     private int ticksToDespawn;
-    private ItemType type;
+    private Item type;
     private int cooldown;
 
-    public ExpiDroppedItem(Vector2 loc, ItemType type, int cooldown) {
+    public ExpiDroppedItem(Vector2 loc, Item type, int cooldown) {
         super(EntityType.DROPPED_ITEM, loc, Constants.D_I_SIZE, Constants.D_I_SIZE);
         ticksToDespawn = Constants.SERVER_DEFAULT_TPS * 60;
         this.type = type;
@@ -31,7 +31,7 @@ public class ExpiDroppedItem extends ExpiEntity {
         this.ticksToDespawn = ticksToDespawn;
     }
 
-    public ItemType getItem() {
+    public Item getItem() {
         return type;
     }
 
@@ -54,7 +54,7 @@ public class ExpiDroppedItem extends ExpiEntity {
 
     @Override
     public void readMeta(PacketInputStream in) {
-        type = ItemType.getType(in.getInt());
+        type = Item.getType(in.getInt());
     }
 
     @Override

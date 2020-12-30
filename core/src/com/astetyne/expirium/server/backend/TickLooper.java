@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.Item;
+import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
@@ -143,7 +144,7 @@ public class TickLooper extends TerminableLooper {
                         break;
 
                     case 16: //TilePlaceReqPacket
-                        server.getWorld().onTilePlaceReq(in.getInt(), in.getInt(), in.getInt(), ItemType.getType(in.getInt()), p);
+                        server.getWorld().onTilePlaceReq(in.getInt(), in.getInt(), in.getInt(), Item.getType(in.getInt()), p);
                         break;
 
                     case 23: {//InvOpenReqPacket
@@ -160,6 +161,11 @@ public class TickLooper extends TerminableLooper {
                         if(server.getInventoriesID().containsKey(invID)) {
                             server.getInventoriesID().get(invID).onMoveReq(p, pos1, pos2);
                         }
+                        break;
+                    }
+                    case 26: {//InvItemMakeReqPacket
+                        ItemRecipe recipe = ItemRecipe.getRecipe(in.getInt());
+                        p.wantsToMakeItem(recipe);
                         break;
                     }
                 }
