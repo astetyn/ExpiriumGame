@@ -1,29 +1,29 @@
 package com.astetyne.expirium.main.gui;
 
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.ItemType;
+import com.astetyne.expirium.main.items.inventory.Inventory;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
-import com.badlogic.gdx.Gdx;
+import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 public class InvGUILayout extends GUILayout {
 
-    private final Table rootTable, recipeList, recipeDetail;
+    private final Table rootTable, gridTable, recipeList, recipeDetail;
     private final Image returnButton;
     private final ScrollPane scrollProductsList;
     private ItemRecipe selectedRecipe;
 
     public InvGUILayout() {
 
-        returnButton = new Image(Resources.CROSS_TEXTURE);
+        returnButton = new Image(Res.CROSS_TEXTURE);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -32,11 +32,14 @@ public class InvGUILayout extends GUILayout {
         });
 
         rootTable = new Table();
-        rootTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        rootTable.setBounds(0, 0, 1000, 1000);
         if(Constants.DEBUG) rootTable.setDebug(true);
 
+        gridTable = new Table();
         recipeList = new Table();
         recipeDetail = new Table();
+
+        if(Constants.DEBUG) gridTable.setDebug(true);
 
         scrollProductsList = new ScrollPane(recipeList);
         scrollProductsList.setScrollingDisabled(true, false);
@@ -55,32 +58,45 @@ public class InvGUILayout extends GUILayout {
 
     @Override
     public void build(Stage stage) {
+
+        Inventory inv = GameStage.get().getInv();
+
         stage.clear();
         stage.addActor(rootTable);
 
         rootTable.clear();
 
+        String s = inv.getInventoryGrid().getTotalWeight()+"/"+inv.getInventoryGrid().getMaxWeight();
+        Label weightLabel = new Label(s, Res.LABEL_STYLE);
+
+        gridTable.clear();
+        gridTable.add(inv.getInventoryGrid()).width(400).height(Utils.percFromW(400)).pad(0, 10, 0, 10);
+        gridTable.row();
+        gridTable.add(weightLabel).align(Align.left).pad(10, 20, 0,0);
+
         recipeList.clear();
-        for(ItemRecipe recipe : GameStage.get().getInv().getItemRecipes()) {
+        for(ItemRecipe recipe : inv.getItemRecipes()) {
             Table t = new Table();
+            t.row().expandX();
+            if(Constants.DEBUG) t.debugAll();
             ItemType item = recipe.getProduct().getItem();
             Image icon = new Image(item.getItemTexture());
-            Label label = new Label("ahoj", Resources.LABEL_STYLE);
-            label.setFontScale(0.2f);
-            t.add(icon).pad(10, 5, 10, 5);
+            Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
+            t.add(icon).width(50).height(Utils.percFromW(50)).align(Align.left).pad(10, 5, 10, 5);
             t.add(label);
-            t.setBackground(new TextureRegionDrawable(Resources.RECIPE_BACK));
-            recipeList.add(t);
+            t.setBackground(Res.RECIPE_BACK);
+            recipeList.add(t).expand();
             recipeList.row();
         }
 
         recipeDetail.clear();
-        if(selectedRecipe == null) selectedRecipe = GameStage.get().getInv().getItemRecipes().get(0);
+        if(selectedRecipe == null) selectedRecipe = inv.getItemRecipes().get(0);
         Image imgDetail = new Image(selectedRecipe.getProduct().getItem().getItemTexture());
-        TextButton makeButton = new TextButton("Make", Resources.TEXT_BUTTON_STYLE);
-        Label desc = new Label(selectedRecipe.getDescription(), Resources.LABEL_STYLE);
-        desc.setFontScale(0.2f);
+        TextButton makeButton = new TextButton("Make", Res.TEXT_BUTTON_STYLE);
+        Label desc = new Label(selectedRecipe.getDescription(), Res.LABEL_STYLE);
         desc.setWrap(true);
+        recipeDetail.add(returnButton).align(Align.topRight);
+        recipeDetail.row();
         recipeDetail.add(imgDetail);
         recipeDetail.row();
         recipeDetail.add(makeButton);
@@ -89,12 +105,16 @@ public class InvGUILayout extends GUILayout {
 
         }
         recipeDetail.row();
-        recipeDetail.add(desc).width(20);
+        recipeDetail.add(desc).width(200);
 
-        rootTable.row().expandX();
-        rootTable.add(GameStage.get().getInv().getInventoryGrid());
-        rootTable.add(scrollProductsList);
-        rootTable.add(recipeDetail);
-        rootTable.add(returnButton).align(Align.topRight);
+        rootTable.add(gridTable).width(Value.percentWidth(0.5f, rootTable)).expandY();
+        rootTable.add(scrollProductsList).width(Value.percentWidth(0.2f, rootTable));
+        rootTable.add(recipeDetail).expand();
+
+    }
+
+    @Override
+    public void resize(int w, int h) {
+
     }
 }

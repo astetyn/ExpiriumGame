@@ -80,11 +80,12 @@ public class StorageGrid extends Widget {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        int tileSize = (int) (getWidth() / columns);
+        int tileSizeX = (int) (getWidth() / columns);
+        int tileSizeY = (int) (getHeight() / rows);
 
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < columns; j++) {
-                batch.draw(style.gridTile, getX()+j*tileSize, getY()+i*tileSize, tileSize, tileSize);
+                batch.draw(style.gridTile, getX()+j*tileSizeX, getY()+i*tileSizeY, tileSizeX, tileSizeY);
             }
         }
         for(ItemStack is : items) {
@@ -95,14 +96,14 @@ public class StorageGrid extends Widget {
             if(is == selItem) {
                 batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
             }
-            batch.draw(tex, getX() + pos.x * tileSize, getY() + pos.y * tileSize, w * tileSize, h * tileSize);
+            batch.draw(tex, getX() + pos.x * tileSizeX, getY() + pos.y * tileSizeY, w * tileSizeX, h * tileSizeY);
             batch.setColor(1,1,1,1);
         }
         if(selItem != null) {
             TextureRegion tex = selItem.getItem().getItemTexture();
             int w = selItem.getItem().getGridWidth();
             int h = selItem.getItem().getGridHeight();
-            batch.draw(tex, selItemVec.x, selItemVec.y, w*tileSize*2, h*tileSize*2);
+            batch.draw(tex, selItemVec.x, selItemVec.y, w*tileSizeX*2, h*tileSizeY*2);
         }
     }
 
@@ -118,16 +119,6 @@ public class StorageGrid extends Widget {
             items.add(new ItemStack(ItemType.getType(itemID), amount, pos));
         }
         onInvUpdate.run();
-    }
-
-    @Override
-    public float getPrefWidth() {
-        return GameStage.toPixels(50) * columns;
-    }
-
-    @Override
-    public float getPrefHeight() {
-        return GameStage.toPixels(50) * rows;
     }
 
     private ItemStack getItemAt(int x, int y) {
@@ -178,5 +169,13 @@ public class StorageGrid extends Widget {
 
     public List<ItemStack> getItems() {
         return items;
+    }
+
+    public float getTotalWeight() {
+        return totalWeight;
+    }
+
+    public float getMaxWeight() {
+        return maxWeight;
     }
 }

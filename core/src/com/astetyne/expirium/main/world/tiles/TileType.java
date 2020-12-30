@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.world.tiles;
 
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.ItemType;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -9,10 +9,10 @@ import java.util.HashMap;
 public enum TileType {
 
     AIR(0, false, null, 0, null, 0, false),
-    STONE(1, true, Resources.STONE_TEXTURE, 1f, ItemType.STONE, 3, false),
-    GRASS(2, true, Resources.GRASS_TEXTURE, 0.5f, ItemType.GRASS, 2, false),
-    DIRT(3, true, Resources.DIRT_TEXTURE, 0.5f, ItemType.DIRT, 2, false),
-    WOOD(4, false, Resources.WOOD_TEXTURE, 0.3f, ItemType.RAW_WOOD, 2, false);
+    STONE(1, true, Res.STONE_TEXTURE, 1f, ItemType.STONE, 3, false),
+    GRASS(2, true, Res.GRASS_TEXTURE, 0.5f, ItemType.GRASS, 2, false),
+    DIRT(3, true, Res.DIRT_TEXTURE, 0.5f, ItemType.DIRT, 2, false),
+    WOOD(4, false, Res.WOOD_TEXTURE, 0.3f, ItemType.RAW_WOOD, 2, false);
 
     private static final HashMap<Integer, TileType> map;
 

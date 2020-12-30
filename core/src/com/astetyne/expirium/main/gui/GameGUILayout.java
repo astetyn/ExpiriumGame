@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.gui;
 
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.Gdx;
@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
-import static com.astetyne.expirium.main.stages.GameStage.toPixels;
+import static com.astetyne.expirium.main.utils.Utils.fromCMToPercW;
 
 public class GameGUILayout extends GUILayout {
 
@@ -28,34 +28,27 @@ public class GameGUILayout extends GUILayout {
         debugInfoTable = new Table();
         playerStatsTable = new Table();
 
-        fpsLabel = new Label("", Resources.LABEL_STYLE);
-        fpsLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
-        locationLabel = new Label("", Resources.LABEL_STYLE);
-        locationLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
-        entityLabel = new Label("", Resources.LABEL_STYLE);
-        entityLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
-        warnLabel = new Label("pre-alpha", Resources.LABEL_STYLE);
-        warnLabel.setFontScale(0.4f * Gdx.graphics.getDensity());
+        fpsLabel = new Label("", Res.LABEL_STYLE);
+        locationLabel = new Label("", Res.LABEL_STYLE);
+        entityLabel = new Label("", Res.LABEL_STYLE);
+        warnLabel = new Label("pre-alpha", Res.LABEL_STYLE);
         warnLabel.setColor(1,0.1f,0.1f,1);
 
-        healthImage = new Image(Resources.TREE_TOP_TEXTURE);
-        hungerImage = new Image(Resources.TREE_TOP_TEXTURE);
-        tempImage = new Image(Resources.TREE_TOP_TEXTURE);
+        healthImage = new Image(Res.TREE_TOP_TEXTURE);
+        hungerImage = new Image(Res.TREE_TOP_TEXTURE);
+        tempImage = new Image(Res.TREE_TOP_TEXTURE);
 
-        healthStat = new Label("0%", Resources.LABEL_STYLE);
-        healthStat.setFontScale(0.3f);
-        hungerStat = new Label("0%", Resources.LABEL_STYLE);
-        hungerStat.setFontScale(0.3f);
-        tempStat = new Label("0%", Resources.LABEL_STYLE);
-        tempStat.setFontScale(0.3f);
+        healthStat = new Label("0%", Res.LABEL_STYLE);
+        hungerStat = new Label("0%", Res.LABEL_STYLE);
+        tempStat = new Label("0%", Res.LABEL_STYLE);
 
-        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowUp()).padBottom(toPixels(6)).colspan(3);
+        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowUp()).padBottom(10).colspan(3);
         itemSelectTable.row();
-        itemSelectTable.add(GameStage.get().getInv().getToolSlot()).padRight(toPixels(15));
-        itemSelectTable.add(GameStage.get().getInv().getMaterialSlot()).padRight(toPixels(15));
+        itemSelectTable.add(GameStage.get().getInv().getToolSlot()).padRight(10);
+        itemSelectTable.add(GameStage.get().getInv().getMaterialSlot()).padRight(10);
         itemSelectTable.add(GameStage.get().getInv().getConsumableSlot());
         itemSelectTable.row();
-        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(toPixels(6)).colspan(3);
+        itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(10).colspan(3);
 
         if(Constants.DEBUG) {
             debugInfoTable.add(fpsLabel).left();
@@ -67,16 +60,18 @@ public class GameGUILayout extends GUILayout {
         }
         debugInfoTable.add(warnLabel).left();
 
-        int iconSize = toPixels(30);
-        playerStatsTable.add(healthStat).padTop(5);
+        float iconSize = 20;
+        playerStatsTable.add(healthStat).padTop(10);
         playerStatsTable.add(healthImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
-        playerStatsTable.add(hungerStat).padTop(5);
+        playerStatsTable.add(hungerStat).padTop(10);
         playerStatsTable.add(hungerImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
-        playerStatsTable.add(tempStat).padTop(5);
+        playerStatsTable.add(tempStat).padTop(10);
         playerStatsTable.add(tempImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
+
+        rootTable.setBounds(0, 0, 1000, 1000);
 
         if(Constants.DEBUG) rootTable.debugCell();
         //mainTable.setDebug(true);
@@ -103,27 +98,32 @@ public class GameGUILayout extends GUILayout {
         stage.addActor(rootTable);
     }
 
+    @Override
+    public void resize(int w, int h) {
+        locationLabel.invalidateHierarchy();
+        entityLabel.invalidateHierarchy();
+        warnLabel.invalidateHierarchy();
+    }
+
     public void buildTableTool() {
         preBuildTable();
         ThumbStick breakTS = GameStage.get().getWorld().getPlayer().getTileBreaker().getBreakTS();
-        rootTable.add(breakTS).align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
+        rootTable.add(breakTS).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
     }
 
     public void buildTableBuild() {
         preBuildTable();
         ImageButton but = GameStage.get().getWorld().getPlayer().getTilePlacer().getStabilityButton();
-        rootTable.add(but).align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
+        rootTable.add(but).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
     }
 
     public void buildTableUse() {
         preBuildTable();
         ImageButton but = GameStage.get().getInv().getConsumeButton();
-        rootTable.add(but).align(Align.bottomRight).padBottom(toPixels(30)).padRight(toPixels(30)).uniformX();
+        rootTable.add(but).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
     }
 
     private void preBuildTable() {
-
-        rootTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         rootTable.clear();
 
@@ -131,11 +131,11 @@ public class GameGUILayout extends GUILayout {
         rootTable.add();
         rootTable.add(playerStatsTable).align(Align.topRight);
         rootTable.row();
-        rootTable.add(GameStage.get().getInv().getInventoryButton()).align(Align.right).colspan(3);
+        rootTable.add(GameStage.get().getInv().getInventoryButton()).width(100).height(100).align(Align.right).colspan(3);
         rootTable.row().expand();
         ThumbStick movementTS = GameStage.get().getWorld().getPlayer().getMovementTS();
-        rootTable.add(movementTS).align(Align.bottomLeft).padBottom(toPixels(30)).padLeft(toPixels(30)).uniformX();
-        rootTable.add(itemSelectTable).align(Align.bottom).padBottom(toPixels(6));
+        rootTable.add(movementTS).align(Align.bottomLeft).padBottom(fromCMToPercW(1)).padLeft(fromCMToPercW(1)).uniformX();
+        rootTable.add(itemSelectTable).align(Align.bottom).padBottom(20);
 
     }
 }

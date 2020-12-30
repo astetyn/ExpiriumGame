@@ -1,7 +1,6 @@
 package com.astetyne.expirium.main.gui;
 
-import com.astetyne.expirium.main.stages.GameStage;
-import com.badlogic.gdx.Gdx;
+import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,13 +13,16 @@ public class ThumbStick extends Widget {
 
     private final ThumbStickStyle style;
 
-    private int circleX, circleY;
+    private float circleX, circleY;
     private float radius;
     private float xR, yR, angle;
     private boolean touched;
     private int touchID;
+    private Vector2 touchVec;
 
     public ThumbStick(ThumbStickStyle style) {
+
+        touchVec = new Vector2();
 
         this.style = style;
         touched = false;
@@ -32,7 +34,7 @@ public class ThumbStick extends Widget {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 touched = true;
                 touchID = pointer;
-                recalculate();
+                recalculate(getX() + x, getY() + y);
                 return true;
             }
 
@@ -44,7 +46,7 @@ public class ThumbStick extends Widget {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                recalculate();
+                recalculate(getX() + x, getY() + y);
             }
         });
     }
@@ -58,22 +60,20 @@ public class ThumbStick extends Widget {
     private void returnToDefault() {
         radius = getWidth()/2.0f;
         circleX = (int) (getX()+getWidth()/2);
-        circleY = (int) (getY()+getWidth()/2);
+        circleY = (int) (getY()+getHeight()/2);
         xR = 0;
         yR = 0;
     }
 
-    private void recalculate() {
+    private void recalculate(float xi, float yi) {
 
-        int xi = Gdx.input.getX(touchID);
-        int yi = Gdx.input.getY(touchID);
-
-        Vector2 touch = new Vector2(xi - getX() - radius, Gdx.graphics.getHeight() - yi- getY() - getHeight()/2.0f);
-        angle = touch.angleDeg();
-        float radiusMin = Math.min(touch.len(), radius);
-        circleX = (int) (getX()+getWidth()/2.0+Math.cos(Math.toRadians(angle))*radiusMin);
-        circleY = (int) (getY()+getHeight()/2.0+Math.sin(Math.toRadians(angle))*radiusMin);
-        xR = (circleX - (getX()+radius)) / (radius);
+        touchVec.set(xi - getX() - radius, yi- getY() - getHeight()/2.0f);
+        angle = touchVec.angleDeg();
+        float radiusMaxX = Math.min(touchVec.len(), radius);
+        float radiusMaxY = Math.min(touchVec.len(), getHeight()/2);
+        circleX = getX()+getWidth()/2.0f+(float)Math.cos(Math.toRadians(angle))*radiusMaxX;
+        circleY = getY()+getHeight()/2.0f+(float)Math.sin(Math.toRadians(angle))*radiusMaxY;
+        xR = (circleX - (getX()+ radius)) / (radius);
         yR = (circleY - (getY()+getHeight()/2.0f)) / (getHeight()/2.0f);
 
     }
@@ -92,12 +92,12 @@ public class ThumbStick extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return GameStage.toPixels(150);
+        return Utils.fromCMToPercW(3);
     }
 
     @Override
     public float getPrefHeight() {
-        return GameStage.toPixels(150);
+        return Utils.percFromW(getPrefWidth());
     }
 
     public float getHorz() {

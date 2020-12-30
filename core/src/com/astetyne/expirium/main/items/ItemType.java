@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.items;
 
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -8,10 +8,10 @@ import java.util.HashMap;
 
 public enum ItemType {
 
-    STONE(0, 1, 1, 1, 1, 0.5f, Resources.STONE_TEXTURE, Resources.STONE_TEXTURE),
-    GRASS(1, 1, 2, 1, 1, 0.5f, Resources.GRASS_TEXTURE, Resources.GRASS_TEXTURE),
-    DIRT(2, 1, 3, 1, 1, 0.5f, Resources.DIRT_TEXTURE, Resources.DIRT_TEXTURE),
-    RAW_WOOD(3, 1, 4, 1, 1, 0.5f, Resources.WOOD_TEXTURE, Resources.WOOD_TEXTURE);
+    STONE(0, 1, 1, 1, 1, 0.5f, Res.STONE_TEXTURE, Res.STONE_TEXTURE, "Stone"),
+    GRASS(1, 1, 2, 1, 1, 0.5f, Res.GRASS_TEXTURE, Res.GRASS_TEXTURE, "Travicka pre \nzajacika"),
+    DIRT(2, 1, 3, 1, 1, 0.5f, Res.DIRT_TEXTURE, Res.DIRT_TEXTURE, "Dirt"),
+    RAW_WOOD(3, 1, 4, 1, 1, 0.5f, Res.WOOD_TEXTURE, Res.WOOD_TEXTURE, "Raw wood");
 
     private static final HashMap<Integer, ItemType> map;
 
@@ -34,8 +34,9 @@ public enum ItemType {
     float weight;
     TextureRegion itemTexture;
     TextureRegion itemTextureInGrid;
+    String label;
 
-    ItemType(int id, int cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2) {
+    ItemType(int id, int cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2, String label) {
         this.id = id;
         category = cat;
         buildTileID = tileID;
@@ -44,6 +45,7 @@ public enum ItemType {
         this.weight = weight;
         this.itemTexture = tex;
         itemTextureInGrid = tex2;
+        this.label = label;
     }
 
     public int getId() {
@@ -80,5 +82,9 @@ public enum ItemType {
 
     public TextureRegion getItemTextureInGrid() {
         return itemTextureInGrid;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

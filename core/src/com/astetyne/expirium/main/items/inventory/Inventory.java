@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.items.inventory;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.*;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
@@ -43,20 +43,20 @@ public class Inventory {
 
         int c = Constants.PLAYER_INV_COLUMNS;
         int r = Constants.PLAYER_INV_ROWS;
-        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Resources.INV_TILE_TEX), reloadSlotItems);
+        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Res.INV_TILE_TEX), reloadSlotItems);
 
         invGUILayout = new InvGUILayout();
 
-        toolSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusTool);
-        materialSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusBuild);
-        consumableSlot = new HotBarSlot(Resources.HOT_BAR_SLOT_STYLE_TOOL, onFocusUse);
+        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusTool);
+        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusBuild);
+        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusUse);
 
         toolSlot.setFocus(true);
 
-        switchArrowUp = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchUp, false);
-        switchArrowDown = new SwitchArrow(Resources.SWITCH_ARROW_STYLE, onSwitchDown, true);
-        inventoryButton = new ImageButton(new TextureRegionDrawable(Resources.INVENTORY_TEXTURE));
-        consumeButton = new ImageButton(new TextureRegionDrawable(Resources.WOOD_TEXTURE));
+        switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, onSwitchUp, false);
+        switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, onSwitchDown, true);
+        inventoryButton = new ImageButton(new TextureRegionDrawable(Res.INVENTORY_TEXTURE));
+        consumeButton = new ImageButton(new TextureRegionDrawable(Res.WOOD_TEXTURE));
 
         inventoryButton.addListener(new ClickListener(){
             @Override

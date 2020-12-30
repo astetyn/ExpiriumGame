@@ -1,6 +1,5 @@
 package com.astetyne.expirium.main.gui;
 
-import com.astetyne.expirium.main.stages.GameStage;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -53,12 +52,12 @@ public class SwitchArrow extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return GameStage.toPixels(50);
+        return 50;
     }
 
     @Override
     public float getPrefHeight() {
-        return GameStage.toPixels(30);
+        return 60;
     }
 
     public static class SwitchArrowStyle {

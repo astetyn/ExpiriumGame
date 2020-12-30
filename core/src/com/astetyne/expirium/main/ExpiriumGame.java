@@ -25,7 +25,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		Resources.loadTextures();
+		Res.loadTextures();
 		currentExpiStage = new LauncherStage();
 	}
 
@@ -54,7 +54,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 			server.stop();
 		}
 		clientGateway.end();
-		Resources.dispose();
+		Res.dispose();
 
 	}
 

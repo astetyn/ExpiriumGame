@@ -11,4 +11,6 @@ public abstract class GUILayout {
 
     public abstract void build(Stage stage);
 
+    public abstract void resize(int w, int h);
+
 }

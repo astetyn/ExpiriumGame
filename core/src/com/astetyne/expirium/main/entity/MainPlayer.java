@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.ThumbStick;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.world.input.TileBreaker;
@@ -22,7 +22,7 @@ public class MainPlayer extends Entity {
         tileBreaker = new TileBreaker();
         tilePlacer = new TilePlacer();
         GameStage.get().getMultiplexer().addProcessor(tilePlacer);
-        movementTS = new ThumbStick(Resources.THUMB_STICK_STYLE);
+        movementTS = new ThumbStick(Res.THUMB_STICK_STYLE);
         animator = new MainPlayerAnimator(GameStage.get().getBatch(), this, movementTS);
     }
 

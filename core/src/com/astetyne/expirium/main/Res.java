@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class Resources {
+public class Res {
 
     // UI
 
@@ -58,14 +58,14 @@ public class Resources {
     // inventory / grid
     public static TextureRegion INVENTORY_TEXTURE;
     public static TextureRegion INV_TILE_TEX;
-    public static TextureRegion RECIPE_BACK;
+    public static Drawable RECIPE_BACK;
 
     public static void loadTextures() {
 
         TextureAtlas ga = new TextureAtlas("game_assets.atlas");
         TextureAtlas uia = new TextureAtlas("ui/gui_assets.atlas");
 
-        ARIAL_FONT = new BitmapFont(Gdx.files.internal("ui/arial_big.fnt"));
+        ARIAL_FONT = new BitmapFont(Gdx.files.internal("ui/medium_arial.fnt"));
 
         // UI
         Drawable up = new TextureRegionDrawable(uia.findRegion("button_base"));
@@ -113,7 +113,7 @@ public class Resources {
         // inventory / grid
         INVENTORY_TEXTURE = ga.findRegion("inventory");
         INV_TILE_TEX = uia.findRegion("inv_tile");
-        RECIPE_BACK = uia.findRegion("recipe_list_background");
+        RECIPE_BACK = new TextureRegionDrawable(uia.findRegion("recipe_list_background"));
 
     }
 

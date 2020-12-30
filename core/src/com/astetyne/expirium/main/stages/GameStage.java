@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.GUILayout;
 import com.astetyne.expirium.main.gui.GameGUILayout;
 import com.astetyne.expirium.main.items.inventory.Inventory;
@@ -62,7 +63,9 @@ public class GameStage extends ExpiStage {
     public void resize() {
 
         if(gameWorld != null) gameWorld.resize();
+        Res.ARIAL_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        if(getGuiLayout() != null) getGuiLayout().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
     }
 
@@ -106,10 +109,6 @@ public class GameStage extends ExpiStage {
 
     public GameWorld getWorld() {
         return gameWorld;
-    }
-
-    public static int toPixels(int realLen) {
-        return (int) (realLen * Gdx.graphics.getDensity());
     }
 
     public static GameStage get() {

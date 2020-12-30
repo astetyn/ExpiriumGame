@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.gui;
 
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -48,12 +48,12 @@ public class HotBarSlot extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return GameStage.toPixels(80);
+        return 60;
     }
 
     @Override
     public float getPrefHeight() {
-        return GameStage.toPixels(80);
+        return Utils.percFromW(60);
     }
 
     public ItemStack getItemStack() {

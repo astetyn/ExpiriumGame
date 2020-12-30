@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.world.input;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.ThumbStick;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.Constants;
@@ -23,7 +23,7 @@ public class TileBreaker {
     public TileBreaker() {
         this.world = GameStage.get().getWorld();
         this.batch = GameStage.get().getBatch();
-        breakTS = new ThumbStick(Resources.THUMB_STICK_STYLE);
+        breakTS = new ThumbStick(Res.THUMB_STICK_STYLE);
         targetTile = null;
         timeAccumulator = 0;
     }
@@ -82,7 +82,7 @@ public class TileBreaker {
 
         float durability = timeAccumulator / targetTile.getType().getBreakTime();
         int x = targetTile.getX() + Constants.T_W_CH * targetTile.getChunk().getId();
-        batch.draw(Resources.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
+        batch.draw(Res.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
     }
 
     public ThumbStick getBreakTS() {

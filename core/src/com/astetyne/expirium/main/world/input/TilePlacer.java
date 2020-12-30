@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.world.input;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.ItemType;
 import com.astetyne.expirium.main.items.inventory.Inventory;
 import com.astetyne.expirium.main.stages.GameStage;
@@ -32,7 +32,7 @@ public class TilePlacer implements InputProcessor {
         world = GameStage.get().getWorld();
         stabilityShowActive = false;
 
-        stabilityButton = new ImageButton(new TextureRegionDrawable(Resources.DIRT_TEXTURE));
+        stabilityButton = new ImageButton(new TextureRegionDrawable(Res.DIRT_TEXTURE));
         stabilityButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -57,7 +57,7 @@ public class TilePlacer implements InputProcessor {
             }else if(t.getStability() == 4) {
                 batch.setColor(0.9f, 0.9f, 0f, 1);
             }
-            batch.draw(Resources.WHITE_TILE, t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.draw(Res.WHITE_TILE, t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
             batch.setColor(1, 1, 1, 1);
         }else {
             batch.draw(t.getTexture(), t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);

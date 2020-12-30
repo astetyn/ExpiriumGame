@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.stages;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Resources;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.utils.Constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -24,15 +24,15 @@ public class LauncherStage extends ExpiStage {
 
         table = new Table();
 
-        TextField textField = new TextField("", Resources.TEXT_FIELD_STYLE);
+        TextField textField = new TextField("", Res.TEXT_FIELD_STYLE);
         textField.setMessageText("Enter your name");
 
-        final TextField textField2 = new TextField("127.0.0.1", Resources.TEXT_FIELD_STYLE);
+        final TextField textField2 = new TextField("127.0.0.1", Res.TEXT_FIELD_STYLE);
         textField2.setMessageText("Enter the ip address");
         textField2.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9.]"));
         textField2.setVisible(false);
 
-        TextButton serverButton = new TextButton("Host a server.", Resources.TEXT_BUTTON_STYLE);
+        TextButton serverButton = new TextButton("Host a server.", Res.TEXT_BUTTON_STYLE);
         serverButton.setColor(Color.GREEN);
         serverButton.addListener(new ClickListener() {
             @Override
@@ -44,20 +44,18 @@ public class LauncherStage extends ExpiStage {
             }
         });
 
-        TextButton button = new TextButton("Connect", Resources.TEXT_BUTTON_STYLE);
+        TextButton button = new TextButton("Connect", Res.TEXT_BUTTON_STYLE);
 
-        table.add(serverButton).width(500*Gdx.graphics.getDensity()).height(100*Gdx.graphics.getDensity());
+        table.add(serverButton).width(500).height(100);
         table.row();
-        table.add(textField).width(500*Gdx.graphics.getDensity()).height(100*Gdx.graphics.getDensity());
+        table.add(textField).width(500).height(100);
         table.row();
-        table.add(textField2).width(500*Gdx.graphics.getDensity()).height(100*Gdx.graphics.getDensity());
+        table.add(textField2).width(500).height(100);
         table.row();
-        table.add(button).width(500*Gdx.graphics.getDensity()).height(100*Gdx.graphics.getDensity());
+        table.add(button).width(500).height(100);
 
-        serverButton.getLabel().setFontScale(0.5f);
-        button.getLabel().setFontScale(0.5f);
-        textField.getStyle().font.getData().setScale(0.9f);
         textField.setAlignment(Align.center);
+        textField2.setAlignment(Align.center);
 
         table.setFillParent(true);
         if(Constants.DEBUG) table.setDebug(true);
@@ -95,6 +93,7 @@ public class LauncherStage extends ExpiStage {
 
     @Override
     public void resize() {
+        Res.ARIAL_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
