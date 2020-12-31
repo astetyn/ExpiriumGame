@@ -24,7 +24,7 @@ public class InvGUILayout extends GUILayout {
 
     public InvGUILayout() {
 
-        returnButton = new Image(Res.CROSS_TEXTURE);
+        returnButton = new Image(Res.CROSS_ICON);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -34,14 +34,15 @@ public class InvGUILayout extends GUILayout {
 
         rootTable = new Table();
         rootTable.setBounds(0, 0, 1000, 1000);
-        if(Constants.DEBUG) rootTable.setDebug(true);
 
         gridTable = new Table();
         recipeList = new Table();
         recipeDetail = new Table();
         requiredItems = new Table();
 
+        //if(Constants.DEBUG) rootTable.setDebug(true);
         if(Constants.DEBUG) gridTable.setDebug(true);
+        if(Constants.DEBUG) recipeDetail.setDebug(true);
 
         scrollProductsList = new ScrollPane(recipeList);
         scrollProductsList.setScrollingDisabled(true, false);
@@ -98,8 +99,10 @@ public class InvGUILayout extends GUILayout {
             recipeList.add(t).width(200);
             recipeList.row();
         }
+        recipeList.setBackground(Res.INV_CHOOSE_BACK);
 
         recipeDetail.clear();
+        recipeDetail.setBackground(Res.INV_DETAIL_BACK);
         if(selectedRecipe == null) selectedRecipe = ItemRecipe.getRecipe(0);
         Image imgDetail = new Image(selectedRecipe.getProduct().getItem().getItemTexture());
         TextButton makeButton = new TextButton("Make", Res.TEXT_BUTTON_STYLE);
@@ -111,6 +114,7 @@ public class InvGUILayout extends GUILayout {
         });
         Label desc = new Label(selectedRecipe.getDescription(), Res.LABEL_STYLE);
         desc.setWrap(true);
+        desc.setAlignment(Align.topLeft);
         recipeDetail.add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
         recipeDetail.row();
         recipeDetail.add(imgDetail).width(Utils.percFromH(100)).height(100).pad(50,50,50,50);
@@ -125,8 +129,7 @@ public class InvGUILayout extends GUILayout {
         }
         recipeDetail.add(scrollRequiredItems).expandX().height(200);
         recipeDetail.row();
-        recipeDetail.add(desc).width(180).pad(50, 10, 10, 10).align(Align.topLeft);
-        if(Constants.DEBUG) recipeDetail.setDebug(true);
+        recipeDetail.add(desc).grow().width(180).pad(50, 10, 10, 10);
 
         rootTable.clear();
         rootTable.add(gridTable).width(500).expandY();

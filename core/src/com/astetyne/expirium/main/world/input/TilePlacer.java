@@ -32,7 +32,7 @@ public class TilePlacer implements InputProcessor {
         world = GameStage.get().getWorld();
         stabilityShowActive = false;
 
-        stabilityButton = new ImageButton(new TextureRegionDrawable(Res.DIRT_TEXTURE));
+        stabilityButton = new ImageButton(new TextureRegionDrawable(Res.DIRT_TILE));
         stabilityButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -57,10 +57,10 @@ public class TilePlacer implements InputProcessor {
             }else if(t.getStability() == 4) {
                 batch.setColor(0.9f, 0.9f, 0f, 1);
             }
-            batch.draw(Res.WHITE_TILE, t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.draw(Res.WHITE_TILE, t.getC() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
             batch.setColor(1, 1, 1, 1);
         }else {
-            batch.draw(t.getTexture(), t.getChunk().getId() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.draw(t.getTex(), t.getC() * Constants.T_W_CH + t.getX(), t.getY(), 1, 1);
         }
 
     }

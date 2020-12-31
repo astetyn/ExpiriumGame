@@ -5,7 +5,6 @@ import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.MainPlayer;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.BodyEditorLoader;
 import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
@@ -28,7 +27,6 @@ public class GameWorld {
     private final World b2dWorld;
     private final SpriteBatch batch;
     private final WorldChunk[] chunkArray;
-    private BodyEditorLoader loader;
     private final Body terrainBody;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
@@ -48,8 +46,7 @@ public class GameWorld {
         camera = new OrthographicCamera();
 
         b2dWorld = new World(new Vector2(0, -9.81f), false);
-        System.out.println("SERVER: W: "+b2dWorld);
-        //loader = new BodyEditorLoader(Gdx.files.internal("shapes.json"));
+
         chunkArray = new WorldChunk[numberOfChunks];
 
         BodyDef terrainDef = new BodyDef();
@@ -112,9 +109,7 @@ public class GameWorld {
                         player.getTilePlacer().render(t);
                         continue;
                     }
-                    if(t.getType() != TileType.AIR) {
-                        batch.draw(t.getTexture(), j + offset, i, 1, 1);
-                    }
+                    if(t.getType() != TileType.AIR) batch.draw(t.getTex(), j + offset, i, 1, 1);
                 }
             }
         }

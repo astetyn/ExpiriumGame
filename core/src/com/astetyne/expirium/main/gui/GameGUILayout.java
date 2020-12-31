@@ -35,9 +35,9 @@ public class GameGUILayout extends GUILayout {
         warnLabel = new Label("pre-alpha", Res.LABEL_STYLE);
         warnLabel.setColor(1,0.1f,0.1f,1);
 
-        healthImage = new Image(Res.TREE_TOP_TEXTURE);
-        hungerImage = new Image(Res.TREE_TOP_TEXTURE);
-        tempImage = new Image(Res.TREE_TOP_TEXTURE);
+        healthImage = new Image(Res.CROSS_ICON);
+        hungerImage = new Image(Res.CROSS_ICON);
+        tempImage = new Image(Res.CROSS_ICON);
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
         hungerStat = new Label("0%", Res.LABEL_STYLE);

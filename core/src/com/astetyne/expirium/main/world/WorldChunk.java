@@ -18,9 +18,9 @@ public class WorldChunk {
 
         for(int i = 0; i < Constants.T_H_CH; i++) {
             for(int j = 0; j < Constants.T_W_CH; j++) {
-                int type = in.getByte();
+                TileType type = TileType.getType(in.getByte());
                 int stability = in.getByte();
-                terrain[i][j] = new Tile(this, j, i, TileType.getType(type), stability);
+                terrain[i][j] = new Tile(id, j, i, stability, type);
             }
         }
 

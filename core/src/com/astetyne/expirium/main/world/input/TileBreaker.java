@@ -90,7 +90,7 @@ public class TileBreaker {
         if(targetTile == null) return;
 
         float durability = timeAccumulator / targetTile.getType().getBreakTime();
-        int x = targetTile.getX() + Constants.T_W_CH * targetTile.getChunk().getId();
+        int x = targetTile.getX() + Constants.T_W_CH * targetTile.getC();
         batch.draw(Res.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
     }
 

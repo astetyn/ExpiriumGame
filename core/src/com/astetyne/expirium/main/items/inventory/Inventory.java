@@ -29,21 +29,21 @@ public class Inventory {
 
         int c = Constants.PLAYER_INV_COLUMNS;
         int r = Constants.PLAYER_INV_ROWS;
-        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Res.INV_TILE_TEX), reloadSlotItems);
+        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Res.INV_TILE), reloadSlotItems);
 
         invGUILayout = new InvGUILayout();
 
-        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusTool, 0, "Tools");
-        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusBuild, 1, "Mats");
-        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE_TOOL, onFocusUse, 2, "Misc");
+        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusTool, 0, "Tools");
+        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusBuild, 1, "Mats");
+        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusUse, 2, "Misc");
 
         focusedSlot = toolSlot;
         focusedSlot.setFocus(true);
 
         switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, onSwitchUp, false);
         switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, onSwitchDown, true);
-        inventoryButton = new Image(Res.INVENTORY_TEXTURE);
-        consumeButton = new Image(Res.WOOD_TEXTURE);
+        inventoryButton = new Image(Res.INVENTORY);
+        consumeButton = new Image(Res.CAMPFIRE_ITEM);
 
         inventoryButton.addListener(new ClickListener(){
             @Override

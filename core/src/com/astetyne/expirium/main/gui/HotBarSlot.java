@@ -44,17 +44,17 @@ public class HotBarSlot extends Widget {
 
         batch.draw(style.background, getX(), getY(), getWidth(), getHeight());
         if(itemStack == null) {
-            Res.ARIAL_FONT.setColor(0.2f, 0.2f, 0.2f, 1);
-            float xOff = getWidth()/2 - Utils.getTextWidth(emptyLabel, Res.ARIAL_FONT)/2;
-            float yOff = getHeight()/2 + Utils.getTextHeight(emptyLabel, Res.ARIAL_FONT)/2;
-            Res.ARIAL_FONT.draw(batch, emptyLabel, getX()+xOff, getY()+yOff);
-            Res.ARIAL_FONT.setColor(1,1,1,1);
+            Res.MAIN_FONT.setColor(0.2f, 0.2f, 0.2f, 1);
+            float xOff = getWidth()/2 - Utils.getTextWidth(emptyLabel, Res.MAIN_FONT)/2;
+            float yOff = getHeight()/2 + Utils.getTextHeight(emptyLabel, Res.MAIN_FONT)/2;
+            Res.MAIN_FONT.draw(batch, emptyLabel, getX()+xOff, getY()+yOff);
+            Res.MAIN_FONT.setColor(1,1,1,1);
         }else {
             batch.draw(itemStack.getItem().getItemTexture(), getX(), getY(), getWidth(), getHeight());
             String amount = itemStack.getAmount()+"";
-            float xOff = getWidth()/2 - Utils.getTextWidth(amount, Res.ARIAL_FONT)/2;
-            float yOff = getHeight()/5 + Utils.getTextHeight(amount, Res.ARIAL_FONT)/2;
-            Res.ARIAL_FONT.draw(batch, amount, getX()+xOff, getY()+yOff);
+            float xOff = getWidth()/2 - Utils.getTextWidth(amount, Res.MAIN_FONT)/2;
+            float yOff = getHeight()/5 + Utils.getTextHeight(amount, Res.MAIN_FONT)/2;
+            Res.MAIN_FONT.draw(batch, amount, getX()+xOff, getY()+yOff);
         }
         batch.draw(style.frame, getX(), getY(), getWidth(), getHeight());
         batch.setColor(1,1,1,1);
@@ -122,12 +122,11 @@ public class HotBarSlot extends Widget {
 
     public static class HotBarSlotStyle {
 
-        final TextureRegion background, frame, defaultItemTexture;
+        final TextureRegion background, frame;
 
-        public HotBarSlotStyle(TextureRegion bg, TextureRegion frame, TextureRegion dit) {
+        public HotBarSlotStyle(TextureRegion bg, TextureRegion frame) {
             this.background = bg;
             this.frame = frame;
-            this.defaultItemTexture = dit;
         }
     }
 }

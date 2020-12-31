@@ -18,107 +18,134 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Res {
 
-    // UI
+    // gui
+    public static BitmapFont MAIN_FONT;
 
     public static Button.ButtonStyle BUTTON_STYLE;
-    public static TextureRegion CROSS_TEXTURE;
+    public static TextureRegion CROSS_ICON;
     public static TextButton.TextButtonStyle TEXT_BUTTON_STYLE;
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
     public static Label.LabelStyle LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
-    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_TOOL;
-    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_BUILD;
-    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE_USE;
+    public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE;
     public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
 
-    public static BitmapFont ARIAL_FONT;
+    // gui - inv
+    public static TextureRegion INVENTORY;
+    public static TextureRegion INV_TILE;
+    public static Drawable INV_DETAIL_BACK;
+    public static Drawable INV_CHOOSE_BACK;
+    public static TextureRegion INV_WEIGHT;
+    public static Drawable RECIPE_BACK;
 
-    // animations
+    // gui - items
+    public static TextureRegion PICKAXE_ITEM;
+    public static TextureRegion GRASS_ITEM;
+    public static TextureRegion DIRT_ITEM;
+    public static TextureRegion STONE_ITEM;
+    public static TextureRegion RAW_WOOD_ITEM;
+    public static TextureRegion WOODEN_WALL_ITEM;
+    public static TextureRegion CAMPFIRE_ITEM;
 
+    // gui - items - grid
+
+    // entities
     public static Animation<TextureRegion> PLAYER_IDLE_ANIM_R;
     public static Animation<TextureRegion> PLAYER_IDLE_ANIM_L;
     public static Animation<TextureRegion> PLAYER_RUN_ANIM_R;
     public static Animation<TextureRegion> PLAYER_RUN_ANIM_L;
 
-    public static Animation<TextureRegion> TILE_BREAK_ANIM;
-
-    // tiles
-
-    public static TextureRegion STONE_TEXTURE;
-    public static TextureRegion GRASS_TEXTURE;
-    public static TextureRegion DIRT_TEXTURE;
-    public static TextureRegion WOOD_TEXTURE;
-    public static TextureRegion TREE_TOP_TEXTURE;
+    // world
+    public static TextureRegion STONE_TILE;
+    public static TextureRegion GRASS_TILE;
+    public static TextureRegion DIRT_TILE;
+    public static TextureRegion TREE1_TILE, TREE2_TILE, TREE3_TILE, TREE4_TILE, TREE5_TILE, TREE6_TILE;
     public static TextureRegion WHITE_TILE;
-    public static TextureRegion CAMPFIRE_TEXTURE;
+    public static TextureRegion WOODEN_WALL_TILE;
 
-    // items
-    public static TextureRegion PICKAXE_TEXTURE;
+    public static Animation<TextureRegion> CAMPFIRE_FULL_TILE;
 
-    // inventory / grid
-    public static TextureRegion INVENTORY_TEXTURE;
-    public static TextureRegion INV_TILE_TEX;
-    public static Drawable RECIPE_BACK;
+    public static Animation<TextureRegion> TILE_BREAK_ANIM;
 
     public static void loadTextures() {
 
-        TextureAtlas ga = new TextureAtlas("game_assets.atlas");
-        TextureAtlas uia = new TextureAtlas("ui/gui_assets.atlas");
+        Animation.PlayMode loop = Animation.PlayMode.LOOP;
+        Animation.PlayMode loop_pong = Animation.PlayMode.LOOP_PINGPONG;
 
-        ARIAL_FONT = new BitmapFont(Gdx.files.internal("ui/medium_arial.fnt"));
+        TextureAtlas world = new TextureAtlas("world.atlas");
+        TextureAtlas gui = new TextureAtlas("gui.atlas");
+        TextureAtlas ent = new TextureAtlas("entities.atlas");
 
-        // UI
-        Drawable up = new TextureRegionDrawable(uia.findRegion("button_base"));
-        Drawable down = new TextureRegionDrawable(uia.findRegion("button_pressed"));
-        Drawable selection = new TextureRegionDrawable(uia.findRegion("selection"));
-        Drawable cursor = new TextureRegionDrawable(uia.findRegion("cursor"));
-        TextureRegion tsBack = uia.findRegion("thumb_stick_back");
-        TextureRegion tsFore = uia.findRegion("thumb_stick_fore");
-        TextureRegion hbsBack = uia.findRegion("hot_bar_slot_background");
-        TextureRegion hbsFrame = uia.findRegion("hot_bar_slot_frame");
-        TextureRegion hbsDefaultTool = uia.findRegion("empty_hotbar_tools");
-        TextureRegion switchArrowUp = uia.findRegion("switch_arrow_up");
-        TextureRegion switchArrowUpPressed = uia.findRegion("switch_arrow_up_pressed");
-        CROSS_TEXTURE = uia.findRegion("cross");
+        // gui
+        MAIN_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
+
+        Drawable up = new TextureRegionDrawable(gui.findRegion("button_base"));
+        Drawable down = new TextureRegionDrawable(gui.findRegion("button_pressed"));
+        Drawable selection = new TextureRegionDrawable(gui.findRegion("selection"));
+        Drawable cursor = new TextureRegionDrawable(gui.findRegion("cursor"));
+        TextureRegion tsBack = gui.findRegion("thumb_stick_back");
+        TextureRegion tsFore = gui.findRegion("thumb_stick_fore");
+        TextureRegion hbsBack = gui.findRegion("hot_bar_slot_background");
+        TextureRegion hbsFrame = gui.findRegion("hot_bar_slot_frame");
+        TextureRegion switchArrowUp = gui.findRegion("switch_arrow_up");
+        TextureRegion switchArrowUpPressed = gui.findRegion("switch_arrow_up_pressed");
+
+        CROSS_ICON = gui.findRegion("cross_icon");
 
         BUTTON_STYLE = new Button.ButtonStyle(up, down, up);
-        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(up, down, up, ARIAL_FONT);
-        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(ARIAL_FONT, Color.WHITE, cursor, selection, up);
-        LABEL_STYLE = new Label.LabelStyle(ARIAL_FONT, Color.WHITE);
+        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(up, down, up, MAIN_FONT);
+        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, up);
+        LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
-        HOT_BAR_SLOT_STYLE_TOOL = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame, hbsDefaultTool);
+        HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
 
-        // animations
-        Animation.PlayMode pm = Animation.PlayMode.LOOP_PINGPONG;
-        PLAYER_IDLE_ANIM_R = new Animation<>(0.5f, ga.findRegions("player_right_idle"), pm);
-        PLAYER_IDLE_ANIM_L = new Animation<>(0.5f, ga.findRegions("player_left_idle"), pm);
-        PLAYER_RUN_ANIM_R = new Animation<>(0.1f, ga.findRegions("player_right_run"), pm);
-        PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ga.findRegions("player_left_run"), pm);
+        // gui - inv
+        INVENTORY = gui.findRegion("inventory");
+        INV_TILE = gui.findRegion("inv_tile");
+        RECIPE_BACK = new TextureRegionDrawable(gui.findRegion("recipe_list_background"));
+        INV_DETAIL_BACK = new TextureRegionDrawable(gui.findRegion("item_detail_back"));
+        INV_CHOOSE_BACK = new TextureRegionDrawable(gui.findRegion("item_choose_back"));
+        INV_WEIGHT = gui.findRegion("weight_icon");
 
-        TILE_BREAK_ANIM = new Animation<>(0.34f, ga.findRegions("tile_break"), pm);
+        // gui - items
+        PICKAXE_ITEM = gui.findRegion("pickaxe_item");
+        GRASS_ITEM = gui.findRegion("grass_item");
+        DIRT_ITEM = gui.findRegion("dirt_item");
+        STONE_ITEM = gui.findRegion("stone_item");
+        RAW_WOOD_ITEM = gui.findRegion("raw_wood_item");
+        WOODEN_WALL_ITEM = gui.findRegion("wooden_wall_item");
+        CAMPFIRE_ITEM = gui.findRegion("campfire_item");
 
-        // tiles
-        STONE_TEXTURE = ga.findRegion("stone");
-        GRASS_TEXTURE = ga.findRegion("grass");
-        DIRT_TEXTURE = ga.findRegion("dirt");
-        WOOD_TEXTURE = ga.findRegion("wood");
-        TREE_TOP_TEXTURE = ga.findRegion("tree_top");
-        WHITE_TILE = ga.findRegion("white_tile");
-        CAMPFIRE_TEXTURE = ga.findRegion("campfire");
+        // gui - items - grid
 
-        // items
-        PICKAXE_TEXTURE  = ga.findRegion("pickaxe");
+        // entities
+        PLAYER_IDLE_ANIM_R = new Animation<>(0.5f, ent.findRegions("player_right_idle"), loop_pong);
+        PLAYER_IDLE_ANIM_L = new Animation<>(0.5f, ent.findRegions("player_left_idle"), loop_pong);
+        PLAYER_RUN_ANIM_R = new Animation<>(0.1f, ent.findRegions("player_right_run"), loop_pong);
+        PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ent.findRegions("player_left_run"), loop_pong);
 
-        // inventory / grid
-        INVENTORY_TEXTURE = ga.findRegion("inventory");
-        INV_TILE_TEX = uia.findRegion("inv_tile");
-        RECIPE_BACK = new TextureRegionDrawable(uia.findRegion("recipe_list_background"));
+        // world
+        STONE_TILE = world.findRegion("stone");
+        GRASS_TILE = world.findRegion("grass");
+        DIRT_TILE = world.findRegion("dirt");
+        TREE1_TILE = world.findRegion("tree1");
+        TREE2_TILE = world.findRegion("tree2");
+        TREE3_TILE = world.findRegion("tree3");
+        TREE4_TILE = world.findRegion("tree4");
+        TREE5_TILE = world.findRegion("tree5");
+        TREE6_TILE = world.findRegion("tree6");
+        WHITE_TILE = world.findRegion("white_tile");
+        WOODEN_WALL_TILE = world.findRegion("wooden_wall");
+
+        CAMPFIRE_FULL_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
+
+        TILE_BREAK_ANIM = new Animation<>(0.26f, world.findRegions("tile_break"), loop);
 
     }
 
     public static void dispose() {
-        ARIAL_FONT.dispose();
+        MAIN_FONT.dispose();
     }
 
 }

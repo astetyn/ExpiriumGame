@@ -36,14 +36,14 @@ public class ClientPacketManager {
 
     public void putTileBreakReqPacket(Tile t) {
         out.startPacket(15);
-        out.putInt(t.getChunk().getId());
+        out.putInt(t.getC());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }
 
     public void putTilePlaceReqPacket(Tile t, Item placedItem) {
         out.startPacket(16);
-        out.putInt(t.getChunk().getId());
+        out.putInt(t.getC());
         out.putInt(t.getX());
         out.putInt(t.getY());
         out.putInt(placedItem.getId());

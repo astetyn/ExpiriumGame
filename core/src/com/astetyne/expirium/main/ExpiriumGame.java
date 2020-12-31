@@ -5,6 +5,7 @@ import com.astetyne.expirium.main.stages.ExpiStage;
 import com.astetyne.expirium.main.stages.LauncherStage;
 import com.astetyne.expirium.server.GameServer;
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 
 public class ExpiriumGame extends ApplicationAdapter {
 
@@ -15,12 +16,14 @@ public class ExpiriumGame extends ApplicationAdapter {
 	private final Object serverTickLock;
 	private boolean available;
 	private String playerName;
+	private float timeSinceStart;
 
 	public ExpiriumGame() {
 		game = this;
 		available = false;
 		serverTickLock = new Object();
 		clientGateway = new ClientGateway();
+		timeSinceStart = 0;
 	}
 
 	@Override
@@ -30,6 +33,7 @@ public class ExpiriumGame extends ApplicationAdapter {
 	}
 
 	public void update() {
+		timeSinceStart += Gdx.graphics.getDeltaTime();
 		checkServerMessages();
 		currentExpiStage.update();
 	}
@@ -103,5 +107,9 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	public String getPlayerName() {
 		return playerName;
+	}
+
+	public float getTime() {
+		return timeSinceStart;
 	}
 }

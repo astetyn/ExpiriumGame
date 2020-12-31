@@ -8,11 +8,13 @@ import java.util.HashMap;
 
 public enum Item {
 
-    STONE(1, 1, 1, 1, 0.5f, Res.STONE_TEXTURE, Res.STONE_TEXTURE, "Stone",1),
-    GRASS(1, 2, 1, 1, 0.5f, Res.GRASS_TEXTURE, Res.GRASS_TEXTURE, "Travicka pre zajacika",1),
-    DIRT(1, 3, 1, 1, 0.5f, Res.DIRT_TEXTURE, Res.DIRT_TEXTURE, "Dirt",1),
-    RAW_WOOD(4, 4, 1, 1, 0.5f, Res.WOOD_TEXTURE, Res.WOOD_TEXTURE, "Raw wood",1),
-    PICKAXE(0, 0, 1, 2, 1, Res.PICKAXE_TEXTURE, Res.PICKAXE_TEXTURE, "Pickaxe",10);
+    STONE(1, 1, 1, 1, 0.5f, Res.STONE_ITEM, Res.STONE_ITEM, "Stone",1.1f),
+    GRASS(1, 2, 1, 1, 0.5f, Res.GRASS_ITEM, Res.GRASS_ITEM, "Grass",1),
+    DIRT(1, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt",1),
+    RAW_WOOD(4, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood",1),
+    PICKAXE(0, 0, 1, 2, 1, Res.PICKAXE_ITEM, Res.PICKAXE_ITEM, "Pickaxe",10),
+    CAMPFIRE(1, 10, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire", 0.8f),
+    WOODEN_WALL(1, 11, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall", 1);
 
     private static final HashMap<Integer, Item> map;
     static {

@@ -9,6 +9,7 @@ import com.astetyne.expirium.main.utils.Constants;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class GameStage extends ExpiStage {
@@ -18,6 +19,7 @@ public class GameStage extends ExpiStage {
     private GameWorld gameWorld;
     private final Inventory inventory;
     private final Box2DDebugRenderer b2dr;
+    private GLProfiler profiler;
     private final GameGUILayout gameGuiLayout;
     private GUILayout guiLayout;
 
@@ -26,6 +28,8 @@ public class GameStage extends ExpiStage {
         game = this;
 
         b2dr = new Box2DDebugRenderer();
+        profiler = new GLProfiler(Gdx.graphics);
+        profiler.enable();
         System.out.println("Display density: "+Gdx.graphics.getDensity());
         inventory = new Inventory();
         resize();
@@ -46,6 +50,8 @@ public class GameStage extends ExpiStage {
     @Override
     public void render() {
 
+        profiler.reset();
+
         Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -62,13 +68,15 @@ public class GameStage extends ExpiStage {
 
         if(Constants.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
 
+        //System.out.println("draw calls: "+profiler.getDrawCalls()+"\ntex bindings: "+profiler.getTextureBindings());
+
     }
 
     @Override
     public void resize() {
 
         if(gameWorld != null) gameWorld.resize();
-        Res.ARIAL_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
+        Res.MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         if(getGuiLayout() != null) getGuiLayout().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 

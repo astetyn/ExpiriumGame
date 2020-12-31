@@ -1,0 +1,132 @@
+
+world.png
+size: 1024,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+campfire_full
+  rotate: false
+  xy: 266, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+campfire_full
+  rotate: false
+  xy: 530, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+campfire_full
+  rotate: false
+  xy: 794, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+dirt
+  rotate: false
+  xy: 596, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+grass
+  rotate: false
+  xy: 398, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+stone
+  rotate: false
+  xy: 134, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tile_break
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+tile_break
+  rotate: false
+  xy: 926, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+tile_break
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+tile_break
+  rotate: false
+  xy: 960, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+tree1
+  rotate: false
+  xy: 860, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tree2
+  rotate: false
+  xy: 464, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tree3
+  rotate: false
+  xy: 200, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tree4
+  rotate: false
+  xy: 728, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tree5
+  rotate: false
+  xy: 332, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tree6
+  rotate: false
+  xy: 2, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+white_tile
+  rotate: false
+  xy: 662, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+wooden_wall
+  rotate: false
+  xy: 68, 36
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
