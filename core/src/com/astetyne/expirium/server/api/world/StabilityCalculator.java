@@ -86,21 +86,36 @@ public class StabilityCalculator {
         int maxAvailStab = 0;
 
         // left tile
-        if(x != 0) maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x-1].getStability()-1);
+        if(x != 0 && !worldTerrain[y][x-1].isLabile())
+            maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x-1].getStability()-1);
         // top tile
-        if(y != h-1) maxAvailStab = Math.max(maxAvailStab, worldTerrain[y+1][x].getStability()-2);
+        if(y != h-1 && !worldTerrain[y+1][x].isLabile())
+            maxAvailStab = Math.max(maxAvailStab, worldTerrain[y+1][x].getStability()-2);
         // right tile
-        if(x != w-1) maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
+        if(x != w-1 && !worldTerrain[y][x+1].isLabile())
+            maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
+
+        if(t.getType().isOnlyOnSolid()) {
+            maxAvailStab = 0; // the three steps above are redundant is this case
+        }
+
         // bottom tile
-        if(y != 0) maxAvailStab = Math.max(maxAvailStab, worldTerrain[y-1][x].getStability());
+        if(y != 0 && !worldTerrain[y-1][x].isLabile())
+            maxAvailStab = Math.max(maxAvailStab, worldTerrain[y-1][x].getStability());
 
         //magic triangle
         if(x > 0 && x < w-1 && y > 0) {
-            int s1 = worldTerrain[y-1][x-1].getStability();
-            int s2 = worldTerrain[y-1][x].getStability();
-            int s3 = worldTerrain[y-1][x+1].getStability();
-            if(s1 == s2 && s2 == s3 && s1 != 0) {
-                maxAvailStab = Math.max(maxAvailStab, s1+1);
+            ExpiTile t1 = worldTerrain[y-1][x-1];
+            ExpiTile t2 = worldTerrain[y-1][x];
+            ExpiTile t3 = worldTerrain[y-1][x+1];
+
+            if(!t1.isLabile() && !t2.isLabile() && !t3.isLabile()) {
+                int s1 = t1.getStability();
+                int s2 = t2.getStability();
+                int s3 = t3.getStability();
+                if(s1 == s2 && s2 == s3 && s1 != 0) {
+                    maxAvailStab = Math.max(maxAvailStab, s1 + 1);
+                }
             }
         }
         return Math.min(t.getType().getStability(), maxAvailStab);

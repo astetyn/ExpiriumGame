@@ -63,7 +63,7 @@ public class Res {
     public static TextureRegion WHITE_TILE;
     public static TextureRegion WOODEN_WALL_TILE;
 
-    public static Animation<TextureRegion> CAMPFIRE_FULL_TILE;
+    public static Animation<TextureRegion> CAMPFIRE_SMALL_TILE, CAMPFIRE_BIG_TILE;
 
     public static Animation<TextureRegion> TILE_BREAK_ANIM;
 
@@ -138,7 +138,8 @@ public class Res {
         WHITE_TILE = world.findRegion("white_tile");
         WOODEN_WALL_TILE = world.findRegion("wooden_wall");
 
-        CAMPFIRE_FULL_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
+        CAMPFIRE_SMALL_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
+        CAMPFIRE_BIG_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
 
         TILE_BREAK_ANIM = new Animation<>(0.26f, world.findRegions("tile_break"), loop);
 

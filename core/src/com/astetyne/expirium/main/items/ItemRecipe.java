@@ -7,7 +7,7 @@ import java.util.List;
 public enum ItemRecipe {
 
     PICKAXE(new ItemStack(Item.PICKAXE), Arrays.asList(new ItemStack(Item.RAW_WOOD, 10), new ItemStack(Item.STONE, 3)), "Palko je naj."),
-    WOODEN_WALL(new ItemStack(Item.WOODEN_WALL, 3), Arrays.asList(new ItemStack(Item.RAW_WOOD, 10)), "Nepriestrelna stena."),
+    WOODEN_WALL(new ItemStack(Item.WOODEN_WALL, 3), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Nepriestrelna stena."),
     CAMPFIRE(new ItemStack(Item.CAMPFIRE), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Ohnicek, ktory aj zahreje.");
 
     private static final HashMap<Integer, ItemRecipe> map;

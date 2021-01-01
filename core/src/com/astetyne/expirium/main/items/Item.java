@@ -13,8 +13,8 @@ public enum Item {
     DIRT(1, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt",1),
     RAW_WOOD(4, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood",1),
     PICKAXE(0, 0, 1, 2, 1, Res.PICKAXE_ITEM, Res.PICKAXE_ITEM, "Pickaxe",10),
-    CAMPFIRE(1, 10, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire", 0.8f),
-    WOODEN_WALL(1, 11, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall", 1);
+    CAMPFIRE(1, 11, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire", 0.8f),
+    WOODEN_WALL(1, 12, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall", 1);
 
     private static final HashMap<Integer, Item> map;
     static {

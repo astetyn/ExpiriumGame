@@ -97,12 +97,12 @@ public class ClientPacketManager {
                     world.onFeedChunkEvent();
                     break;
 
-                case 17: //BreakTileAckPacket
-                    world.onBreakTileEvent();
+                case 17: //FixturePacket
+                    world.onFixturesChange(in);
                     break;
 
-                case 18: //BreakPlaceAckPacket
-                    world.onPlaceTileEvent();
+                case 18: //StabilityPacket
+                    world.onStabilityChange(in);
                     break;
 
                 case 19: //EntityMovePacket
@@ -122,6 +122,10 @@ public class ClientPacketManager {
                 case 21: //EntityDespawnPacket
                     int id = in.getInt();
                     world.getEntitiesID().get(id).destroy();
+                    break;
+
+                case 22:
+                    world.onTileChange(in);
                     break;
 
                 case 24: //InvFeedPacket

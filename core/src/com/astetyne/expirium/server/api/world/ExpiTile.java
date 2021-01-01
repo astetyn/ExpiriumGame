@@ -12,7 +12,6 @@ public class ExpiTile {
     private final List<Fixture> fixtures;
     private final int x, y;
     private int stability;
-    //todo: meta?
 
     public ExpiTile(TileType type, int x, int y) {
         this.type = type;
@@ -36,6 +35,10 @@ public class ExpiTile {
 
     public int getStability() {
         return stability;
+    }
+
+    public boolean isLabile() {
+        return type.getSolidity().isLabile();
     }
 
     public List<Fixture> getFixtures() {

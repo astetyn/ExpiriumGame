@@ -3,11 +3,13 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.world.tiles.Solidity;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.backend.FixRes;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -30,6 +32,7 @@ public class ExpiWorld {
     private final WorldGenerator worldGenerator;
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
+    private final List<TileListener> tileListeners;
 
     public ExpiWorld(String worldName) {
         this(worldName, (long)(Math.random()*10000));
@@ -40,13 +43,15 @@ public class ExpiWorld {
         this.worldName = worldName;
         this.seed = seed;
 
+        tileListeners = new ArrayList<>();
+
         w = Constants.T_W_CH * Constants.CHUNKS_NUMBER;
         h = Constants.T_H_CH;
 
         worldTerrain = new ExpiTile[h][w];
 
         box2dWorld = new World(new Vector2(0, -9.81f), false);
-        System.out.println("SERVER: W: "+box2dWorld);
+        FixRes.load();
         BodyDef terrainDef = new BodyDef();
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
@@ -80,6 +85,10 @@ public class ExpiWorld {
                 if(p == ee) continue;
                 p.getGateway().getManager().putEntityMovePacket(ee);
             }
+        }
+
+        for(TileListener l : tileListeners) {
+            l.onTick();
         }
 
     }
@@ -161,6 +170,10 @@ public class ExpiWorld {
         if(tile.getType() == TileType.AIR) return;
 
         // confirmed from here
+        for(TileListener l : tileListeners) {
+            l.onTilePreBreak(tile);
+        }
+
         float off = (1 - Constants.D_I_SIZE)/2;
         Vector2 loc = new Vector2();
         FixturePack fp = new FixturePack();
@@ -201,7 +214,11 @@ public class ExpiWorld {
             }
         }
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getManager().putTileBreakAckPacket(brokenTiles, fp, affectedTiles);
+            for(ExpiTile t : brokenTiles) {
+                pp.getGateway().getManager().putTileChangePacket(t);
+            }
+            pp.getGateway().getManager().putFixturePacket(fp);
+            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
         }
     }
 
@@ -212,12 +229,12 @@ public class ExpiWorld {
         ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
         if(t.getType() != TileType.AIR) return;
 
-        if(item.getBuildTile().isSolid() && !isPlaceFree(x, y)) return;
+        Solidity solidity = item.getBuildTile().getSolidity();
+        if(solidity != Solidity.SOLID_SOFT && solidity != Solidity.LABILE_SOFT && !isPlaceFree(x, y)) return;
 
         FixturePack fp = new FixturePack();
 
         t.setType(item.getBuildTile());
-
         int newStability = stabilityCalc.getActualStability(t);
         if(newStability == 0) {
             t.setType(TileType.AIR);
@@ -233,9 +250,38 @@ public class ExpiWorld {
         affectedTiles.add(t);
         stabilityCalc.recalculateStabilityForNearbyTiles(t, affectedTiles);
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getManager().putTilePlaceAckPacket(t, fp, affectedTiles);
+            pp.getGateway().getManager().putTileChangePacket(t);
+            pp.getGateway().getManager().putFixturePacket(fp);
+            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
+        }
+        for(TileListener l : tileListeners) {
+            l.onTilePlace(t);
+        }
+    }
+
+    public void onTileInteract(int c, int x, int y, ExpiPlayer p) {
+        for(TileListener l : tileListeners) {
+            l.onTileInteract(worldTerrain[y][c*Constants.T_W_CH + x]);
+        }
+    }
+
+    private void changeTile(ExpiTile t, TileType to, boolean withDrops) {
+
+        Vector2 tempVec = new Vector2();
+
+        float off = (1 - Constants.D_I_SIZE)/2;
+
+        if(to == TileType.AIR && withDrops) {
+            tempVec.set(t.getX() + off, t.getY() + off);
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
+            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
+            }
         }
 
+        t.setType(to);
+        FixturePack fp = new FixturePack();
+        fixtureCalc.recalcTileFixturesPlus(t, fp);
     }
 
     private boolean isPlaceFree(int x, int y) {
@@ -285,5 +331,13 @@ public class ExpiWorld {
 
     public World getBox2dWorld() {
         return box2dWorld;
+    }
+
+    public void registerTileListener(TileListener listener) {
+        tileListeners.add(listener);
+    }
+
+    public void unregisterTileListener(TileListener listener) {
+        tileListeners.remove(listener);
     }
 }

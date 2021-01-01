@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class ServerPacketManager {
         out.startPacket(13);
         out.putInt(c);
 
-        int totalFixtures = 0;
+        FixturePack fp = new FixturePack();
 
         int off = c * Constants.T_W_CH;
         for(int i = 0; i < Constants.T_H_CH; i++) {
@@ -50,45 +49,27 @@ public class ServerPacketManager {
                 ExpiTile t = worldTerrain[i][j+off];
                 out.putByte((byte) t.getType().getID());
                 out.putByte((byte) t.getStability());
-                totalFixtures += t.getFixtures().size();
+                fp.addedFixtures.addAll(t.getFixtures());
             }
         }
-
-        Vector2 v1 = new Vector2();
-        Vector2 v2 = new Vector2();
-
-        out.putInt(totalFixtures);
-        for(int i = 0; i < Constants.T_H_CH; i++) {
-            for(int j = 0; j < Constants.T_W_CH; j++) {
-                ExpiTile t = worldTerrain[i][j+off];
-                for(Fixture f : t.getFixtures()) {
-                    EdgeShape shape = (EdgeShape) f.getShape();
-                    shape.getVertex1(v1);
-                    shape.getVertex2(v2);
-                    int fixID = GameServer.get().getWorld().getFixturesID().get(f);
-                    out.putFixture(fixID, v1.x, v1.y, v2.x, v2.y);
-                }
-            }
-        }
+        putFixturePacket(fp);
     }
 
     public void putChunkDestroyPacket(ExpiTile[][] worldTerrain, int c) {
         out.startPacket(12);
         out.putInt(c);
-        List<Integer> IDs = new ArrayList<>();
+
+        FixturePack fp = new FixturePack();
         int off = c * Constants.T_W_CH;
         for(int i = 0; i < Constants.T_H_CH; i++) {
             for(int j = 0; j < Constants.T_W_CH; j++) {
                 ExpiTile t = worldTerrain[i][j + off];
                 for(Fixture f : t.getFixtures()) {
-                    IDs.add(GameServer.get().getWorld().getFixturesID().get(f));
+                    fp.removedFixtures.add(GameServer.get().getWorld().getFixturesID().get(f));
                 }
             }
         }
-        out.putInt(IDs.size());
-        for(int e : IDs) {
-            out.putInt(e);
-        }
+        putFixturePacket(fp);
     }
 
     public void putEntityMovePacket(ExpiEntity e) {
@@ -125,68 +106,42 @@ public class ServerPacketManager {
         }
     }
 
-    public void putTileBreakAckPacket(List<ExpiTile> brokenTiles, FixturePack fp, HashSet<ExpiTile> at) {
+    public void putTileChangePacket(ExpiTile t) {
+        out.startPacket(22);
+        out.putInt(t.getType().getID());
+        out.putInt(t.getX() / Constants.T_W_CH);
+        out.putInt(t.getX() - (t.getX() / Constants.T_W_CH)*Constants.T_W_CH);
+        out.putInt(t.getY());
+    }
+
+    public void putFixturePacket(FixturePack pack) {
         out.startPacket(17);
-        out.putInt(brokenTiles.size());
-        for(ExpiTile t : brokenTiles) {
-            out.putInt(t.getX() / Constants.T_W_CH);
-            out.putInt(t.getX() - (t.getX() / Constants.T_W_CH)*Constants.T_W_CH);
-            out.putInt(t.getY());
-        }
 
         Vector2 v1 = new Vector2();
         Vector2 v2 = new Vector2();
 
-        out.putInt(fp.addedFixtures.size());
-        for(Fixture f : fp.addedFixtures) {
+        out.putInt(pack.addedFixtures.size());
+        for(Fixture f : pack.addedFixtures) {
             EdgeShape shape = (EdgeShape) f.getShape();
             shape.getVertex1(v1);
             shape.getVertex2(v2);
             int fixID = GameServer.get().getWorld().getFixturesID().get(f);
             out.putFixture(fixID, v1.x, v1.y, v2.x, v2.y);
         }
-        out.putInt(fp.removedFixtures.size());
-        for(int i : fp.removedFixtures) {
+        out.putInt(pack.removedFixtures.size());
+        for(int i : pack.removedFixtures) {
             out.putInt(i);
         }
-        out.putInt(at.size());
-        for(ExpiTile t : at) {
+    }
+
+    public void putStabilityPacket(HashSet<ExpiTile> affectedTiles) {
+        out.startPacket(18);
+        out.putInt(affectedTiles.size());
+        for(ExpiTile t : affectedTiles) {
             out.putInt(t.getX() / Constants.T_W_CH);
             out.putInt(t.getX() - (t.getX() / Constants.T_W_CH)*Constants.T_W_CH);
             out.putInt(t.getY());
             out.putInt(t.getStability());
-        }
-    }
-
-    public void putTilePlaceAckPacket(ExpiTile t, FixturePack fp, HashSet<ExpiTile> at) {
-        out.startPacket(18);
-        out.putInt(t.getType().getID());
-        out.putInt(t.getX() / Constants.T_W_CH);
-        out.putInt(t.getX());
-        out.putInt(t.getY());
-
-        out.putInt(at.size());
-        for(ExpiTile t2 : at) {
-            out.putInt(t2.getX() / Constants.T_W_CH);
-            out.putInt(t2.getX());
-            out.putInt(t2.getY());
-            out.putInt(t2.getStability());
-        }
-
-        Vector2 v1 = new Vector2();
-        Vector2 v2 = new Vector2();
-
-        out.putInt(fp.addedFixtures.size());
-        for(Fixture f : fp.addedFixtures) {
-            EdgeShape shape = (EdgeShape) f.getShape();
-            shape.getVertex1(v1);
-            shape.getVertex2(v2);
-            int fixID = GameServer.get().getWorld().getFixturesID().get(f);
-            out.putFixture(fixID, v1.x, v1.y, v2.x, v2.y);
-        }
-        out.putInt(fp.removedFixtures.size());
-        for(int i : fp.removedFixtures) {
-            out.putInt(i);
         }
     }
 

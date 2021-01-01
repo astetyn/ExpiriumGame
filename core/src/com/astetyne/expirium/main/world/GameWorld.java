@@ -137,7 +137,6 @@ public class GameWorld {
 
         WorldChunk worldChunk = new WorldChunk(in);
         chunkArray[worldChunk.getId()] = worldChunk;
-        parseFixtures();
     }
 
     public void onDestroyChunkEvent() {
@@ -146,64 +145,20 @@ public class GameWorld {
 
         int chunkID = in.getInt();
         chunkArray[chunkID] = null;
-        parseOldFixtures();
     }
 
-    public void onBreakTileEvent() {
-
-        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
-
-        int brokenTiles = in.getInt();
-        for(int i = 0; i < brokenTiles; i++) {
-            int c = in.getInt();
-            int x = in.getInt();
-            int y = in.getInt();
-            chunkArray[c].getTerrain()[y][x].setType(TileType.AIR);
-        }
-
-        parseFixtures();
-        parseOldFixtures();
-
-        int size = in.getInt();
-        for(int i = 0; i < size; i++) {
-            int c2 = in.getInt();
-            int x2 = in.getInt();
-            int y2 = in.getInt();
-            int stability = in.getInt();
-            chunkArray[c2].getTerrain()[y2][x2].setStability(stability);
-        }
-
-    }
-
-    public void onPlaceTileEvent() {
-
-        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+    public void onTileChange(PacketInputStream in) {
 
         int type = in.getInt();
-        int ct = in.getInt();
-        int xt = in.getInt();
-        int yt = in.getInt();
+        int c = in.getInt();
+        int x = in.getInt();
+        int y = in.getInt();
 
-        Tile t = chunkArray[ct].getTerrain()[yt][xt];
-        t.setType(TileType.getType(type));
+        chunkArray[c].getTerrain()[y][x].setType(TileType.getType(type));
 
-        int changed = in.getInt();
-        for(int i = 0; i < changed; i++) {
-            int c = in.getInt();
-            int x = in.getInt();
-            int y = in.getInt();
-            int stab = in.getInt();
-            t = chunkArray[c].getTerrain()[y][x];
-            t.setStability(stab);
-        }
-
-        parseFixtures();
-        parseOldFixtures();
     }
 
-    private void parseFixtures() {
-
-        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+    public void onFixturesChange(PacketInputStream in) {
 
         int size = in.getInt();
         EdgeShape shape = new EdgeShape();
@@ -218,18 +173,26 @@ public class GameWorld {
             Fixture f = terrainBody.createFixture(def);
             fixturesID.put(id, f);
         }
-    }
 
-    private void parseOldFixtures() {
-
-        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
-
-        int size = in.getInt();
+        size = in.getInt();
         for(int i = 0; i < size; i++) {
             int fixID = in.getInt();
             Fixture f = fixturesID.get(fixID);
             terrainBody.destroyFixture(f);
             fixturesID.remove(fixID);
+        }
+    }
+
+    public void onStabilityChange(PacketInputStream in) {
+
+        int size = in.getInt();
+        for(int i = 0; i < size; i++) {
+            int c = in.getInt();
+            int x = in.getInt();
+            int y = in.getInt();
+            int stability = in.getInt();
+            System.out.println(stability);
+            chunkArray[c].getTerrain()[y][x].setStability(stability);
         }
     }
 

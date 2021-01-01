@@ -1,6 +1,8 @@
 package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.world.tiles.Solidity;
+import com.astetyne.expirium.server.backend.FixRes;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
@@ -43,16 +45,11 @@ public class FixtureCalculator {
         }
     }
 
-    // This method will check all nearby tiles and create his own fixtures + impact nearby tiles if solid
+    // This method will check all nearby tiles and create his own fixtures + impact nearby tiles
     public void recalcTileFixturesPlus(ExpiTile t, FixturePack fp) {
 
         int x = t.getX();
         int y = t.getY();
-
-        if(!t.getType().isSolid()) {
-            clearTileFixtures(t, fp);
-            return;
-        }
 
         recalcTileFixtures(y, x, shape, fixDef, fp);
         if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef, fp);
@@ -102,21 +99,29 @@ public class FixtureCalculator {
         }
         t.getFixtures().clear();
 
-        if(!t.getType().isSolid()) return;
+        if(t.getType().getEdgesData() != null) {
+            FixRes.EdgesData data = t.getType().getEdgesData();
+            for(int i = 0; i < data.l1.size(); i++) {
+                shape.set(data.l1.get(i).x + x, data.l1.get(i).y + y, data.l2.get(i).x + x, data.l2.get(i).y + y);
+                createFixture(fixDef, t, fp);
+            }
+        }
 
-        if(y != 0 && !worldTerrain[y-1][x].getType().isSolid()) {
+        if(t.getType().getSolidity() != Solidity.SOLID) return;
+
+        if(y != 0 && worldTerrain[y-1][x].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x+1,y);
             createFixture(fixDef, t, fp);
         }
-        if(y != h-1 && !worldTerrain[y+1][x].getType().isSolid()) {
+        if(y != h-1 && worldTerrain[y+1][x].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y+1, x+1,y+1);
             createFixture(fixDef, t, fp);
         }
-        if(x != 0 && !worldTerrain[y][x-1].getType().isSolid()) {
+        if(x != 0 && worldTerrain[y][x-1].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x,y+1);
             createFixture(fixDef, t, fp);
         }
-        if(x != w-1 && !worldTerrain[y][x+1].getType().isSolid()) {
+        if(x != w-1 && worldTerrain[y][x+1].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x+1, y, x+1,y+1);
             createFixture(fixDef, t, fp);
         }
