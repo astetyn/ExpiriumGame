@@ -35,18 +35,45 @@ public class StabilityCalculator {
 
     }
 
-    // This method will set the given tiles stability to 0 and return all affected tiles.
-    public HashSet<ExpiTile> clearStabilityAndRecalculate(ExpiTile tile) {
+    /** This method will calculate all required stability and return tiles which were affected. Call
+     *  this when TileType was changed. You should check if TileType can be changed with canBeAdjusted() first.
+     * @param t changed tile from which stability should be recalculated
+     * @return all affected tiles
+     */
+    public HashSet<ExpiTile> adjustStability(ExpiTile t) {
 
-        StabilityPack pack = new StabilityPack();
+        int newStability = getActualStability(t);
 
-        findStrongConnections(tile, pack);
+        HashSet<ExpiTile> affectedTiles = new HashSet<>();
 
-        HashSet<ExpiTile> ignored = new HashSet<>();
-        for(ExpiTile t : pack.strongTiles) {
-            recalculateStabilityForNearbyTiles(t, ignored);
+        if(newStability > t.getStability()) {
+
+            t.setStability(newStability);
+            affectedTiles.add(t);
+            recalculateStabilityForNearbyTiles(t, affectedTiles);
+
+        }else if(newStability < t.getStability()) {
+
+            StabilityPack pack = new StabilityPack();
+            findStrongConnections(t, pack);
+            for(ExpiTile t2 : pack.strongTiles) {
+                recalculateStabilityForNearbyTiles(t2, affectedTiles);
+            }
+            affectedTiles = pack.changedTiles;
+            t.setStability(newStability);
+            recalculateStabilityForNearbyTiles(t, affectedTiles);
         }
-        return pack.changedTiles;
+        return affectedTiles;
+    }
+
+    public boolean canBeAdjusted(ExpiTile t, TileType checkType) {
+
+        TileType oldType = t.getType();
+
+        t.setType(checkType);
+        int actualS = getActualStability(t);
+        t.setType(oldType);
+        return actualS != 0;
     }
 
     private void findStrongConnections(ExpiTile t, StabilityPack pack) {
@@ -70,15 +97,15 @@ public class StabilityCalculator {
 
     private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
         if(t.getType() == TileType.AIR) return;
-        if(t.getStability() <= getActualStability(t)) {
-            pack.strongTiles.add(t);
-        }else {
+        if(t.getStability() > getActualStability(t)) {
             findStrongConnections(t, pack);
+        }else {
+            pack.strongTiles.add(t);
         }
     }
 
-    // This method will return new stability of the tile based on nearby tiles.
-    public int getActualStability(ExpiTile t) {
+    /** This method will return new stability of the tile based on nearby tiles.*/
+    private int getActualStability(ExpiTile t) {
 
         int x = t.getX();
         int y = t.getY();
@@ -121,7 +148,8 @@ public class StabilityCalculator {
         return Math.min(t.getType().getStability(), maxAvailStab);
     }
 
-    public void recalculateStabilityForNearbyTiles(ExpiTile t, HashSet<ExpiTile> changed) {
+    /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/
+    private void recalculateStabilityForNearbyTiles(ExpiTile t, HashSet<ExpiTile> changed) {
 
         int x = t.getX();
         int y = t.getY();

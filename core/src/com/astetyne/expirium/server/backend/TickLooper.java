@@ -37,9 +37,7 @@ public class TickLooper extends TerminableLooper {
 
                 resolvePlayersActions();
 
-                server.getWorld().onTick();
-
-                //todo: ai? time? weather?
+                GameServer.get().onTick();
 
                 // wakes up all clients threads and send new actions
                 synchronized(tickLock) {

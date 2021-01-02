@@ -22,7 +22,7 @@ public class Constants {
     public static final float D_I_SIZE = 0.5f;
     public static final float D_I_PICK_DIST = 1.3f;
 
-    public static final float CAMPFIRE_TIME = 60;
+    public static final float CAMPFIRE_TIME = 10;
 
     // player
     public static final int PLAYER_INV_COLUMNS = 6;

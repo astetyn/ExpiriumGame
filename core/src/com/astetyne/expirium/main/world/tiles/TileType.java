@@ -15,14 +15,14 @@ public enum TileType {
     STONE(Solidity.SOLID, Res.STONE_TILE, 10f, Item.STONE, 3, false, null),
     GRASS(Solidity.SOLID, Res.GRASS_TILE, 5f, Item.GRASS, 2, false, null),
     DIRT(Solidity.SOLID, Res.DIRT_TILE, 5f, Item.DIRT, 2, false, null),
-    TREE1(Solidity.SOLID_SOFT, Res.TREE1_TILE, 3f, Item.RAW_WOOD, 2, false, null),
+    TREE1(Solidity.SOLID_SOFT, Res.TREE1_TILE, 3f, Item.RAW_WOOD, 2, true, null),
     TREE2(Solidity.SOLID_SOFT, Res.TREE2_TILE, 3f, Item.RAW_WOOD, 2, false, null),
     TREE3(Solidity.SOLID_SOFT, Res.TREE3_TILE, 3f, Item.RAW_WOOD, 2, false, null),
     TREE4(Solidity.SOLID_SOFT, Res.TREE4_TILE, 3f, Item.RAW_WOOD, 2, false, null),
     TREE5(Solidity.SOLID_SOFT, Res.TREE5_TILE, 3f, Item.RAW_WOOD, 2, false, null),
     TREE6(Solidity.SOLID_SOFT, Res.TREE6_TILE, 3f, Item.RAW_WOOD, 2, false, null),
-    CAMPFIRE_SMALL(Solidity.LABILE_SHAPE, Res.CAMPFIRE_SMALL_TILE, 0.5f, Item.CAMPFIRE, 1, true, FixRes.CAMPFIRE),
-    CAMPFIRE_BIG(Solidity.LABILE_SHAPE, Res.CAMPFIRE_BIG_TILE, 0.5f, Item.CAMPFIRE, 1, true, FixRes.CAMPFIRE),
+    CAMPFIRE_SMALL(Solidity.LABILE_SHAPE, Res.CAMPFIRE_SMALL_TILE, 0.5f, null, 1, true, FixRes.CAMPFIRE),
+    CAMPFIRE_BIG(Solidity.LABILE_SHAPE, Res.CAMPFIRE_BIG_TILE, 0.5f, null, 1, true, FixRes.CAMPFIRE),
     WOODEN_WALL(Solidity.SOLID, Res.WOODEN_WALL_TILE, 2f, Item.WOODEN_WALL, 5, false, null);
 
     int id;

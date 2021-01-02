@@ -3,12 +3,13 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Constants;
-import com.astetyne.expirium.main.world.tiles.Solidity;
+import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.astetyne.expirium.server.backend.FixturePack;
 import com.badlogic.gdx.Gdx;
@@ -33,6 +34,7 @@ public class ExpiWorld {
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
     private final List<TileListener> tileListeners;
+    private WeatherType weatherType;
 
     public ExpiWorld(String worldName) {
         this(worldName, (long)(Math.random()*10000));
@@ -43,7 +45,12 @@ public class ExpiWorld {
         this.worldName = worldName;
         this.seed = seed;
 
+        weatherType = WeatherType.SUNNY;
+
         tileListeners = new ArrayList<>();
+
+        CampfireListener list = new CampfireListener();
+        registerTileListener(list);
 
         w = Constants.T_W_CH * Constants.CHUNKS_NUMBER;
         h = Constants.T_H_CH;
@@ -174,52 +181,7 @@ public class ExpiWorld {
             l.onTilePreBreak(tile);
         }
 
-        float off = (1 - Constants.D_I_SIZE)/2;
-        Vector2 loc = new Vector2();
-        FixturePack fp = new FixturePack();
-        List<ExpiTile> brokenTiles = new ArrayList<>();
-
-        // destroy origin tile first
-        loc.set(tile.getX()+off, tile.getY()+off);
-        ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, tile.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
-        }
-        tile.setType(TileType.AIR);
-        fixtureCalc.clearTileFixtures(tile, fp);
-        brokenTiles.add(tile);
-
-        // recalculate all affected tiles
-        HashSet<ExpiTile> affectedTiles = stabilityCalc.clearStabilityAndRecalculate(tile);
-
-        float dropChance = 1.0f/affectedTiles.size();
-
-        // destroy affected tiles
-        Iterator<ExpiTile> it = affectedTiles.iterator();
-        while(it.hasNext()) {
-            ExpiTile t = it.next();
-            if(t.getStability() == 0 && t != tile) {
-                loc.set(t.getX()+off, t.getY()+off);
-                //if(Math.random() < dropChance) { // todo: toto je strasne mala sanca, treba nastavit vacsiu
-                if(Math.random() < 1) {
-                    droppedItem = new ExpiDroppedItem(loc, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
-                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
-                    }
-                }
-                t.setType(TileType.AIR);
-                fixtureCalc.clearTileFixtures(t, fp);
-                brokenTiles.add(t);
-                it.remove();
-            }
-        }
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            for(ExpiTile t : brokenTiles) {
-                pp.getGateway().getManager().putTileChangePacket(t);
-            }
-            pp.getGateway().getManager().putFixturePacket(fp);
-            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
-        }
+        changeTile(tile, TileType.AIR, true);
     }
 
     public void onTilePlaceReq(int c, int x, int y, Item item, ExpiPlayer p) {
@@ -229,31 +191,16 @@ public class ExpiWorld {
         ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
         if(t.getType() != TileType.AIR) return;
 
-        Solidity solidity = item.getBuildTile().getSolidity();
-        if(solidity != Solidity.SOLID_SOFT && solidity != Solidity.LABILE_SOFT && !isPlaceFree(x, y)) return;
+        if(!isTileFree(x, y)) return;
 
-        FixturePack fp = new FixturePack();
-
-        t.setType(item.getBuildTile());
-        int newStability = stabilityCalc.getActualStability(t);
-        if(newStability == 0) {
-            t.setType(TileType.AIR);
-            return;
-        }
+        if(!stabilityCalc.canBeAdjusted(t, item.getBuildTile())) return;
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
         p.getGateway().getManager().putInvFeedPacket(p.getInv());
-        fixtureCalc.recalcTileFixturesPlus(t, fp);
-        t.setStability(newStability);
-        HashSet<ExpiTile> affectedTiles = new HashSet<>();
-        affectedTiles.add(t);
-        stabilityCalc.recalculateStabilityForNearbyTiles(t, affectedTiles);
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            pp.getGateway().getManager().putTileChangePacket(t);
-            pp.getGateway().getManager().putFixturePacket(fp);
-            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
-        }
+
+        changeTile(t, item.getBuildTile(), true);
+
         for(TileListener l : tileListeners) {
             l.onTilePlace(t);
         }
@@ -265,13 +212,13 @@ public class ExpiWorld {
         }
     }
 
-    private void changeTile(ExpiTile t, TileType to, boolean withDrops) {
+    public void changeTile(ExpiTile t, TileType to, boolean withDrops) {
 
         Vector2 tempVec = new Vector2();
 
         float off = (1 - Constants.D_I_SIZE)/2;
 
-        if(to == TileType.AIR && withDrops) {
+        if(to == TileType.AIR && withDrops && t.getType() != TileType.AIR) {
             tempVec.set(t.getX() + off, t.getY() + off);
             ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
@@ -282,9 +229,42 @@ public class ExpiWorld {
         t.setType(to);
         FixturePack fp = new FixturePack();
         fixtureCalc.recalcTileFixturesPlus(t, fp);
+
+        List<ExpiTile> changedTiles = new ArrayList<>();
+        changedTiles.add(t);
+
+        HashSet<ExpiTile> affectedTiles = stabilityCalc.adjustStability(t);
+        Iterator<ExpiTile> it = affectedTiles.iterator();
+        while(it.hasNext()) {
+            ExpiTile t2 = it.next();
+            if(t2.getStability() == 0) {
+                if(Math.random() < 1 && withDrops && t2.getType().getDropItem() != null) {
+                    tempVec.set(t2.getX()+off, t2.getY()+off);
+                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
+                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                        pp.getGateway().getManager().putEntitySpawnPacket(edi);
+                    }
+                }
+                t2.setType(TileType.AIR);
+                fixtureCalc.clearTileFixtures(t2, fp);
+                changedTiles.add(t2);
+                it.remove();
+            }
+        }
+
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            for(ExpiTile t2 : changedTiles) {
+                pp.getGateway().getManager().putTileChangePacket(t2);
+            }
+            pp.getGateway().getManager().putFixturePacket(fp);
+            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
+        }
+
     }
 
-    private boolean isPlaceFree(int x, int y) {
+    private boolean isTileFree(int x, int y) {
+
+        if(worldTerrain[y][x].getType().getSolidity().isSoft()) return true;
 
         for(ExpiEntity p : GameServer.get().getEntities()) {
 
@@ -339,5 +319,9 @@ public class ExpiWorld {
 
     public void unregisterTileListener(TileListener listener) {
         tileListeners.remove(listener);
+    }
+
+    public WeatherType getWeather() {
+        return weatherType;
     }
 }

@@ -145,4 +145,10 @@ public class ServerPacketManager {
         }
     }
 
+    public void putEnviroPacket() {
+        out.startPacket(28);
+        out.putInt(GameServer.get().getServerTime());
+        out.putInt(GameServer.get().getWorld().getWeather().getID());
+    }
+
 }

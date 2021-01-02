@@ -45,7 +45,7 @@ public class FixtureCalculator {
         }
     }
 
-    // This method will check all nearby tiles and create his own fixtures + impact nearby tiles
+    /** This method will check all nearby tiles and create his own fixtures + impact nearby tiles*/
     public void recalcTileFixturesPlus(ExpiTile t, FixturePack fp) {
 
         int x = t.getX();
@@ -59,7 +59,7 @@ public class FixtureCalculator {
 
     }
 
-    // This method will remove all fixtures from given tile and also updates nearby tiles fixtures
+    /** This method will remove all fixtures from given tile and also updates nearby tiles fixtures*/
     public void clearTileFixtures(ExpiTile t, FixturePack fp) {
 
         for(Fixture f : t.getFixtures()) {
@@ -83,7 +83,7 @@ public class FixtureCalculator {
         if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef, fp);
     }
 
-    // This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)
+    /** This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)*/
     private void recalcTileFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef, FixturePack fp) {
 
         ExpiTile t = worldTerrain[y][x];
