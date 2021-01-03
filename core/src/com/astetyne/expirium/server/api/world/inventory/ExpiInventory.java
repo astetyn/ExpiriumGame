@@ -1,8 +1,8 @@
-package com.astetyne.expirium.server.api;
+package com.astetyne.expirium.server.api.world.inventory;
 
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
@@ -14,11 +14,11 @@ import java.util.List;
 
 public class ExpiInventory {
 
-    private final List<ItemStack> items;
-    private final int id;
-    private final ItemStack[][] grid;
-    private float totalWeight;
-    private final float maxWeight;
+    protected final List<ItemStack> items;
+    protected final int id;
+    protected final ItemStack[][] grid;
+    protected float totalWeight;
+    protected final float maxWeight;
 
     public ExpiInventory(int columns, int rows, float maxWeight) {
         items = new ArrayList<>();
@@ -33,8 +33,8 @@ public class ExpiInventory {
         this.maxWeight = maxWeight;
     }
 
-    public boolean canBeAdded(Item item) {
-        if(totalWeight + item.getWeight() > maxWeight) return false;
+    public boolean canBeAdded(Item item, int amount) {
+        if(totalWeight + item.getWeight() * amount > maxWeight) return false;
 
 
 
@@ -47,6 +47,7 @@ public class ExpiInventory {
         for(ItemStack is : items) {
             if(is.getItem() == copyIS.getItem()) {
                 is.increaseAmount(copyIS.getAmount());
+                totalWeight += copyIS.getItem().getWeight() * copyIS.getAmount();
                 return;
             }
         }
@@ -58,7 +59,7 @@ public class ExpiInventory {
                 copyIS.getGridPos().set(j, i);
                 insertToGrid(copyIS);
                 items.add(copyIS);
-                totalWeight += copyIS.getItem().getWeight();
+                totalWeight += copyIS.getItem().getWeight() * copyIS.getAmount();
                 return;
             }
         }
@@ -71,7 +72,7 @@ public class ExpiInventory {
             removeItem(is);
             for(ExpiPlayer p2 : GameServer.get().getPlayers()) {
                 //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
-                ExpiDroppedItem edi = new ExpiDroppedItem(p.getCenter(), is.getItem(), Constants.SERVER_DEFAULT_TPS);
+                ExpiDroppedItem edi = new ExpiDroppedItem(p.getCenter(), is.getItem(), Consts.SERVER_DEFAULT_TPS);
                 p2.getGateway().getManager().putEntitySpawnPacket(edi);
             }
             p.getGateway().getManager().putInvFeedPacket(this);
@@ -84,14 +85,14 @@ public class ExpiInventory {
         p.getGateway().getManager().putInvFeedPacket(this);
     }
 
-    public boolean contain(Item item) {
+    public boolean contains(Item item) {
         for(ItemStack is : items) {
             if(is.getItem() == item) return true;
         }
         return false;
     }
 
-    public boolean contain(ItemStack conIS) {
+    public boolean contains(ItemStack conIS) {
         for(ItemStack is : items) {
             if(is.getItem() == conIS.getItem() && is.getAmount() >= conIS.getAmount()) return true;
         }
@@ -103,11 +104,11 @@ public class ExpiInventory {
         while(it.hasNext()) {
             ItemStack is = it.next();
             if(is.getItem() == remIS.getItem()) {
+                totalWeight -= is.getItem().getWeight() * Math.min(is.getAmount(), remIS.getAmount());
                 is.decreaseAmount(remIS.getAmount());
                 if(is.getAmount() <= 0) {
                     it.remove();
                     cleanGridFrom(is);
-                    totalWeight -= remIS.getItem().getWeight();
                     break;
                 }
             }

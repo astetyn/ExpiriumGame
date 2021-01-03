@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
@@ -24,7 +24,7 @@ public class CampfireListener implements TileListener {
         while(it.hasNext()) {
             Map.Entry<ExpiTile, Float> entry = it.next();
             float time = entry.getValue();
-            time -= 1.0f / Constants.SERVER_DEFAULT_TPS;
+            time -= 1.0f / Consts.SERVER_DEFAULT_TPS;
             if(time <= 0) {
                 GameServer.get().getWorld().changeTile(entry.getKey(), TileType.AIR, false);
                 activeCampfires.remove(entry.getKey());
@@ -49,7 +49,7 @@ public class CampfireListener implements TileListener {
     public void onTilePlace(ExpiTile t) {
         if(t.getType() == TileType.CAMPFIRE_BIG) {
             activeCampfires.add(t);
-            timeTillEnd.put(t, Constants.CAMPFIRE_TIME);
+            timeTillEnd.put(t, Consts.CAMPFIRE_TIME);
             System.out.println("place");
         }
     }

@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.Solidity;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.astetyne.expirium.server.backend.FixturePack;
@@ -31,7 +31,7 @@ public class FixtureCalculator {
         fixDef = new FixtureDef();
         fixDef.shape = shape;
         fixDef.friction = 0.2f;
-        fixDef.filter.categoryBits = Constants.DEFAULT_BIT;
+        fixDef.filter.categoryBits = Consts.DEFAULT_BIT;
     }
 
     public void generateWorldFixtures() {

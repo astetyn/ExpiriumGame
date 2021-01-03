@@ -5,7 +5,7 @@ import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.MainPlayer;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -30,7 +30,6 @@ public class GameWorld {
     private final Body terrainBody;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
-    private final ExpiContactListener contactListener;
     private MainPlayer player;
     private final OrthographicCamera camera;
     private final HashMap<Integer, Fixture> fixturesID;
@@ -53,9 +52,6 @@ public class GameWorld {
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
         terrainBody = b2dWorld.createBody(terrainDef);
-
-        contactListener = new ExpiContactListener();
-        b2dWorld.setContactListener(contactListener);
 
         generateWorldBorders();
 
@@ -80,6 +76,8 @@ public class GameWorld {
 
     }
 
+    public static int steps;
+
     public void update() {
 
         for(Entity e : entities) {
@@ -89,6 +87,7 @@ public class GameWorld {
         player.update();
 
         b2dWorld.step(1/60f, 6, 2);
+        steps++;
 
         cameraCenter();
     }
@@ -101,9 +100,9 @@ public class GameWorld {
         for(WorldChunk chunk : chunkArray) {
             if(chunk == null) continue;
             Tile[][] terrain = chunk.getTerrain();
-            int offset = chunk.getId()*Constants.T_W_CH;
-            for(int i = 0; i < Constants.T_H_CH; i++) {
-                for(int j = 0; j < Constants.T_W_CH; j++) {
+            int offset = chunk.getId()* Consts.T_W_CH;
+            for(int i = 0; i < Consts.T_H_CH; i++) {
+                for(int j = 0; j < Consts.T_W_CH; j++) {
                     Tile t = terrain[i][j];
                     if(GameStage.get().getInv().getMaterialSlot().isFocused()) {
                         player.getTilePlacer().render(t);
@@ -165,7 +164,7 @@ public class GameWorld {
         FixtureDef def = new FixtureDef();
         def.shape = shape;
         def.friction = 0.2f;
-        def.filter.categoryBits = Constants.DEFAULT_BIT;
+        def.filter.categoryBits = Consts.DEFAULT_BIT;
 
         for(int i = 0; i < size; i++) {
             int id = in.getInt();
@@ -204,12 +203,12 @@ public class GameWorld {
 
         verts[0] = 0;
         verts[1] = 0;
-        verts[2] = chunkArray.length * Constants.T_W_CH;
+        verts[2] = chunkArray.length * Consts.T_W_CH;
         verts[3] = 0;
-        verts[5] = Constants.T_H_CH;
-        verts[4] = chunkArray.length * Constants.T_W_CH;
+        verts[5] = Consts.T_H_CH;
+        verts[4] = chunkArray.length * Consts.T_W_CH;
         verts[6] = 0;
-        verts[7] = Constants.T_H_CH;
+        verts[7] = Consts.T_H_CH;
         verts[8] = 0;
         verts[9] = 0;
 
@@ -227,16 +226,16 @@ public class GameWorld {
     }
 
     public Tile getTileAt(Vector2 vec) {
-        int chunk = (int) (vec.x / Constants.T_W_CH);
-        int x = (int) (vec.x - (chunk * Constants.T_W_CH));
+        int chunk = (int) (vec.x / Consts.T_W_CH);
+        int x = (int) (vec.x - (chunk * Consts.T_W_CH));
         int y = (int) vec.y;
         WorldChunk wch = chunkArray[chunk];
         return wch == null ? null : wch.getTerrain()[y][x];
     }
 
     public Tile getTileAt(int xG, int yG) {
-        int chunk = xG / Constants.T_W_CH;
-        int x = xG - (chunk * Constants.T_W_CH);
+        int chunk = xG / Consts.T_W_CH;
+        int x = xG - (chunk * Consts.T_W_CH);
         WorldChunk wch = chunkArray[chunk];
         return wch == null ? null : wch.getTerrain()[yG][x];
     }
@@ -267,10 +266,6 @@ public class GameWorld {
 
     public List<Entity> getEntities() {
         return entities;
-    }
-
-    public ExpiContactListener getCL() {
-        return contactListener;
     }
 
     public HashMap<Integer, Fixture> getFixturesID() {

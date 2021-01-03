@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.gui;
 
 import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.stages.GameStage;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
 import java.util.ArrayList;
@@ -23,22 +25,23 @@ public class StorageGrid extends Widget {
     private ItemStack selItem;
     private final Vector2 selItemVec;
     private int id, columns, rows;
-    private final Runnable onInvUpdate;
     private float totalWeight, maxWeight;
+    private Label weightLabel;
 
-    public StorageGrid(int columns, int rows, StorageGridStyle style, Runnable onInvUpdate) {
-        this(-1, columns, rows, style, onInvUpdate);
+    public StorageGrid(int columns, int rows, StorageGridStyle style) {
+        this(-1, columns, rows, style);
     }
 
-    public StorageGrid(int id, int columns, int rows, StorageGridStyle style, Runnable onInvUpdate) {
+    public StorageGrid(int id, int columns, int rows, StorageGridStyle style) {
 
         this.id = id;
         this.columns = columns;
         this.rows = rows;
         this.style = style;
-        this.onInvUpdate = onInvUpdate;
         totalWeight = 0;
         maxWeight = 0;
+
+        weightLabel = new Label("0.0/0.0", Res.LABEL_STYLE);
 
         items = new ArrayList<>();
 
@@ -64,7 +67,7 @@ public class StorageGrid extends Widget {
                     y = -1;
                 }
                 IntVector2 pos2 = new IntVector2((int)x, (int)y);
-                ExpiriumGame.get().getClientGateway().getManager().putInvItemMoveReqPacket(getId(), selItem.getGridPos(), pos2);
+                ExpiriumGame.get().getClientGateway().getManager().putInvItemMoveReqPacket(getId(), selItem.getGridPos(), getId(), pos2);
                 selItem = null;
             }
 
@@ -110,6 +113,7 @@ public class StorageGrid extends Widget {
     public void onInvFeed(PacketInputStream in) {
         totalWeight = in.getFloat();
         maxWeight = in.getFloat();
+        weightLabel.setText(totalWeight+"/"+maxWeight);
         items.clear();
         int itemsNumber = in.getInt();
         for(int i = 0; i < itemsNumber; i++) {
@@ -118,7 +122,6 @@ public class StorageGrid extends Widget {
             IntVector2 pos = in.getIntVector();
             items.add(new ItemStack(Item.getType(itemID), amount, pos));
         }
-        onInvUpdate.run();
     }
 
     private ItemStack getItemAt(int x, int y) {
@@ -177,5 +180,9 @@ public class StorageGrid extends Widget {
 
     public float getMaxWeight() {
         return maxWeight;
+    }
+
+    public Label getWeightLabel() {
+        return weightLabel;
     }
 }

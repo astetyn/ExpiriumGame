@@ -18,7 +18,6 @@ public class MainPlayer extends Entity {
 
     public MainPlayer(int id, Vector2 loc) {
         super(EntityType.PLAYER, id, loc, 0.9f, 1.25f);
-        GameStage.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
         tileBreaker = new TileBreaker();
         tilePlacer = new TilePlacer();
         GameStage.get().getMultiplexer().addProcessor(tilePlacer);
@@ -27,35 +26,18 @@ public class MainPlayer extends Entity {
     }
 
     public void draw() {
-        tileBreaker.render();
         animator.draw();
+        tileBreaker.render();
     }
 
     public void update() {
-
         tileBreaker.update();
-
-        // movement
-        float vert = movementTS.getVert();
-        float horz = movementTS.getHorz();
-
-        Vector2 center = body.getWorldCenter();
-        float jump = 0;
-        if(onGround) {
-            if(body.getLinearVelocity().y < 5 && vert >= 0.6f) {
-                jump = 1;
-            }
-        }
-        if((body.getLinearVelocity().x >= 3 && horz > 0) || (body.getLinearVelocity().x <= -3 && horz < 0)) {
-            horz = 0;
-        }
-        body.applyLinearImpulse(0, 60*jump, center.x, center.y, true);
-        body.applyForceToCenter(1000f * horz, 0, true);
-
     }
 
     public void generateMovePacket() {
-        ExpiriumGame.get().getClientGateway().getManager().putPlayerMovePacket(getLocation(), getVelocity());
+        float vert = movementTS.getVert();
+        float horz = movementTS.getHorz();
+        ExpiriumGame.get().getClientGateway().getManager().putTS1Packet(horz, vert);
     }
 
     @Override

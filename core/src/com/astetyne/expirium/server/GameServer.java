@@ -1,10 +1,10 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.server.api.ExpiInventory;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
+import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;

@@ -1,12 +1,13 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemRecipe;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
+import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,8 +44,9 @@ public class TickLooper extends TerminableLooper {
                 synchronized(tickLock) {
                     tickLock.notifyAll();
                 }
+
                 //noinspection BusyWait
-                Thread.sleep(1000/Constants.SERVER_DEFAULT_TPS);
+                Thread.sleep(1000 / Consts.SERVER_DEFAULT_TPS);
             }
 
         }catch(InterruptedException e) {
@@ -100,7 +102,7 @@ public class TickLooper extends TerminableLooper {
             }
 
             // initial packet for new player
-            newPlayer.getGateway().getManager().putInitDataPacket(Constants.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
+            newPlayer.getGateway().getManager().putInitDataPacket(Consts.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
 
             newPlayer.getGateway().getOut().swap();
 
@@ -132,17 +134,21 @@ public class TickLooper extends TerminableLooper {
 
                 switch(packetID) {
 
-                    case 14: //PlayerMovePacket
-                        ExpiPlayer e = (ExpiPlayer) server.getEntitiesID().get(p.getID());
-                        e.onMove(in.getFloat(), in.getFloat(), in.getFloat(), in.getFloat());
+                    case 14: //TS1Packet
+                        float horz = in.getFloat();
+                        float vert = in.getFloat();
+                        p.onMove(horz, vert);
                         break;
 
                     case 15: //TileBreakReqPacket
                         server.getWorld().onTileBreakReq(in.getInt(), in.getInt(), in.getInt(), p);
                         break;
 
-                    case 16: //TilePlaceReqPacket
-                        server.getWorld().onTilePlaceReq(in.getInt(), in.getInt(), in.getInt(), Item.getType(in.getInt()), p);
+                    case 16: //InteractPacket
+                        float x = in.getFloat();
+                        float y = in.getFloat();
+                        InteractType type = InteractType.getType(in.getInt());
+                        server.getWorld().getInteractHandler().onInteract(p, x, y, type);
                         break;
 
                     case 23: {//InvOpenReqPacket
@@ -155,6 +161,7 @@ public class TickLooper extends TerminableLooper {
                     case 25: {//InvItemMoveReqPacket
                         int invID = in.getInt();
                         IntVector2 pos1 = in.getIntVector();
+                        int invID2 = in.getInt();
                         IntVector2 pos2 = in.getIntVector();
                         if(server.getInventoriesID().containsKey(invID)) {
                             server.getInventoriesID().get(invID).onMoveReq(p, pos1, pos2);
@@ -166,6 +173,8 @@ public class TickLooper extends TerminableLooper {
                         p.wantsToMakeItem(recipe);
                         break;
                     }
+                    case 29://InvInteractPacket
+                        p.getInv().onInteract(InvInteractType.getType(in.getInt()));
                 }
             }
         }

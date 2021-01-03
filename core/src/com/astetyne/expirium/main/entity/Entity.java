@@ -1,14 +1,13 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
-import com.astetyne.expirium.main.world.Collidable;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.backend.PacketInputStream;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
 
-public abstract class Entity implements Collidable, MetaReadable {
+public abstract class Entity implements MetaReadable {
 
     protected EntityType type;
     protected final int ID;
@@ -16,10 +15,10 @@ public abstract class Entity implements Collidable, MetaReadable {
     private final Vector2 targetPosition;
     private float intpolDelta;
     private float targetAngle;
-    protected boolean onGround;
-    private int collisions;
     protected final float width, height;
     private final Vector2 centerLoc;
+    private Vector2 lastLoc;
+    private float lastAngle;
 
     public Entity(EntityType type, int id, Vector2 loc, float width, float height) {
 
@@ -30,10 +29,10 @@ public abstract class Entity implements Collidable, MetaReadable {
         body = EntityBodyFactory.createBody(type, loc, GameStage.get().getWorld().getB2dWorld());
         intpolDelta = 0;
         targetAngle = 0;
-        onGround = false;
-        collisions = 0;
         targetPosition = loc;
         centerLoc = new Vector2();
+        lastLoc = new Vector2();
+        lastAngle = 0;
 
         GameStage.get().getWorld().getEntitiesID().put(ID, this);
         GameStage.get().getWorld().getEntities().add(this);
@@ -46,10 +45,15 @@ public abstract class Entity implements Collidable, MetaReadable {
 
         if(intpolDelta == -1) return;
 
-        float ang = body.getAngle();
 
-        body.setTransform(getLocation().lerp(targetPosition.cpy(), intpolDelta), ang + (targetAngle-ang)*intpolDelta);
-        intpolDelta = intpolDelta + 1.0f / Constants.SERVER_DEFAULT_TPS;
+        float posX = lastLoc.x + (targetPosition.x - lastLoc.x) * intpolDelta;
+        float posY = lastLoc.y + (targetPosition.y - lastLoc.y) * intpolDelta;
+        float ang = lastAngle + (targetAngle-lastAngle) * intpolDelta;
+
+        intpolDelta += Consts.SERVER_DEFAULT_TPS / (float) Gdx.graphics.getFramesPerSecond();
+
+        body.setTransform(posX, posY, ang);
+
         if(intpolDelta >= 1) {
             body.setTransform(targetPosition, targetAngle);
             intpolDelta = -1;
@@ -57,11 +61,14 @@ public abstract class Entity implements Collidable, MetaReadable {
     }
 
     public void onMove(PacketInputStream in) {
+
         targetPosition.set(in.getFloat(), in.getFloat());
         intpolDelta = 0;
         body.setLinearVelocity(in.getFloat(), in.getFloat());
         targetAngle = in.getFloat();
         body.setAngularVelocity(in.getFloat());
+        lastLoc = getLocation().cpy();
+        lastAngle = body.getAngle();
     }
 
     public Vector2 getLocation() {
@@ -92,18 +99,6 @@ public abstract class Entity implements Collidable, MetaReadable {
         GameStage.get().getWorld().getEntitiesID().remove(ID);
         GameStage.get().getWorld().getEntities().remove(this);
         GameStage.get().getWorld().getB2dWorld().destroyBody(body);
-    }
-
-    @Override
-    public void onCollisionBegin(Fixture fix) {
-        collisions++;
-        onGround = true;
-    }
-
-    @Override
-    public void onCollisionEnd(Fixture fix) {
-        collisions--;
-        if(collisions == 0) onGround = false;
     }
 
     public EntityType getType() {

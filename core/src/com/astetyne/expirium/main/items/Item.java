@@ -8,13 +8,14 @@ import java.util.HashMap;
 
 public enum Item {
 
-    STONE(1, 1, 1, 1, 0.5f, Res.STONE_ITEM, Res.STONE_ITEM, "Stone",1.1f),
-    GRASS(1, 2, 1, 1, 0.5f, Res.GRASS_ITEM, Res.GRASS_ITEM, "Grass",1),
-    DIRT(1, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt",1),
-    RAW_WOOD(4, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood",1),
-    PICKAXE(0, 0, 1, 2, 1, Res.PICKAXE_ITEM, Res.PICKAXE_ITEM, "Pickaxe",10),
-    CAMPFIRE(1, 11, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire", 0.8f),
-    WOODEN_WALL(1, 12, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall", 1);
+    EMPTY(ItemCategory.EMPTY, -1, -1, -1, 0, null, null, "error", -1),
+    STONE(ItemCategory.MATERIAL, 1, 1, 1, 0.5f, Res.STONE_ITEM, Res.STONE_ITEM, "Stone",1.1f),
+    GRASS(ItemCategory.MATERIAL, 2, 1, 1, 0.5f, Res.GRASS_ITEM, Res.GRASS_ITEM, "Grass",1),
+    DIRT(ItemCategory.MATERIAL, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt",1),
+    RAW_WOOD(ItemCategory.MISC, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood",1),
+    PICKAXE(ItemCategory.TOOL, 0, 1, 2, 1, Res.PICKAXE_ITEM, Res.PICKAXE_ITEM, "Pickaxe",10),
+    CAMPFIRE(ItemCategory.MATERIAL, 11, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire", 0.8f),
+    WOODEN_WALL(ItemCategory.MATERIAL, 12, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall", 1);
 
     private static final HashMap<Integer, Item> map;
     static {
@@ -28,7 +29,7 @@ public enum Item {
     }
 
     int id;
-    int category;
+    ItemCategory category;
     int buildTileID;
     int gridWidth;
     int gridHeight;
@@ -38,7 +39,7 @@ public enum Item {
     String label;
     float speedCoef;
 
-    Item(int cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2, String label, float sc) {
+    Item(ItemCategory cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2, String label, float sc) {
         category = cat;
         buildTileID = tileID;
         gridWidth = gw;
@@ -58,7 +59,7 @@ public enum Item {
         return id;
     }
 
-    public int getCategory() {
+    public ItemCategory getCategory() {
         return category;
     }
 

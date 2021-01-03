@@ -2,7 +2,7 @@ package com.astetyne.expirium.main.gui;
 
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
@@ -51,7 +51,7 @@ public class GameGUILayout extends GUILayout {
         itemSelectTable.row();
         itemSelectTable.add(GameStage.get().getInv().getSwitchArrowDown()).padTop(10).colspan(3);
 
-        if(Constants.DEBUG) {
+        if(Consts.DEBUG) {
             debugInfoTable.add(fpsLabel).left();
             debugInfoTable.row();
             debugInfoTable.add(locationLabel).left();

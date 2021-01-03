@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.badlogic.gdx.math.Vector2;
@@ -22,14 +22,15 @@ public class PacketOutputStream {
 
     public PacketOutputStream(OutputStream out) {
         this.out = out;
-        buffer1 = ByteBuffer.allocate(Constants.BUFFER_SIZE);
-        buffer2 = ByteBuffer.allocate(Constants.BUFFER_SIZE);
+        buffer1 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
+        buffer2 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
         writeBuffer = buffer1;
         readBuffer = buffer2;
 
         activePacketCounter = 0;
         lastPacketCounter = 0;
         writeBuffer.putInt(0);
+        writeBuffer.putLong(0);
     }
 
     public void startPacket(int packetID) {
@@ -39,6 +40,10 @@ public class PacketOutputStream {
 
     public void putByte(byte b) {
         writeBuffer.put(b);
+    }
+
+    public void putBoolean(boolean b) {
+        writeBuffer.put((byte) (b ? 1 : 0));
     }
 
     public void putInt(int i) {
@@ -84,6 +89,7 @@ public class PacketOutputStream {
 
     public void flush() throws IOException {
         readBuffer.putInt(0, lastPacketCounter);
+        readBuffer.putLong(4, System.currentTimeMillis());
         //System.out.println("packets: "+lastPacketCounter+" pos: "+readBuffer.position()+" packet counter: "+lastPacketCounter);
         //System.out.println("Flushing: "+readBuffer.position());
         out.write(readBuffer.array(), 0, readBuffer.position());
@@ -99,6 +105,8 @@ public class PacketOutputStream {
         lastPacketCounter = 0;
         writeBuffer.putInt(0);
         readBuffer.putInt(0);
+        writeBuffer.putLong(0);
+        readBuffer.putLong(0);
     }
 
     // Call this method when you are done with writing and reading.
@@ -114,6 +122,7 @@ public class PacketOutputStream {
             writeBuffer = buffer2;
         }
         writeBuffer.putInt(0);
+        writeBuffer.putLong(0);
         lastPacketCounter = activePacketCounter;
         activePacketCounter = 0;
     }

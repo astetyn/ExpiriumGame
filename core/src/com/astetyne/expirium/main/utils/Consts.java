@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.utils;
 
-public class Constants {
+public class Consts {
 
     public static final boolean DEBUG = true;
 

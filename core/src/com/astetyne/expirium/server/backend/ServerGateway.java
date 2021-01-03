@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +15,7 @@ public class ServerGateway extends TerminableLooper {
 
         try {
 
-            server = new ServerSocket(Constants.SERVER_PORT);
+            server = new ServerSocket(Consts.SERVER_PORT);
 
             while(isRunning()) {
 

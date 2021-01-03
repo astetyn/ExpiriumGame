@@ -56,6 +56,8 @@ public class Res {
     public static Animation<TextureRegion> PLAYER_RUN_ANIM_L;
 
     // world
+    public static TextureRegion BG_1, BG_2, BG_3;
+
     public static TextureRegion STONE_TILE;
     public static TextureRegion GRASS_TILE;
     public static TextureRegion DIRT_TILE;
@@ -126,6 +128,10 @@ public class Res {
         PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ent.findRegions("player_left_run"), loop_pong);
 
         // world
+        BG_1 = world.findRegion("stone");
+        BG_2 = world.findRegion("dirt");
+        BG_3 = world.findRegion("grass");
+
         STONE_TILE = world.findRegion("stone");
         GRASS_TILE = world.findRegion("grass");
         DIRT_TILE = world.findRegion("dirt");

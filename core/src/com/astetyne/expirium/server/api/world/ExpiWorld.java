@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
@@ -27,7 +27,7 @@ public class ExpiWorld {
     private final ExpiTile[][] worldTerrain;
     private final String worldName;
     private final long seed;
-    private final World box2dWorld;
+    private final World b2dWorld;
     private final Body terrainBody;
     private final int w, h;
     private final WorldGenerator worldGenerator;
@@ -35,6 +35,8 @@ public class ExpiWorld {
     private final FixtureCalculator fixtureCalc;
     private final List<TileListener> tileListeners;
     private WeatherType weatherType;
+    private final InteractHandler interactHandler;
+    private final ExpiContactListener contactListener;
 
     public ExpiWorld(String worldName) {
         this(worldName, (long)(Math.random()*10000));
@@ -48,21 +50,26 @@ public class ExpiWorld {
         weatherType = WeatherType.SUNNY;
 
         tileListeners = new ArrayList<>();
+        interactHandler = new InteractHandler(this);
 
         CampfireListener list = new CampfireListener();
         registerTileListener(list);
 
-        w = Constants.T_W_CH * Constants.CHUNKS_NUMBER;
-        h = Constants.T_H_CH;
+        w = Consts.T_W_CH * Consts.CHUNKS_NUMBER;
+        h = Consts.T_H_CH;
 
         worldTerrain = new ExpiTile[h][w];
 
-        box2dWorld = new World(new Vector2(0, -9.81f), false);
+        b2dWorld = new World(new Vector2(0, -9.81f), false);
+
+        contactListener = new ExpiContactListener();
+        b2dWorld.setContactListener(contactListener);
+
         FixRes.load();
         BodyDef terrainDef = new BodyDef();
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
-        terrainBody = box2dWorld.createBody(terrainDef);
+        terrainBody = b2dWorld.createBody(terrainDef);
 
         worldGenerator = new WorldGenerator(worldTerrain);
         stabilityCalc = new StabilityCalculator(worldTerrain);
@@ -77,10 +84,13 @@ public class ExpiWorld {
         }
     }
 
+    public static int steps;
+
     public void onTick() {
 
-        for(int i = 0; i < 60.0/Constants.SERVER_DEFAULT_TPS; i++) {
-            box2dWorld.step(1 / 60f, 6, 2);
+        for(int i = 0; i < 60.0/ Consts.SERVER_DEFAULT_TPS; i++) {
+            b2dWorld.step(1/60f, 6, 2);
+            steps++;
         }
 
         checkChunks();
@@ -88,9 +98,8 @@ public class ExpiWorld {
         recalculateDroppedItems();
 
         for(ExpiEntity ee : GameServer.get().getEntities()) {
-            for(ExpiPlayer p : GameServer.get().getPlayers()) {
-                if(p == ee) continue;
-                p.getGateway().getManager().putEntityMovePacket(ee);
+            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                pp.getGateway().getManager().putEntityMovePacket(ee);
             }
         }
 
@@ -113,7 +122,7 @@ public class ExpiWorld {
             Vector2 center = droppedItem.getCenter();
             for(ExpiPlayer p : GameServer.get().getPlayers()) {
                 Vector2 dif = p.getCenter().sub(center);
-                if(dif.len() < Constants.D_I_PICK_DIST && p.getInv().canBeAdded(droppedItem.getItem())) {
+                if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(droppedItem.getItem(), 1)) {
                     it.remove();
 
                     p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1));
@@ -145,9 +154,9 @@ public class ExpiWorld {
         for(ExpiPlayer p : GameServer.get().getPlayers()) {
 
             int renderDistance = 1;
-            int currentChunk = (int) (p.getLocation().x / Constants.T_W_CH);
+            int currentChunk = (int) (p.getLocation().x / Consts.T_W_CH);
 
-            for(int i = 0; i < Constants.CHUNKS_NUMBER; i++) {
+            for(int i = 0; i < Consts.CHUNKS_NUMBER; i++) {
                 if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
                     if(!p.getActiveChunks().contains(i)) {
                         p.getGateway().getManager().putChunkFeedPacket(worldTerrain, i);
@@ -173,7 +182,7 @@ public class ExpiWorld {
 
     public void onTileBreakReq(int c, int x, int y, ExpiPlayer p) {
 
-        ExpiTile tile = worldTerrain[y][c*Constants.T_W_CH + x];
+        ExpiTile tile = worldTerrain[y][c* Consts.T_W_CH + x];
         if(tile.getType() == TileType.AIR) return;
 
         // confirmed from here
@@ -184,14 +193,11 @@ public class ExpiWorld {
         changeTile(tile, TileType.AIR, true);
     }
 
-    public void onTilePlaceReq(int c, int x, int y, Item item, ExpiPlayer p) {
+    public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
 
-        if(!p.getInv().contain(item)) return;
+        System.out.println("place req");
 
-        ExpiTile t = worldTerrain[y][c*Constants.T_W_CH + x];
-        if(t.getType() != TileType.AIR) return;
-
-        if(!isTileFree(x, y)) return;
+        if(!isTileFree(t)) return;
 
         if(!stabilityCalc.canBeAdjusted(t, item.getBuildTile())) return;
 
@@ -208,7 +214,7 @@ public class ExpiWorld {
 
     public void onTileInteract(int c, int x, int y, ExpiPlayer p) {
         for(TileListener l : tileListeners) {
-            l.onTileInteract(worldTerrain[y][c*Constants.T_W_CH + x]);
+            l.onTileInteract(worldTerrain[y][c* Consts.T_W_CH + x]);
         }
     }
 
@@ -216,11 +222,11 @@ public class ExpiWorld {
 
         Vector2 tempVec = new Vector2();
 
-        float off = (1 - Constants.D_I_SIZE)/2;
+        float off = (1 - Consts.D_I_SIZE)/2;
 
         if(to == TileType.AIR && withDrops && t.getType() != TileType.AIR) {
             tempVec.set(t.getX() + off, t.getY() + off);
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Consts.SERVER_DEFAULT_TPS);
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                 pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
             }
@@ -240,7 +246,7 @@ public class ExpiWorld {
             if(t2.getStability() == 0) {
                 if(Math.random() < 1 && withDrops && t2.getType().getDropItem() != null) {
                     tempVec.set(t2.getX()+off, t2.getY()+off);
-                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Constants.SERVER_DEFAULT_TPS);
+                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Consts.SERVER_DEFAULT_TPS);
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                         pp.getGateway().getManager().putEntitySpawnPacket(edi);
                     }
@@ -262,7 +268,10 @@ public class ExpiWorld {
 
     }
 
-    private boolean isTileFree(int x, int y) {
+    private boolean isTileFree(ExpiTile t) {
+
+        int x = t.getX();
+        int y = t.getY();
 
         if(worldTerrain[y][x].getType().getSolidity().isSoft()) return true;
 
@@ -283,7 +292,7 @@ public class ExpiWorld {
 
     public Vector2 getSaveLocationForSpawn() {
         int i = 0;
-        while(i != Constants.T_H_CH && worldTerrain[i][10].getType() != TileType.AIR) {
+        while(i != Consts.T_H_CH && worldTerrain[i][10].getType() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);
@@ -291,6 +300,10 @@ public class ExpiWorld {
 
     public void saveWorld() {
 
+    }
+
+    public ExpiTile getTileAt(float x, float y) {
+        return worldTerrain[(int)y][(int)x];
     }
 
     public String getWorldName() {
@@ -309,8 +322,8 @@ public class ExpiWorld {
         return fixtureCalc.getFixturesID();
     }
 
-    public World getBox2dWorld() {
-        return box2dWorld;
+    public World getB2dWorld() {
+        return b2dWorld;
     }
 
     public void registerTileListener(TileListener listener) {
@@ -323,5 +336,13 @@ public class ExpiWorld {
 
     public WeatherType getWeather() {
         return weatherType;
+    }
+
+    public InteractHandler getInteractHandler() {
+        return interactHandler;
+    }
+
+    public ExpiContactListener getCL() {
+        return contactListener;
     }
 }

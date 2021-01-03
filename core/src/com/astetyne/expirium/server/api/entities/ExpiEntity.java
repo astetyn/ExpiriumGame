@@ -3,22 +3,26 @@ package com.astetyne.expirium.server.api.entities;
 import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.Metaable;
+import com.astetyne.expirium.main.world.Collidable;
 import com.astetyne.expirium.server.GameServer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 
-public abstract class ExpiEntity implements Metaable {
+public abstract class ExpiEntity implements Metaable, Collidable {
 
     private final int ID;
     private final float width, height;
     private float angle;
     protected EntityType type;
     protected Body body;
+    protected boolean onGround;
+    private int collisions;
 
     public ExpiEntity(EntityType type, Vector2 loc, float width, float height) {
 
         this.type = type;
-        body = EntityBodyFactory.createBody(type, loc, GameServer.get().getWorld().getBox2dWorld());
+        body = EntityBodyFactory.createBody(type, loc, GameServer.get().getWorld().getB2dWorld());
 
         int randomID;
         do {
@@ -31,6 +35,8 @@ public abstract class ExpiEntity implements Metaable {
         this.width = width;
         this.height = height;
         this.angle = 0;
+        onGround = false;
+        collisions = 0;
     }
 
     public int getID() {
@@ -76,7 +82,19 @@ public abstract class ExpiEntity implements Metaable {
     public void destroy() {
         GameServer.get().getEntitiesID().remove(ID);
         GameServer.get().getEntities().remove(this);
-        GameServer.get().getWorld().getBox2dWorld().destroyBody(body);
+        GameServer.get().getWorld().getB2dWorld().destroyBody(body);
+    }
+
+    @Override
+    public void onCollisionBegin(Fixture fix) {
+        collisions++;
+        onGround = true;
+    }
+
+    @Override
+    public void onCollisionEnd(Fixture fix) {
+        collisions--;
+        if(collisions == 0) onGround = false;
     }
 
 }

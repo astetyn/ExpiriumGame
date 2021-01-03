@@ -8,10 +8,12 @@ import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
+import com.astetyne.expirium.main.world.WeatherType;
+import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.main.world.tiles.Tile;
+import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
-import com.badlogic.gdx.math.Vector2;
 
 public class ClientPacketManager {
 
@@ -28,10 +30,16 @@ public class ClientPacketManager {
         out.putString(name);
     }
 
-    public void putPlayerMovePacket(Vector2 loc, Vector2 velocity) {
+    public void putTS1Packet(float horz, float vert) {
         out.startPacket(14);
-        out.putVector(loc);
-        out.putVector(velocity);
+        out.putFloat(horz);
+        out.putFloat(vert);
+    }
+
+    public void putTS2Packet(float horz, float vert) {
+        out.startPacket(15);
+        out.putFloat(horz);
+        out.putFloat(vert);
     }
 
     public void putTileBreakReqPacket(Tile t) {
@@ -49,15 +57,28 @@ public class ClientPacketManager {
         out.putInt(placedItem.getId());
     }
 
+    public void putInteractPacket(float x, float y, InteractType type) {
+        out.startPacket(16);
+        out.putFloat(x);
+        out.putFloat(y);
+        out.putInt(type.getID());
+    }
+
+    public void putInvInteractPacket(InvInteractType action) {
+        out.startPacket(29);
+        out.putInt(action.getID());
+    }
+
     public void putInvOpenReqPacket(int id) {
         out.startPacket(23);
         out.putInt(id);
     }
 
-    public void putInvItemMoveReqPacket(int id, IntVector2 pos1, IntVector2 pos2) {
+    public void putInvItemMoveReqPacket(int id, IntVector2 pos1, int id2, IntVector2 pos2) {
         out.startPacket(25);
         out.putInt(id);
         out.putIntVector(pos1);
+        out.putInt(id2);
         out.putIntVector(pos2);
     }
 
@@ -124,12 +145,21 @@ public class ClientPacketManager {
                     world.getEntitiesID().get(id).destroy();
                     break;
 
-                case 22:
+                case 22: //TileChangePacket
                     world.onTileChange(in);
                     break;
 
                 case 24: //InvFeedPacket
                     GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvFeed(in);
+                    break;
+
+                case 28: //EnviroPacket
+                    GameStage.get().setServerTime(in.getInt());
+                    WeatherType weather = WeatherType.getType(in.getInt());
+                    break;
+
+                case 30: //InvHotSlotsFeedPacket
+                    GameStage.get().getInv().feedHotSlots(in);
                     break;
             }
         }

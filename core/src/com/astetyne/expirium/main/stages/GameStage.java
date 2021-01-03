@@ -5,7 +5,7 @@ import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.GUILayout;
 import com.astetyne.expirium.main.gui.GameGUILayout;
 import com.astetyne.expirium.main.items.inventory.Inventory;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -22,6 +22,7 @@ public class GameStage extends ExpiStage {
     private GLProfiler profiler;
     private final GameGUILayout gameGuiLayout;
     private GUILayout guiLayout;
+    private int serverTime;
 
     public GameStage() {
 
@@ -55,18 +56,30 @@ public class GameStage extends ExpiStage {
         Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        float xShift1 = (gameWorld.getPlayer().getLocation().x*30) % 1000;
+        float yShift1 = gameWorld.getPlayer().getLocation().y*30; // texture will end in y=100
+        float xShift2 = (gameWorld.getPlayer().getLocation().x*50) % 1000;
+        float yShift2 = gameWorld.getPlayer().getLocation().y*50;
+        float xShift3 = (gameWorld.getPlayer().getLocation().x*80) % 1000;
+        float yShift3 = gameWorld.getPlayer().getLocation().y*100;
+
         batch.begin();
+
+        // parallax effect - needs projection matrix from gui (1000*1000)
+        batch.draw(Res.BG_1, -xShift1, -yShift1, 1000, 3000);
+        batch.draw(Res.BG_1, 1000-xShift1, -yShift1, 1000, 3000);
+        batch.draw(Res.BG_2, -xShift2, -yShift2, 1000, 3000);
+        batch.draw(Res.BG_2, 1000-xShift2, -yShift2, 1000, 3000);
+        batch.draw(Res.BG_3, -xShift3, -yShift3, 1000, 3000);
+        batch.draw(Res.BG_3, 1000-xShift3, -yShift3, 1000, 3000);
+
         gameWorld.render();
-        if(guiLayout.isDimmed()) {
-            batch.setColor(0, 0, 0, 0.5f);
-            batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.setColor(1,1,1,1);
-        }
+
         batch.end();
 
         stage.draw();
 
-        if(Constants.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
+        if(Consts.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
 
         //System.out.println("draw calls: "+profiler.getDrawCalls()+"\ntex bindings: "+profiler.getTextureBindings());
 
@@ -130,5 +143,13 @@ public class GameStage extends ExpiStage {
 
     public GameGUILayout getGameGuiLayout() {
         return gameGuiLayout;
+    }
+
+    public int getServerTime() {
+        return serverTime;
+    }
+
+    public void setServerTime(int serverTime) {
+        this.serverTime = serverTime;
     }
 }

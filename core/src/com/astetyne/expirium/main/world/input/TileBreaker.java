@@ -4,7 +4,7 @@ import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.ThumbStick;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
@@ -42,9 +42,9 @@ public class TileBreaker {
         }
 
         tempVec.set(world.getPlayer().getCenterLocation());
-        tempVec2.set(breakTS.getHorz()*2, breakTS.getVert()*2).scl(1.0f/(Constants.BREAKING_PRECISION-1));
+        tempVec2.set(breakTS.getHorz()*2, breakTS.getVert()*2).scl(1.0f/(Consts.BREAKING_PRECISION-1));
 
-        for(int i = 0; i < Constants.BREAKING_PRECISION; i++) {
+        for(int i = 0; i < Consts.BREAKING_PRECISION; i++) {
             if(!isInWorld(tempVec)) {
                 timeAccumulator = 0;
                 targetTile = null;
@@ -70,7 +70,7 @@ public class TileBreaker {
             if(GameStage.get().getInv().getItemInHand() != null) {
                 speedCoef = GameStage.get().getInv().getItemInHand().getItem().getSpeedCoef();
             }
-            if(Constants.DEBUG) speedCoef = 50;
+            if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += Gdx.graphics.getDeltaTime() * speedCoef;
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
                 ExpiriumGame.get().getClientGateway().getManager().putTileBreakReqPacket(targetTile);
@@ -82,7 +82,7 @@ public class TileBreaker {
     }
 
     private boolean isInWorld(Vector2 v) {
-        return v.x >= 0 && v.x < world.getChunks().length * Constants.T_W_CH && v.y >= 0 && v.y < Constants.T_H_CH;
+        return v.x >= 0 && v.x < world.getChunks().length * Consts.T_W_CH && v.y >= 0 && v.y < Consts.T_H_CH;
     }
 
     public void render() {
@@ -90,7 +90,7 @@ public class TileBreaker {
         if(targetTile == null) return;
 
         float durability = timeAccumulator / targetTile.getType().getBreakTime();
-        int x = targetTile.getX() + Constants.T_W_CH * targetTile.getC();
+        int x = targetTile.getX() + Consts.T_W_CH * targetTile.getC();
         batch.draw(Res.TILE_BREAK_ANIM.getKeyFrame(durability), x, targetTile.getY(), 1, 1);
     }
 

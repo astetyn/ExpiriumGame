@@ -1,11 +1,12 @@
 package com.astetyne.expirium.server.api.entities;
 
+import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.ExpiInventory;
+import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
@@ -18,25 +19,40 @@ public class ExpiPlayer extends ExpiEntity {
     private final ServerPlayerGateway gateway;
     private String name;
     private final HashSet<Integer> activeChunks;
-    private final ExpiInventory inventory;
+    private final ExpiPlayerInventory inventory;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
         super(EntityType.PLAYER, location, 0.9f, 1.25f);
+        GameServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
         this.gateway = gateway;
         this.name = name;
         activeChunks = new HashSet<>();
         GameServer.get().getPlayers().add(this);
-        inventory = new ExpiInventory(Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_ROWS, Constants.PLAYER_INV_MAX_WEIGHT);
+        inventory = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
     }
 
-    public void onMove(float x, float y, float v1, float v2) {
-        body.setTransform(x, y, 0);
-        body.setLinearVelocity(v1, v2);
+    public void onMove(float horz, float vert) {
+
+        Vector2 center = body.getWorldCenter();
+        float jump = 0;
+        if(onGround) {
+            if(body.getLinearVelocity().y < 5 && vert >= 0.6f) {
+                jump = 1;
+            }
+        }
+        if((body.getLinearVelocity().x >= 3 && horz > 0) || (body.getLinearVelocity().x <= -3 && horz < 0)) {
+            horz = 0;
+        }
+        body.applyLinearImpulse(0, Math.min((3200.0f/Consts.SERVER_DEFAULT_TPS), 200)*jump, center.x, center.y, true);
+        body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * horz, 0, true);
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            //pp.getGateway().getManager().putEntityMoveForcesPacket(this, 0, Math.min((3200.0f/Consts.SERVER_DEFAULT_TPS), 200)*jump, (40000.0f/Consts.SERVER_DEFAULT_TPS) * horz, 0);
+        }
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
         for(ItemStack is : recipe.getRequiredItems()) {
-            if(!inventory.contain(is)) return;
+            if(!inventory.contains(is)) return;
         }
         for(ItemStack is : recipe.getRequiredItems()) {
             inventory.removeItem(is);
@@ -81,7 +97,7 @@ public class ExpiPlayer extends ExpiEntity {
         out.putString(name);
     }
 
-    public ExpiInventory getInv() {
+    public ExpiPlayerInventory getInv() {
         return inventory;
     }
 }

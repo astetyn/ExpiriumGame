@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.entity;
 
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -33,7 +33,7 @@ public class EntityBodyFactory {
         fixtureDef.restitution = 0.2f;
         fixtureDef.friction = 0.2f;
         fixtureDef.shape = polyShape;
-        fixtureDef.filter.categoryBits = Constants.DEFAULT_BIT;
+        fixtureDef.filter.categoryBits = Consts.DEFAULT_BIT;
 
         body.createFixture(fixtureDef);
         polyShape.dispose();
@@ -54,8 +54,8 @@ public class EntityBodyFactory {
 
         fixtureDef.density = 30f;
         fixtureDef.restitution = 0f;
-        fixtureDef.filter.categoryBits = Constants.PLAYER_BIT;
-        fixtureDef.filter.maskBits = Constants.DEFAULT_BIT;
+        fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
+        fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
 
         body.setFixedRotation(true);
 

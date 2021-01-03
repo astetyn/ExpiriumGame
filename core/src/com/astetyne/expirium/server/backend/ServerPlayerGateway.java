@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.world.ExpiWorld;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -51,7 +52,6 @@ public class ServerPlayerGateway extends TerminableLooper {
             in.reset();
 
             while(isRunning()) {
-
                 out.flush();
                 //System.out.println("Server flushing.");
                 client.setSoTimeout(5000);
@@ -59,9 +59,9 @@ public class ServerPlayerGateway extends TerminableLooper {
                 if(readBytes == -1) end();//System.out.println("Server reading: "+readBytes+"\n"+in);
 
                 traffic += readBytes;
-                if(time + 5000 < System.currentTimeMillis()) {
+                if(time + 1000 < System.currentTimeMillis()) {
                     time = System.currentTimeMillis();
-                    System.out.println("Server traffic: "+traffic);
+                    System.out.println("Server traffic (bytes): "+traffic+" ping (ms): "+in.getPing()+" steps: "+ ExpiWorld.steps);
                     traffic = 0;
                 }
 

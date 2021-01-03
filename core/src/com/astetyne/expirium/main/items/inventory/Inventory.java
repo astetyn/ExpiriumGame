@@ -3,9 +3,12 @@ package com.astetyne.expirium.main.items.inventory;
 import com.astetyne.expirium.main.ExpiriumGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.*;
+import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
+import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -19,7 +22,7 @@ public class Inventory {
     private HotBarSlot toolSlot, materialSlot, consumableSlot, focusedSlot;
     private final SwitchArrow switchArrowUp, switchArrowDown;
     private final Image inventoryButton, consumeButton;
-    private StorageGrid inventoryGrid;
+    private final StorageGrid inventoryGrid;
 
     private final HashMap<Integer, StorageGrid> storageGridIDs;
 
@@ -27,15 +30,15 @@ public class Inventory {
 
         storageGridIDs = new HashMap<>();
 
-        int c = Constants.PLAYER_INV_COLUMNS;
-        int r = Constants.PLAYER_INV_ROWS;
-        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Res.INV_TILE), reloadSlotItems);
+        int c = Consts.PLAYER_INV_COLUMNS;
+        int r = Consts.PLAYER_INV_ROWS;
+        inventoryGrid = new StorageGrid(c, r, new StorageGrid.StorageGridStyle(Res.INV_TILE));
 
         invGUILayout = new InvGUILayout();
 
-        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusTool, 0, "Tools");
-        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusBuild, 1, "Mats");
-        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusUse, 2, "Misc");
+        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusTool, "Tools");
+        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusBuild, "Mats");
+        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, onFocusUse, "Misc");
 
         focusedSlot = toolSlot;
         focusedSlot.setFocus(true);
@@ -63,6 +66,7 @@ public class Inventory {
         consumableSlot.setFocus(false);
         ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableTool();
         focusedSlot = toolSlot;
+        ExpiriumGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.SLOT_TOOLS);
     };
 
     private final Runnable onFocusBuild = () -> {
@@ -70,6 +74,7 @@ public class Inventory {
         consumableSlot.setFocus(false);
         ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableBuild();
         focusedSlot = materialSlot;
+        ExpiriumGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.SLOT_MATERIALS);
     };
 
     private final Runnable onFocusUse = () -> {
@@ -77,25 +82,20 @@ public class Inventory {
         materialSlot.setFocus(false);
         ((GameGUILayout) GameStage.get().getGuiLayout()).buildTableUse();
         focusedSlot = consumableSlot;
+        ExpiriumGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.SLOT_CONSUMABLE);
     };
 
-    private final Runnable reloadSlotItems = () -> {
+    private final Runnable onSwitchUp = () ->
+        ExpiriumGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.SWITCH_UP);
 
-        toolSlot.saveItemFeed(inventoryGrid.getItems());
-        materialSlot.saveItemFeed(inventoryGrid.getItems());
-        consumableSlot.saveItemFeed(inventoryGrid.getItems());
+    private final Runnable onSwitchDown = () ->
+        ExpiriumGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.SWITCH_DOWN);
 
-    };
-
-    private final Runnable onSwitchDown = () -> {
-        if(focusedSlot.getIndex() > 0) focusedSlot.decreaseIndex();
-        reloadSlotItems.run();
-    };
-
-    private final Runnable onSwitchUp = () -> {
-        focusedSlot.increaseIndex();
-        reloadSlotItems.run();
-    };
+    public void feedHotSlots(PacketInputStream in) {
+        toolSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
+        materialSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
+        consumableSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
+    }
 
     public ItemStack getItemInHand() {
         return focusedSlot.getItemStack();

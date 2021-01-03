@@ -1,7 +1,8 @@
 package com.astetyne.expirium.main.net.client;
 
 import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.TerminableLooper;
@@ -37,8 +38,8 @@ public class ClientGateway extends TerminableLooper {
 
         try {
             socket = new Socket();
-            socket.setPerformancePreferences(0,10,0);
-            socket.connect(new InetSocketAddress(ipAddress, Constants.SERVER_PORT), 10000);
+            //socket.setPerformancePreferences(0,10,0);
+            socket.connect(new InetSocketAddress(ipAddress, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
             System.out.println("Exception during connecting to server.");
             game.getCurrentStage().onServerFail();
@@ -67,9 +68,9 @@ public class ClientGateway extends TerminableLooper {
                 out.flush(); //System.out.println("Client flushing.");
 
                 traffic += readBytes;
-                if(time + 5000 < System.currentTimeMillis()) {
+                if(time + 1000 < System.currentTimeMillis()) {
                     time = System.currentTimeMillis();
-                    System.out.println("Client traffic: "+traffic);
+                    System.out.println("Client traffic (bytes): "+traffic+" ping (ms): "+in.getPing()+" steps: "+ GameWorld.steps);
                     traffic = 0;
                 }
 

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.api.entities;
 
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
@@ -15,8 +15,8 @@ public class ExpiDroppedItem extends ExpiEntity {
     private int cooldown;
 
     public ExpiDroppedItem(Vector2 loc, Item type, int cooldown) {
-        super(EntityType.DROPPED_ITEM, loc, Constants.D_I_SIZE, Constants.D_I_SIZE);
-        ticksToDespawn = Constants.SERVER_DEFAULT_TPS * 60;
+        super(EntityType.DROPPED_ITEM, loc, Consts.D_I_SIZE, Consts.D_I_SIZE);
+        ticksToDespawn = Consts.SERVER_DEFAULT_TPS * 60;
         this.type = type;
         this.cooldown = cooldown;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);

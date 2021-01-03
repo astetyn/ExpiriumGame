@@ -7,12 +7,13 @@ import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.items.inventory.Inventory;
 import com.astetyne.expirium.main.stages.GameStage;
-import com.astetyne.expirium.main.utils.Constants;
+import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 public class InvGUILayout extends GUILayout {
@@ -41,14 +42,16 @@ public class InvGUILayout extends GUILayout {
         requiredItems = new Table();
 
         //if(Constants.DEBUG) rootTable.setDebug(true);
-        if(Constants.DEBUG) gridTable.setDebug(true);
-        if(Constants.DEBUG) recipeDetail.setDebug(true);
+        if(Consts.DEBUG) gridTable.setDebug(true);
+        if(Consts.DEBUG) recipeDetail.setDebug(true);
 
         scrollProductsList = new ScrollPane(recipeList);
         scrollProductsList.setScrollingDisabled(true, false);
 
         scrollRequiredItems = new ScrollPane(requiredItems);
         scrollRequiredItems.setScrollingDisabled(true, false);
+
+        rootTable.setBackground(new TextureRegionDrawable(Res.WHITE_TILE));
 
     }
 
@@ -67,21 +70,18 @@ public class InvGUILayout extends GUILayout {
 
         Inventory inv = GameStage.get().getInv();
 
-        String s = inv.getInventoryGrid().getTotalWeight()+"/"+inv.getInventoryGrid().getMaxWeight();
-        Label weightLabel = new Label(s, Res.LABEL_STYLE);
-
         Image weightImage = new Image(Res.WHITE_TILE);
 
         gridTable.clear();
         gridTable.add(inv.getInventoryGrid()).width(400).height(Utils.percFromW(400)).colspan(2);
         gridTable.row();
         gridTable.add(weightImage).width(30).height(Utils.percFromW(30)).align(Align.left).padTop(20);
-        gridTable.add(weightLabel).expandX().align(Align.left).pad(20, 20, 0,0);
+        gridTable.add(inv.getInventoryGrid().getWeightLabel()).expandX().align(Align.left).pad(20, 20, 0,0);
 
         recipeList.clear();
         for(ItemRecipe recipe : ItemRecipe.values()) {
             Table t = new Table();
-            if(Constants.DEBUG) t.debugAll();
+            if(Consts.DEBUG) t.debugAll();
             Item item = recipe.getProduct().getItem();
             Image icon = new Image(item.getItemTexture());
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
