@@ -3,6 +3,7 @@ package com.astetyne.expirium.main.screens;
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.stage.DoubleInventoryStage;
+import com.astetyne.expirium.main.gui.stage.ExpiStage;
 import com.astetyne.expirium.main.gui.stage.GameStage;
 import com.astetyne.expirium.main.gui.stage.InventoryStage;
 import com.astetyne.expirium.main.utils.Consts;
@@ -11,6 +12,7 @@ import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -24,10 +26,12 @@ public class GameScreen implements Screen, Gatewayable {
     private final GameWorld gameWorld;
     private final Box2DDebugRenderer b2dr;
     private int serverTime;
+    private int serverTPS;
 
     private final GameStage gameStage;
     private final InventoryStage invStage;
     private final DoubleInventoryStage doubleInvStage;
+    private ExpiStage currentStage;
 
     public GameScreen(PacketInputStream in) {
 
@@ -41,7 +45,7 @@ public class GameScreen implements Screen, Gatewayable {
         gameStage = new GameStage();
         invStage = new InventoryStage();
         doubleInvStage = new DoubleInventoryStage();
-        gameStage.setVisible(true);
+        showGameStage();
 
         Res.MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
 
@@ -71,31 +75,48 @@ public class GameScreen implements Screen, Gatewayable {
     @Override
     public void render(float delta) {
 
+        batch.totalRenderCalls = 0;
+
         update();
 
-        Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
+        // sky
+        //Gdx.gl.glClearColor(0.6f, 0.8f, 1, 1);
+        Color sky = getSkyColor();
+        Gdx.gl.glClearColor(sky.r, sky.g, sky.b, sky.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        float xShift1 = (gameWorld.getPlayer().getLocation().x*30) % 1000;
-        float yShift1 = gameWorld.getPlayer().getLocation().y*30; // texture will end in y=100
-        float xShift2 = (gameWorld.getPlayer().getLocation().x*50) % 1000;
-        float yShift2 = gameWorld.getPlayer().getLocation().y*50;
-        float xShift3 = (gameWorld.getPlayer().getLocation().x*80) % 1000;
-        float yShift3 = gameWorld.getPlayer().getLocation().y*100;
+        int parallaxWidth = 1600;
+        int parallaxWidth2 = 1400;
+        int parallaxWidth3 = 900;
+        int parallaxHeight = 2000;
+
+        float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
+        float yShift1 = gameWorld.getPlayer().getLocation().y*4;
+        float xShift2 = (gameWorld.getPlayer().getLocation().x*6) % parallaxWidth;
+        float yShift2 = gameWorld.getPlayer().getLocation().y*6;
+        float xShift3 = (gameWorld.getPlayer().getLocation().x*8) % parallaxWidth;
+        float yShift3 = gameWorld.getPlayer().getLocation().y*8;
 
         batch.begin();
 
-        // parallax effect - needs projection matrix from gui (1000*1000)
-        batch.draw(Res.BG_1, -xShift1, -yShift1, 1000, 3000);
-        batch.draw(Res.BG_1, 1000-xShift1, -yShift1, 1000, 3000);
-        batch.draw(Res.BG_2, -xShift2, -yShift2, 1000, 3000);
-        batch.draw(Res.BG_2, 1000-xShift2, -yShift2, 1000, 3000);
-        batch.draw(Res.BG_3, -xShift3, -yShift3, 1000, 3000);
-        batch.draw(Res.BG_3, 1000-xShift3, -yShift3, 1000, 3000);
+        // parallax - needs projection matrix from gui (1000*1000)
+        //batch.setColor(1f, 0.8f, 0.4f, 1);
+        batch.setColor(getBGColor());
+        batch.draw(Res.BG_1, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        batch.draw(Res.BG_1, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        batch.draw(Res.BG_2, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        batch.draw(Res.BG_2, parallaxWidth2-xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        batch.draw(Res.BG_3, -xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        batch.draw(Res.BG_3, parallaxWidth3-xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        batch.setColor(Color.WHITE);
 
         gameWorld.render();
 
-        // render black screen if stage is dimmed
+        if(currentStage.isDimmed()) {
+            batch.setColor(0, 0, 0, 0.8f);
+            batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.setColor(1, 1, 1, 1);
+        }
 
         batch.end();
 
@@ -104,6 +125,9 @@ public class GameScreen implements Screen, Gatewayable {
         doubleInvStage.draw();
 
         if(Consts.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
+
+        System.out.println(batch.totalRenderCalls);
+
     }
 
     @Override
@@ -145,18 +169,36 @@ public class GameScreen implements Screen, Gatewayable {
         gameStage.setVisible(true);
         invStage.setVisible(false);
         doubleInvStage.setVisible(false);
+        currentStage = gameStage;
     }
 
     public void showInvStage() {
         gameStage.setVisible(false);
         invStage.setVisible(true);
         doubleInvStage.setVisible(false);
+        currentStage = invStage;
     }
 
     public void showDoubleInvStage() {
         gameStage.setVisible(false);
         invStage.setVisible(false);
         doubleInvStage.setVisible(true);
+        currentStage = doubleInvStage;
+    }
+
+    private Color getSkyColor() {
+        //todo
+        return null;
+    }
+
+    private Color getBGColor() {
+        //todo
+        return null;
+    }
+
+    public Color getNightColor() {
+        //todo
+        return null;
     }
 
     public GameWorld getWorld() {
@@ -190,4 +232,5 @@ public class GameScreen implements Screen, Gatewayable {
     public DoubleInventoryStage getDoubleInvStage() {
         return doubleInvStage;
     }
+
 }

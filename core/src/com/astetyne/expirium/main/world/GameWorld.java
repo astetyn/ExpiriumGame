@@ -63,7 +63,7 @@ public class GameWorld {
         activeLights = new ArrayList<>();
 
         screenMatrix = new Matrix4().setToOrtho2D(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        lightsFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+        lightsFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);

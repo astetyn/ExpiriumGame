@@ -27,7 +27,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import static com.astetyne.expirium.main.utils.Utils.fromCMToPercW;
 
-public class GameStage extends Stage {
+public class GameStage extends Stage implements ExpiStage {
 
     private final Table rootTable, itemSelectTable, debugInfoTable, playerStatsTable;
 
@@ -205,5 +205,10 @@ public class GameStage extends Stage {
 
     public HotBarSlot getFocusedSlot() {
         return focusedSlot;
+    }
+
+    @Override
+    public boolean isDimmed() {
+        return false;
     }
 }

@@ -2,7 +2,7 @@ package com.astetyne.expirium.main.utils;
 
 public class Consts {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // networking
     public static final int SERVER_PORT = 1414;
@@ -21,6 +21,8 @@ public class Consts {
 
     public static final float D_I_SIZE = 0.5f;
     public static final float D_I_PICK_DIST = 1.3f;
+
+    public static final int DAY_TIME_SEC = 300;
 
     public static final float CAMPFIRE_TIME = 10;
 

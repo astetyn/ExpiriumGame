@@ -9,7 +9,7 @@ import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class DoubleInventoryStage extends Stage {
+public class DoubleInventoryStage extends Stage implements ExpiStage {
 
     private final StorageGrid mainGrid;
     private final StorageGrid secondGrid;
@@ -41,5 +41,10 @@ public class DoubleInventoryStage extends Stage {
 
     public void setVisible(boolean b) {
 
+    }
+
+    @Override
+    public boolean isDimmed() {
+        return true;
     }
 }

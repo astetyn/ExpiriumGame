@@ -134,9 +134,9 @@ public class Res {
         PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ent.findRegions("player_left_run"), loop_pong);
 
         // world
-        BG_1 = world.findRegion("stone");
-        BG_2 = world.findRegion("dirt");
-        BG_3 = world.findRegion("grass");
+        BG_1 = new TextureRegion(new Texture(Gdx.files.internal("img3.png"))); // back
+        BG_2 = new TextureRegion(new Texture(Gdx.files.internal("img4.png"))); // middle
+        BG_3 = new TextureRegion(new Texture(Gdx.files.internal("img5.png"))); // front
 
         LIGHT_SPH_1 = new TextureRegion(new Texture(Gdx.files.internal("lightning.png")));
 

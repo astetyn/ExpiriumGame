@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class InventoryStage extends Stage {
+public class InventoryStage extends Stage implements ExpiStage {
 
     private final StorageGrid inventoryGrid;
     private final Table rootTable, gridTable, recipeList, recipeDetail, requiredItems;
@@ -71,7 +71,7 @@ public class InventoryStage extends Stage {
 
     private void build() {
 
-        Image weightImage = new Image(Res.WHITE_TILE);
+        Image weightImage = new Image(Res.INV_WEIGHT);
 
         gridTable.clear();
         gridTable.add(inventoryGrid).width(400).height(Utils.percFromW(400)).colspan(2);
@@ -144,5 +144,10 @@ public class InventoryStage extends Stage {
 
     public StorageGrid getInvGrid() {
         return inventoryGrid;
+    }
+
+    @Override
+    public boolean isDimmed() {
+        return true;
     }
 }

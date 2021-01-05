@@ -95,7 +95,7 @@ public class ExpiWorld {
     public void onTick() {
 
         worldTime++;
-        if(worldTime == Consts.SERVER_DEFAULT_TPS * 10) {
+        if(worldTime == Consts.SERVER_DEFAULT_TPS * Consts.DAY_TIME_SEC) {
             worldTime = 0;
         }
 

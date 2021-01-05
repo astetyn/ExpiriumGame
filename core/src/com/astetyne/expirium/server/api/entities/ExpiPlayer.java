@@ -35,7 +35,7 @@ public class ExpiPlayer extends ExpiEntity {
 
         Vector2 center = body.getWorldCenter();
         float jump = 0;
-        if(onGround) {
+        if(onGround || Consts.DEBUG) {
             if(body.getLinearVelocity().y < 5 && vert >= 0.6f) {
                 jump = 1;
             }
@@ -45,9 +45,6 @@ public class ExpiPlayer extends ExpiEntity {
         }
         body.applyLinearImpulse(0, Math.min((3200.0f/Consts.SERVER_DEFAULT_TPS), 200)*jump, center.x, center.y, true);
         body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * horz, 0, true);
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            //pp.getGateway().getManager().putEntityMoveForcesPacket(this, 0, Math.min((3200.0f/Consts.SERVER_DEFAULT_TPS), 200)*jump, (40000.0f/Consts.SERVER_DEFAULT_TPS) * horz, 0);
-        }
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
