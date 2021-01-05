@@ -14,7 +14,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
     private ItemStack itemInHand;
     private int indexTools, indexMats, indexCons;
     private ItemStack isTool, isMat, isCon;
-    private int chosenSlot;
+    private ChosenSlot chosenSlot;
 
     public ExpiPlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight) {
         super(columns, rows, maxWeight);
@@ -25,7 +25,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
         isTool = new ItemStack(Item.EMPTY);
         isMat = new ItemStack(Item.EMPTY);
         isCon = new ItemStack(Item.EMPTY);
-        chosenSlot = 0;
+        chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
     }
 
@@ -33,9 +33,9 @@ public class ExpiPlayerInventory extends ExpiInventory {
 
         switch(type) {
 
-            case SLOT_TOOLS: chosenSlot = 0; break;
-            case SLOT_MATERIALS: chosenSlot = 1; break;
-            case SLOT_CONSUMABLE: chosenSlot = 2; break;
+            case SLOT_TOOLS: chosenSlot = ChosenSlot.TOOL_SLOT; break;
+            case SLOT_MATERIALS: chosenSlot = ChosenSlot.MATERIAL_SLOT; break;
+            case SLOT_CONSUMABLE: chosenSlot = ChosenSlot.CONSUMABLE_SLOT; break;
             case SWITCH_UP:
                 if(itemInHand.getItem().getCategory() == ItemCategory.TOOL) {
                     indexTools++;
@@ -54,6 +54,8 @@ public class ExpiPlayerInventory extends ExpiInventory {
                     indexCons--;
                 }
                 break;
+            case OPEN_INV:
+                owner.getGateway().getManager().putMainInvFeedPacket(owner.getInv());
         }
         updateHotSlots();
 
@@ -107,15 +109,15 @@ public class ExpiPlayerInventory extends ExpiInventory {
             isCon = is3.get(indexCons);
         }
 
-        if(chosenSlot == 0) {
+        if(chosenSlot == ChosenSlot.TOOL_SLOT) {
             itemInHand = isTool;
-        }else if(chosenSlot == 1) {
+        }else if(chosenSlot == ChosenSlot.MATERIAL_SLOT) {
             itemInHand = isMat;
-        }else if(chosenSlot == 2) {
+        }else if(chosenSlot == ChosenSlot.CONSUMABLE_SLOT) {
             itemInHand = isCon;
         }
 
-        owner.getGateway().getManager().putHotSlotsFeedPacket(isTool, isMat, isCon);
+        owner.getGateway().getManager().putHotSlotsFeedPacket((byte) chosenSlot.getId(), isTool, isMat, isCon);
 
     }
 

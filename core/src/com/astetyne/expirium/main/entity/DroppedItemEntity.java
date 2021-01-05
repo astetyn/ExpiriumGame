@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.entity;
 
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.stages.GameStage;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -13,7 +13,7 @@ public class DroppedItemEntity extends Entity {
 
     public DroppedItemEntity(int id, Vector2 loc, PacketInputStream in) {
         super(EntityType.DROPPED_ITEM, id, loc, 0.5f, 0.5f);
-        this.batch = GameStage.get().getBatch();
+        this.batch = ExpiGame.get().getBatch();
         readMeta(in);
     }
 

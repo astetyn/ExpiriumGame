@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.ThumbStick;
+import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;

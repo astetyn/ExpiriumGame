@@ -1,25 +1,27 @@
 package com.astetyne.expirium.main;
 
 import com.astetyne.expirium.main.net.client.ClientGateway;
-import com.astetyne.expirium.main.stages.ExpiStage;
-import com.astetyne.expirium.main.stages.LauncherStage;
+import com.astetyne.expirium.main.screens.Gatewayable;
+import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.server.GameServer;
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class ExpiriumGame extends ApplicationAdapter {
+public class ExpiGame extends Game {
 
-	private static ExpiriumGame game;
+	private static ExpiGame expiGame;
+
 	private GameServer server;
 	private final ClientGateway clientGateway;
-	private ExpiStage currentExpiStage;
 	private final Object serverTickLock;
 	private boolean available;
 	private String playerName;
 	private float timeSinceStart;
+	private SpriteBatch batch;
 
-	public ExpiriumGame() {
-		game = this;
+	public ExpiGame() {
+		expiGame = this;
 		available = false;
 		serverTickLock = new Object();
 		clientGateway = new ClientGateway();
@@ -29,30 +31,25 @@ public class ExpiriumGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		Res.loadTextures();
-		currentExpiStage = new LauncherStage();
+		batch = new SpriteBatch();
+		setScreen(new LauncherScreen());
 	}
 
 	public void update() {
 		timeSinceStart += Gdx.graphics.getDeltaTime();
 		checkServerMessages();
-		currentExpiStage.update();
 	}
 
 	@Override
 	public void render () {
 		update();
-		currentExpiStage.render();
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		currentExpiStage.resize();
+		super.render();
 	}
 
 	@Override
 	public void dispose () {
-
-		currentExpiStage.dispose();
+		super.dispose();
+		getScreen().dispose();
 
 		if(server != null) {
 			server.stop();
@@ -66,16 +63,8 @@ public class ExpiriumGame extends ApplicationAdapter {
 		return clientGateway;
 	}
 
-	public static ExpiriumGame get() {
-		return game;
-	}
-
-	public ExpiStage getCurrentStage() {
-		return currentExpiStage;
-	}
-
-	public void setCurrentStage(ExpiStage currentExpiStage) {
-		this.currentExpiStage = currentExpiStage;
+	public static ExpiGame get() {
+		return expiGame;
 	}
 
 	public void notifyServerUpdate() {
@@ -91,7 +80,9 @@ public class ExpiriumGame extends ApplicationAdapter {
 		}
 		clientGateway.swapBuffers();
 		clientGateway.getManager().processIncomingPackets();
-		currentExpiStage.onServerUpdate();
+		if(getScreen() instanceof Gatewayable) {
+			((Gatewayable)getScreen()).onServerUpdate();
+		}
 	}
 
 	public void startServer() {
@@ -111,5 +102,9 @@ public class ExpiriumGame extends ApplicationAdapter {
 
 	public float getTime() {
 		return timeSinceStart;
+	}
+
+	public SpriteBatch getBatch() {
+		return batch;
 	}
 }

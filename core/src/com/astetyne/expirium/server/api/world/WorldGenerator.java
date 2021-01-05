@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.world.Noise;
 import com.astetyne.expirium.main.world.tiles.TileType;
 
 public class WorldGenerator {

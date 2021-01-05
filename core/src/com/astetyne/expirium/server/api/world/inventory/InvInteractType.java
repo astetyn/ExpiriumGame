@@ -7,7 +7,9 @@ public enum InvInteractType {
     SWITCH_UP,
     SWITCH_DOWN,
     SLOT_TOOLS,
-    SLOT_MATERIALS, SLOT_CONSUMABLE;
+    SLOT_MATERIALS,
+    SLOT_CONSUMABLE,
+    OPEN_INV;
 
     int id;
 

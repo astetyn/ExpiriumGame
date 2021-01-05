@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.entity;
 
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 public abstract class Entity implements MetaReadable {
 
     protected EntityType type;
-    protected final int ID;
+    protected int ID;
     protected Body body;
     private final Vector2 targetPosition;
     private float intpolDelta;
@@ -26,7 +26,7 @@ public abstract class Entity implements MetaReadable {
         this.ID = id;
         this.width = width;
         this.height = height;
-        body = EntityBodyFactory.createBody(type, loc, GameStage.get().getWorld().getB2dWorld());
+        body = EntityBodyFactory.createBody(type, loc, GameScreen.get().getWorld().getB2dWorld());
         intpolDelta = 0;
         targetAngle = 0;
         targetPosition = loc;
@@ -34,8 +34,8 @@ public abstract class Entity implements MetaReadable {
         lastLoc = new Vector2();
         lastAngle = 0;
 
-        GameStage.get().getWorld().getEntitiesID().put(ID, this);
-        GameStage.get().getWorld().getEntities().add(this);
+        GameScreen.get().getWorld().getEntitiesID().put(ID, this);
+        GameScreen.get().getWorld().getEntities().add(this);
 
     }
 
@@ -91,14 +91,18 @@ public abstract class Entity implements MetaReadable {
         return ID;
     }
 
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
     public Vector2 getTargetPosition() {
         return targetPosition;
     }
 
     public void destroy() {
-        GameStage.get().getWorld().getEntitiesID().remove(ID);
-        GameStage.get().getWorld().getEntities().remove(this);
-        GameStage.get().getWorld().getB2dWorld().destroyBody(body);
+        GameScreen.get().getWorld().getEntitiesID().remove(ID);
+        GameScreen.get().getWorld().getEntities().remove(this);
+        GameScreen.get().getWorld().getB2dWorld().destroyBody(body);
     }
 
     public EntityType getType() {

@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.entity;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 
@@ -36,7 +36,7 @@ public enum EntityType {
     }
 
     public Entity initEntity() {
-        PacketInputStream in = ExpiriumGame.get().getClientGateway().getIn();
+        PacketInputStream in = ExpiGame.get().getClientGateway().getIn();
         try {
             int id = in.getInt();
             Vector2 loc = new Vector2(in.getFloat(), in.getFloat());

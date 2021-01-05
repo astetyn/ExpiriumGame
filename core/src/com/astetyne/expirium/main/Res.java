@@ -1,10 +1,12 @@
 package com.astetyne.expirium.main;
 
-import com.astetyne.expirium.main.gui.HotBarSlot;
-import com.astetyne.expirium.main.gui.SwitchArrow;
-import com.astetyne.expirium.main.gui.ThumbStick;
+import com.astetyne.expirium.main.gui.widget.HotBarSlot;
+import com.astetyne.expirium.main.gui.widget.StorageGrid;
+import com.astetyne.expirium.main.gui.widget.SwitchArrow;
+import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -29,10 +31,10 @@ public class Res {
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
     public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE;
     public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
+    public static StorageGrid.StorageGridStyle STORAGE_GRID_STYLE;
 
     // gui - inv
     public static TextureRegion INVENTORY;
-    public static TextureRegion INV_TILE;
     public static Drawable INV_DETAIL_BACK;
     public static Drawable INV_CHOOSE_BACK;
     public static TextureRegion INV_WEIGHT;
@@ -58,6 +60,8 @@ public class Res {
     // world
     public static TextureRegion BG_1, BG_2, BG_3;
 
+    public static TextureRegion LIGHT_SPH_1;
+
     public static TextureRegion STONE_TILE;
     public static TextureRegion GRASS_TILE;
     public static TextureRegion DIRT_TILE;
@@ -80,6 +84,7 @@ public class Res {
 
         // gui
         MAIN_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
+        MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
 
         Drawable up = new TextureRegionDrawable(gui.findRegion("button_base"));
         Drawable down = new TextureRegionDrawable(gui.findRegion("button_pressed"));
@@ -91,6 +96,7 @@ public class Res {
         TextureRegion hbsFrame = gui.findRegion("hot_bar_slot_frame");
         TextureRegion switchArrowUp = gui.findRegion("switch_arrow_up");
         TextureRegion switchArrowUpPressed = gui.findRegion("switch_arrow_up_pressed");
+        TextureRegion invTile = gui.findRegion("inv_tile");
 
         CROSS_ICON = gui.findRegion("cross_icon");
 
@@ -101,10 +107,10 @@ public class Res {
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
+        STORAGE_GRID_STYLE = new StorageGrid.StorageGridStyle(invTile);
 
         // gui - inv
         INVENTORY = gui.findRegion("inventory");
-        INV_TILE = gui.findRegion("inv_tile");
         RECIPE_BACK = new TextureRegionDrawable(gui.findRegion("recipe_list_background"));
         INV_DETAIL_BACK = new TextureRegionDrawable(gui.findRegion("item_detail_back"));
         INV_CHOOSE_BACK = new TextureRegionDrawable(gui.findRegion("item_choose_back"));
@@ -131,6 +137,8 @@ public class Res {
         BG_1 = world.findRegion("stone");
         BG_2 = world.findRegion("dirt");
         BG_3 = world.findRegion("grass");
+
+        LIGHT_SPH_1 = new TextureRegion(new Texture(Gdx.files.internal("lightning.png")));
 
         STONE_TILE = world.findRegion("stone");
         GRASS_TILE = world.findRegion("grass");

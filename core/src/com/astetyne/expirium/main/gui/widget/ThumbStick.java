@@ -1,4 +1,4 @@
-package com.astetyne.expirium.main.gui;
+package com.astetyne.expirium.main.gui.widget;
 
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.graphics.Color;
@@ -18,7 +18,7 @@ public class ThumbStick extends Widget {
     private float xR, yR, angle;
     private boolean touched;
     private int touchID;
-    private Vector2 touchVec;
+    private final Vector2 touchVec;
 
     public ThumbStick(ThumbStickStyle style) {
 

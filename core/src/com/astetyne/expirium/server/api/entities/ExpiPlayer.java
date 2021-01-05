@@ -58,7 +58,7 @@ public class ExpiPlayer extends ExpiEntity {
             inventory.removeItem(is);
         }
         inventory.addItem(recipe.getProduct());
-        gateway.getManager().putInvFeedPacket(inventory);
+        gateway.getManager().putMainInvFeedPacket(inventory);
     }
 
     public ServerPlayerGateway getGateway() {

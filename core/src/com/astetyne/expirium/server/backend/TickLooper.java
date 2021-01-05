@@ -151,21 +151,12 @@ public class TickLooper extends TerminableLooper {
                         server.getWorld().getInteractHandler().onInteract(p, x, y, type);
                         break;
 
-                    case 23: {//InvOpenReqPacket
-                        int invID = in.getInt();
-                        if(server.getInventoriesID().containsKey(invID)) {
-                            p.getGateway().getManager().putInvFeedPacket(server.getInventoriesID().get(invID));
-                        }
-                        break;
-                    }
                     case 25: {//InvItemMoveReqPacket
-                        int invID = in.getInt();
+                        boolean main = in.getBoolean();
                         IntVector2 pos1 = in.getIntVector();
-                        int invID2 = in.getInt();
+                        boolean main2 = in.getBoolean();
                         IntVector2 pos2 = in.getIntVector();
-                        if(server.getInventoriesID().containsKey(invID)) {
-                            server.getInventoriesID().get(invID).onMoveReq(p, pos1, pos2);
-                        }
+                        p.getInv().onMoveReq(p, pos1, pos2);
                         break;
                     }
                     case 26: {//InvItemMakeReqPacket

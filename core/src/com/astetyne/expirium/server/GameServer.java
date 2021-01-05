@@ -28,14 +28,11 @@ public class GameServer implements Runnable {
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
     private final List<ExpiDroppedItem> droppedItems;
-    private int serverTime;
 
     // you MUST create this object on dedicated thread, it will create endless loop
     public GameServer() {
 
         server = this;
-
-        serverTime = 0;
 
         entitiesID = new HashMap<>();
         inventoriesID = new HashMap<>();
@@ -69,8 +66,6 @@ public class GameServer implements Runnable {
     }
 
     public void onTick() {
-
-        serverTime++;
 
         expiWorld.onTick();
 
@@ -133,9 +128,5 @@ public class GameServer implements Runnable {
 
     public List<ExpiDroppedItem> getDroppedItems() {
         return droppedItems;
-    }
-
-    public int getServerTime() {
-        return serverTime;
     }
 }

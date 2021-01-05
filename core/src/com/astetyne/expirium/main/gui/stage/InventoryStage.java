@@ -1,35 +1,37 @@
-package com.astetyne.expirium.main.gui;
+package com.astetyne.expirium.main.gui.stage;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.gui.widget.StorageGrid;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.inventory.Inventory;
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class InvGUILayout extends GUILayout {
+public class InventoryStage extends Stage {
 
+    private final StorageGrid inventoryGrid;
     private final Table rootTable, gridTable, recipeList, recipeDetail, requiredItems;
     private final Image returnButton;
     private final ScrollPane scrollProductsList, scrollRequiredItems;
     private ItemRecipe selectedRecipe;
 
-    public InvGUILayout() {
+    public InventoryStage() {
+        super(new StretchViewport(1000, 1000), ExpiGame.get().getBatch());
 
         returnButton = new Image(Res.CROSS_ICON);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameStage.get().setActiveGuiLayout(GameStage.get().getGameGuiLayout());
+                GameScreen.get().showGameStage();
             }
         });
 
@@ -41,9 +43,13 @@ public class InvGUILayout extends GUILayout {
         recipeDetail = new Table();
         requiredItems = new Table();
 
-        //if(Constants.DEBUG) rootTable.setDebug(true);
+        if(Consts.DEBUG) rootTable.setDebug(true);
         if(Consts.DEBUG) gridTable.setDebug(true);
         if(Consts.DEBUG) recipeDetail.setDebug(true);
+
+        int c = Consts.PLAYER_INV_COLUMNS;
+        int r = Consts.PLAYER_INV_ROWS;
+        inventoryGrid = new StorageGrid(r, c, Res.STORAGE_GRID_STYLE);
 
         scrollProductsList = new ScrollPane(recipeList);
         scrollProductsList.setScrollingDisabled(true, false);
@@ -51,32 +57,27 @@ public class InvGUILayout extends GUILayout {
         scrollRequiredItems = new ScrollPane(requiredItems);
         scrollRequiredItems.setScrollingDisabled(true, false);
 
-        rootTable.setBackground(new TextureRegionDrawable(Res.WHITE_TILE));
+        build();
 
+        setRoot(rootTable);
+        getRoot().setVisible(false);
     }
 
     @Override
-    public void update() {
-
+    public void act() {
+        if(!getRoot().isVisible()) return;
+        super.act();
     }
 
-    @Override
-    public Table getRootTable() {
-        return rootTable;
-    }
-
-    @Override
-    public void build(Stage stage) {
-
-        Inventory inv = GameStage.get().getInv();
+    private void build() {
 
         Image weightImage = new Image(Res.WHITE_TILE);
 
         gridTable.clear();
-        gridTable.add(inv.getInventoryGrid()).width(400).height(Utils.percFromW(400)).colspan(2);
+        gridTable.add(inventoryGrid).width(400).height(Utils.percFromW(400)).colspan(2);
         gridTable.row();
         gridTable.add(weightImage).width(30).height(Utils.percFromW(30)).align(Align.left).padTop(20);
-        gridTable.add(inv.getInventoryGrid().getWeightLabel()).expandX().align(Align.left).pad(20, 20, 0,0);
+        gridTable.add(inventoryGrid.getWeightLabel()).expandX().align(Align.left).pad(20, 20, 0,0);
 
         recipeList.clear();
         for(ItemRecipe recipe : ItemRecipe.values()) {
@@ -93,7 +94,7 @@ public class InvGUILayout extends GUILayout {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     selectedRecipe = recipe;
-                    build(stage);
+                    build();
                 }
             });
             recipeList.add(t).width(200);
@@ -109,7 +110,7 @@ public class InvGUILayout extends GUILayout {
         makeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ExpiriumGame.get().getClientGateway().getManager().putInvItemMakeReqPacket(selectedRecipe);
+                ExpiGame.get().getClientGateway().getManager().putInvItemMakeReqPacket(selectedRecipe);
             }
         });
         Label desc = new Label(selectedRecipe.getDescription(), Res.LABEL_STYLE);
@@ -135,17 +136,13 @@ public class InvGUILayout extends GUILayout {
         rootTable.add(gridTable).width(500).expandY();
         rootTable.add(scrollProductsList).width(200).pad(20,0,20,0);
         rootTable.add(recipeDetail).width(200).pad(20, 20, 20, 20).align(Align.top);
-
-        stage.clear();
-        stage.addActor(rootTable);
-
     }
 
-    @Override
-    public void resize(int w, int h) {}
+    public void setVisible(boolean visible) {
+        getRoot().setVisible(visible);
+    }
 
-    @Override
-    public boolean isDimmed() {
-        return true;
+    public StorageGrid getInvGrid() {
+        return inventoryGrid;
     }
 }

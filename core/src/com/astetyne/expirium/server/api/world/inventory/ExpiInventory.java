@@ -75,14 +75,14 @@ public class ExpiInventory {
                 ExpiDroppedItem edi = new ExpiDroppedItem(p.getCenter(), is.getItem(), Consts.SERVER_DEFAULT_TPS);
                 p2.getGateway().getManager().putEntitySpawnPacket(edi);
             }
-            p.getGateway().getManager().putInvFeedPacket(this);
+            p.getGateway().getManager().putMainInvFeedPacket(this);
             return;
         }
         if(!isPlaceFor(is, pos2.x, pos2.y)) return;
         cleanGridFrom(is);
         is.getGridPos().set(pos2);
         insertToGrid(is);
-        p.getGateway().getManager().putInvFeedPacket(this);
+        p.getGateway().getManager().putMainInvFeedPacket(this);
     }
 
     public boolean contains(Item item) {

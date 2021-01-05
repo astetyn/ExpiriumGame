@@ -1,11 +1,11 @@
 package com.astetyne.expirium.main.net.client;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemRecipe;
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.WeatherType;
@@ -69,16 +69,11 @@ public class ClientPacketManager {
         out.putInt(action.getID());
     }
 
-    public void putInvOpenReqPacket(int id) {
-        out.startPacket(23);
-        out.putInt(id);
-    }
-
-    public void putInvItemMoveReqPacket(int id, IntVector2 pos1, int id2, IntVector2 pos2) {
+    public void putInvItemMoveReqPacket(boolean main, IntVector2 pos1, boolean main2, IntVector2 pos2) {
         out.startPacket(25);
-        out.putInt(id);
+        out.putBoolean(main);
         out.putIntVector(pos1);
-        out.putInt(id2);
+        out.putBoolean(main2);
         out.putIntVector(pos2);
     }
 
@@ -90,8 +85,8 @@ public class ClientPacketManager {
     public void processIncomingPackets() {
 
         GameWorld world = null;
-        if(ExpiriumGame.get().getCurrentStage() instanceof GameStage) {
-            world = GameStage.get().getWorld();
+        if(GameScreen.get() != null) {
+            world = GameScreen.get().getWorld();
         }
 
         int availPackets = in.getAvailablePackets();
@@ -105,10 +100,7 @@ public class ClientPacketManager {
             switch(packetID) {
 
                 case 11:
-                    GameStage game = new GameStage();
-                    game.initGameStage();
-                    ExpiriumGame.get().setCurrentStage(game);
-                    world = GameStage.get().getWorld();
+                    ExpiGame.get().setScreen(new GameScreen(in));
                     break;
                 case 12: //ChunkDestroyPacket
                     world.onDestroyChunkEvent();
@@ -149,17 +141,25 @@ public class ClientPacketManager {
                     world.onTileChange(in);
                     break;
 
-                case 24: //InvFeedPacket
-                    GameStage.get().getInv().getStorageGridIDs().get(in.getInt()).onInvFeed(in);
+                case 23: //MainInvFeedPacket
+                    GameScreen.get().getInvStage().getInvGrid().feed(in);
+                    break;
+
+                case 24: //DoubleInvFeedPacket
+                    GameScreen.get().getDoubleInvStage().getMainGrid().feed(in);
+                    GameScreen.get().getDoubleInvStage().getSecondGrid().feed(in);
                     break;
 
                 case 28: //EnviroPacket
-                    GameStage.get().setServerTime(in.getInt());
+                    GameScreen.get().setServerTime(in.getInt());
                     WeatherType weather = WeatherType.getType(in.getInt());
                     break;
 
                 case 30: //InvHotSlotsFeedPacket
-                    GameStage.get().getInv().feedHotSlots(in);
+                    GameScreen.get().getGameStage().feedHotSlots(in);
+                    break;
+                case 31: //OpenDoubleInvPacket
+                    GameScreen.get().getDoubleInvStage().open(in);
                     break;
             }
         }

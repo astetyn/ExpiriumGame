@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.net.client;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.screens.Gatewayable;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -14,7 +15,7 @@ import java.net.Socket;
 public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
-    private final ExpiriumGame game;
+    private final ExpiGame game;
     private String ipAddress;
     private PacketInputStream in;
     private PacketOutputStream out;
@@ -24,7 +25,7 @@ public class ClientGateway extends TerminableLooper {
     private long time;
 
     public ClientGateway() {
-        game = ExpiriumGame.get();
+        game = ExpiGame.get();
         ipAddress = "127.0.0.1";
         nextReadLock = new Object();
         traffic = 0;
@@ -42,7 +43,9 @@ public class ClientGateway extends TerminableLooper {
             socket.connect(new InetSocketAddress(ipAddress, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
             System.out.println("Exception during connecting to server.");
-            game.getCurrentStage().onServerFail();
+            if(game.getScreen() instanceof Gatewayable) {
+                ((Gatewayable)game.getScreen()).onServerFail();
+            }
             return;
         }
 
@@ -55,7 +58,7 @@ public class ClientGateway extends TerminableLooper {
 
             packetManager = new ClientPacketManager(in, out);
 
-            packetManager.putJoinReqPacket(ExpiriumGame.get().getPlayerName());
+            packetManager.putJoinReqPacket(ExpiGame.get().getPlayerName());
             out.swap();
             out.flush();
             out.reset();
@@ -81,7 +84,9 @@ public class ClientGateway extends TerminableLooper {
             }
         }catch(IOException e) {
             System.out.println("Exception during messaging with server.");
-            game.getCurrentStage().onServerFail();
+            if(game.getScreen() instanceof Gatewayable) {
+                ((Gatewayable)game.getScreen()).onServerFail();
+            }
         }catch(InterruptedException e) {
             e.printStackTrace();
         }

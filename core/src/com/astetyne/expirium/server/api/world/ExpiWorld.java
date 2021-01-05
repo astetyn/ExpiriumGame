@@ -37,6 +37,8 @@ public class ExpiWorld {
     private WeatherType weatherType;
     private final InteractHandler interactHandler;
     private final ExpiContactListener contactListener;
+    private float stepsTimeAccumulator;
+    private int worldTime;
 
     public ExpiWorld(String worldName) {
         this(worldName, (long)(Math.random()*10000));
@@ -47,7 +49,11 @@ public class ExpiWorld {
         this.worldName = worldName;
         this.seed = seed;
 
+        worldTime = 0;
+
         weatherType = WeatherType.SUNNY;
+
+        stepsTimeAccumulator = 0;
 
         tileListeners = new ArrayList<>();
         interactHandler = new InteractHandler(this);
@@ -88,8 +94,16 @@ public class ExpiWorld {
 
     public void onTick() {
 
-        for(int i = 0; i < 60.0/ Consts.SERVER_DEFAULT_TPS; i++) {
+        worldTime++;
+        if(worldTime == Consts.SERVER_DEFAULT_TPS * 10) {
+            worldTime = 0;
+        }
+
+        stepsTimeAccumulator += 1f / Consts.SERVER_DEFAULT_TPS;
+
+        while(stepsTimeAccumulator >= 1/60f) {
             b2dWorld.step(1/60f, 6, 2);
+            stepsTimeAccumulator -= 1/60f;
             steps++;
         }
 
@@ -126,7 +140,7 @@ public class ExpiWorld {
                     it.remove();
 
                     p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1));
-                    p.getGateway().getManager().putInvFeedPacket(p.getInv());
+                    p.getGateway().getManager().putMainInvFeedPacket(p.getInv());
 
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                         pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
@@ -195,26 +209,18 @@ public class ExpiWorld {
 
     public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
 
-        System.out.println("place req");
-
-        if(!isTileFree(t)) return;
+        if(!isTileFree(t, item)) return;
 
         if(!stabilityCalc.canBeAdjusted(t, item.getBuildTile())) return;
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
-        p.getGateway().getManager().putInvFeedPacket(p.getInv());
+        p.getGateway().getManager().putMainInvFeedPacket(p.getInv());
 
         changeTile(t, item.getBuildTile(), true);
 
         for(TileListener l : tileListeners) {
             l.onTilePlace(t);
-        }
-    }
-
-    public void onTileInteract(int c, int x, int y, ExpiPlayer p) {
-        for(TileListener l : tileListeners) {
-            l.onTileInteract(worldTerrain[y][c* Consts.T_W_CH + x]);
         }
     }
 
@@ -268,12 +274,12 @@ public class ExpiWorld {
 
     }
 
-    private boolean isTileFree(ExpiTile t) {
+    private boolean isTileFree(ExpiTile t, Item toPlace) {
 
         int x = t.getX();
         int y = t.getY();
 
-        if(worldTerrain[y][x].getType().getSolidity().isSoft()) return true;
+        if(toPlace.getBuildTile().getSolidity().isSoft()) return true;
 
         for(ExpiEntity p : GameServer.get().getEntities()) {
 
@@ -344,5 +350,13 @@ public class ExpiWorld {
 
     public ExpiContactListener getCL() {
         return contactListener;
+    }
+
+    public List<TileListener> getTileListeners() {
+        return tileListeners;
+    }
+
+    public int getWorldTime() {
+        return worldTime;
     }
 }

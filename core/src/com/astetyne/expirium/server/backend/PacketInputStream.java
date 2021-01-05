@@ -32,6 +32,10 @@ public class PacketInputStream {
         return readBuffer.get();
     }
 
+    public boolean getBoolean() {
+        return readBuffer.get() == 1;
+    }
+
     public int getInt() {
         return readBuffer.getInt();
     }

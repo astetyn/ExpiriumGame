@@ -2,15 +2,15 @@ package com.astetyne.expirium.main.utils;
 
 public class Consts {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // networking
     public static final int SERVER_PORT = 1414;
     public static final int BUFFER_SIZE = 262144;
-    public static final int SERVER_DEFAULT_TPS = 20;
+    public static final int SERVER_DEFAULT_TPS = 30;
 
     // world
-    public static final int CHUNKS_NUMBER = 5;
+    public static final int CHUNKS_NUMBER = 32;
     public static final int T_W_CH = 32;
     public static final int T_H_CH = 256;
 

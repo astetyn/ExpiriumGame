@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.world.tiles;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.server.backend.FixRes;
@@ -68,7 +68,7 @@ public enum TileType {
 
     public TextureRegion getTexture() {
         if(anim != null) {
-            return anim.getKeyFrame(ExpiriumGame.get().getTime());
+            return anim.getKeyFrame(ExpiGame.get().getTime());
         }
         return texture;
     }

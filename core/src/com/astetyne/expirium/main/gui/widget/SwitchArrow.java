@@ -1,5 +1,7 @@
-package com.astetyne.expirium.main.gui;
+package com.astetyne.expirium.main.gui.widget;
 
+import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +14,7 @@ public class SwitchArrow extends Widget {
     private boolean pressed;
     private final boolean rotated;
 
-    public SwitchArrow(SwitchArrowStyle style, Runnable onClick, boolean rotated) {
+    public SwitchArrow(SwitchArrowStyle style, InvInteractType onClick, boolean rotated) {
 
         this.style = style;
         pressed = false;
@@ -21,7 +23,7 @@ public class SwitchArrow extends Widget {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                onClick.run();
+                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(onClick);
                 pressed = true;
                 return true;
             }

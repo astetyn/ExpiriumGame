@@ -1,9 +1,11 @@
-package com.astetyne.expirium.main.gui;
+package com.astetyne.expirium.main.gui.widget;
 
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Utils;
+import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,17 +18,18 @@ public class HotBarSlot extends Widget {
     private final HotBarSlotStyle style;
     private boolean focused;
     private final String emptyLabel;
+    private final ChosenSlot slotType;
 
-    public HotBarSlot(HotBarSlotStyle style, Runnable onFocus, String emptyLabel) {
-        itemStack = null;
+    public HotBarSlot(HotBarSlotStyle style, String emptyLabel, ChosenSlot slotType) {
+        itemStack = new ItemStack(Item.EMPTY);
         this.style = style;
-        focused = false;
         this.emptyLabel = emptyLabel;
+        this.slotType = slotType;
+        focused = false;
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                onFocus.run();
-                focused = true;
+                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(slotType.getOnClick());
             }
         });
     }
@@ -82,6 +85,10 @@ public class HotBarSlot extends Widget {
         return focused;
     }
 
+    public ChosenSlot getSlotType() {
+        return slotType;
+    }
+
     public static class HotBarSlotStyle {
 
         final TextureRegion background, frame;
@@ -91,4 +98,5 @@ public class HotBarSlot extends Widget {
             this.frame = frame;
         }
     }
+
 }

@@ -1,9 +1,12 @@
-package com.astetyne.expirium.main.stages;
+package com.astetyne.expirium.main.screens;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.gui.stage.LauncherStage;
 import com.astetyne.expirium.main.utils.Consts;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,14 +16,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class LauncherStage extends ExpiStage {
+public class LauncherScreen implements Screen, Gatewayable {
 
     private boolean hostingServer;
     private final Table table;
+    private final LauncherStage launcherStage;
+    private final InputMultiplexer multiplexer;
 
-    public LauncherStage() {
+    public LauncherScreen() {
 
         hostingServer = true;
+
+        multiplexer = new InputMultiplexer();
+        launcherStage = new LauncherStage();
 
         table = new Table();
 
@@ -60,46 +68,58 @@ public class LauncherStage extends ExpiStage {
         table.setFillParent(true);
         if(Consts.DEBUG) table.setDebug(true);
 
-        stage.addActor(table);
+        launcherStage.addActor(table);
 
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(hostingServer) {
-                    ExpiriumGame.get().startServer();
-                    ExpiriumGame.get().startClient("127.0.0.1", textField.getText());
+                    ExpiGame.get().startServer();
+                    ExpiGame.get().startClient("127.0.0.1", textField.getText());
                 }else {
-                    ExpiriumGame.get().startClient(textField2.getText(), textField.getText());
+                    ExpiGame.get().startClient(textField2.getText(), textField.getText());
                 }
                 table.setVisible(false);
             }
         });
 
+        multiplexer.addProcessor(launcherStage);
+        Gdx.input.setInputProcessor(multiplexer);
+
     }
 
-    @Override
     public void update() {
-        stage.act();
+        launcherStage.act();
     }
 
     @Override
-    public void render() {
+    public void show() {
 
+    }
+
+    @Override
+    public void render(float delta) {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.draw();
+        launcherStage.draw();
     }
 
     @Override
-    public void resize() {
-        Res.MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
-        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-    }
+    public void resize(int width, int height) {}
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {}
 
     @Override
     public void dispose() {
-        super.dispose();
+        launcherStage.dispose();
     }
 
     @Override

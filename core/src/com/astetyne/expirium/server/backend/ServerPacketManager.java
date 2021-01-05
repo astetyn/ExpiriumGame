@@ -26,11 +26,9 @@ public class ServerPacketManager {
 
     public void putInitDataPacket(int numberOfChunks, ExpiPlayer p, List<ExpiEntity> entities) {
         out.startPacket(11);
-        out.putInt(p.getInv().getId());
         out.putInt(numberOfChunks);
         out.putInt(p.getID());
-        out.putFloat(p.getLocation().x);
-        out.putFloat(p.getLocation().y);
+        out.putVector(p.getLocation());
         out.putInt(entities.size());
         for(ExpiEntity e : entities) {
             out.putEntity(e);
@@ -93,9 +91,8 @@ public class ServerPacketManager {
         out.putInt(e.getID());
     }
 
-    public void putInvFeedPacket(ExpiInventory inv) {
-        out.startPacket(24);
-        out.putInt(inv.getId());
+    public void putMainInvFeedPacket(ExpiInventory inv) {
+        out.startPacket(23);
         out.putFloat(inv.getTotalWeight());
         out.putFloat(inv.getMaxWeight());
         out.putInt(inv.getItems().size());
@@ -106,8 +103,29 @@ public class ServerPacketManager {
         }
     }
 
-    public void putHotSlotsFeedPacket(ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
+    public void putDoubleInvFeedPacket(ExpiInventory inv1, ExpiInventory inv2) {
+        out.startPacket(24);
+        out.putFloat(inv1.getTotalWeight());
+        out.putFloat(inv1.getMaxWeight());
+        out.putInt(inv1.getItems().size());
+        for(ItemStack is : inv1.getItems()) {
+            out.putInt(is.getItem().getId());
+            out.putInt(is.getAmount());
+            out.putIntVector(is.getGridPos());
+        }
+        out.putFloat(inv2.getTotalWeight());
+        out.putFloat(inv2.getMaxWeight());
+        out.putInt(inv2.getItems().size());
+        for(ItemStack is : inv2.getItems()) {
+            out.putInt(is.getItem().getId());
+            out.putInt(is.getAmount());
+            out.putIntVector(is.getGridPos());
+        }
+    }
+
+    public void putHotSlotsFeedPacket(byte focus, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
         out.startPacket(30);
+        out.putByte(focus);
         out.putInt(toolIS.getItem().getId());
         out.putInt(toolIS.getAmount());
         out.putInt(materialIS.getItem().getId());
@@ -157,7 +175,7 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putInt(GameServer.get().getServerTime());
+        out.putInt(GameServer.get().getWorld().getWorldTime());
         out.putInt(GameServer.get().getWorld().getWeather().getID());
     }
 }

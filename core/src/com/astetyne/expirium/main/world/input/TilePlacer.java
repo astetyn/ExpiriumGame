@@ -1,8 +1,8 @@
 package com.astetyne.expirium.main.world.input;
 
-import com.astetyne.expirium.main.ExpiriumGame;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
@@ -24,8 +24,8 @@ public class TilePlacer implements InputProcessor {
 
     public TilePlacer() {
 
-        batch = GameStage.get().getBatch();
-        world = GameStage.get().getWorld();
+        batch = ExpiGame.get().getBatch();
+        world = GameScreen.get().getWorld();
         stabilityShowActive = false;
 
         stabilityButton = new ImageButton(new TextureRegionDrawable(Res.DIRT_TILE));
@@ -79,10 +79,10 @@ public class TilePlacer implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunks().length && vec.y < 0 || vec.y >= Consts.T_H_CH) {
+        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunksInMap() && vec.y < 0 || vec.y >= Consts.T_H_CH) {
             return false;
         }
-        ExpiriumGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.PRESS);
+        ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.PRESS);
         pressed = true;
         return true;
     }
@@ -92,17 +92,17 @@ public class TilePlacer implements InputProcessor {
         if(!pressed) return true;
         pressed = false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        ExpiriumGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.RELEASE);
+        ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.RELEASE);
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunks().length && vec.y < 0 || vec.y >= Consts.T_H_CH) {
+        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunksInMap() && vec.y < 0 || vec.y >= Consts.T_H_CH) {
             return true;
         }
-        ExpiriumGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.DRAG);
+        ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.DRAG);
         return true;
     }
 

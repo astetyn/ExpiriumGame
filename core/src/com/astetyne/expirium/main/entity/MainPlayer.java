@@ -1,9 +1,8 @@
 package com.astetyne.expirium.main.entity;
 
-import com.astetyne.expirium.main.ExpiriumGame;
-import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.ThumbStick;
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.gui.widget.ThumbStick;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.world.input.TileBreaker;
 import com.astetyne.expirium.main.world.input.TilePlacer;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -20,9 +19,9 @@ public class MainPlayer extends Entity {
         super(EntityType.PLAYER, id, loc, 0.9f, 1.25f);
         tileBreaker = new TileBreaker();
         tilePlacer = new TilePlacer();
-        GameStage.get().getMultiplexer().addProcessor(tilePlacer);
-        movementTS = new ThumbStick(Res.THUMB_STICK_STYLE);
-        animator = new MainPlayerAnimator(GameStage.get().getBatch(), this, movementTS);
+        GameScreen.get().getMultiplexer().addProcessor(tilePlacer);
+        movementTS = GameScreen.get().getGameStage().moveTS;
+        animator = new MainPlayerAnimator(ExpiGame.get().getBatch(), this, movementTS);
     }
 
     public void draw() {
@@ -37,7 +36,7 @@ public class MainPlayer extends Entity {
     public void generateMovePacket() {
         float vert = movementTS.getVert();
         float horz = movementTS.getHorz();
-        ExpiriumGame.get().getClientGateway().getManager().putTS1Packet(horz, vert);
+        ExpiGame.get().getClientGateway().getManager().putTS1Packet(horz, vert);
     }
 
     @Override

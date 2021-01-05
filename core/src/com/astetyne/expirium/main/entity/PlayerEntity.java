@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.entity;
 
-import com.astetyne.expirium.main.stages.GameStage;
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 
@@ -11,7 +11,7 @@ public class PlayerEntity extends Entity {
 
     public PlayerEntity(int id, Vector2 loc, PacketInputStream in) {
         super(EntityType.PLAYER, id, loc, 0.9f, 1.25f);
-        animator = new PlayerEntityAnimator(GameStage.get().getBatch(), this);
+        animator = new PlayerEntityAnimator(ExpiGame.get().getBatch(), this);
         readMeta(in);
     }
 
