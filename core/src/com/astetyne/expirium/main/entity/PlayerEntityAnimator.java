@@ -27,7 +27,7 @@ public class PlayerEntityAnimator {
 
         timer += Gdx.graphics.getDeltaTime();
 
-        Vector2 vel = player.getBody().getLinearVelocity();
+        Vector2 vel = player.getVelocity();
         Vector2 loc = player.getLocation();
 
         if(Math.abs(vel.x) <= 0.1) {

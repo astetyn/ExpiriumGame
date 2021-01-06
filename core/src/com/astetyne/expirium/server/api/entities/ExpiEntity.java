@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.api.entities;
 
-import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.Metaable;
 import com.astetyne.expirium.main.world.Collidable;
@@ -18,11 +17,13 @@ public abstract class ExpiEntity implements Metaable, Collidable {
     protected Body body;
     protected boolean onGround;
     private int collisions;
+    private final Vector2 centerLoc;
 
-    public ExpiEntity(EntityType type, Vector2 loc, float width, float height) {
+    public ExpiEntity(EntityType type, float width, float height) {
 
         this.type = type;
-        body = EntityBodyFactory.createBody(type, loc, GameServer.get().getWorld().getB2dWorld());
+
+        centerLoc = new Vector2();
 
         int randomID;
         do {
@@ -48,7 +49,7 @@ public abstract class ExpiEntity implements Metaable, Collidable {
     }
 
     public Vector2 getCenter() {
-        return new Vector2(body.getPosition().x + width/2, body.getPosition().y + height/2);
+        return centerLoc.set(body.getPosition().x + width/2, body.getPosition().y + height/2);
     }
 
     public Vector2 getVelocity() {

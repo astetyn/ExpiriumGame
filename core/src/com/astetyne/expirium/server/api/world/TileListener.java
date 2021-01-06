@@ -4,7 +4,7 @@ public interface TileListener {
 
     void onTick();
 
-    void onTilePreBreak(ExpiTile t);
+    void onTileChange(ExpiTile t);
 
     void onTilePlace(ExpiTile t);
 

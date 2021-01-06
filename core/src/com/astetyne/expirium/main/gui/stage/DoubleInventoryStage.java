@@ -2,7 +2,7 @@ package com.astetyne.expirium.main.gui.stage;
 
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.widget.StorageGrid;
+import com.astetyne.expirium.main.gui.widget.DoubleStorageGrid;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -11,32 +11,19 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 public class DoubleInventoryStage extends Stage implements ExpiStage {
 
-    private final StorageGrid mainGrid;
-    private final StorageGrid secondGrid;
+    private DoubleStorageGrid grid;
 
     public DoubleInventoryStage() {
         super(new StretchViewport(1000, 1000), ExpiGame.get().getBatch());
-        int c = Consts.PLAYER_INV_COLUMNS;
-        int r = Consts.PLAYER_INV_ROWS;
-        mainGrid = new StorageGrid(r, c, Res.STORAGE_GRID_STYLE);
-        secondGrid = new StorageGrid(Res.STORAGE_GRID_STYLE);
     }
 
     public void open(PacketInputStream in) {
-        byte r = in.getByte();
-        byte c = in.getByte();
-        secondGrid.setGrid(r, c);
-        GameScreen.get().getGameStage().setVisible(false);
-        GameScreen.get().getInvStage().setVisible(false);
-        setVisible(true);
-    }
-
-    public StorageGrid getMainGrid() {
-        return mainGrid;
-    }
-
-    public StorageGrid getSecondGrid() {
-        return secondGrid;
+        int r1 = Consts.PLAYER_INV_ROWS;
+        int c1 = Consts.PLAYER_INV_COLUMNS;
+        byte r2 = in.getByte();
+        byte c2 = in.getByte();
+        grid = new DoubleStorageGrid(r1, c1, r2, c2, Res.STORAGE_GRID_STYLE);
+        GameScreen.get().showDoubleInvStage();
     }
 
     public void setVisible(boolean b) {
@@ -46,5 +33,9 @@ public class DoubleInventoryStage extends Stage implements ExpiStage {
     @Override
     public boolean isDimmed() {
         return true;
+    }
+
+    public DoubleStorageGrid getGrid() {
+        return grid;
     }
 }

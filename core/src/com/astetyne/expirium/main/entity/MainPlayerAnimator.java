@@ -30,7 +30,7 @@ public class MainPlayerAnimator {
 
         timer += Gdx.graphics.getDeltaTime();
 
-        Vector2 vel = player.getBody().getLinearVelocity();
+        Vector2 vel = player.getVelocity();
         Vector2 loc = player.getLocation();
 
         if(thumbStick.getHorz() == 0 || Math.abs(vel.x) <= 0.1) {

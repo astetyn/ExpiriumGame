@@ -17,7 +17,7 @@ public class WorldGenerator {
 
         for(int j = 0; j < w; j++) {
 
-            int hh = (int) (40 + Noise.noise((j) / 32.0f, 0, 0) * 20);
+            int hh = (int) (0 + Noise.noise((j) / 32.0f, 0, 0) * 20);
 
             for(int i = 0; i < h; i++) {
                 if(i == hh) {

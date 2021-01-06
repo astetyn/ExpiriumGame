@@ -127,4 +127,8 @@ public class PacketOutputStream {
         activePacketCounter = 0;
     }
 
+    public float occupied() {
+        return (float) writeBuffer.position() / Consts.BUFFER_SIZE;
+    }
+
 }

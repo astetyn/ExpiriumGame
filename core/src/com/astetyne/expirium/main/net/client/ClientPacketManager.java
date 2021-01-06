@@ -3,14 +3,13 @@ package com.astetyne.expirium.main.net.client;
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.items.Item;
+import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.input.InteractType;
-import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
@@ -30,31 +29,12 @@ public class ClientPacketManager {
         out.putString(name);
     }
 
-    public void putTS1Packet(float horz, float vert) {
+    public void putTSPacket(ThumbStick ts1, ThumbStick ts2) {
         out.startPacket(14);
-        out.putFloat(horz);
-        out.putFloat(vert);
-    }
-
-    public void putTS2Packet(float horz, float vert) {
-        out.startPacket(15);
-        out.putFloat(horz);
-        out.putFloat(vert);
-    }
-
-    public void putTileBreakReqPacket(Tile t) {
-        out.startPacket(15);
-        out.putInt(t.getC());
-        out.putInt(t.getX());
-        out.putInt(t.getY());
-    }
-
-    public void putTilePlaceReqPacket(Tile t, Item placedItem) {
-        out.startPacket(16);
-        out.putInt(t.getC());
-        out.putInt(t.getX());
-        out.putInt(t.getY());
-        out.putInt(placedItem.getId());
+        out.putFloat(ts1.getHorz());
+        out.putFloat(ts1.getVert());
+        out.putFloat(ts2.getHorz());
+        out.putFloat(ts2.getVert());
     }
 
     public void putInteractPacket(float x, float y, InteractType type) {
@@ -101,17 +81,18 @@ public class ClientPacketManager {
 
                 case 11:
                     ExpiGame.get().setScreen(new GameScreen(in));
+                    world = GameScreen.get().getWorld();
                     break;
-                case 12: //ChunkDestroyPacket
-                    world.onDestroyChunkEvent();
+                case 12: //
+
                     break;
 
-                case 13: //ChunkFeedPacket
-                    world.onFeedChunkEvent();
+                case 13: //WorldFeedPacket
+                    world.onFeedWorldEvent(in);
                     break;
 
-                case 17: //FixturePacket
-                    world.onFixturesChange(in);
+                case 15: //BreakingTilePacket
+                    world.onBreakingTile(in);
                     break;
 
                 case 18: //StabilityPacket
@@ -146,8 +127,7 @@ public class ClientPacketManager {
                     break;
 
                 case 24: //DoubleInvFeedPacket
-                    GameScreen.get().getDoubleInvStage().getMainGrid().feed(in);
-                    GameScreen.get().getDoubleInvStage().getSecondGrid().feed(in);
+                    GameScreen.get().getDoubleInvStage().getGrid().feed(in);
                     break;
 
                 case 28: //EnviroPacket

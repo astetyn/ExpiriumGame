@@ -134,6 +134,7 @@ public class ExpiInventory {
     private boolean isPlaceFor(ItemStack is, int c, int r) {
         for(int i = 0; i < is.getItem().getGridHeight(); i++) {
             for(int j = 0; j < is.getItem().getGridWidth(); j++) {
+                if(r+i == grid.length || c+j == grid[0].length) return false;
                 if(grid[r+i][c+j] != null && grid[r+i][c+j] != is) {
                     return false;
                 }

@@ -37,7 +37,7 @@ public class CampfireListener implements TileListener {
     }
 
     @Override
-    public void onTilePreBreak(ExpiTile t) {
+    public void onTileChange(ExpiTile t) {
         if(t.getType() == TileType.CAMPFIRE_BIG || t.getType() == TileType.CAMPFIRE_SMALL) {
             activeCampfires.remove(t);
             timeTillEnd.remove(t);

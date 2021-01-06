@@ -31,7 +31,7 @@ public class GameStage extends Stage implements ExpiStage {
 
     private final Table rootTable, itemSelectTable, debugInfoTable, playerStatsTable;
 
-    private final Label fpsLabel, locationLabel, entityLabel, warnLabel, healthStat, hungerStat, tempStat;
+    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, warnLabel, healthStat, hungerStat, tempStat;
     private final Image healthImage, hungerImage, tempImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
@@ -75,6 +75,8 @@ public class GameStage extends Stage implements ExpiStage {
         fpsLabel = new Label("", Res.LABEL_STYLE);
         locationLabel = new Label("", Res.LABEL_STYLE);
         entityLabel = new Label("", Res.LABEL_STYLE);
+        callsLabel = new Label("", Res.LABEL_STYLE);
+        buffersLabel = new Label("", Res.LABEL_STYLE);
         warnLabel = new Label("pre-alpha", Res.LABEL_STYLE);
         warnLabel.setColor(1,0.1f,0.1f,1);
 
@@ -100,6 +102,10 @@ public class GameStage extends Stage implements ExpiStage {
             debugInfoTable.add(locationLabel).left();
             debugInfoTable.row();
             debugInfoTable.add(entityLabel).left();
+            debugInfoTable.row();
+            debugInfoTable.add(callsLabel).left();
+            debugInfoTable.row();
+            debugInfoTable.add(buffersLabel).left();
             debugInfoTable.row();
         }
         debugInfoTable.add(warnLabel).left();
@@ -136,6 +142,11 @@ public class GameStage extends Stage implements ExpiStage {
         Vector2 loc = GameScreen.get().getWorld().getPlayer().getLocation();
         locationLabel.setText("x: "+((int)loc.x)+" y: "+((int)loc.y));
         entityLabel.setText("entities: "+ GameScreen.get().getWorld().getEntitiesID().keySet().size());
+        callsLabel.setText(ExpiGame.get().getBatch().totalRenderCalls);
+        ExpiGame.get().getBatch().totalRenderCalls = 0;
+        String out = "out: "+Math.round(ExpiGame.get().getClientGateway().getOut().occupied() * 1000) / 10f+"%";
+        String in = "in: "+Math.round(ExpiGame.get().getClientGateway().getIn().occupied() * 1000) / 10f+"%";
+        buffersLabel.setText(out+" "+in);
 
         if(!lastFocused.isFocused()) {
             build();

@@ -8,9 +8,11 @@ import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;
+import com.astetyne.expirium.server.backend.WorldLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class GameServer implements Runnable {
@@ -25,6 +27,7 @@ public class GameServer implements Runnable {
     private final HashMap<Integer, ExpiInventory> inventoriesID;
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ServerPlayerGateway> leavingClients;
+    private final List<WorldLoader> worldLoaders;
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
     private final List<ExpiDroppedItem> droppedItems;
@@ -41,6 +44,7 @@ public class GameServer implements Runnable {
 
         joiningClients = new ArrayList<>();
         leavingClients = new ArrayList<>();
+        worldLoaders = new ArrayList<>();
         entities = new ArrayList<>();
         players = new ArrayList<>();
         droppedItems = new ArrayList<>();
@@ -71,6 +75,13 @@ public class GameServer implements Runnable {
 
         for(ExpiPlayer pp : players) {
             pp.getGateway().getManager().putEnviroPacket();
+        }
+
+        Iterator<WorldLoader> it = worldLoaders.iterator();
+        while(it.hasNext()) {
+            WorldLoader wl = it.next();
+            wl.update();
+            if(wl.isCompleted()) it.remove();
         }
     }
 
@@ -128,5 +139,9 @@ public class GameServer implements Runnable {
 
     public List<ExpiDroppedItem> getDroppedItems() {
         return droppedItems;
+    }
+
+    public List<WorldLoader> getWorldLoaders() {
+        return worldLoaders;
     }
 }

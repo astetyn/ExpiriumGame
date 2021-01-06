@@ -1,29 +1,19 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.server.GameServer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class EntityBodyFactory {
 
-    public static Body createBody(EntityType type, Vector2 loc, World b2dWorld) {
-        if(type == EntityType.PLAYER) {
-            return createPlayerBody(loc, b2dWorld);
-        }else if(type == EntityType.DROPPED_ITEM) {
-            return createDroppedEntityBody(loc, b2dWorld);
-        }
-
-        return null;
-
-    }
-
-    public static Body createDroppedEntityBody(Vector2 loc, World b2dWorld) {
+    public static Body createDroppedEntityBody(Vector2 loc) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        Body body = b2dWorld.createBody(bodyDef);
+        Body body = GameServer.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
@@ -41,13 +31,13 @@ public class EntityBodyFactory {
         return body;
     }
 
-    public static Body createPlayerBody(Vector2 loc, World b2dWorld) {
+    public static Body createPlayerBody(Vector2 loc) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        Body body = b2dWorld.createBody(bodyDef);
+        Body body = GameServer.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();

@@ -15,7 +15,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class GameScreen implements Screen, Gatewayable {
 
@@ -24,7 +23,6 @@ public class GameScreen implements Screen, Gatewayable {
     private final SpriteBatch batch;
     private final InputMultiplexer multiplexer;
     private final GameWorld gameWorld;
-    private final Box2DDebugRenderer b2dr;
     private int serverTime;
     private int serverTPS;
 
@@ -37,10 +35,11 @@ public class GameScreen implements Screen, Gatewayable {
 
         gameScreen = this;
 
+        serverTPS = Consts.SERVER_DEFAULT_TPS;
+
         batch = ExpiGame.get().getBatch();
         multiplexer = new InputMultiplexer();
         gameWorld = new GameWorld();
-        b2dr = new Box2DDebugRenderer();
 
         gameStage = new GameStage();
         invStage = new InventoryStage();
@@ -75,8 +74,6 @@ public class GameScreen implements Screen, Gatewayable {
     @Override
     public void render(float delta) {
 
-        batch.totalRenderCalls = 0;
-
         update();
 
         // sky
@@ -92,9 +89,9 @@ public class GameScreen implements Screen, Gatewayable {
 
         float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
         float yShift1 = gameWorld.getPlayer().getLocation().y*4;
-        float xShift2 = (gameWorld.getPlayer().getLocation().x*6) % parallaxWidth;
+        float xShift2 = (gameWorld.getPlayer().getLocation().x*6) % parallaxWidth2;
         float yShift2 = gameWorld.getPlayer().getLocation().y*6;
-        float xShift3 = (gameWorld.getPlayer().getLocation().x*8) % parallaxWidth;
+        float xShift3 = (gameWorld.getPlayer().getLocation().x*8) % parallaxWidth3;
         float yShift3 = gameWorld.getPlayer().getLocation().y*8;
 
         batch.begin();
@@ -124,9 +121,12 @@ public class GameScreen implements Screen, Gatewayable {
         invStage.draw();
         doubleInvStage.draw();
 
-        if(Consts.DEBUG) b2dr.render(gameWorld.getB2dWorld(), gameWorld.getCamera().combined);
-
-        System.out.println(batch.totalRenderCalls);
+        // lag simulator
+        try {
+            Thread.sleep(0);
+        }catch(InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -157,7 +157,7 @@ public class GameScreen implements Screen, Gatewayable {
 
     @Override
     public void onServerUpdate() {
-        gameWorld.getPlayer().generateMovePacket();
+        gameWorld.getPlayer().sendTSPacket();
     }
 
     @Override
@@ -188,17 +188,17 @@ public class GameScreen implements Screen, Gatewayable {
 
     private Color getSkyColor() {
         //todo
-        return null;
+        return new Color(1,1,1,1);
     }
 
     private Color getBGColor() {
         //todo
-        return null;
+        return new Color(1, 1, 1, 1);
     }
 
     public Color getNightColor() {
         //todo
-        return null;
+        return new Color();
     }
 
     public GameWorld getWorld() {
@@ -233,4 +233,7 @@ public class GameScreen implements Screen, Gatewayable {
         return doubleInvStage;
     }
 
+    public int getServerTPS() {
+        return serverTPS;
+    }
 }

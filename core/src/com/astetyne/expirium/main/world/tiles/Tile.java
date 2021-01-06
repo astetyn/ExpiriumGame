@@ -7,30 +7,17 @@ import java.util.HashSet;
 
 public class Tile {
 
-    private int c, x, y;
-    private int stability;
     private TileType type;
+    private final int x, y;
+    private int stability;
     private final HashSet<LightSource> attachedLights;
 
-    public Tile() {
-        this.c = 0;
-        this.x = 0;
-        this.y = 0;
-        this.stability = 0;
-        this.type = TileType.AIR;
-        attachedLights = new HashSet<>();
-    }
-
-    public void init(int c, int x, int y, int stability, TileType type) {
-        this.c = c;
+    public Tile(TileType type, int x, int y, int stability) {
+        this.type = type;
         this.x = x;
         this.y = y;
         this.stability = stability;
-        this.type = type;
-    }
-
-    public int getC() {
-        return c;
+        attachedLights = new HashSet<>();
     }
 
     public int getX() {

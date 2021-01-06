@@ -2,7 +2,7 @@ package com.astetyne.expirium.main.gui.stage;
 
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.widget.StorageGrid;
+import com.astetyne.expirium.main.gui.widget.SingleStorageGrid;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
@@ -10,7 +10,9 @@ import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -18,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 public class InventoryStage extends Stage implements ExpiStage {
 
-    private final StorageGrid inventoryGrid;
+    private final SingleStorageGrid invGrid;
     private final Table rootTable, gridTable, recipeList, recipeDetail, requiredItems;
     private final Image returnButton;
     private final ScrollPane scrollProductsList, scrollRequiredItems;
@@ -38,6 +40,8 @@ public class InventoryStage extends Stage implements ExpiStage {
         rootTable = new Table();
         rootTable.setBounds(0, 0, 1000, 1000);
 
+        rootTable.setTouchable(Touchable.enabled);
+
         gridTable = new Table();
         recipeList = new Table();
         recipeDetail = new Table();
@@ -49,7 +53,7 @@ public class InventoryStage extends Stage implements ExpiStage {
 
         int c = Consts.PLAYER_INV_COLUMNS;
         int r = Consts.PLAYER_INV_ROWS;
-        inventoryGrid = new StorageGrid(r, c, Res.STORAGE_GRID_STYLE);
+        invGrid = new SingleStorageGrid(r, c, Res.STORAGE_GRID_STYLE);
 
         scrollProductsList = new ScrollPane(recipeList);
         scrollProductsList.setScrollingDisabled(true, false);
@@ -71,13 +75,9 @@ public class InventoryStage extends Stage implements ExpiStage {
 
     private void build() {
 
-        Image weightImage = new Image(Res.INV_WEIGHT);
-
         gridTable.clear();
-        gridTable.add(inventoryGrid).width(400).height(Utils.percFromW(400)).colspan(2);
+        gridTable.add(invGrid).width(400).height(Utils.percFromW(400)).colspan(2);
         gridTable.row();
-        gridTable.add(weightImage).width(30).height(Utils.percFromW(30)).align(Align.left).padTop(20);
-        gridTable.add(inventoryGrid.getWeightLabel()).expandX().align(Align.left).pad(20, 20, 0,0);
 
         recipeList.clear();
         for(ItemRecipe recipe : ItemRecipe.values()) {
@@ -136,14 +136,21 @@ public class InventoryStage extends Stage implements ExpiStage {
         rootTable.add(gridTable).width(500).expandY();
         rootTable.add(scrollProductsList).width(200).pad(20,0,20,0);
         rootTable.add(recipeDetail).width(200).pad(20, 20, 20, 20).align(Align.top);
+        rootTable.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                return true;
+            }
+        });
     }
 
     public void setVisible(boolean visible) {
         getRoot().setVisible(visible);
     }
 
-    public StorageGrid getInvGrid() {
-        return inventoryGrid;
+    public SingleStorageGrid getInvGrid() {
+        return invGrid;
     }
 
     @Override

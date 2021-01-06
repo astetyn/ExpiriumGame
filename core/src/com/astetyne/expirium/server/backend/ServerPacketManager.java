@@ -1,15 +1,11 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +20,15 @@ public class ServerPacketManager {
         this.out = out;
     }
 
-    public void putInitDataPacket(int numberOfChunks, ExpiPlayer p, List<ExpiEntity> entities) {
+    public void putInitDataPacket(ExpiTile[][] terrain, ExpiPlayer p, List<ExpiEntity> entities) {
         out.startPacket(11);
-        out.putInt(numberOfChunks);
+
+        int w = terrain[0].length;
+        int h = terrain.length;
+
+        out.putInt(w);
+        out.putInt(h);
+
         out.putInt(p.getID());
         out.putVector(p.getLocation());
         out.putInt(entities.size());
@@ -35,39 +37,20 @@ public class ServerPacketManager {
         }
     }
 
-    public void putChunkFeedPacket(ExpiTile[][] worldTerrain, int c) {
+    public void putWorldFeedPacket(ExpiTile[][] terrain, int partHeight, int partNumber) {
         out.startPacket(13);
-        out.putInt(c);
 
-        FixturePack fp = new FixturePack();
+        out.putInt(partHeight);
+        out.putInt(partNumber);
 
-        int off = c * Consts.T_W_CH;
-        for(int i = 0; i < Consts.T_H_CH; i++) {
-            for(int j = 0; j < Consts.T_W_CH; j++) {
-                ExpiTile t = worldTerrain[i][j+off];
+        int yOff = partNumber * partHeight;
+        for(int i = 0; i < terrain[0].length; i++) {
+            for(int j = yOff; j < yOff + partHeight; j++) {
+                ExpiTile t = terrain[j][i];
                 out.putByte((byte) t.getType().getID());
                 out.putByte((byte) t.getStability());
-                fp.addedFixtures.addAll(t.getFixtures());
             }
         }
-        putFixturePacket(fp);
-    }
-
-    public void putChunkDestroyPacket(ExpiTile[][] worldTerrain, int c) {
-        out.startPacket(12);
-        out.putInt(c);
-
-        FixturePack fp = new FixturePack();
-        int off = c * Consts.T_W_CH;
-        for(int i = 0; i < Consts.T_H_CH; i++) {
-            for(int j = 0; j < Consts.T_W_CH; j++) {
-                ExpiTile t = worldTerrain[i][j + off];
-                for(Fixture f : t.getFixtures()) {
-                    fp.removedFixtures.add(GameServer.get().getWorld().getFixturesID().get(f));
-                }
-            }
-        }
-        putFixturePacket(fp);
     }
 
     public void putEntityMovePacket(ExpiEntity e) {
@@ -78,7 +61,6 @@ public class ServerPacketManager {
         out.putFloat(e.getVelocity().x);
         out.putFloat(e.getVelocity().y);
         out.putFloat(e.getBody().getAngle());
-        out.putFloat(e.getBody().getAngularVelocity());
     }
 
     public void putEntitySpawnPacket(ExpiEntity e) {
@@ -137,37 +119,15 @@ public class ServerPacketManager {
     public void putTileChangePacket(ExpiTile t) {
         out.startPacket(22);
         out.putInt(t.getType().getID());
-        out.putInt(t.getX() / Consts.T_W_CH);
-        out.putInt(t.getX() - (t.getX() / Consts.T_W_CH)* Consts.T_W_CH);
+        out.putInt(t.getX());
         out.putInt(t.getY());
-    }
-
-    public void putFixturePacket(FixturePack pack) {
-        out.startPacket(17);
-
-        Vector2 v1 = new Vector2();
-        Vector2 v2 = new Vector2();
-
-        out.putInt(pack.addedFixtures.size());
-        for(Fixture f : pack.addedFixtures) {
-            EdgeShape shape = (EdgeShape) f.getShape();
-            shape.getVertex1(v1);
-            shape.getVertex2(v2);
-            int fixID = GameServer.get().getWorld().getFixturesID().get(f);
-            out.putFixture(fixID, v1.x, v1.y, v2.x, v2.y);
-        }
-        out.putInt(pack.removedFixtures.size());
-        for(int i : pack.removedFixtures) {
-            out.putInt(i);
-        }
     }
 
     public void putStabilityPacket(HashSet<ExpiTile> affectedTiles) {
         out.startPacket(18);
         out.putInt(affectedTiles.size());
         for(ExpiTile t : affectedTiles) {
-            out.putInt(t.getX() / Consts.T_W_CH);
-            out.putInt(t.getX() - (t.getX() / Consts.T_W_CH)* Consts.T_W_CH);
+            out.putInt(t.getX());
             out.putInt(t.getY());
             out.putInt(t.getStability());
         }
@@ -177,5 +137,12 @@ public class ServerPacketManager {
         out.startPacket(28);
         out.putInt(GameServer.get().getWorld().getWorldTime());
         out.putInt(GameServer.get().getWorld().getWeather().getID());
+    }
+
+    public void putBreakingTile(ExpiTile t, float state) {
+        out.startPacket(15);
+        out.putInt(t.getX());
+        out.putInt(t.getY());
+        out.putFloat(state);
     }
 }

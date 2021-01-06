@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.entities;
 
+import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.utils.Consts;
@@ -15,7 +16,8 @@ public class ExpiDroppedItem extends ExpiEntity {
     private int cooldown;
 
     public ExpiDroppedItem(Vector2 loc, Item type, int cooldown) {
-        super(EntityType.DROPPED_ITEM, loc, Consts.D_I_SIZE, Consts.D_I_SIZE);
+        super(EntityType.DROPPED_ITEM, Consts.D_I_SIZE, Consts.D_I_SIZE);
+        body = EntityBodyFactory.createDroppedEntityBody(loc);
         ticksToDespawn = Consts.SERVER_DEFAULT_TPS * 60;
         this.type = type;
         this.cooldown = cooldown;

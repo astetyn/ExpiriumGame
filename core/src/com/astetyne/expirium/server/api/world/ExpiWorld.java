@@ -11,25 +11,27 @@ import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.backend.FixRes;
-import com.astetyne.expirium.server.backend.FixturePack;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class ExpiWorld {
 
     private final ExpiTile[][] worldTerrain;
+    private final int terrainWidth, terrainHeight;
+    private final int partHeight;
     private final String worldName;
     private final long seed;
     private final World b2dWorld;
     private final Body terrainBody;
-    private final int w, h;
     private final WorldGenerator worldGenerator;
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
@@ -61,10 +63,12 @@ public class ExpiWorld {
         CampfireListener list = new CampfireListener();
         registerTileListener(list);
 
-        w = Consts.T_W_CH * Consts.CHUNKS_NUMBER;
-        h = Consts.T_H_CH;
+        terrainWidth = 320;
+        terrainHeight = 320;
 
-        worldTerrain = new ExpiTile[h][w];
+        partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
+
+        worldTerrain = new ExpiTile[terrainHeight][terrainWidth];
 
         b2dWorld = new World(new Vector2(0, -9.81f), false);
 
@@ -79,7 +83,7 @@ public class ExpiWorld {
 
         worldGenerator = new WorldGenerator(worldTerrain);
         stabilityCalc = new StabilityCalculator(worldTerrain);
-        fixtureCalc = new FixtureCalculator(worldTerrain, terrainBody);
+        fixtureCalc = new FixtureCalculator(this, terrainBody);
 
         FileHandle file = Gdx.files.local("world/"+worldName+".txt");
 
@@ -89,8 +93,6 @@ public class ExpiWorld {
             //todo: nacitat svet zo suboru
         }
     }
-
-    public static int steps;
 
     public void onTick() {
 
@@ -104,12 +106,13 @@ public class ExpiWorld {
         while(stepsTimeAccumulator >= 1/60f) {
             b2dWorld.step(1/60f, 6, 2);
             stepsTimeAccumulator -= 1/60f;
-            steps++;
         }
 
-        checkChunks();
-
         recalculateDroppedItems();
+
+        for(ExpiPlayer p : GameServer.get().getPlayers()) {
+            p.move();
+        }
 
         for(ExpiEntity ee : GameServer.get().getEntities()) {
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
@@ -163,27 +166,6 @@ public class ExpiWorld {
 
     }
 
-    private void checkChunks() {
-
-        for(ExpiPlayer p : GameServer.get().getPlayers()) {
-
-            int renderDistance = 1;
-            int currentChunk = (int) (p.getLocation().x / Consts.T_W_CH);
-
-            for(int i = 0; i < Consts.CHUNKS_NUMBER; i++) {
-                if(i >= currentChunk - renderDistance && i <= currentChunk + renderDistance) {
-                    if(!p.getActiveChunks().contains(i)) {
-                        p.getGateway().getManager().putChunkFeedPacket(worldTerrain, i);
-                        p.getActiveChunks().add(i);
-                    }
-                }else if(p.getActiveChunks().contains(i)) {
-                    p.getGateway().getManager().putChunkDestroyPacket(worldTerrain, i);
-                    p.getActiveChunks().remove(i);
-                }
-            }
-        }
-    }
-
     public void createWorld() {
         System.out.println("Generating world...");
         worldGenerator.generateWorld();
@@ -192,19 +174,6 @@ public class ExpiWorld {
         System.out.println("Recalculating stability...");
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
-    }
-
-    public void onTileBreakReq(int c, int x, int y, ExpiPlayer p) {
-
-        ExpiTile tile = worldTerrain[y][c* Consts.T_W_CH + x];
-        if(tile.getType() == TileType.AIR) return;
-
-        // confirmed from here
-        for(TileListener l : tileListeners) {
-            l.onTilePreBreak(tile);
-        }
-
-        changeTile(tile, TileType.AIR, true);
     }
 
     public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
@@ -239,8 +208,7 @@ public class ExpiWorld {
         }
 
         t.setType(to);
-        FixturePack fp = new FixturePack();
-        fixtureCalc.recalcTileFixturesPlus(t, fp);
+        fixtureCalc.recalcTileFixturesPlus(t);
 
         List<ExpiTile> changedTiles = new ArrayList<>();
         changedTiles.add(t);
@@ -258,7 +226,7 @@ public class ExpiWorld {
                     }
                 }
                 t2.setType(TileType.AIR);
-                fixtureCalc.clearTileFixtures(t2, fp);
+                fixtureCalc.clearTileFixtures(t2);
                 changedTiles.add(t2);
                 it.remove();
             }
@@ -268,8 +236,11 @@ public class ExpiWorld {
             for(ExpiTile t2 : changedTiles) {
                 pp.getGateway().getManager().putTileChangePacket(t2);
             }
-            pp.getGateway().getManager().putFixturePacket(fp);
             pp.getGateway().getManager().putStabilityPacket(affectedTiles);
+        }
+
+        for(TileListener l : tileListeners) {
+            l.onTileChange(t);
         }
 
     }
@@ -298,7 +269,7 @@ public class ExpiWorld {
 
     public Vector2 getSaveLocationForSpawn() {
         int i = 0;
-        while(i != Consts.T_H_CH && worldTerrain[i][10].getType() != TileType.AIR) {
+        while(i != terrainHeight && worldTerrain[i][10].getType() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);
@@ -312,6 +283,10 @@ public class ExpiWorld {
         return worldTerrain[(int)y][(int)x];
     }
 
+    public ExpiTile getTileAt(Vector2 vec) {
+        return worldTerrain[(int)vec.y][(int)vec.x];
+    }
+
     public String getWorldName() {
         return worldName;
     }
@@ -322,10 +297,6 @@ public class ExpiWorld {
 
     public Body getTerrainBody() {
         return terrainBody;
-    }
-
-    public HashMap<Fixture, Integer> getFixturesID() {
-        return fixtureCalc.getFixturesID();
     }
 
     public World getB2dWorld() {
@@ -358,5 +329,21 @@ public class ExpiWorld {
 
     public int getWorldTime() {
         return worldTime;
+    }
+
+    public ExpiTile[][] getTerrain() {
+        return worldTerrain;
+    }
+
+    public int getTerrainWidth() {
+        return terrainWidth;
+    }
+
+    public int getTerrainHeight() {
+        return terrainHeight;
+    }
+
+    public int getPartHeight() {
+        return partHeight;
     }
 }

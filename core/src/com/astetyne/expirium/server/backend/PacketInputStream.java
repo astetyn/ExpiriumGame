@@ -123,4 +123,8 @@ public class PacketInputStream {
         }
         return s.toString();
     }
+
+    public float occupied() {
+        return (float) readBuffer.position() / Consts.BUFFER_SIZE;
+    }
 }

@@ -87,7 +87,9 @@ public class TickLooper extends TerminableLooper {
                 PacketInputStream in = gateway.getIn();
                 int packetID = in.getInt();
                 String name = in.getString();
-                joiningPlayers.add(new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name));
+                ExpiPlayer ep = new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
+                joiningPlayers.add(ep);
+                server.getWorldLoaders().add(new WorldLoader(ep));
             }
             server.getJoiningClients().clear();
         }
@@ -102,8 +104,7 @@ public class TickLooper extends TerminableLooper {
             }
 
             // initial packet for new player
-            newPlayer.getGateway().getManager().putInitDataPacket(Consts.CHUNKS_NUMBER, newPlayer, alreadyExistingEntities);
-
+            newPlayer.getGateway().getManager().putInitDataPacket(server.getWorld().getTerrain(), newPlayer, alreadyExistingEntities);
             newPlayer.getGateway().getOut().swap();
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
@@ -134,14 +135,8 @@ public class TickLooper extends TerminableLooper {
 
                 switch(packetID) {
 
-                    case 14: //TS1Packet
-                        float horz = in.getFloat();
-                        float vert = in.getFloat();
-                        p.onMove(horz, vert);
-                        break;
-
-                    case 15: //TileBreakReqPacket
-                        server.getWorld().onTileBreakReq(in.getInt(), in.getInt(), in.getInt(), p);
+                    case 14: //TSPacket
+                        p.updateThumbSticks(in);
                         break;
 
                     case 16: //InteractPacket

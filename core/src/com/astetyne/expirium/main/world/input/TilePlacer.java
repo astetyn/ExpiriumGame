@@ -3,7 +3,6 @@ package com.astetyne.expirium.main.world.input;
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.screens.GameScreen;
-import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
@@ -53,10 +52,10 @@ public class TilePlacer implements InputProcessor {
             }else if(t.getStability() == 4) {
                 batch.setColor(0.9f, 0.9f, 0f, 1);
             }
-            batch.draw(Res.WHITE_TILE, t.getC() * Consts.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.draw(Res.WHITE_TILE, t.getX(), t.getY(), 1, 1);
             batch.setColor(1, 1, 1, 1);
         }else {
-            batch.draw(t.getTex(), t.getC() * Consts.T_W_CH + t.getX(), t.getY(), 1, 1);
+            batch.draw(t.getTex(), t.getX(), t.getY(), 1, 1);
         }
 
     }
@@ -79,7 +78,7 @@ public class TilePlacer implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunksInMap() && vec.y < 0 || vec.y >= Consts.T_H_CH) {
+        if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return false;
         }
         ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.PRESS);
@@ -99,7 +98,7 @@ public class TilePlacer implements InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= Consts.T_W_CH * world.getChunksInMap() && vec.y < 0 || vec.y >= Consts.T_H_CH) {
+        if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return true;
         }
         ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.DRAG);

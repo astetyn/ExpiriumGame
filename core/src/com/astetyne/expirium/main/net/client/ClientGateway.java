@@ -3,7 +3,6 @@ package com.astetyne.expirium.main.net.client;
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.screens.Gatewayable;
 import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.astetyne.expirium.server.backend.TerminableLooper;
@@ -71,9 +70,9 @@ public class ClientGateway extends TerminableLooper {
                 out.flush(); //System.out.println("Client flushing.");
 
                 traffic += readBytes;
-                if(time + 1000 < System.currentTimeMillis()) {
+                if(time + 5000 < System.currentTimeMillis()) {
                     time = System.currentTimeMillis();
-                    System.out.println("Client traffic (bytes): "+traffic+" ping (ms): "+in.getPing()+" steps: "+ GameWorld.steps);
+                    System.out.println("Client traffic (bytes): "+traffic+" ping (ms): "+in.getPing());
                     traffic = 0;
                 }
 

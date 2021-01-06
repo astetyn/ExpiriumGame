@@ -3,29 +3,21 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.Solidity;
 import com.astetyne.expirium.server.backend.FixRes;
-import com.astetyne.expirium.server.backend.FixturePack;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-
-import java.util.HashMap;
+import com.badlogic.gdx.physics.box2d.*;
 
 public class FixtureCalculator {
 
     private final ExpiTile[][] worldTerrain;
     private final int w, h;
     private final Body terrainBody;
-    private final HashMap<Fixture, Integer> fixturesID;
     private final EdgeShape shape;
     private final FixtureDef fixDef;
 
-    public FixtureCalculator(ExpiTile[][] worldTerrain, Body terrainBody) {
-        this.worldTerrain = worldTerrain;
-        this.h = worldTerrain.length;
-        this.w = worldTerrain[0].length;
+    public FixtureCalculator(ExpiWorld world, Body terrainBody) {
+        this.worldTerrain = world.getTerrain();
+        this.h = world.getTerrainHeight();
+        this.w = world.getTerrainWidth();
         this.terrainBody = terrainBody;
-        fixturesID = new HashMap<>();
 
         shape = new EdgeShape();
         fixDef = new FixtureDef();
@@ -36,40 +28,51 @@ public class FixtureCalculator {
 
     public void generateWorldFixtures() {
 
-        FixturePack fp = new FixturePack();
-
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
-                recalcTileFixtures(i, j, shape, fixDef, fp);
+                recalcTileFixtures(i, j, shape, fixDef);
             }
         }
+
+        ChainShape chainShape = new ChainShape();
+
+        float[] verts = new float[10];
+
+        verts[0] = 0;
+        verts[1] = 0;
+        verts[2] = w;
+        verts[3] = 0;
+        verts[5] = h;
+        verts[4] = w;
+        verts[6] = 0;
+        verts[7] = h;
+        verts[8] = 0;
+        verts[9] = 0;
+
+        chainShape.createChain(verts);
+        terrainBody.createFixture(chainShape, 1);
+
     }
 
     /** This method will check all nearby tiles and create his own fixtures + impact nearby tiles*/
-    public void recalcTileFixturesPlus(ExpiTile t, FixturePack fp) {
+    public void recalcTileFixturesPlus(ExpiTile t) {
 
         int x = t.getX();
         int y = t.getY();
 
-        recalcTileFixtures(y, x, shape, fixDef, fp);
-        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef, fp);
-        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef, fp);
-        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef, fp);
-        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef, fp);
+        recalcTileFixtures(y, x, shape, fixDef);
+        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef);
+        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef);
+        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef);
+        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef);
 
     }
 
     /** This method will remove all fixtures from given tile and also updates nearby tiles fixtures*/
-    public void clearTileFixtures(ExpiTile t, FixturePack fp) {
+    public void clearTileFixtures(ExpiTile t) {
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
-            if(fp.addedFixtures.contains(f)) {
-                fp.addedFixtures.remove(f);
-            }else {
-                fp.removedFixtures.add(fixturesID.get(f));
-            }
-            fixturesID.remove(f);
         }
         t.getFixtures().clear();
 
@@ -77,25 +80,19 @@ public class FixtureCalculator {
         int x = t.getX();
 
         // updates nearby tiles fixtures
-        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef, fp);
-        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef, fp);
-        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef, fp);
-        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef, fp);
+        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef);
+        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef);
+        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef);
+        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef);
     }
 
     /** This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)*/
-    private void recalcTileFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef, FixturePack fp) {
+    private void recalcTileFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef) {
 
         ExpiTile t = worldTerrain[y][x];
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
-            if(fp.addedFixtures.contains(f)) {
-                fp.addedFixtures.remove(f);
-            }else {
-                fp.removedFixtures.add(fixturesID.get(f));
-            }
-            fixturesID.remove(f);
         }
         t.getFixtures().clear();
 
@@ -103,7 +100,7 @@ public class FixtureCalculator {
             FixRes.EdgesData data = t.getType().getEdgesData();
             for(int i = 0; i < data.l1.size(); i++) {
                 shape.set(data.l1.get(i).x + x, data.l1.get(i).y + y, data.l2.get(i).x + x, data.l2.get(i).y + y);
-                createFixture(fixDef, t, fp);
+                createFixture(fixDef, t);
             }
         }
 
@@ -111,36 +108,24 @@ public class FixtureCalculator {
 
         if(y != 0 && worldTerrain[y-1][x].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x+1,y);
-            createFixture(fixDef, t, fp);
+            createFixture(fixDef, t);
         }
         if(y != h-1 && worldTerrain[y+1][x].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y+1, x+1,y+1);
-            createFixture(fixDef, t, fp);
+            createFixture(fixDef, t);
         }
         if(x != 0 && worldTerrain[y][x-1].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x,y+1);
-            createFixture(fixDef, t, fp);
+            createFixture(fixDef, t);
         }
         if(x != w-1 && worldTerrain[y][x+1].getType().getSolidity() != Solidity.SOLID) {
             shape.set(x+1, y, x+1,y+1);
-            createFixture(fixDef, t, fp);
+            createFixture(fixDef, t);
         }
     }
 
-    private void createFixture(FixtureDef fixDef, ExpiTile t, FixturePack fp) {
-
+    private void createFixture(FixtureDef fixDef, ExpiTile t) {
         Fixture f = terrainBody.createFixture(fixDef);
-        fp.addedFixtures.add(f);
         t.getFixtures().add(f);
-
-        int randomID;
-        do {
-            randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(fixturesID.containsKey(f));
-        fixturesID.put(f, randomID);
-    }
-
-    public HashMap<Fixture, Integer> getFixturesID() {
-        return fixturesID;
     }
 }

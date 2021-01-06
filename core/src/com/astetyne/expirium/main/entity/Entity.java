@@ -1,19 +1,19 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.screens.GameScreen;
-import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 
 public abstract class Entity implements MetaReadable {
 
     protected EntityType type;
     protected int ID;
-    protected Body body;
-    private final Vector2 targetPosition;
-    private float intpolDelta;
+    protected final Vector2 location;
+    protected float angle;
+    protected final Vector2 velocity;
+    private final Vector2 targetLocation;
+    private float interpolationDelta;
     private float targetAngle;
     protected final float width, height;
     private final Vector2 centerLoc;
@@ -26,12 +26,13 @@ public abstract class Entity implements MetaReadable {
         this.ID = id;
         this.width = width;
         this.height = height;
-        body = EntityBodyFactory.createBody(type, loc, GameScreen.get().getWorld().getB2dWorld());
-        intpolDelta = 0;
+        interpolationDelta = 0;
         targetAngle = 0;
-        targetPosition = loc;
-        centerLoc = new Vector2();
-        lastLoc = new Vector2();
+        location = loc;
+        targetLocation = loc.cpy();
+        centerLoc = loc.cpy();
+        lastLoc = loc.cpy();
+        velocity = new Vector2();
         lastAngle = 0;
 
         GameScreen.get().getWorld().getEntitiesID().put(ID, this);
@@ -43,69 +44,55 @@ public abstract class Entity implements MetaReadable {
 
     public void move() {
 
-        if(intpolDelta == -1) return;
+        if(interpolationDelta == -1) return;
 
+        interpolationDelta += GameScreen.get().getServerTPS() / (float) Gdx.graphics.getFramesPerSecond();
 
-        float posX = lastLoc.x + (targetPosition.x - lastLoc.x) * intpolDelta;
-        float posY = lastLoc.y + (targetPosition.y - lastLoc.y) * intpolDelta;
-        float ang = lastAngle + (targetAngle-lastAngle) * intpolDelta;
+        float posX = lastLoc.x + (targetLocation.x - lastLoc.x) * interpolationDelta;
+        float posY = lastLoc.y + (targetLocation.y - lastLoc.y) * interpolationDelta;
+        float ang = lastAngle + (targetAngle-lastAngle) * interpolationDelta;
 
-        intpolDelta += Consts.SERVER_DEFAULT_TPS / (float) Gdx.graphics.getFramesPerSecond();
+        location.set(posX, posY);
+        angle = ang;
 
-        body.setTransform(posX, posY, ang);
-
-        if(intpolDelta >= 1) {
-            body.setTransform(targetPosition, targetAngle);
-            intpolDelta = -1;
+        if(interpolationDelta >= 1) {
+            location.set(targetLocation);
+            angle = targetAngle;
+            interpolationDelta = -1;
         }
     }
 
     public void onMove(PacketInputStream in) {
-
-        targetPosition.set(in.getFloat(), in.getFloat());
-        intpolDelta = 0;
-        body.setLinearVelocity(in.getFloat(), in.getFloat());
+        targetLocation.set(in.getFloat(), in.getFloat());
+        velocity.set(in.getFloat(), in.getFloat());
         targetAngle = in.getFloat();
-        body.setAngularVelocity(in.getFloat());
         lastLoc = getLocation().cpy();
-        lastAngle = body.getAngle();
+        lastAngle = angle;
+        interpolationDelta = 0;
     }
 
     public Vector2 getLocation() {
-        return body.getPosition();
+        return location;
     }
 
-    public Vector2 getCenterLocation() {
+    public Vector2 getCenter() {
         return centerLoc.set(getLocation()).add(width/2, height/2);
-    }
-
-    public Vector2 getVelocity() {
-        return body.getLinearVelocity();
-    }
-
-    public Body getBody() {
-        return body;
     }
 
     public int getID() {
         return ID;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public Vector2 getTargetPosition() {
-        return targetPosition;
-    }
-
     public void destroy() {
         GameScreen.get().getWorld().getEntitiesID().remove(ID);
         GameScreen.get().getWorld().getEntities().remove(this);
-        GameScreen.get().getWorld().getB2dWorld().destroyBody(body);
     }
 
     public EntityType getType() {
         return type;
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
     }
 }
