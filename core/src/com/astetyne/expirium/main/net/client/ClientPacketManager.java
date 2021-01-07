@@ -49,11 +49,11 @@ public class ClientPacketManager {
         out.putInt(action.getID());
     }
 
-    public void putInvItemMoveReqPacket(boolean main, IntVector2 pos1, boolean main2, IntVector2 pos2) {
+    public void putInvItemMoveReqPacket(boolean fromMain, IntVector2 pos1, boolean toMain, IntVector2 pos2) {
         out.startPacket(25);
-        out.putBoolean(main);
+        out.putBoolean(fromMain);
         out.putIntVector(pos1);
-        out.putBoolean(main2);
+        out.putBoolean(toMain);
         out.putIntVector(pos2);
     }
 
@@ -122,12 +122,11 @@ public class ClientPacketManager {
                     world.onTileChange(in);
                     break;
 
-                case 23: //MainInvFeedPacket
-                    GameScreen.get().getInvStage().getInvGrid().feed(in);
-                    break;
-
-                case 24: //DoubleInvFeedPacket
-                    GameScreen.get().getDoubleInvStage().getGrid().feed(in);
+                case 24: //InvFeedPacket
+                    GameScreen.get().getInvStage().getMainData().feed(in);
+                    GameScreen.get().getInvStage().getSecondData().feed(in);
+                    GameScreen.get().getInvStage().onFeedUpdate();
+                    GameScreen.get().getDoubleInvStage().onFeedUpdate();
                     break;
 
                 case 28: //EnviroPacket

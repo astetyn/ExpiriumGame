@@ -46,10 +46,9 @@ public class GameScreen implements Screen, Gatewayable {
         doubleInvStage = new DoubleInventoryStage();
         showGameStage();
 
-        Res.MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
-
         multiplexer.addProcessor(gameStage);
         multiplexer.addProcessor(invStage);
+        multiplexer.addProcessor(doubleInvStage);
         Gdx.input.setInputProcessor(multiplexer);
 
         // load init data from server
@@ -110,7 +109,7 @@ public class GameScreen implements Screen, Gatewayable {
         gameWorld.render();
 
         if(currentStage.isDimmed()) {
-            batch.setColor(0, 0, 0, 0.8f);
+            batch.setColor(0, 0, 0, 0.5f);
             batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.setColor(1, 1, 1, 1);
         }

@@ -2,7 +2,6 @@ package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
@@ -68,7 +67,6 @@ public class TickLooper extends TerminableLooper {
                         }
                         p.destroySafe();
                         System.out.println("Player "+p.getName()+" left the server.");
-                        server.getEntitiesID().remove(p.getID());
                         break;
                     }
                 }
@@ -147,11 +145,7 @@ public class TickLooper extends TerminableLooper {
                         break;
 
                     case 25: {//InvItemMoveReqPacket
-                        boolean main = in.getBoolean();
-                        IntVector2 pos1 = in.getIntVector();
-                        boolean main2 = in.getBoolean();
-                        IntVector2 pos2 = in.getIntVector();
-                        p.getInv().onMoveReq(p, pos1, pos2);
+                        p.onInvMove(in);
                         break;
                     }
                     case 26: {//InvItemMakeReqPacket

@@ -4,14 +4,12 @@ import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
-import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,8 +21,6 @@ public class GameServer implements Runnable {
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
-    private final HashMap<Integer, ExpiEntity> entitiesID;
-    private final HashMap<Integer, ExpiInventory> inventoriesID;
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ServerPlayerGateway> leavingClients;
     private final List<WorldLoader> worldLoaders;
@@ -36,9 +32,6 @@ public class GameServer implements Runnable {
     public GameServer() {
 
         server = this;
-
-        entitiesID = new HashMap<>();
-        inventoriesID = new HashMap<>();
 
         System.out.println("Booting server...");
 
@@ -58,7 +51,9 @@ public class GameServer implements Runnable {
 
     @Override
     public void run() {
-        new Thread(serverGateway).start();
+        Thread t = new Thread(serverGateway);
+        t.setName("Server gateway");
+        t.start();
         tickLooper.run();
     }
 
@@ -127,14 +122,6 @@ public class GameServer implements Runnable {
 
     public List<ServerPlayerGateway> getLeavingClients() {
         return leavingClients;
-    }
-
-    public HashMap<Integer, ExpiEntity> getEntitiesID() {
-        return entitiesID;
-    }
-
-    public HashMap<Integer, ExpiInventory> getInventoriesID() {
-        return inventoriesID;
     }
 
     public List<ExpiDroppedItem> getDroppedItems() {

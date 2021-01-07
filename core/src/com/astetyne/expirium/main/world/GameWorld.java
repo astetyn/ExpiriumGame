@@ -144,7 +144,7 @@ public class GameWorld {
 
         lightsFrameBuffer.begin();
 
-        Gdx.gl.glClearColor(0f,0f,0f,0.6f); // ambient color
+        Gdx.gl.glClearColor(0f,0f,0f,0f); // ambient color
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);

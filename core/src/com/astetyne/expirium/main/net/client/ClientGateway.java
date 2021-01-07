@@ -38,7 +38,6 @@ public class ClientGateway extends TerminableLooper {
 
         try {
             socket = new Socket();
-            //socket.setPerformancePreferences(0,10,0);
             socket.connect(new InetSocketAddress(ipAddress, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
             System.out.println("Exception during connecting to server.");

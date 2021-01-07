@@ -20,12 +20,15 @@ public class Consts {
 
     public static final int DAY_TIME_SEC = 300;
 
-    public static final float CAMPFIRE_TIME = 10;
+    public static final float CAMPFIRE_TIME = 20;
 
     // player
-    public static final int PLAYER_INV_COLUMNS = 6;
-    public static final int PLAYER_INV_ROWS = 6;
+    public static final int PLAYER_INV_COLUMNS = 5;
+    public static final int PLAYER_INV_ROWS = 5;
     public static final int PLAYER_INV_MAX_WEIGHT = 10;
+
+    // gui
+    public static final int INV_TILE_MLT = 60;
 
 
 }

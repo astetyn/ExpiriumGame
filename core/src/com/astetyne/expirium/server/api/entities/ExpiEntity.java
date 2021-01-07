@@ -8,7 +8,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
+import java.util.HashMap;
+
 public abstract class ExpiEntity implements Metaable, Collidable {
+
+    private static final HashMap<Integer, ExpiEntity> entitiesID = new HashMap<>();
 
     private final int ID;
     private final float width, height;
@@ -28,8 +32,8 @@ public abstract class ExpiEntity implements Metaable, Collidable {
         int randomID;
         do {
             randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(GameServer.get().getEntitiesID().containsKey(randomID));
-        GameServer.get().getEntitiesID().put(randomID, this);
+        } while(entitiesID.containsKey(randomID));
+        entitiesID.put(randomID, this);
         GameServer.get().getEntities().add(this);
 
         this.ID = randomID;
@@ -81,7 +85,7 @@ public abstract class ExpiEntity implements Metaable, Collidable {
     }
 
     public void destroy() {
-        GameServer.get().getEntitiesID().remove(ID);
+        entitiesID.remove(ID);
         GameServer.get().getEntities().remove(this);
         GameServer.get().getWorld().getB2dWorld().destroyBody(body);
     }

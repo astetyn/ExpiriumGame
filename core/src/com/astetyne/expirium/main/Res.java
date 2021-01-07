@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main;
 
+import com.astetyne.expirium.main.gui.widget.BaseGrid;
 import com.astetyne.expirium.main.gui.widget.HotBarSlot;
-import com.astetyne.expirium.main.gui.widget.StorageGrid;
 import com.astetyne.expirium.main.gui.widget.SwitchArrow;
 import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.badlogic.gdx.Gdx;
@@ -31,7 +31,7 @@ public class Res {
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
     public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE;
     public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
-    public static StorageGrid.StorageGridStyle STORAGE_GRID_STYLE;
+    public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
 
     // gui - inv
     public static TextureRegion INVENTORY;
@@ -107,7 +107,7 @@ public class Res {
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
-        STORAGE_GRID_STYLE = new StorageGrid.StorageGridStyle(invTile);
+        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, tsFore, tsFore); //todo: nove textury
 
         // gui - inv
         INVENTORY = gui.findRegion("inventory");

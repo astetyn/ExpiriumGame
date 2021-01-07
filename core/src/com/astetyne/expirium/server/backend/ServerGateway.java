@@ -21,7 +21,9 @@ public class ServerGateway extends TerminableLooper {
 
                 System.out.println("Listening for incoming clients...");
                 Socket client = server.accept();
-                new Thread(new ServerPlayerGateway(client)).start();
+                Thread t = new Thread(new ServerPlayerGateway(client));
+                t.setName("Server (client) gateway");
+                t.start();
 
             }
 

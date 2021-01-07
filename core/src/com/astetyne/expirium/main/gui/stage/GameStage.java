@@ -124,7 +124,7 @@ public class GameStage extends Stage implements ExpiStage {
         rootTable.setBounds(0, 0, 1000, 1000);
 
         if(Consts.DEBUG) rootTable.debugCell();
-        rootTable.setDebug(true);
+        if(Consts.DEBUG) rootTable.setDebug(true);
 
         build();
 
@@ -158,7 +158,6 @@ public class GameStage extends Stage implements ExpiStage {
 
     public void feedHotSlots(PacketInputStream in) {
         ChosenSlot chs = ChosenSlot.getSlot(in.getByte());
-        System.out.println(chs);
         switch(chs) {
             case TOOL_SLOT:
                 toolSlot.setFocus(true);

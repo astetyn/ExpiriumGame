@@ -9,6 +9,11 @@ public class IntVector2 {
         this.y = y;
     }
 
+    public IntVector2(IntVector2 vec) {
+        this.x = vec.x;
+        this.y = vec.y;
+    }
+
     public void set(int x, int y) {
         this.x = x;
         this.y = y;

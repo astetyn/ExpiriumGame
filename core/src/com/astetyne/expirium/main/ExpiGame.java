@@ -87,13 +87,17 @@ public class ExpiGame extends Game {
 
 	public void startServer() {
 		server = new GameServer();
-		new Thread(server).start();
+		Thread t = new Thread(server);
+		t.setName("Game Server");
+		t.start();
 	}
 
 	public void startClient(String clientIpAddress, String playerName) {
 		this.playerName = playerName;
 		clientGateway.setIpAddress(clientIpAddress);
-		new Thread(clientGateway).start();
+		Thread t = new Thread(clientGateway);
+		t.setName("Client gateway");
+		t.start();
 	}
 
 	public String getPlayerName() {

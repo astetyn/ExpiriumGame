@@ -27,6 +27,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
         isCon = new ItemStack(Item.EMPTY);
         chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
+        label = "Your inventory.";
     }
 
     public void onInteract(InvInteractType type) {
@@ -55,7 +56,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
                 }
                 break;
             case OPEN_INV:
-                owner.getGateway().getManager().putMainInvFeedPacket(owner.getInv());
+                owner.getGateway().getManager().putInvFeedPacket(owner);
         }
         updateHotSlots();
 
@@ -122,9 +123,10 @@ public class ExpiPlayerInventory extends ExpiInventory {
     }
 
     @Override
-    public void addItem(ItemStack addIS) {
-        super.addItem(addIS);
+    public boolean addItem(ItemStack addIS, boolean merge) {
+        boolean b = super.addItem(addIS, merge);
         updateHotSlots();
+        return b;
     }
 
     @Override

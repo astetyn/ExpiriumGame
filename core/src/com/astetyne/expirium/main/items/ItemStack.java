@@ -11,7 +11,7 @@ public class ItemStack {
     public ItemStack(ItemStack is) {
         this.item = is.getItem();
         this.amount = is.getAmount();
-        this.gridPos = is.getGridPos();
+        this.gridPos = new IntVector2(is.getGridPos());
     }
 
     public ItemStack(Item item) {

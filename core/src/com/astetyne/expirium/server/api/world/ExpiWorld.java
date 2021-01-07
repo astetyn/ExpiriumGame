@@ -9,6 +9,9 @@ import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entities.ExpiEntity;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.world.event.ServerTickEvent;
+import com.astetyne.expirium.server.api.world.event.Source;
+import com.astetyne.expirium.server.api.world.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.Gdx;
@@ -35,7 +38,6 @@ public class ExpiWorld {
     private final WorldGenerator worldGenerator;
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
-    private final List<TileListener> tileListeners;
     private WeatherType weatherType;
     private final InteractHandler interactHandler;
     private final ExpiContactListener contactListener;
@@ -57,11 +59,10 @@ public class ExpiWorld {
 
         stepsTimeAccumulator = 0;
 
-        tileListeners = new ArrayList<>();
         interactHandler = new InteractHandler(this);
 
         CampfireListener list = new CampfireListener();
-        registerTileListener(list);
+
 
         terrainWidth = 320;
         terrainHeight = 320;
@@ -120,9 +121,7 @@ public class ExpiWorld {
             }
         }
 
-        for(TileListener l : tileListeners) {
-            l.onTick();
-        }
+        ServerTickEvent.onTick();
 
     }
 
@@ -142,8 +141,8 @@ public class ExpiWorld {
                 if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(droppedItem.getItem(), 1)) {
                     it.remove();
 
-                    p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1));
-                    p.getGateway().getManager().putMainInvFeedPacket(p.getInv());
+                    p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1), true);
+                    p.getGateway().getManager().putInvFeedPacket(p);
 
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                         pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
@@ -184,16 +183,14 @@ public class ExpiWorld {
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
-        p.getGateway().getManager().putMainInvFeedPacket(p.getInv());
+        p.getGateway().getManager().putInvFeedPacket(p);
 
-        changeTile(t, item.getBuildTile(), true);
-
-        for(TileListener l : tileListeners) {
-            l.onTilePlace(t);
-        }
+        changeTile(t, item.getBuildTile(), true, p, Source.PLAYER);
     }
 
-    public void changeTile(ExpiTile t, TileType to, boolean withDrops) {
+    public void changeTile(ExpiTile t, TileType to, boolean withDrops, ExpiPlayer p, Source source) {
+
+        TileType from = t.getType();
 
         Vector2 tempVec = new Vector2();
 
@@ -239,10 +236,7 @@ public class ExpiWorld {
             pp.getGateway().getManager().putStabilityPacket(affectedTiles);
         }
 
-        for(TileListener l : tileListeners) {
-            l.onTileChange(t);
-        }
-
+        new TileChangeEvent(t, from, p, source);
     }
 
     private boolean isTileFree(ExpiTile t, Item toPlace) {
@@ -303,14 +297,6 @@ public class ExpiWorld {
         return b2dWorld;
     }
 
-    public void registerTileListener(TileListener listener) {
-        tileListeners.add(listener);
-    }
-
-    public void unregisterTileListener(TileListener listener) {
-        tileListeners.remove(listener);
-    }
-
     public WeatherType getWeather() {
         return weatherType;
     }
@@ -321,10 +307,6 @@ public class ExpiWorld {
 
     public ExpiContactListener getCL() {
         return contactListener;
-    }
-
-    public List<TileListener> getTileListeners() {
-        return tileListeners;
     }
 
     public int getWorldTime() {

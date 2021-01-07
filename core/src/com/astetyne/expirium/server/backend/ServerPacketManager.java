@@ -73,20 +73,11 @@ public class ServerPacketManager {
         out.putInt(e.getID());
     }
 
-    public void putMainInvFeedPacket(ExpiInventory inv) {
-        out.startPacket(23);
-        out.putFloat(inv.getTotalWeight());
-        out.putFloat(inv.getMaxWeight());
-        out.putInt(inv.getItems().size());
-        for(ItemStack is : inv.getItems()) {
-            out.putInt(is.getItem().getId());
-            out.putInt(is.getAmount());
-            out.putIntVector(is.getGridPos());
-        }
-    }
-
-    public void putDoubleInvFeedPacket(ExpiInventory inv1, ExpiInventory inv2) {
+    public void putInvFeedPacket(ExpiPlayer p) {
+        ExpiInventory inv1 = p.getInv();
+        ExpiInventory inv2 = p.getSecondInv();
         out.startPacket(24);
+        out.putString(inv1.getLabel());
         out.putFloat(inv1.getTotalWeight());
         out.putFloat(inv1.getMaxWeight());
         out.putInt(inv1.getItems().size());
@@ -95,6 +86,7 @@ public class ServerPacketManager {
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());
         }
+        out.putString(inv2.getLabel());
         out.putFloat(inv2.getTotalWeight());
         out.putFloat(inv2.getMaxWeight());
         out.putInt(inv2.getItems().size());
@@ -103,6 +95,12 @@ public class ServerPacketManager {
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());
         }
+    }
+
+    public void putOpenDoubleInvPacket(ExpiInventory secondInv) {
+        out.startPacket(31);
+        out.putInt(secondInv.getGrid().length);
+        out.putInt(secondInv.getGrid()[0].length);
     }
 
     public void putHotSlotsFeedPacket(byte focus, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {

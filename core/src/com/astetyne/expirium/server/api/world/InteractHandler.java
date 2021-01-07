@@ -4,6 +4,7 @@ import com.astetyne.expirium.main.items.ItemCategory;
 import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.world.event.PlayerInteractEvent;
 
 public class InteractHandler {
 
@@ -20,13 +21,10 @@ public class InteractHandler {
         if(type == InteractType.PRESS || type == InteractType.DRAG) {
             if(p.getInv().getItemInHand().getItem().getCategory() == ItemCategory.MATERIAL && t.getType() == TileType.AIR) {
                 world.onTilePlaceReq(t, p.getInv().getItemInHand().getItem(), p);
+                return;
             }
         }
-
-        for(TileListener l : world.getTileListeners()) {
-            l.onTileInteract(t);
-        }
-
+        new PlayerInteractEvent(p, x, y, t);
     }
 
 }
