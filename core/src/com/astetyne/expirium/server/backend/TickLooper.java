@@ -1,12 +1,9 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entities.ExpiEntity;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
-import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
+import com.astetyne.expirium.server.api.entity.ExpiEntity;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +32,9 @@ public class TickLooper extends TerminableLooper {
 
                 resolveJoiningPlayers();
 
-                resolvePlayersActions();
+                for(ExpiPlayer ep : players) {
+                    ep.getNetManager().processIncomingPackets();
+                }
 
                 GameServer.get().onTick();
 
@@ -63,7 +62,7 @@ public class TickLooper extends TerminableLooper {
                     if(gateway == p.getGateway()) {
                         it.remove();
                         for(ExpiPlayer pp : players) {
-                            pp.getGateway().getManager().putEntityDespawnPacket(p);
+                            pp.getNetManager().putEntityDespawnPacket(p);
                         }
                         p.destroySafe();
                         System.out.println("Player "+p.getName()+" left the server.");
@@ -102,7 +101,7 @@ public class TickLooper extends TerminableLooper {
             }
 
             // initial packet for new player
-            newPlayer.getGateway().getManager().putInitDataPacket(server.getWorld().getTerrain(), newPlayer, alreadyExistingEntities);
+            newPlayer.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), alreadyExistingEntities);
             newPlayer.getGateway().getOut().swap();
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
@@ -112,52 +111,10 @@ public class TickLooper extends TerminableLooper {
             // notify all players about new players
             for(ExpiPlayer p : players) {
                 if(p == newPlayer) continue;
-                p.getGateway().getManager().putEntitySpawnPacket(newPlayer);
+                p.getNetManager().putEntitySpawnPacket(newPlayer);
             }
         }
         joiningPlayers.clear();
-    }
-
-    private void resolvePlayersActions() {
-
-        for(ExpiPlayer p : players) {
-
-            PacketInputStream in = p.getGateway().getIn();
-
-            //System.out.println("Server avail packets: "+in.getAvailablePackets());
-
-            for(int i = 0; i < in.getAvailablePackets(); i++) {
-
-                int packetID = in.getInt();
-                //System.out.println("S: PID: " + packetID);
-
-                switch(packetID) {
-
-                    case 14: //TSPacket
-                        p.updateThumbSticks(in);
-                        break;
-
-                    case 16: //InteractPacket
-                        float x = in.getFloat();
-                        float y = in.getFloat();
-                        InteractType type = InteractType.getType(in.getInt());
-                        server.getWorld().getInteractHandler().onInteract(p, x, y, type);
-                        break;
-
-                    case 25: {//InvItemMoveReqPacket
-                        p.onInvMove(in);
-                        break;
-                    }
-                    case 26: {//InvItemMakeReqPacket
-                        ItemRecipe recipe = ItemRecipe.getRecipe(in.getInt());
-                        p.wantsToMakeItem(recipe);
-                        break;
-                    }
-                    case 29://InvInteractPacket
-                        p.getInv().onInteract(InvInteractType.getType(in.getInt()));
-                }
-            }
-        }
     }
 
     public Object getTickLock() {

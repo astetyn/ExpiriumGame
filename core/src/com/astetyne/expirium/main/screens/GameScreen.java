@@ -83,7 +83,7 @@ public class GameScreen implements Screen, Gatewayable {
 
         int parallaxWidth = 1600;
         int parallaxWidth2 = 1400;
-        int parallaxWidth3 = 900;
+        int parallaxWidth3 = 1000;
         int parallaxHeight = 2000;
 
         float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
@@ -187,7 +187,7 @@ public class GameScreen implements Screen, Gatewayable {
 
     private Color getSkyColor() {
         //todo
-        return new Color(1,1,1,1);
+        return new Color(0.5f,0.5f,1,1);
     }
 
     private Color getBGColor() {

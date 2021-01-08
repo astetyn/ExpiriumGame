@@ -10,7 +10,7 @@ import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.input.InteractType;
-import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
+import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 
@@ -22,44 +22,6 @@ public class ClientPacketManager {
     public ClientPacketManager(PacketInputStream in, PacketOutputStream out) {
         this.in = in;
         this.out = out;
-    }
-
-    public void putJoinReqPacket(String name) {
-        out.startPacket(10);
-        out.putString(name);
-    }
-
-    public void putTSPacket(ThumbStick ts1, ThumbStick ts2) {
-        out.startPacket(14);
-        out.putFloat(ts1.getHorz());
-        out.putFloat(ts1.getVert());
-        out.putFloat(ts2.getHorz());
-        out.putFloat(ts2.getVert());
-    }
-
-    public void putInteractPacket(float x, float y, InteractType type) {
-        out.startPacket(16);
-        out.putFloat(x);
-        out.putFloat(y);
-        out.putInt(type.getID());
-    }
-
-    public void putInvInteractPacket(InvInteractType action) {
-        out.startPacket(29);
-        out.putInt(action.getID());
-    }
-
-    public void putInvItemMoveReqPacket(boolean fromMain, IntVector2 pos1, boolean toMain, IntVector2 pos2) {
-        out.startPacket(25);
-        out.putBoolean(fromMain);
-        out.putIntVector(pos1);
-        out.putBoolean(toMain);
-        out.putIntVector(pos2);
-    }
-
-    public void putInvItemMakeReqPacket(ItemRecipe recipe) {
-        out.startPacket(26);
-        out.putInt(recipe.getId());
     }
 
     public void processIncomingPackets() {
@@ -129,6 +91,10 @@ public class ClientPacketManager {
                     GameScreen.get().getDoubleInvStage().onFeedUpdate();
                     break;
 
+                case 27:
+                    GameScreen.get().getGameStage().feedLivingStats(in);
+                    break;
+
                 case 28: //EnviroPacket
                     GameScreen.get().setServerTime(in.getInt());
                     WeatherType weather = WeatherType.getType(in.getInt());
@@ -142,5 +108,43 @@ public class ClientPacketManager {
                     break;
             }
         }
+    }
+
+    public void putJoinReqPacket(String name) {
+        out.startPacket(10);
+        out.putString(name);
+    }
+
+    public void putTSPacket(ThumbStick ts1, ThumbStick ts2) {
+        out.startPacket(14);
+        out.putFloat(ts1.getHorz());
+        out.putFloat(ts1.getVert());
+        out.putFloat(ts2.getHorz());
+        out.putFloat(ts2.getVert());
+    }
+
+    public void putInteractPacket(float x, float y, InteractType type) {
+        out.startPacket(16);
+        out.putFloat(x);
+        out.putFloat(y);
+        out.putInt(type.getID());
+    }
+
+    public void putInvInteractPacket(UIInteractType action) {
+        out.startPacket(29);
+        out.putInt(action.getID());
+    }
+
+    public void putInvItemMoveReqPacket(boolean fromMain, IntVector2 pos1, boolean toMain, IntVector2 pos2) {
+        out.startPacket(25);
+        out.putBoolean(fromMain);
+        out.putIntVector(pos1);
+        out.putBoolean(toMain);
+        out.putIntVector(pos2);
+    }
+
+    public void putInvItemMakeReqPacket(ItemRecipe recipe) {
+        out.startPacket(26);
+        out.putInt(recipe.getId());
     }
 }

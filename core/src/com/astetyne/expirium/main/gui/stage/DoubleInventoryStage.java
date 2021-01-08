@@ -75,7 +75,7 @@ public class DoubleInventoryStage extends Stage implements ExpiStage {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                IntVector2 finalPos = null;
+                IntVector2 finalPos = new IntVector2(-1, -1);
                 IntVector2 pos = storage1.getGridPos(x - storageCell1.getActorX(), y - storageCell1.getActorY());
                 IntVector2 pos2 = storage2.getGridPos(x - storageCell2.getActorX(), y - storageCell2.getActorY());
                 boolean toMain = false;
@@ -91,7 +91,7 @@ public class DoubleInventoryStage extends Stage implements ExpiStage {
                 }else {
                     selItem = storage2.getGrid().getSelectedItem();
                 }
-                //System.out.println("FM: "+fromMain+" P1: "+selItem.getGridPos()+" TM: "+toMain+" P2: "+finalPos);
+                System.out.println("FM: "+fromMain+" P1: "+selItem.getGridPos()+" TM: "+toMain+" P2: "+finalPos);
                 ExpiGame.get().getClientGateway().getManager().putInvItemMoveReqPacket(fromMain, selItem.getGridPos(), toMain, finalPos);
                 storage1.getGrid().setSelectedItem(null);
                 storage2.getGrid().setSelectedItem(null);

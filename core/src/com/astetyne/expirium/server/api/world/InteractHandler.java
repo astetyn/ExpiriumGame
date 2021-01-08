@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.main.items.ItemCategory;
 import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.main.world.tiles.TileType;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.event.PlayerInteractEvent;
 
 public class InteractHandler {

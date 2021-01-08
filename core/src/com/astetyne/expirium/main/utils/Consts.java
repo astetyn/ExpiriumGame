@@ -22,6 +22,9 @@ public class Consts {
 
     public static final float CAMPFIRE_TIME = 20;
 
+    public static final float ITEM_COOLDOWN_BREAK = 1;
+    public static final float ITEM_COOLDOWN_DROP = 6;
+
     // player
     public static final int PLAYER_INV_COLUMNS = 5;
     public static final int PLAYER_INV_ROWS = 5;

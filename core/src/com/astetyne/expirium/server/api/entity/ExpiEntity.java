@@ -1,4 +1,4 @@
-package com.astetyne.expirium.server.api.entities;
+package com.astetyne.expirium.server.api.entity;
 
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.Metaable;

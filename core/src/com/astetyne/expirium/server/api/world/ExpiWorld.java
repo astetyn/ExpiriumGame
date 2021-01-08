@@ -6,13 +6,14 @@ import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
-import com.astetyne.expirium.server.api.entities.ExpiEntity;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
+import com.astetyne.expirium.server.api.entity.ExpiEntity;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.event.ServerTickEvent;
 import com.astetyne.expirium.server.api.world.event.Source;
 import com.astetyne.expirium.server.api.world.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
+import com.astetyne.expirium.server.api.world.listeners.TreeListener;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -61,8 +62,8 @@ public class ExpiWorld {
 
         interactHandler = new InteractHandler(this);
 
-        CampfireListener list = new CampfireListener();
-
+        new CampfireListener();
+        new TreeListener();
 
         terrainWidth = 320;
         terrainHeight = 320;
@@ -109,59 +110,13 @@ public class ExpiWorld {
             stepsTimeAccumulator -= 1/60f;
         }
 
-        recalculateDroppedItems();
-
-        for(ExpiPlayer p : GameServer.get().getPlayers()) {
-            p.move();
-        }
-
         for(ExpiEntity ee : GameServer.get().getEntities()) {
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                pp.getGateway().getManager().putEntityMovePacket(ee);
+                pp.getNetManager().putEntityMovePacket(ee);
             }
         }
 
         ServerTickEvent.onTick();
-
-    }
-
-    private void recalculateDroppedItems() {
-
-        Iterator<ExpiDroppedItem> it = GameServer.get().getDroppedItems().iterator();
-        outer:
-        while(it.hasNext()) {
-            ExpiDroppedItem droppedItem = it.next();
-            if(droppedItem.getCooldown() != 0) {
-                droppedItem.reduceCooldown();
-                continue;
-            }
-            Vector2 center = droppedItem.getCenter();
-            for(ExpiPlayer p : GameServer.get().getPlayers()) {
-                Vector2 dif = p.getCenter().sub(center);
-                if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(droppedItem.getItem(), 1)) {
-                    it.remove();
-
-                    p.getInv().addItem(new ItemStack(droppedItem.getItem(), 1), true);
-                    p.getGateway().getManager().putInvFeedPacket(p);
-
-                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
-                    }
-                    droppedItem.destroySafe();
-                    continue outer;
-                }
-            }
-            int remainingTicks = droppedItem.getTicksToDespawn();
-            if(remainingTicks == 0) {
-                for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                    pp.getGateway().getManager().putEntityDespawnPacket(droppedItem);
-                }
-                it.remove();
-                droppedItem.destroySafe();
-                continue;
-            }
-            droppedItem.setTicksToDespawn(remainingTicks-1);
-        }
 
     }
 
@@ -183,7 +138,7 @@ public class ExpiWorld {
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
-        p.getGateway().getManager().putInvFeedPacket(p);
+        p.getNetManager().putInvFeedPacket();
 
         changeTile(t, item.getBuildTile(), true, p, Source.PLAYER);
     }
@@ -198,9 +153,9 @@ public class ExpiWorld {
 
         if(to == TileType.AIR && withDrops && t.getType() != TileType.AIR) {
             tempVec.set(t.getX() + off, t.getY() + off);
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Consts.SERVER_DEFAULT_TPS);
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                pp.getGateway().getManager().putEntitySpawnPacket(droppedItem);
+                pp.getNetManager().putEntitySpawnPacket(droppedItem);
             }
         }
 
@@ -217,9 +172,9 @@ public class ExpiWorld {
             if(t2.getStability() == 0) {
                 if(Math.random() < 1 && withDrops && t2.getType().getDropItem() != null) {
                     tempVec.set(t2.getX()+off, t2.getY()+off);
-                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Consts.SERVER_DEFAULT_TPS);
+                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getGateway().getManager().putEntitySpawnPacket(edi);
+                        pp.getNetManager().putEntitySpawnPacket(edi);
                     }
                 }
                 t2.setType(TileType.AIR);
@@ -231,9 +186,9 @@ public class ExpiWorld {
 
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
             for(ExpiTile t2 : changedTiles) {
-                pp.getGateway().getManager().putTileChangePacket(t2);
+                pp.getNetManager().putTileChangePacket(t2);
             }
-            pp.getGateway().getManager().putStabilityPacket(affectedTiles);
+            pp.getNetManager().putStabilityPacket(affectedTiles);
         }
 
         new TileChangeEvent(t, from, p, source);

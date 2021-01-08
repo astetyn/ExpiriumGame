@@ -1,11 +1,14 @@
 package com.astetyne.expirium.server.backend;
 
+import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entities.ExpiEntity;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiEntity;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
+import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,13 +17,53 @@ public class ServerPacketManager {
 
     private final PacketInputStream in;
     private final PacketOutputStream out;
+    private final ExpiPlayer owner;
 
-    public ServerPacketManager(PacketInputStream in, PacketOutputStream out) {
-        this.in = in;
-        this.out = out;
+    public ServerPacketManager(ExpiPlayer owner) {
+        this.owner = owner;
+        this.in = owner.getGateway().getIn();
+        this.out = owner.getGateway().getOut();
     }
 
-    public void putInitDataPacket(ExpiTile[][] terrain, ExpiPlayer p, List<ExpiEntity> entities) {
+    public void processIncomingPackets() {
+
+        //System.out.println("Server avail packets: "+in.getAvailablePackets());
+
+        for(int i = 0; i < in.getAvailablePackets(); i++) {
+
+            int packetID = in.getInt();
+            //System.out.println("S: PID: " + packetID);
+
+            switch(packetID) {
+
+                case 14: //TSPacket
+                    owner.updateThumbSticks(in);
+                    break;
+
+                case 16: //InteractPacket
+                    float x = in.getFloat();
+                    float y = in.getFloat();
+                    InteractType type = InteractType.getType(in.getInt());
+                    GameServer.get().getWorld().getInteractHandler().onInteract(owner, x, y, type);
+                    break;
+
+                case 25: {//InvItemMoveReqPacket
+                    owner.onInvMove(in);
+                    break;
+                }
+                case 26: {//InvItemMakeReqPacket
+                    ItemRecipe recipe = ItemRecipe.getRecipe(in.getInt());
+                    owner.wantsToMakeItem(recipe);
+                    break;
+                }
+                case 29://InvInteractPacket
+                    owner.getInv().onInteract(UIInteractType.getType(in.getInt()));
+            }
+        }
+
+    }
+
+    public void putInitDataPacket(ExpiTile[][] terrain, List<ExpiEntity> entities) {
         out.startPacket(11);
 
         int w = terrain[0].length;
@@ -29,8 +72,8 @@ public class ServerPacketManager {
         out.putInt(w);
         out.putInt(h);
 
-        out.putInt(p.getID());
-        out.putVector(p.getLocation());
+        out.putInt(owner.getID());
+        out.putVector(owner.getLocation());
         out.putInt(entities.size());
         for(ExpiEntity e : entities) {
             out.putEntity(e);
@@ -73,9 +116,9 @@ public class ServerPacketManager {
         out.putInt(e.getID());
     }
 
-    public void putInvFeedPacket(ExpiPlayer p) {
-        ExpiInventory inv1 = p.getInv();
-        ExpiInventory inv2 = p.getSecondInv();
+    public void putInvFeedPacket() {
+        ExpiInventory inv1 = owner.getInv();
+        ExpiInventory inv2 = owner.getSecondInv();
         out.startPacket(24);
         out.putString(inv1.getLabel());
         out.putFloat(inv1.getTotalWeight());
@@ -97,10 +140,10 @@ public class ServerPacketManager {
         }
     }
 
-    public void putOpenDoubleInvPacket(ExpiInventory secondInv) {
+    public void putOpenDoubleInvPacket() {
         out.startPacket(31);
-        out.putInt(secondInv.getGrid().length);
-        out.putInt(secondInv.getGrid()[0].length);
+        out.putInt(owner.getSecondInv().getGrid().length);
+        out.putInt(owner.getSecondInv().getGrid()[0].length);
     }
 
     public void putHotSlotsFeedPacket(byte focus, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
@@ -137,10 +180,17 @@ public class ServerPacketManager {
         out.putInt(GameServer.get().getWorld().getWeather().getID());
     }
 
-    public void putBreakingTile(ExpiTile t, float state) {
+    public void putBreakingTilePacket(ExpiTile t, float state) {
         out.startPacket(15);
         out.putInt(t.getX());
         out.putInt(t.getY());
         out.putFloat(state);
+    }
+
+    public void putLivingStatsPacket() {
+        out.startPacket(27);
+        out.putFloat(owner.getHealthLevel());
+        out.putFloat(owner.getFoodLevel());
+        out.putFloat(owner.getTemperatureLevel());
     }
 }

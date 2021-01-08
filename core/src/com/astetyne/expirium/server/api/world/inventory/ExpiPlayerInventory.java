@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.api.world.inventory;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemCategory;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
     private ChosenSlot chosenSlot;
 
     public ExpiPlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight) {
-        super(columns, rows, maxWeight);
+        super(rows, columns, maxWeight, true);
         this.owner = owner;
         indexTools = 0;
         indexMats = 0;
@@ -27,10 +27,10 @@ public class ExpiPlayerInventory extends ExpiInventory {
         isCon = new ItemStack(Item.EMPTY);
         chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
-        label = "Your inventory.";
+        label = "This is better than minecraft.";
     }
 
-    public void onInteract(InvInteractType type) {
+    public void onInteract(UIInteractType type) {
 
         switch(type) {
 
@@ -56,7 +56,21 @@ public class ExpiPlayerInventory extends ExpiInventory {
                 }
                 break;
             case OPEN_INV:
-                owner.getGateway().getManager().putInvFeedPacket(owner);
+                owner.getNetManager().putInvFeedPacket(); //todo: toto je zbytocne?
+                break;
+            case CONSUME_BUTTON:
+                if(itemInHand.getItem().getCategory() != ItemCategory.CONSUMABLE) break;
+
+                switch(itemInHand.getItem()) {
+                    case APPLE:
+                        owner.increaseFoodLevel(10);
+                        break;
+                    case COOKED_APPLE:
+                        owner.increaseFoodLevel(15);
+                        break;
+                }
+
+                break;
         }
         updateHotSlots();
 
@@ -118,7 +132,7 @@ public class ExpiPlayerInventory extends ExpiInventory {
             itemInHand = isCon;
         }
 
-        owner.getGateway().getManager().putHotSlotsFeedPacket((byte) chosenSlot.getId(), isTool, isMat, isCon);
+        owner.getNetManager().putHotSlotsFeedPacket((byte) chosenSlot.getId(), isTool, isMat, isCon);
 
     }
 

@@ -11,7 +11,7 @@ import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
-import com.astetyne.expirium.server.api.world.inventory.InvInteractType;
+import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
@@ -31,8 +31,8 @@ public class GameStage extends Stage implements ExpiStage {
 
     private final Table rootTable, itemSelectTable, debugInfoTable, playerStatsTable;
 
-    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, warnLabel, healthStat, hungerStat, tempStat;
-    private final Image healthImage, hungerImage, tempImage;
+    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, warnLabel, healthStat, foodStat, tempStat;
+    private final Image healthImage, foodImage, tempImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
     public final ThumbStick moveTS, breakTS;
@@ -51,15 +51,15 @@ public class GameStage extends Stage implements ExpiStage {
         lastFocused = toolSlot;
         focusedSlot = toolSlot;
 
-        switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, InvInteractType.SWITCH_UP, false);
-        switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, InvInteractType.SWITCH_DOWN, true);
+        switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_UP, false);
+        switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_DOWN, true);
         inventoryButton = new Image(Res.INVENTORY);
         consumeButton = new Image(Res.CAMPFIRE_ITEM);
 
         inventoryButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(InvInteractType.OPEN_INV);
+                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(UIInteractType.OPEN_INV);
                 GameScreen.get().showInvStage();
             }
         });
@@ -81,11 +81,11 @@ public class GameStage extends Stage implements ExpiStage {
         warnLabel.setColor(1,0.1f,0.1f,1);
 
         healthImage = new Image(Res.CROSS_ICON);
-        hungerImage = new Image(Res.CROSS_ICON);
+        foodImage = new Image(Res.CROSS_ICON);
         tempImage = new Image(Res.CROSS_ICON);
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
-        hungerStat = new Label("0%", Res.LABEL_STYLE);
+        foodStat = new Label("0%", Res.LABEL_STYLE);
         tempStat = new Label("0%", Res.LABEL_STYLE);
 
         itemSelectTable.add(switchArrowUp).padBottom(10).colspan(3);
@@ -114,8 +114,8 @@ public class GameStage extends Stage implements ExpiStage {
         playerStatsTable.add(healthStat).padTop(10);
         playerStatsTable.add(healthImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
-        playerStatsTable.add(hungerStat).padTop(10);
-        playerStatsTable.add(hungerImage).height(iconSize).width(iconSize);
+        playerStatsTable.add(foodStat).padTop(10);
+        playerStatsTable.add(foodImage).height(iconSize).width(iconSize);
         playerStatsTable.row();
         playerStatsTable.add(tempStat).padTop(10);
         playerStatsTable.add(tempImage).height(iconSize).width(iconSize);
@@ -183,6 +183,12 @@ public class GameStage extends Stage implements ExpiStage {
         consumableSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
     }
 
+    public void feedLivingStats(PacketInputStream in) {
+        healthStat.setText((int)Math.ceil(in.getFloat())+" %");
+        foodStat.setText((int)Math.ceil(in.getFloat())+" %");
+        tempStat.setText((int)Math.ceil(in.getFloat())+" °C");
+    }
+
     public ItemStack getItemInHand() {
         return focusedSlot.getItemStack();
     }
@@ -207,6 +213,10 @@ public class GameStage extends Stage implements ExpiStage {
         }else if(consumableSlot.isFocused()) {
             rootTable.add(consumeButton).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
         }
+    }
+
+    public boolean isVisible() {
+        return getRoot().isVisible();
     }
 
     public void setVisible(boolean visible) {

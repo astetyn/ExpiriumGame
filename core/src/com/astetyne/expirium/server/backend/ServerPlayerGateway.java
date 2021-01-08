@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -33,8 +34,6 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             in = new PacketInputStream(client.getInputStream());
             out = new PacketOutputStream(client.getOutputStream());
-
-            packetManager = new ServerPacketManager(in, out);
 
             client.setSoTimeout(5000);
             int readBytes = in.fillBuffer();
@@ -90,6 +89,10 @@ public class ServerPlayerGateway extends TerminableLooper {
         }
         gameServer.playerPreLeaveAsync(this);
         System.out.println("Channel with client closed.");
+    }
+
+    public void setOwner(ExpiPlayer owner) {
+        packetManager = new ServerPacketManager(owner);
     }
 
     public ServerPacketManager getManager() {

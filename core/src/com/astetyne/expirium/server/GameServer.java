@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.server.api.entities.ExpiDroppedItem;
-import com.astetyne.expirium.server.api.entities.ExpiEntity;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
+import com.astetyne.expirium.server.api.entity.ExpiEntity;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
@@ -69,7 +69,7 @@ public class GameServer implements Runnable {
         expiWorld.onTick();
 
         for(ExpiPlayer pp : players) {
-            pp.getGateway().getManager().putEnviroPacket();
+            pp.getNetManager().putEnviroPacket();
         }
 
         Iterator<WorldLoader> it = worldLoaders.iterator();

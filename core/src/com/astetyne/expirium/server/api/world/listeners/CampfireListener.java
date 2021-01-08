@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.api.world.listeners;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.event.*;
 import com.astetyne.expirium.server.api.world.inventory.CookingInventory;
@@ -69,8 +69,8 @@ public class CampfireListener implements TileChangeListener {
             if(event.getTile() != tile || placeTime + 500 > System.currentTimeMillis()) return;
             ExpiPlayer p = event.getPlayer();
             p.setSecondInv(inventory);
-            p.getGateway().getManager().putOpenDoubleInvPacket(inventory);
-            p.getGateway().getManager().putInvFeedPacket(p);
+            p.getNetManager().putOpenDoubleInvPacket();
+            p.getNetManager().putInvFeedPacket();
         }
 
         @Override

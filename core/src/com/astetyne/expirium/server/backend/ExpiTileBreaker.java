@@ -4,7 +4,7 @@ import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 import com.astetyne.expirium.server.api.world.event.Source;
@@ -31,7 +31,7 @@ public class ExpiTileBreaker {
 
         // check if breaking
         if(horz == 0 && vert == 0) {
-            if(targetTile != null) owner.getGateway().getManager().putBreakingTile(targetTile, -1);
+            if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
             targetTile = null;
             timeAccumulator = 0;
             return;
@@ -43,21 +43,21 @@ public class ExpiTileBreaker {
         for(int i = 0; i < Consts.BREAKING_PRECISION; i++) {
             if(!isInWorld(tempVec)) {
                 timeAccumulator = 0;
-                if(targetTile != null) owner.getGateway().getManager().putBreakingTile(targetTile, -1);
+                if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
                 break;
             }
             ExpiTile newTarget = world.getTileAt(tempVec);
             if(newTarget == null) {
                 timeAccumulator = 0;
-                if(targetTile != null) owner.getGateway().getManager().putBreakingTile(targetTile, -1);
+                if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
                 break;
             }
             if(newTarget.getType() != TileType.AIR) {
                 if(newTarget != targetTile) {
                     timeAccumulator = 0;
-                    if(targetTile != null) owner.getGateway().getManager().putBreakingTile(targetTile, -1);
+                    if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                     targetTile = newTarget;
                 }
                 break;
@@ -67,17 +67,17 @@ public class ExpiTileBreaker {
         if(targetTile != null) {
             float speedCoef = 1;
             if(owner.getInv().getItemInHand().getItem() != Item.EMPTY) {
-                speedCoef = owner.getInv().getItemInHand().getItem().getSpeedCoef();
+                //speedCoef = owner.getInv().getItemInHand().getItem().getSpeedCoef();
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
                 GameServer.get().getWorld().changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
-                owner.getGateway().getManager().putBreakingTile(targetTile, -1);
+                owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
             }else {
-                owner.getGateway().getManager().putBreakingTile(targetTile, timeAccumulator);
+                owner.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator);
             }
         }
 

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
-import com.astetyne.expirium.server.api.entities.ExpiEntity;
+import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;

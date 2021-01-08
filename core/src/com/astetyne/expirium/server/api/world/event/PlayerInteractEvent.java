@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.world.event;
 
-import com.astetyne.expirium.server.api.entities.ExpiPlayer;
+import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 
 import java.util.HashSet;

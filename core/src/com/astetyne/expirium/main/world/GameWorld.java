@@ -83,11 +83,9 @@ public class GameWorld {
     }
 
     public void update() {
-
         for(Entity e : entities) {
             e.move();
         }
-
         cameraCenter();
     }
 

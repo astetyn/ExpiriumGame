@@ -4,14 +4,14 @@ import java.util.HashMap;
 
 public enum ChosenSlot {
 
-    TOOL_SLOT(InvInteractType.SLOT_TOOLS),
-    MATERIAL_SLOT(InvInteractType.SLOT_MATERIALS),
-    CONSUMABLE_SLOT(InvInteractType.SLOT_CONSUMABLE);
+    TOOL_SLOT(UIInteractType.SLOT_TOOLS),
+    MATERIAL_SLOT(UIInteractType.SLOT_MATERIALS),
+    CONSUMABLE_SLOT(UIInteractType.SLOT_CONSUMABLE);
 
     int id;
-    InvInteractType onClick;
+    UIInteractType onClick;
 
-    ChosenSlot(InvInteractType onClick) {
+    ChosenSlot(UIInteractType onClick) {
         this.onClick = onClick;
     }
 
@@ -23,7 +23,7 @@ public enum ChosenSlot {
         return id;
     }
 
-    public InvInteractType getOnClick() {
+    public UIInteractType getOnClick() {
         return onClick;
     }
 
