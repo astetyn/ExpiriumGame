@@ -13,7 +13,7 @@ public enum Item {
     GRASS(ItemCategory.MATERIAL, 2, 1, 1, 0.5f, Res.GRASS_ITEM, Res.GRASS_ITEM, "Grass"),
     DIRT(ItemCategory.MATERIAL, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt"),
     RAW_WOOD(ItemCategory.MISC, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood"),
-    PICKAXE(ItemCategory.TOOL, 0, 1, 2, 1, Res.PICKAXE_ITEM, Res.PICKAXE_ITEM, "Pickaxe"),
+    PICKAXE(ItemCategory.TOOL, 0, 1, 2, 1, Res.RHYOLITE_PICKAXE_ITEM, Res.RHYOLITE_PICKAXE_ITEM, "Pickaxe"),
     CAMPFIRE(ItemCategory.MATERIAL, 11, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire"),
     WOODEN_WALL(ItemCategory.MATERIAL, 12, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall"),
     APPLE(ItemCategory.CONSUMABLE, 0, 1, 1, 0.1f, Res.TREE5_TILE, Res.TREE6_TILE, "Apple"),

@@ -49,6 +49,8 @@ public class ClientGateway extends TerminableLooper {
 
         try {
 
+            socket.setTcpNoDelay(true);
+
             System.out.println("Connection established.");
 
             in = new PacketInputStream(socket.getInputStream());

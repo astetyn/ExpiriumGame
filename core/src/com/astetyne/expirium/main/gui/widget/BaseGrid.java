@@ -35,8 +35,8 @@ public class BaseGrid extends Widget {
         for(int i = 0; i < data.rows; i++) {
             for(int j = 0; j < data.columns; j++) {
                 if(withUtils && i == 0 && j == data.columns-2) {
-                    batch.draw(Res.WHITE_TILE, getX()+j*tileSizeX, getY(), tileSizeX, tileSizeY);
-                    batch.draw(Res.WHITE_TILE, getX()+(j+1)*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    batch.draw(style.splitTile, getX()+j*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    batch.draw(style.throwTile, getX()+(j+1)*tileSizeX, getY(), tileSizeX, tileSizeY);
                     j++;
                     continue;
                 }

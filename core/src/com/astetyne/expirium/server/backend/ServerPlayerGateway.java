@@ -31,6 +31,7 @@ public class ServerPlayerGateway extends TerminableLooper {
         try {
 
             System.out.println("New client connected.");
+            client.setTcpNoDelay(true);
 
             in = new PacketInputStream(client.getInputStream());
             out = new PacketOutputStream(client.getOutputStream());

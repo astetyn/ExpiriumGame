@@ -84,12 +84,12 @@ public class GameScreen implements Screen, Gatewayable {
         int parallaxWidth = 1600;
         int parallaxWidth2 = 1400;
         int parallaxWidth3 = 1000;
-        int parallaxHeight = 2000;
+        int parallaxHeight = 1300;
 
         float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
         float yShift1 = gameWorld.getPlayer().getLocation().y*4;
         float xShift2 = (gameWorld.getPlayer().getLocation().x*6) % parallaxWidth2;
-        float yShift2 = gameWorld.getPlayer().getLocation().y*6;
+        float yShift2 = gameWorld.getPlayer().getLocation().y*7;
         float xShift3 = (gameWorld.getPlayer().getLocation().x*8) % parallaxWidth3;
         float yShift3 = gameWorld.getPlayer().getLocation().y*8;
 

@@ -80,9 +80,9 @@ public class GameStage extends Stage implements ExpiStage {
         warnLabel = new Label("pre-alpha", Res.LABEL_STYLE);
         warnLabel.setColor(1,0.1f,0.1f,1);
 
-        healthImage = new Image(Res.CROSS_ICON);
-        foodImage = new Image(Res.CROSS_ICON);
-        tempImage = new Image(Res.CROSS_ICON);
+        healthImage = new Image(Res.HEALTH_ICON);
+        foodImage = new Image(Res.FOOD_ICON);
+        tempImage = new Image(Res.TEMP_ICON);
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
         foodStat = new Label("0%", Res.LABEL_STYLE);
@@ -110,15 +110,15 @@ public class GameStage extends Stage implements ExpiStage {
         }
         debugInfoTable.add(warnLabel).left();
 
-        float iconSize = 20;
+        float iconSize = 30;
         playerStatsTable.add(healthStat).padTop(10);
-        playerStatsTable.add(healthImage).height(iconSize).width(iconSize);
+        playerStatsTable.add(healthImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10);
         playerStatsTable.row();
         playerStatsTable.add(foodStat).padTop(10);
-        playerStatsTable.add(foodImage).height(iconSize).width(iconSize);
+        playerStatsTable.add(foodImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(20);
         playerStatsTable.row();
         playerStatsTable.add(tempStat).padTop(10);
-        playerStatsTable.add(tempImage).height(iconSize).width(iconSize);
+        playerStatsTable.add(tempImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(20);
         playerStatsTable.row();
 
         rootTable.setBounds(0, 0, 1000, 1000);

@@ -59,7 +59,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
         if(row1 == row2 && column1 == column2) return;
 
-        System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
+        //System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
 
         if(fromMain) {
             ItemStack is = mainInv.getGrid()[row1][column1];
@@ -76,7 +76,6 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
                     if(is.getAmount() == 1) return;
                     is.decreaseAmount(1);
                     mainInv.decreaseWeight(is.getItem().getWeight());
-                    System.out.println("split source: "+is.getGridPos());
                     mainInv.addItem(new ItemStack(is.getItem()), false);
                     getNetManager().putInvFeedPacket();
                     return;

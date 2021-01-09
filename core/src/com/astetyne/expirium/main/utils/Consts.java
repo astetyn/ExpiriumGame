@@ -6,7 +6,7 @@ public class Consts {
 
     // networking
     public static final int SERVER_PORT = 1414;
-    public static final int BUFFER_SIZE = 32768; //262144
+    public static final int BUFFER_SIZE = 32768; //262144, 2097152, 32768
     public static final int SERVER_DEFAULT_TPS = 30;
 
     // world

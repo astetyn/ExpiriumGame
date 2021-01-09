@@ -33,15 +33,16 @@ public class Res {
     public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
     public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
 
+    public static TextureRegion HEALTH_ICON, FOOD_ICON, TEMP_ICON;
+
     // gui - inv
     public static TextureRegion INVENTORY;
-    public static Drawable INV_DETAIL_BACK;
-    public static Drawable INV_CHOOSE_BACK;
+    public static TextureRegion INV_CHOOSE_BACK, INV_DETAIL_BACK;
     public static TextureRegion INV_WEIGHT;
     public static Drawable RECIPE_BACK;
 
     // gui - items
-    public static TextureRegion PICKAXE_ITEM;
+    public static TextureRegion RHYOLITE_PICKAXE_ITEM;
     public static TextureRegion GRASS_ITEM;
     public static TextureRegion DIRT_ITEM;
     public static TextureRegion STONE_ITEM;
@@ -58,8 +59,6 @@ public class Res {
     public static Animation<TextureRegion> PLAYER_RUN_ANIM_L;
 
     // world
-    public static TextureRegion BG_1, BG_2, BG_3;
-
     public static TextureRegion LIGHT_SPH_1;
 
     public static TextureRegion STONE_TILE;
@@ -73,6 +72,10 @@ public class Res {
 
     public static Animation<TextureRegion> TILE_BREAK_ANIM;
 
+    // background
+    public static TextureRegion BG_1, BG_2, BG_3;
+    public static TextureRegion SUN, MOON;
+
     public static void loadTextures() {
 
         Animation.PlayMode loop = Animation.PlayMode.LOOP;
@@ -81,6 +84,7 @@ public class Res {
         TextureAtlas world = new TextureAtlas("world.atlas");
         TextureAtlas gui = new TextureAtlas("gui.atlas");
         TextureAtlas ent = new TextureAtlas("entities.atlas");
+        TextureAtlas bg = new TextureAtlas("background.atlas");
 
         // gui
         MAIN_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
@@ -92,11 +96,12 @@ public class Res {
         Drawable cursor = new TextureRegionDrawable(gui.findRegion("cursor"));
         TextureRegion tsBack = gui.findRegion("thumb_stick_back");
         TextureRegion tsFore = gui.findRegion("thumb_stick_fore");
-        TextureRegion hbsBack = gui.findRegion("hot_bar_slot_background");
         TextureRegion hbsFrame = gui.findRegion("hot_bar_slot_frame");
         TextureRegion switchArrowUp = gui.findRegion("switch_arrow_up");
         TextureRegion switchArrowUpPressed = gui.findRegion("switch_arrow_up_pressed");
         TextureRegion invTile = gui.findRegion("inv_tile");
+        TextureRegion invTileSplit = gui.findRegion("inv_tile_split");
+        TextureRegion invTileThrow = gui.findRegion("inv_tile_throw");
 
         CROSS_ICON = gui.findRegion("cross_icon");
 
@@ -105,19 +110,23 @@ public class Res {
         TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, up);
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
-        HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsBack, hbsFrame);
+        HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsFrame);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
-        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, tsFore, tsFore); //todo: nove textury
+        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, invTileThrow, invTileSplit);
+
+        HEALTH_ICON = gui.findRegion("health_icon");
+        FOOD_ICON = gui.findRegion("food_icon");
+        TEMP_ICON = gui.findRegion("temperature_icon");
 
         // gui - inv
         INVENTORY = gui.findRegion("inventory");
         RECIPE_BACK = new TextureRegionDrawable(gui.findRegion("recipe_list_background"));
-        INV_DETAIL_BACK = new TextureRegionDrawable(gui.findRegion("item_detail_back"));
-        INV_CHOOSE_BACK = new TextureRegionDrawable(gui.findRegion("item_choose_back"));
+        INV_DETAIL_BACK = gui.findRegion("item_detail_back");
+        INV_CHOOSE_BACK = gui.findRegion("item_choose_back");
         INV_WEIGHT = gui.findRegion("weight_icon");
 
         // gui - items
-        PICKAXE_ITEM = gui.findRegion("pickaxe_item");
+        RHYOLITE_PICKAXE_ITEM = gui.findRegion("rhyolite_pickaxe_item");
         GRASS_ITEM = gui.findRegion("grass_item");
         DIRT_ITEM = gui.findRegion("dirt_item");
         STONE_ITEM = gui.findRegion("stone_item");
@@ -134,15 +143,11 @@ public class Res {
         PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ent.findRegions("player_left_run"), loop_pong);
 
         // world
-        BG_1 = new TextureRegion(new Texture(Gdx.files.internal("img3.png"))); // back
-        BG_2 = new TextureRegion(new Texture(Gdx.files.internal("img4.png"))); // middle
-        BG_3 = new TextureRegion(new Texture(Gdx.files.internal("img5.png"))); // front
-
         LIGHT_SPH_1 = new TextureRegion(new Texture(Gdx.files.internal("lightning.png")));
 
-        STONE_TILE = world.findRegion("stone");
+        STONE_TILE = world.findRegion("stone_tile");
         GRASS_TILE = world.findRegion("grass");
-        DIRT_TILE = world.findRegion("dirt");
+        DIRT_TILE = world.findRegion("dirt_tile");
         TREE1_TILE = world.findRegion("tree1");
         TREE2_TILE = world.findRegion("tree2");
         TREE3_TILE = world.findRegion("tree3");
@@ -152,10 +157,17 @@ public class Res {
         WHITE_TILE = world.findRegion("white_tile");
         WOODEN_WALL_TILE = world.findRegion("wooden_wall");
 
-        CAMPFIRE_SMALL_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
-        CAMPFIRE_BIG_TILE = new Animation<>(0.1f, world.findRegions("campfire_full"), loop_pong);
+        CAMPFIRE_SMALL_TILE = new Animation<>(0.1f, world.findRegions("campfire_small"), loop_pong);
+        CAMPFIRE_BIG_TILE = new Animation<>(0.1f, world.findRegions("campfire_big"), loop_pong);
 
         TILE_BREAK_ANIM = new Animation<>(0.26f, world.findRegions("tile_break"), loop);
+
+        // background
+        BG_1 = bg.findRegion("bg1"); // back
+        BG_2 = bg.findRegion("bg2"); // middle
+        BG_3 = bg.findRegion("bg3"); // front
+        SUN = bg.findRegion("sun");
+        MOON = bg.findRegion("moon");
 
     }
 

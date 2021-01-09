@@ -52,10 +52,4 @@ public class ItemStack {
         return gridPos;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if(!(o instanceof ItemStack)) return false;
-        ItemStack is = (ItemStack) o;
-        return item == is.getItem() && amount == is.getAmount();
-    }
 }

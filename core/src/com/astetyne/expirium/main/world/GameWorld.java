@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class GameWorld {
 
-    public static float PPM = 64;
+    public static float PPM = 45;
 
     private final SpriteBatch batch;
     private Tile[][] worldTerrain;

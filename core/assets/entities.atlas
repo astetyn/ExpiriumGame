@@ -1,125 +1,76 @@
 
 entities.png
-size: 512,256
+size: 1024,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-campfire_item
-  rotate: false
-  xy: 398, 182
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-dirt_item
+player_left_idle
   rotate: false
   xy: 2, 2
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-grass_item
-  rotate: false
-  xy: 68, 2
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-pickaxe_item
-  rotate: false
-  xy: 332, 116
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-player_left_idle
-  rotate: false
-  xy: 2, 158
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_idle
   rotate: false
-  xy: 200, 158
+  xy: 398, 2
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_left_run
   rotate: false
-  xy: 68, 68
+  xy: 200, 2
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_run
   rotate: false
-  xy: 134, 68
+  xy: 332, 2
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 3
 player_left_run
   rotate: false
-  xy: 266, 68
+  xy: 596, 2
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_right_idle
-  rotate: false
-  xy: 68, 158
-  size: 64, 88
-  orig: 64, 88
-  offset: 0, 0
-  index: 1
-player_right_idle
-  rotate: false
-  xy: 266, 158
-  size: 64, 88
-  orig: 64, 88
-  offset: 0, 0
-  index: 2
-player_right_run
-  rotate: false
-  xy: 2, 68
-  size: 64, 88
-  orig: 64, 88
-  offset: 0, 0
-  index: 1
-player_right_run
-  rotate: false
-  xy: 134, 158
-  size: 64, 88
-  orig: 64, 88
-  offset: 0, 0
-  index: 3
-player_right_run
-  rotate: false
-  xy: 200, 68
-  size: 64, 88
-  orig: 64, 88
-  offset: 0, 0
-  index: 2
-raw_wood_item
-  rotate: false
-  xy: 332, 182
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-stone_item
   rotate: false
   xy: 134, 2
-  size: 64, 64
-  orig: 64, 64
+  size: 64, 88
+  orig: 64, 88
   offset: 0, 0
-  index: -1
-wooden_wall_item
+  index: 1
+player_right_idle
   rotate: false
-  xy: 398, 116
-  size: 64, 64
-  orig: 64, 64
+  xy: 530, 2
+  size: 64, 88
+  orig: 64, 88
   offset: 0, 0
-  index: -1
+  index: 2
+player_right_run
+  rotate: false
+  xy: 68, 2
+  size: 64, 88
+  orig: 64, 88
+  offset: 0, 0
+  index: 1
+player_right_run
+  rotate: false
+  xy: 266, 2
+  size: 64, 88
+  orig: 64, 88
+  offset: 0, 0
+  index: 3
+player_right_run
+  rotate: false
+  xy: 464, 2
+  size: 64, 88
+  orig: 64, 88
+  offset: 0, 0
+  index: 2
