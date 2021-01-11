@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -21,13 +22,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class Res {
 
     // gui
+    public static BitmapFont TITLE_FONT;
     public static BitmapFont MAIN_FONT;
 
     public static Button.ButtonStyle BUTTON_STYLE;
     public static TextureRegion CROSS_ICON;
     public static TextButton.TextButtonStyle TEXT_BUTTON_STYLE;
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
-    public static Label.LabelStyle LABEL_STYLE;
+    public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
     public static HotBarSlot.HotBarSlotStyle HOT_BAR_SLOT_STYLE;
     public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
@@ -86,9 +88,23 @@ public class Res {
         TextureAtlas ent = new TextureAtlas("entities.atlas");
         TextureAtlas bg = new TextureAtlas("background.atlas");
 
+        FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("ladylikeBB.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 90;
+        TITLE_FONT = gen.generateFont(parameter);
+        parameter.size = 60;
+        MAIN_FONT = gen.generateFont(parameter);
+        gen.dispose();
+
         // gui
-        MAIN_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
-        MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
+        //MAIN_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
+        //MAIN_FONT = new BitmapFont(Gdx.files.internal("test1.fnt"));
+        //MAIN_FONT.getData().setScale((float)Gdx.graphics.getHeight() / Gdx.graphics.getWidth(), 1);
+        //MAIN_FONT.getData().setScale(1, Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight());
+
+        //TITLE_FONT = new BitmapFont(Gdx.files.internal("arial_medium.fnt"), gui.findRegion("arial_medium"));
+        //TITLE_FONT.getData().setScale((float)Gdx.graphics.getHeight() * 3/ Gdx.graphics.getWidth(), 3);
+        //TITLE_FONT.getData().scale(3);
 
         Drawable up = new TextureRegionDrawable(gui.findRegion("button_base"));
         Drawable down = new TextureRegionDrawable(gui.findRegion("button_pressed"));
@@ -109,6 +125,7 @@ public class Res {
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(up, down, up, MAIN_FONT);
         TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, up);
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
+        TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         HOT_BAR_SLOT_STYLE = new HotBarSlot.HotBarSlotStyle(hbsFrame);
         SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);

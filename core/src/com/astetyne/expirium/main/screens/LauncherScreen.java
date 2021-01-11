@@ -1,108 +1,42 @@
 package com.astetyne.expirium.main.screens;
 
 import com.astetyne.expirium.main.ExpiGame;
-import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.stage.LauncherStage;
-import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.main.gui.roots.LauncherRoot;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class LauncherScreen implements Screen, Gatewayable {
+public class LauncherScreen implements Screen {
 
-    private boolean hostingServer;
-    private final Table table;
-    private final LauncherStage launcherStage;
-    private final InputMultiplexer multiplexer;
+    private static LauncherScreen launcherScreen;
+
+    private final Stage stage;
 
     public LauncherScreen() {
 
-        hostingServer = true;
+        launcherScreen = this;
 
-        multiplexer = new InputMultiplexer();
-        launcherStage = new LauncherStage();
-
-        table = new Table();
-
-        TextField textField = new TextField("", Res.TEXT_FIELD_STYLE);
-        textField.setMessageText("Enter your name");
-
-        final TextField textField2 = new TextField("127.0.0.1", Res.TEXT_FIELD_STYLE);
-        textField2.setMessageText("Enter the ip address");
-        textField2.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9.]"));
-        textField2.setVisible(false);
-
-        TextButton serverButton = new TextButton("Host a server.", Res.TEXT_BUTTON_STYLE);
-        serverButton.setColor(Color.GREEN);
-        serverButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                hostingServer = !hostingServer;
-                textField2.setVisible(!hostingServer);
-                Color c = hostingServer ? Color.GREEN : Color.LIGHT_GRAY;
-                serverButton.setColor(c);
-            }
-        });
-
-        TextButton button = new TextButton("Connect", Res.TEXT_BUTTON_STYLE);
-
-        table.add(serverButton).width(500).height(100);
-        table.row();
-        table.add(textField).width(500).height(100);
-        table.row();
-        table.add(textField2).width(500).height(100);
-        table.row();
-        table.add(button).width(500).height(100);
-
-        textField.setAlignment(Align.center);
-        textField2.setAlignment(Align.center);
-
-        table.setFillParent(true);
-        if(Consts.DEBUG) table.setDebug(true);
-
-        launcherStage.addActor(table);
-
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(hostingServer) {
-                    ExpiGame.get().startServer();
-                    ExpiGame.get().startClient("127.0.0.1", textField.getText());
-                }else {
-                    ExpiGame.get().startClient(textField2.getText(), textField.getText());
-                }
-                table.setVisible(false);
-            }
-        });
-
-        multiplexer.addProcessor(launcherStage);
-        Gdx.input.setInputProcessor(multiplexer);
-
-    }
-
-    public void update() {
-        launcherStage.act();
+        stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
+        setRoot(new LauncherRoot());
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+
+        stage.act();
+
+        Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        launcherStage.draw();
+        stage.draw();
     }
 
     @Override
@@ -115,20 +49,22 @@ public class LauncherScreen implements Screen, Gatewayable {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
 
     @Override
     public void dispose() {
-        launcherStage.dispose();
+        stage.dispose();
     }
 
-    @Override
-    public void onServerUpdate() {
-
+    public static LauncherScreen get() {
+        return launcherScreen;
     }
 
-    @Override
-    public void onServerFail() {
-        table.setVisible(true);
+    public void setRoot(Actor root) {
+        root.setBounds(0, 0, 2000, 1000);
+        stage.clear();
+        stage.addActor(root);
     }
 }

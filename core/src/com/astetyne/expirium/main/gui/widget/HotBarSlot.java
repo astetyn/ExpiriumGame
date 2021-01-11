@@ -58,16 +58,6 @@ public class HotBarSlot extends Widget {
         batch.setColor(1,1,1,1);
     }
 
-    @Override
-    public float getPrefWidth() {
-        return 60;
-    }
-
-    @Override
-    public float getPrefHeight() {
-        return Utils.percFromW(60);
-    }
-
     public void setItemStack(ItemStack is) {
         itemStack = is;
     }

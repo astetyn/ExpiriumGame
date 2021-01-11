@@ -1,56 +1,55 @@
-package com.astetyne.expirium.main.gui.stage;
+package com.astetyne.expirium.main.gui.roots;
 
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.widget.StorageGrid;
 import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.items.StorageGridData;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.utils.Utils;
 import com.astetyne.expirium.server.backend.PacketInputStream;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class DoubleInventoryStage extends Stage implements ExpiStage {
+public class DoubleInventoryRoot extends Table implements ExpiRoot {
 
     private final StorageGrid storage1, storage2;
     private final Cell<StorageGrid> storageCell1, storageCell2;
-    private final Table rootTable;
     private final Image returnButton;
     private boolean fromMain;
 
-    public DoubleInventoryStage() {
-        super(new StretchViewport(1000, 1000), ExpiGame.get().getBatch());
+    public DoubleInventoryRoot(PacketInputStream in) {
 
-        storage1 = new StorageGrid(GameScreen.get().getInvStage().getMainData(), true);
-        storage2 = new StorageGrid(GameScreen.get().getInvStage().getSecondData(), false);
+        StorageGridData secondData = GameScreen.get().getInventoryHandler().getSecondData();
+        secondData.rows = in.getInt();
+        secondData.columns = in.getInt();
+
+        storage1 = new StorageGrid(GameScreen.get().getInventoryHandler().getMainData(), true);
+        storage2 = new StorageGrid(GameScreen.get().getInventoryHandler().getSecondData(), false);
 
         returnButton = new Image(Res.CROSS_ICON);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().showGameStage();
+                GameScreen.get().setRoot(new GameRoot());
             }
         });
 
-        rootTable = new Table();
-        rootTable.setBounds(0, 0, 1000, 1000);
+        storageCell1 = add(storage1).padRight(200);
+        storageCell2 = add(storage2);
+        add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
 
-        storageCell1 = rootTable.add(storage1).padRight(100);
-        storageCell2 = rootTable.add(storage2);
-        rootTable.add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
+        setTouchable(Touchable.enabled);
 
-        rootTable.setTouchable(Touchable.enabled);
-
-        rootTable.addListener(new InputListener() {
+        addListener(new InputListener() {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -104,27 +103,11 @@ public class DoubleInventoryStage extends Stage implements ExpiStage {
             }
 
         });
-
-        setRoot(rootTable);
-        getRoot().setVisible(false);
     }
 
-    public void open(PacketInputStream in) {
-        int r = in.getInt();
-        int c = in.getInt();
-        storage2.getGrid().getData().rows = r;
-        storage2.getGrid().getData().columns = c;
-        storage2.rebuild();
-        GameScreen.get().showDoubleInvStage();
-    }
-
-    public void setVisible(boolean b) {
-        getRoot().setVisible(b);
-        if(b) {
-            rootTable.setTouchable(Touchable.enabled);
-        }else {
-            rootTable.setTouchable(Touchable.disabled);
-        }
+    @Override
+    public Actor getActor() {
+        return this;
     }
 
     @Override
@@ -132,9 +115,9 @@ public class DoubleInventoryStage extends Stage implements ExpiStage {
         return true;
     }
 
-    public void onFeedUpdate() {
-        storage1.onFeedUpdate();
-        storage2.onFeedUpdate();
+    @Override
+    public void refresh() {
+        storage1.refreshLabels();
+        storage2.refreshLabels();
     }
-
 }

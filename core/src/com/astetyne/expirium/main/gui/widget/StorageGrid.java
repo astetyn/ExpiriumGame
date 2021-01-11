@@ -45,7 +45,7 @@ public class StorageGrid extends Table {
     }
 
     public void rebuild() {
-        int mlt = 60;
+        int mlt = 120;
         clear();
         gridCell = add(grid).width(data.columns * mlt).height(Utils.percFromW(data.rows * mlt)).colspan(2);
         row();
@@ -57,7 +57,7 @@ public class StorageGrid extends Table {
         grid.setZIndex(100);
     }
 
-    public void onFeedUpdate() {
+    public void refreshLabels() {
         weightLabel.setText(data.totalWeight+"/"+data.maxWeight);
         infoLabel.setText(data.label);
     }

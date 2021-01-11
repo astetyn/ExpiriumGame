@@ -7,7 +7,6 @@ import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.world.event.ServerTickEvent;
 import com.astetyne.expirium.server.api.world.event.TickListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
@@ -35,7 +34,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         GameServer.get().getPlayers().add(this);
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         ts1H = ts1V = ts2H = ts2V = 0;
-        ServerTickEvent.getListeners().add(this);
+        TickLooper.getListeners().add(this);
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -43,6 +42,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         ts1V = in.getFloat();
         ts2H = in.getFloat();
         ts2V = in.getFloat();
+        System.out.println("S: updating TS: "+ts1H+" "+ts1V);
     }
 
     public void onInvMove(PacketInputStream in) {
@@ -159,6 +159,8 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     @Override
     public void onTick() {
 
+        System.out.println("S: applying TS: "+ts1H+" "+ts1V);
+
         foodLevel -= (1f / Consts.SERVER_DEFAULT_TPS) / 10; // tenth of second = 1 for 10 seconds
 
         getNetManager().putLivingStatsPacket();
@@ -220,7 +222,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
     public void destroySafe() {
         super.destroy();
-        ServerTickEvent.getListeners().remove(this);
+        TickLooper.getListeners().remove(this);
     }
 
     @Override

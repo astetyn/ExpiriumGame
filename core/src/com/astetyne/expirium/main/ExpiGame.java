@@ -1,12 +1,15 @@
 package com.astetyne.expirium.main;
 
 import com.astetyne.expirium.main.net.client.ClientGateway;
-import com.astetyne.expirium.main.screens.Gatewayable;
+import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.world.WorldSettings;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import java.net.Inet4Address;
 
 public class ExpiGame extends Game {
 
@@ -78,23 +81,30 @@ public class ExpiGame extends Game {
 			if(!available) return;
 			available = false;
 		}
+		System.out.println("C: swapping!");
 		clientGateway.swapBuffers();
 		clientGateway.getManager().processIncomingPackets();
-		if(getScreen() instanceof Gatewayable) {
-			((Gatewayable)getScreen()).onServerUpdate();
+
+		if(GameScreen.get() != null) {
+			GameScreen.get().getWorld().getPlayer().sendTSPacket();
 		}
+
 	}
 
-	public void startServer() {
-		server = new GameServer();
+	public void startServer(WorldSettings settings, boolean createNew, int tps, int port) {
+		try {
+			server = new GameServer(settings, createNew, tps, port);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		Thread t = new Thread(server);
 		t.setName("Game Server");
 		t.start();
 	}
 
-	public void startClient(String clientIpAddress, String playerName) {
+	public void startClient(Inet4Address address, String playerName) {
 		this.playerName = playerName;
-		clientGateway.setIpAddress(clientIpAddress);
+		clientGateway.setIpAddress(address);
 		Thread t = new Thread(clientGateway);
 		t.setName("Client gateway");
 		t.start();

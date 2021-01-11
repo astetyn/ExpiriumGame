@@ -7,13 +7,25 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Utils {
 
-    private static final GlyphLayout glyphLayout;
+    private static final GlyphLayout glyphLayout = new GlyphLayout();
+
+    private static final String symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final Map<Character, Integer> symbolIndex = new HashMap<>(symbols.length() * 4 / 3 + 1);
+    private static final BigInteger radix = BigInteger.valueOf(symbols.length());
 
     static {
-        glyphLayout = new GlyphLayout();
+        for (int i = 0; i < symbols.length(); i++) {
+            symbolIndex.put(symbols.charAt(i), i);
+        }
     }
 
     public static int sizeof(Object obj) {
@@ -46,15 +58,40 @@ public class Utils {
     }
 
     public static float fromCMToPercW(float cm) {
-        return (cm * Gdx.graphics.getDensity() * 50) / Gdx.graphics.getWidth() * 1000;
+        return (cm * Gdx.graphics.getDensity() * 100) / Gdx.graphics.getWidth() * 1000;
     }
 
     public static float percFromW(float val) {
-        return Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight() * val;
+        return Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight() * val / 2;
     }
 
     public static float percFromH(float val) {
-        return Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth() * val;
+        return Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth() * val * 2;
+    }
+
+    // main only for testing
+    public static void main(String[] args) throws UnknownHostException {
+        System.out.println("-- running main for testing --");
+        System.out.println(getCodeFromAddress((Inet4Address) Inet4Address.getByName("192.168.0.113")));
+        System.out.println(getAddressFromCode("palko"));
+    }
+
+    public static Inet4Address getAddressFromCode(String code) throws UnknownHostException {
+        BigInteger value = BigInteger.ZERO;
+        for (int i = 0; i < code.length(); i++) {
+            Integer index = symbolIndex.get(code.charAt(i));
+            value = value.multiply(radix).add(BigInteger.valueOf(index));
+        }
+        return (Inet4Address) Inet4Address.getByAddress(ByteBuffer.allocate(4).putInt(value.intValue()).array());
+    }
+
+    public static String getCodeFromAddress(Inet4Address address) {
+        BigInteger bi = BigInteger.valueOf(Integer.toUnsignedLong(ByteBuffer.wrap(address.getAddress()).getInt()));
+        StringBuilder buf = new StringBuilder();
+        for (BigInteger v = bi; v.signum() != 0; v = v.divide(radix)) {
+            buf.append(symbols.charAt(v.mod(radix).intValue()));
+        }
+        return buf.reverse().toString();
     }
 
 }

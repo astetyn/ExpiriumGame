@@ -106,7 +106,7 @@ public class GameWorld {
                 Tile t = worldTerrain[i][j];
                 if(t.getType() == TileType.AIR) continue;
 
-                if(GameScreen.get().getGameStage().getFocusedSlot().getSlotType() == ChosenSlot.MATERIAL_SLOT) {
+                if(GameScreen.get().getInventoryHandler().getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT) {
                     player.getTilePlacer().render(t);
                     continue;
                 }

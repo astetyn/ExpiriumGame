@@ -1,11 +1,11 @@
 package com.astetyne.expirium.main.screens;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.InventoryHandler;
+import com.astetyne.expirium.main.PlayerDataHandler;
 import com.astetyne.expirium.main.Res;
-import com.astetyne.expirium.main.gui.stage.DoubleInventoryStage;
-import com.astetyne.expirium.main.gui.stage.ExpiStage;
-import com.astetyne.expirium.main.gui.stage.GameStage;
-import com.astetyne.expirium.main.gui.stage.InventoryStage;
+import com.astetyne.expirium.main.gui.roots.ExpiRoot;
+import com.astetyne.expirium.main.gui.roots.GameRoot;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.GameWorld;
 import com.astetyne.expirium.server.backend.PacketInputStream;
@@ -15,21 +15,22 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class GameScreen implements Screen, Gatewayable {
+public class GameScreen implements Screen {
 
     private static GameScreen gameScreen;
 
     private final SpriteBatch batch;
     private final InputMultiplexer multiplexer;
+    private final Stage stage;
     private final GameWorld gameWorld;
     private int serverTime;
     private int serverTPS;
-
-    private final GameStage gameStage;
-    private final InventoryStage invStage;
-    private final DoubleInventoryStage doubleInvStage;
-    private ExpiStage currentStage;
+    private final InventoryHandler inventoryHandler;
+    private final PlayerDataHandler playerDataHandler;
+    private ExpiRoot activeRoot;
 
     public GameScreen(PacketInputStream in) {
 
@@ -41,33 +42,28 @@ public class GameScreen implements Screen, Gatewayable {
         multiplexer = new InputMultiplexer();
         gameWorld = new GameWorld();
 
-        gameStage = new GameStage();
-        invStage = new InventoryStage();
-        doubleInvStage = new DoubleInventoryStage();
-        showGameStage();
+        inventoryHandler = new InventoryHandler();
+        playerDataHandler = new PlayerDataHandler();
 
-        multiplexer.addProcessor(gameStage);
-        multiplexer.addProcessor(invStage);
-        multiplexer.addProcessor(doubleInvStage);
-        Gdx.input.setInputProcessor(multiplexer);
+        stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
+        setRoot(new GameRoot());
+
+        multiplexer.addProcessor(stage);
 
         // load init data from server
         gameWorld.loadData(in);
-
     }
 
     public void update() {
 
-        gameStage.act();
-        invStage.act();
-        doubleInvStage.act();
+        stage.act();
         gameWorld.update();
 
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -81,9 +77,9 @@ public class GameScreen implements Screen, Gatewayable {
         Gdx.gl.glClearColor(sky.r, sky.g, sky.b, sky.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        int parallaxWidth = 1600;
-        int parallaxWidth2 = 1400;
-        int parallaxWidth3 = 1000;
+        int parallaxWidth = 3200;
+        int parallaxWidth2 = 2800;
+        int parallaxWidth3 = 2000;
         int parallaxHeight = 1300;
 
         float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
@@ -108,7 +104,7 @@ public class GameScreen implements Screen, Gatewayable {
 
         gameWorld.render();
 
-        if(currentStage.isDimmed()) {
+        if(false) {
             batch.setColor(0, 0, 0, 0.5f);
             batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.setColor(1, 1, 1, 1);
@@ -116,9 +112,7 @@ public class GameScreen implements Screen, Gatewayable {
 
         batch.end();
 
-        gameStage.draw();
-        invStage.draw();
-        doubleInvStage.draw();
+        stage.draw();
 
         // lag simulator
         try {
@@ -154,35 +148,11 @@ public class GameScreen implements Screen, Gatewayable {
         gameWorld.dispose();
     }
 
-    @Override
-    public void onServerUpdate() {
-        gameWorld.getPlayer().sendTSPacket();
-    }
-
-    @Override
-    public void onServerFail() {
-
-    }
-
-    public void showGameStage() {
-        gameStage.setVisible(true);
-        invStage.setVisible(false);
-        doubleInvStage.setVisible(false);
-        currentStage = gameStage;
-    }
-
-    public void showInvStage() {
-        gameStage.setVisible(false);
-        invStage.setVisible(true);
-        doubleInvStage.setVisible(false);
-        currentStage = invStage;
-    }
-
-    public void showDoubleInvStage() {
-        gameStage.setVisible(false);
-        invStage.setVisible(false);
-        doubleInvStage.setVisible(true);
-        currentStage = doubleInvStage;
+    public void setRoot(ExpiRoot root) {
+        root.getActor().setBounds(0, 0, 2000, 1000);
+        stage.clear();
+        stage.addActor(root.getActor());
+        activeRoot = root;
     }
 
     private Color getSkyColor() {
@@ -220,19 +190,19 @@ public class GameScreen implements Screen, Gatewayable {
         return multiplexer;
     }
 
-    public GameStage getGameStage() {
-        return gameStage;
-    }
-
-    public InventoryStage getInvStage() {
-        return invStage;
-    }
-
-    public DoubleInventoryStage getDoubleInvStage() {
-        return doubleInvStage;
-    }
-
     public int getServerTPS() {
         return serverTPS;
+    }
+
+    public InventoryHandler getInventoryHandler() {
+        return inventoryHandler;
+    }
+
+    public PlayerDataHandler getPlayerDataHandler() {
+        return playerDataHandler;
+    }
+
+    public ExpiRoot getActiveRoot() {
+        return activeRoot;
     }
 }

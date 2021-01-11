@@ -4,18 +4,24 @@ import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.api.world.event.TickListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 public class TickLooper extends TerminableLooper {
 
+    private static final HashSet<TickListener> listeners = new HashSet<>();
+
     private final Object tickLock;
     private final GameServer server;
     private final List<ExpiPlayer> players;
+    private final int tps;
 
-    public TickLooper() {
+    public TickLooper(int tps) {
+        this.tps = tps;
         tickLock = new Object();
         server = GameServer.get();
         players = server.getPlayers();
@@ -37,6 +43,11 @@ public class TickLooper extends TerminableLooper {
                 }
 
                 GameServer.get().onTick();
+
+                HashSet<TickListener> copy = new HashSet<>(listeners); // todo: toto je dost drahe na kazdy tick
+                for(TickListener listener : copy) {
+                    listener.onTick();
+                }
 
                 // wakes up all clients threads and send new actions
                 synchronized(tickLock) {
@@ -125,5 +136,13 @@ public class TickLooper extends TerminableLooper {
     public void end() {
         super.end();
         GameServer.get().getServerGateway().end();
+    }
+
+    public static HashSet<TickListener> getListeners() {
+        return listeners;
+    }
+
+    public int getTps() {
+        return tps;
     }
 }

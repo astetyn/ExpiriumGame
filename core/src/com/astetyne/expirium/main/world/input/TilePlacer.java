@@ -77,8 +77,7 @@ public class TilePlacer implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        System.out.println(GameScreen.get().getGameStage().isVisible());
-        if(!GameScreen.get().getGameStage().isVisible()) return false;
+        //todo: ??
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return false;

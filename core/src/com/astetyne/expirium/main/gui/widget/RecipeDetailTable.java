@@ -2,6 +2,7 @@ package com.astetyne.expirium.main.gui.widget;
 
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.gui.roots.GameRoot;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.screens.GameScreen;
@@ -29,7 +30,7 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().showGameStage();
+                GameScreen.get().setRoot(new GameRoot());
             }
         });
 
@@ -66,9 +67,9 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         desc.setAlignment(Align.topLeft);
         add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
         row();
-        add(imgDetail).width(Utils.percFromH(100)).height(100).pad(50,50,50,50);
+        add(imgDetail).width(Utils.percFromH(100)).height(100).pad(50,100,50,100);
         row();
-        add(makeButton).width(120).height(80).padBottom(30);
+        add(makeButton).width(240).height(80).padBottom(30);
         row();
 
         requiredItems.clear();
@@ -79,7 +80,7 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         }
         add(scrollRequiredItems).expandX().height(200);
         row();
-        add(desc).grow().width(180).pad(50, 10, 10, 10);
+        add(desc).grow().width(360).pad(50, 20, 10, 20);
 
     }
 }

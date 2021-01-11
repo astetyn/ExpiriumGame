@@ -1,7 +1,5 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.utils.Consts;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,13 +7,18 @@ import java.net.Socket;
 public class ServerGateway extends TerminableLooper {
 
     private ServerSocket server;
+    private final int port;
+
+    public ServerGateway(int port) {
+        this.port = port;
+    }
 
     @Override
     public void run() {
 
         try {
 
-            server = new ServerSocket(Consts.SERVER_PORT);
+            server = new ServerSocket(port);
 
             while(isRunning()) {
 

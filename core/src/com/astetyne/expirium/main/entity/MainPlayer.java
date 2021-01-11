@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.entity;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.world.input.TilePlacer;
@@ -17,8 +18,8 @@ public class MainPlayer extends Entity {
         super(EntityType.PLAYER, id, loc, 0.9f, 1.25f);
         tilePlacer = new TilePlacer();
         GameScreen.get().getMultiplexer().addProcessor(tilePlacer);
-        movementTS = GameScreen.get().getGameStage().moveTS;
-        breakTS = GameScreen.get().getGameStage().breakTS;
+        movementTS = new ThumbStick(Res.THUMB_STICK_STYLE);
+        breakTS = new ThumbStick(Res.THUMB_STICK_STYLE);
         animator = new MainPlayerAnimator(ExpiGame.get().getBatch(), this, movementTS);
     }
 

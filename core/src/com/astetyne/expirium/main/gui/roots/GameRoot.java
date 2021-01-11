@@ -1,35 +1,34 @@
-package com.astetyne.expirium.main.gui.stage;
+package com.astetyne.expirium.main.gui.roots;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.PlayerDataHandler;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.gui.widget.HotBarSlot;
 import com.astetyne.expirium.main.gui.widget.SwitchArrow;
 import com.astetyne.expirium.main.gui.widget.ThumbStick;
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.items.HotSlotsData;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
-import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import static com.astetyne.expirium.main.utils.Utils.fromCMToPercW;
 
-public class GameStage extends Stage implements ExpiStage {
+public class GameRoot extends Table implements ExpiRoot {
 
-    private final Table rootTable, itemSelectTable, debugInfoTable, playerStatsTable;
+    private final Table itemSelectTable, debugInfoTable, playerStatsTable;
 
     private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, warnLabel, healthStat, foodStat, tempStat;
     private final Image healthImage, foodImage, tempImage;
@@ -39,9 +38,9 @@ public class GameStage extends Stage implements ExpiStage {
     private final SwitchArrow switchArrowUp, switchArrowDown;
     private final Image inventoryButton, consumeButton;
 
-    public GameStage() {
+    public GameRoot() {
 
-        super(new StretchViewport(1000,1000), ExpiGame.get().getBatch());
+        if(Consts.DEBUG) setDebug(true);
 
         toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, "Tools", ChosenSlot.TOOL_SLOT);
         materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, "Mats", ChosenSlot.MATERIAL_SLOT);
@@ -60,14 +59,13 @@ public class GameStage extends Stage implements ExpiStage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(UIInteractType.OPEN_INV);
-                GameScreen.get().showInvStage();
+                GameScreen.get().setRoot(new InventoryRoot());
             }
         });
 
         moveTS = new ThumbStick(Res.THUMB_STICK_STYLE);
         breakTS = new ThumbStick(Res.THUMB_STICK_STYLE);
 
-        rootTable = new Table();
         itemSelectTable = new Table();
         debugInfoTable = new Table();
         playerStatsTable = new Table();
@@ -90,53 +88,44 @@ public class GameStage extends Stage implements ExpiStage {
 
         itemSelectTable.add(switchArrowUp).padBottom(10).colspan(3);
         itemSelectTable.row();
-        itemSelectTable.add(toolSlot).padRight(10);
-        itemSelectTable.add(materialSlot).padRight(10);
-        itemSelectTable.add(consumableSlot);
+        itemSelectTable.add(toolSlot).padRight(20).width(120).height(Utils.percFromW(120));
+        itemSelectTable.add(materialSlot).padRight(20).width(120).height(Utils.percFromW(120));;
+        itemSelectTable.add(consumableSlot).width(120).height(Utils.percFromW(120));;
         itemSelectTable.row();
         itemSelectTable.add(switchArrowDown).padTop(10).colspan(3);
 
         if(Consts.DEBUG) {
-            debugInfoTable.add(fpsLabel).left();
+            debugInfoTable.add(fpsLabel).left().height(50).padTop(40);
             debugInfoTable.row();
-            debugInfoTable.add(locationLabel).left();
+            debugInfoTable.add(locationLabel).left().height(50);
             debugInfoTable.row();
-            debugInfoTable.add(entityLabel).left();
+            debugInfoTable.add(entityLabel).left().height(50);
             debugInfoTable.row();
-            debugInfoTable.add(callsLabel).left();
+            debugInfoTable.add(callsLabel).left().height(50);
             debugInfoTable.row();
-            debugInfoTable.add(buffersLabel).left();
+            debugInfoTable.add(buffersLabel).left().height(50);
             debugInfoTable.row();
         }
         debugInfoTable.add(warnLabel).left();
 
-        float iconSize = 30;
-        playerStatsTable.add(healthStat).padTop(10);
-        playerStatsTable.add(healthImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10);
+        float iconSize = 60;
+        playerStatsTable.add(healthStat).padTop(40).height(50);
+        playerStatsTable.add(healthImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(40);
         playerStatsTable.row();
-        playerStatsTable.add(foodStat).padTop(10);
-        playerStatsTable.add(foodImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(20);
+        playerStatsTable.add(foodStat).padTop(10).height(50);
+        playerStatsTable.add(foodImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10);
         playerStatsTable.row();
-        playerStatsTable.add(tempStat).padTop(10);
-        playerStatsTable.add(tempImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(20);
+        playerStatsTable.add(tempStat).padTop(10).height(50);
+        playerStatsTable.add(tempImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10);
         playerStatsTable.row();
-
-        rootTable.setBounds(0, 0, 1000, 1000);
-
-        if(Consts.DEBUG) rootTable.debugCell();
-        if(Consts.DEBUG) rootTable.setDebug(true);
+        playerStatsTable.setDebug(true);
 
         build();
-
-        setRoot(rootTable);
-        getRoot().setVisible(false);
 
     }
 
     @Override
-    public void act() {
-
-        if(!getRoot().isVisible()) return;
+    public void draw(Batch batch, float parentAlpha) {
 
         fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
         Vector2 loc = GameScreen.get().getWorld().getPlayer().getLocation();
@@ -148,17 +137,51 @@ public class GameStage extends Stage implements ExpiStage {
         String in = "in: "+Math.round(ExpiGame.get().getClientGateway().getIn().occupied() * 1000) / 10f+"%";
         buffersLabel.setText(out+" "+in);
 
-        if(!lastFocused.isFocused()) {
-            build();
-            lastFocused = focusedSlot;
-        }
-
-        super.act();
+        super.draw(batch, parentAlpha);
     }
 
-    public void feedHotSlots(PacketInputStream in) {
-        ChosenSlot chs = ChosenSlot.getSlot(in.getByte());
-        switch(chs) {
+    private void build() {
+
+        clear();
+        add(debugInfoTable).align(Align.topLeft);
+        add();
+        add(playerStatsTable).align(Align.topRight);
+        row();
+        add(inventoryButton).width(128).height(Utils.percFromW(128)).align(Align.right).colspan(3).padTop(50);
+        row().expand();
+        add(moveTS).align(Align.bottomLeft).padBottom(fromCMToPercW(1)).padLeft(fromCMToPercW(1)).uniformX();
+        add(itemSelectTable).align(Align.bottom).padBottom(20);
+
+        if(toolSlot.isFocused()) {
+            add(breakTS).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
+        }else if(materialSlot.isFocused()) {
+            ImageButton but = GameScreen.get().getWorld().getPlayer().getTilePlacer().getStabilityButton();
+            add(but).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
+        }else if(consumableSlot.isFocused()) {
+            add(consumeButton).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
+        }
+    }
+
+    public HotBarSlot getFocusedSlot() {
+        return focusedSlot;
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
+    }
+
+    @Override
+    public boolean isDimmed() {
+        return false;
+    }
+
+    @Override
+    public void refresh() {
+
+        HotSlotsData data = GameScreen.get().getInventoryHandler().getHotSlotsData();
+
+        switch(data.getChosenSlot()) {
             case TOOL_SLOT:
                 toolSlot.setFocus(true);
                 materialSlot.setFocus(false);
@@ -178,57 +201,20 @@ public class GameStage extends Stage implements ExpiStage {
                 focusedSlot = consumableSlot;
                 break;
         }
-        toolSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
-        materialSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
-        consumableSlot.setItemStack(new ItemStack(Item.getType(in.getInt()), in.getInt()));
-    }
+        toolSlot.setItemStack(data.getIs1());
+        materialSlot.setItemStack(data.getIs2());
+        consumableSlot.setItemStack(data.getIs3());
 
-    public void feedLivingStats(PacketInputStream in) {
-        healthStat.setText((int)Math.ceil(in.getFloat())+" %");
-        foodStat.setText((int)Math.ceil(in.getFloat())+" %");
-        tempStat.setText((int)Math.ceil(in.getFloat())+" °C");
-    }
-
-    public ItemStack getItemInHand() {
-        return focusedSlot.getItemStack();
-    }
-
-    private void build() {
-
-        rootTable.clear();
-        rootTable.add(debugInfoTable).align(Align.topLeft);
-        rootTable.add();
-        rootTable.add(playerStatsTable).align(Align.topRight);
-        rootTable.row();
-        rootTable.add(inventoryButton).width(64).height(Utils.percFromW(64)).align(Align.right).colspan(3).padTop(50);
-        rootTable.row().expand();
-        rootTable.add(moveTS).align(Align.bottomLeft).padBottom(fromCMToPercW(1)).padLeft(fromCMToPercW(1)).uniformX();
-        rootTable.add(itemSelectTable).align(Align.bottom).padBottom(20);
-
-        if(toolSlot.isFocused()) {
-            rootTable.add(breakTS).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
-        }else if(materialSlot.isFocused()) {
-            ImageButton but = GameScreen.get().getWorld().getPlayer().getTilePlacer().getStabilityButton();
-            rootTable.add(but).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
-        }else if(consumableSlot.isFocused()) {
-            rootTable.add(consumeButton).align(Align.bottomRight).padBottom(fromCMToPercW(1)).padRight(fromCMToPercW(1)).uniformX();
+        if(!lastFocused.isFocused()) {
+            build();
+            lastFocused = focusedSlot;
         }
-    }
 
-    public boolean isVisible() {
-        return getRoot().isVisible();
-    }
+        PlayerDataHandler playerData = GameScreen.get().getPlayerDataHandler();
 
-    public void setVisible(boolean visible) {
-        getRoot().setVisible(visible);
-    }
+        healthStat.setText((int)Math.ceil(playerData.getHealth())+" %");
+        foodStat.setText((int)Math.ceil(playerData.getFood())+" %");
+        tempStat.setText((int)Math.ceil(playerData.getTemperature())+" °C");
 
-    public HotBarSlot getFocusedSlot() {
-        return focusedSlot;
-    }
-
-    @Override
-    public boolean isDimmed() {
-        return false;
     }
 }

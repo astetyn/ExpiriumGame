@@ -3,6 +3,7 @@ package com.astetyne.expirium.main.net.client;
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.main.gui.roots.DoubleInventoryRoot;
 import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.screens.GameScreen;
@@ -85,14 +86,13 @@ public class ClientPacketManager {
                     break;
 
                 case 24: //InvFeedPacket
-                    GameScreen.get().getInvStage().getMainData().feed(in);
-                    GameScreen.get().getInvStage().getSecondData().feed(in);
-                    GameScreen.get().getInvStage().onFeedUpdate();
-                    GameScreen.get().getDoubleInvStage().onFeedUpdate();
+                    GameScreen.get().getInventoryHandler().getMainData().feed(in);
+                    GameScreen.get().getInventoryHandler().getSecondData().feed(in);
+                    GameScreen.get().getActiveRoot().refresh();
                     break;
 
-                case 27:
-                    GameScreen.get().getGameStage().feedLivingStats(in);
+                case 27: //living stats
+                    GameScreen.get().getPlayerDataHandler().feed(in);
                     break;
 
                 case 28: //EnviroPacket
@@ -101,10 +101,11 @@ public class ClientPacketManager {
                     break;
 
                 case 30: //InvHotSlotsFeedPacket
-                    GameScreen.get().getGameStage().feedHotSlots(in);
+                    GameScreen.get().getInventoryHandler().getHotSlotsData().feed(in);
+                    GameScreen.get().getActiveRoot().refresh();
                     break;
                 case 31: //OpenDoubleInvPacket
-                    GameScreen.get().getDoubleInvStage().open(in);
+                    GameScreen.get().setRoot(new DoubleInventoryRoot(in));
                     break;
             }
         }
@@ -121,6 +122,7 @@ public class ClientPacketManager {
         out.putFloat(ts1.getVert());
         out.putFloat(ts2.getHorz());
         out.putFloat(ts2.getVert());
+        System.out.println("C: putting TS Packet: "+ts1.getHorz()+" "+ts1.getVert());
     }
 
     public void putInteractPacket(float x, float y, InteractType type) {

@@ -6,10 +6,10 @@ import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.world.event.ServerTickEvent;
 import com.astetyne.expirium.server.api.world.event.TickListener;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
+import com.astetyne.expirium.server.backend.TickLooper;
 import com.badlogic.gdx.math.Vector2;
 
 public class ExpiDroppedItem extends ExpiEntity implements TickListener {
@@ -26,8 +26,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
         this.item = item;
         this.pickCooldown = pickCooldown;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);
-        GameServer.get().getDroppedItems().add(this);
-        ServerTickEvent.getListeners().add(this);
+        TickLooper.getListeners().add(this);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
     }
 
     public void destroy() {
-        ServerTickEvent.getListeners().remove(this);
+        TickLooper.getListeners().remove(this);
         super.destroy();
     }
 

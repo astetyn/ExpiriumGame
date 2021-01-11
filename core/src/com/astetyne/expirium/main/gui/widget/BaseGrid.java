@@ -60,7 +60,7 @@ public class BaseGrid extends Widget {
         }
 
         if(selectedItem != null) {
-            int size = 80;
+            int size = 160;
             TextureRegion tex = selectedItem.getItem().getItemTexture();
             batch.draw(tex, itemVec.x - size/2f, itemVec.y - Utils.percFromW(size)/2, size, Utils.percFromW(size));
         }

@@ -1,9 +1,9 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
+import com.astetyne.expirium.server.api.world.WorldSettings;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;
@@ -26,10 +26,9 @@ public class GameServer implements Runnable {
     private final List<WorldLoader> worldLoaders;
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
-    private final List<ExpiDroppedItem> droppedItems;
 
     // you MUST create this object on dedicated thread, it will create endless loop
-    public GameServer() {
+    public GameServer(WorldSettings worldSettings, boolean createNew, int tps, int port) throws Exception {
 
         server = this;
 
@@ -40,12 +39,11 @@ public class GameServer implements Runnable {
         worldLoaders = new ArrayList<>();
         entities = new ArrayList<>();
         players = new ArrayList<>();
-        droppedItems = new ArrayList<>();
 
-        expiWorld = new ExpiWorld("svet");
+        expiWorld = new ExpiWorld(worldSettings, createNew);
 
-        tickLooper = new TickLooper();
-        serverGateway = new ServerGateway();
+        tickLooper = new TickLooper(tps);
+        serverGateway = new ServerGateway(port);
 
     }
 
@@ -122,10 +120,6 @@ public class GameServer implements Runnable {
 
     public List<ServerPlayerGateway> getLeavingClients() {
         return leavingClients;
-    }
-
-    public List<ExpiDroppedItem> getDroppedItems() {
-        return droppedItems;
     }
 
     public List<WorldLoader> getWorldLoaders() {

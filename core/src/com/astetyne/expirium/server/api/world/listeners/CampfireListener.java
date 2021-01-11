@@ -7,6 +7,7 @@ import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.event.*;
 import com.astetyne.expirium.server.api.world.inventory.CookingInventory;
+import com.astetyne.expirium.server.backend.TickLooper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,13 +38,13 @@ public class CampfireListener implements TileChangeListener {
             Campfire campfire = lookUp.get(event.getTile());
             activeCampfires.remove(campfire);
             PlayerInteractEvent.getListeners().remove(campfire);
-            ServerTickEvent.getListeners().remove(campfire);
+            TickLooper.getListeners().remove(campfire);
         }
 
         if(toType == TileType.CAMPFIRE_BIG) {
             Campfire cf = new Campfire(event.getTile());
             PlayerInteractEvent.getListeners().add(cf);
-            ServerTickEvent.getListeners().add(cf);
+            TickLooper.getListeners().add(cf);
             activeCampfires.add(cf);
             lookUp.put(cf.tile, cf);
         }

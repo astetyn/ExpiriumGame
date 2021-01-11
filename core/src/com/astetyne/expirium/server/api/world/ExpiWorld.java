@@ -6,57 +6,71 @@ import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.world.event.ServerTickEvent;
 import com.astetyne.expirium.server.api.world.event.Source;
 import com.astetyne.expirium.server.api.world.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.api.world.listeners.TreeListener;
 import com.astetyne.expirium.server.backend.FixRes;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExpiWorld {
+public class ExpiWorld implements Saveable {
 
-    private final ExpiTile[][] worldTerrain;
-    private final int terrainWidth, terrainHeight;
-    private final int partHeight;
-    private final String worldName;
-    private final long seed;
-    private final World b2dWorld;
-    private final Body terrainBody;
-    private final WorldGenerator worldGenerator;
-    private final StabilityCalculator stabilityCalc;
-    private final FixtureCalculator fixtureCalc;
+    private ExpiTile[][] worldTerrain;
+    private int partHeight;
+    private World b2dWorld;
+    private Body terrainBody;
+    private StabilityCalculator stabilityCalc;
+    private FixtureCalculator fixtureCalc;
     private WeatherType weatherType;
-    private final InteractHandler interactHandler;
-    private final ExpiContactListener contactListener;
+    private InteractHandler interactHandler;
+    private ExpiContactListener contactListener;
+    private final WorldFileManager fileManager;
     private float stepsTimeAccumulator;
     private int worldTime;
+    private WorldSettings settings;
 
-    public ExpiWorld(String worldName) {
-        this(worldName, (long)(Math.random()*10000));
-    }
+    public ExpiWorld(WorldSettings settings, boolean createNew) throws Exception {
 
-    public ExpiWorld(String worldName, long seed) {
+        fileManager = new WorldFileManager(this);
 
-        this.worldName = worldName;
-        this.seed = seed;
+        if(!createNew) {
+            fileManager.loadWorld(settings.name);
+            return;
+        }
+
+        this.settings = settings;
+
+        worldTerrain = new ExpiTile[settings.height][settings.width];
+        new WorldGenerator(worldTerrain).generateWorld();
 
         worldTime = 0;
-
         weatherType = WeatherType.SUNNY;
+
+        initAfterCreation();
+
+        try {
+            fileManager.saveWorld(settings.name);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initAfterCreation() {
 
         stepsTimeAccumulator = 0;
 
@@ -65,12 +79,7 @@ public class ExpiWorld {
         new CampfireListener();
         new TreeListener();
 
-        terrainWidth = 320;
-        terrainHeight = 320;
-
         partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
-
-        worldTerrain = new ExpiTile[terrainHeight][terrainWidth];
 
         b2dWorld = new World(new Vector2(0, -9.81f), false);
 
@@ -83,17 +92,15 @@ public class ExpiWorld {
         terrainDef.position.set(0, 0);
         terrainBody = b2dWorld.createBody(terrainDef);
 
-        worldGenerator = new WorldGenerator(worldTerrain);
         stabilityCalc = new StabilityCalculator(worldTerrain);
         fixtureCalc = new FixtureCalculator(this, terrainBody);
 
-        FileHandle file = Gdx.files.local("world/"+worldName+".txt");
+        System.out.println("Creating fixtures...");
+        fixtureCalc.generateWorldFixtures();
+        System.out.println("Recalculating stability...");
+        stabilityCalc.generateStability();
+        System.out.println("Generating world done!");
 
-        if(!file.exists()) {
-            createWorld();
-        }else {
-            //todo: nacitat svet zo suboru
-        }
     }
 
     public void onTick() {
@@ -115,19 +122,6 @@ public class ExpiWorld {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
         }
-
-        ServerTickEvent.onTick();
-
-    }
-
-    public void createWorld() {
-        System.out.println("Generating world...");
-        worldGenerator.generateWorld();
-        System.out.println("Creating fixtures...");
-        fixtureCalc.generateWorldFixtures();
-        System.out.println("Recalculating stability...");
-        stabilityCalc.generateStability();
-        System.out.println("Generating world done!");
     }
 
     public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
@@ -218,14 +212,10 @@ public class ExpiWorld {
 
     public Vector2 getSaveLocationForSpawn() {
         int i = 0;
-        while(i != terrainHeight && worldTerrain[i][10].getType() != TileType.AIR) {
+        while(i != settings.height && worldTerrain[i][10].getType() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);
-    }
-
-    public void saveWorld() {
-
     }
 
     public ExpiTile getTileAt(float x, float y) {
@@ -234,14 +224,6 @@ public class ExpiWorld {
 
     public ExpiTile getTileAt(Vector2 vec) {
         return worldTerrain[(int)vec.y][(int)vec.x];
-    }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
-    public long getSeed() {
-        return seed;
     }
 
     public Body getTerrainBody() {
@@ -273,14 +255,49 @@ public class ExpiWorld {
     }
 
     public int getTerrainWidth() {
-        return terrainWidth;
+        return settings.width;
     }
 
     public int getTerrainHeight() {
-        return terrainHeight;
+        return settings.height;
     }
 
     public int getPartHeight() {
         return partHeight;
+    }
+
+    @Override
+    public void readData(DataInputStream in) throws IOException {
+
+        settings = new WorldSettings();
+        settings.readData(in);
+
+        worldTerrain = new ExpiTile[settings.height][settings.width];
+
+        for(int h = 0; h < settings.height; h++) {
+            for(int w = 0; w < settings.width; w++) {
+                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), w, h);
+            }
+        }
+
+        //todo: len docasne zatial
+        worldTime = 0;
+        weatherType = WeatherType.SUNNY;
+
+        initAfterCreation();
+
+    }
+
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+
+        settings.writeData(out);
+
+        for(int h = 0; h < settings.height; h++) {
+            for(int w = 0; w < settings.width; w++) {
+                out.writeByte(worldTerrain[h][w].getType().getID());
+            }
+        }
+
     }
 }
