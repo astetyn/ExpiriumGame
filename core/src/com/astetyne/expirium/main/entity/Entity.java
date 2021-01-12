@@ -69,7 +69,6 @@ public abstract class Entity implements MetaReadable {
         lastLoc = getLocation().cpy();
         lastAngle = angle;
         interpolationDelta = 0;
-        System.out.println("C: onMove: x: "+targetLocation.x+" y: "+targetLocation.y);
     }
 
     public Vector2 getLocation() {

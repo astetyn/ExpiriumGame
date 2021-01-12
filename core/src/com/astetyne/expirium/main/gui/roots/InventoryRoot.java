@@ -33,7 +33,7 @@ public class InventoryRoot extends Table implements ExpiRoot {
 
         recipeList = new RecipeList(new RecipeListTable(recipeDetail));
 
-        storage = new StorageGrid(GameScreen.get().getInventoryHandler().getMainData(), true);
+        storage = new StorageGrid(GameScreen.get().getPlayerData().getMainData(), true);
 
         storage.addListener(new InputListener() {
 
@@ -82,5 +82,10 @@ public class InventoryRoot extends Table implements ExpiRoot {
     @Override
     public void refresh() {
         storage.refreshLabels();
+    }
+
+    @Override
+    public boolean canInteractWithWorld() {
+        return false;
     }
 }

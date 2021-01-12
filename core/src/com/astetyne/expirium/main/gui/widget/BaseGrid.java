@@ -1,9 +1,9 @@
 package com.astetyne.expirium.main.gui.widget;
 
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.data.StorageGridData;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.StorageGridData;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.graphics.g2d.Batch;

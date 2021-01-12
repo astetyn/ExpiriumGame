@@ -9,31 +9,17 @@ import com.astetyne.expirium.main.world.tiles.TileType;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class TilePlacer implements InputProcessor {
 
     private final SpriteBatch batch;
     private final GameWorld world;
-    private final ImageButton stabilityButton;
-    private boolean stabilityShowActive, pressed;
+    private boolean pressed;
 
     public TilePlacer() {
 
         batch = ExpiGame.get().getBatch();
         world = GameScreen.get().getWorld();
-        stabilityShowActive = false;
-
-        stabilityButton = new ImageButton(new TextureRegionDrawable(Res.DIRT_TILE));
-        stabilityButton.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                stabilityShowActive = !stabilityShowActive;
-            }
-        });
 
     }
 
@@ -41,7 +27,7 @@ public class TilePlacer implements InputProcessor {
 
         if(t.getType() == TileType.AIR) return;
 
-        if(stabilityShowActive) {
+        if(GameScreen.get().isBuildViewActive()) {
 
             if(t.getStability() == 1) {
                 batch.setColor(0.9f, 0f, 0f, 1);
@@ -77,7 +63,7 @@ public class TilePlacer implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        //todo: ??
+        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return false;
@@ -117,7 +103,4 @@ public class TilePlacer implements InputProcessor {
         return false;
     }
 
-    public ImageButton getStabilityButton() {
-        return stabilityButton;
-    }
 }

@@ -23,7 +23,7 @@ public class SwitchArrow extends Widget {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(onClick);
+                ExpiGame.get().getClientGateway().getManager().putUIInteractPacket(onClick);
                 pressed = true;
                 return true;
             }
@@ -54,7 +54,7 @@ public class SwitchArrow extends Widget {
 
     @Override
     public float getPrefWidth() {
-        return 50;
+        return 100;
     }
 
     @Override

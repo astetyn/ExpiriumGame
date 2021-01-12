@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
+import com.astetyne.expirium.main.world.WorldLoadingException;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
@@ -15,18 +16,21 @@ public class WorldFileManager {
         this.world = world;
     }
 
-    public void loadWorld(String name) throws Exception {
+    public void loadWorld(String name) throws WorldLoadingException {
 
         FileHandle file = Gdx.files.local(worldsPath+name);
 
         if(!file.exists()) {
-            throw new Exception("World does not exists.");
+            throw new WorldLoadingException("World does not exists.");
         }
 
         DataInputStream in = new DataInputStream(new BufferedInputStream(file.read()));
-        world.readData(in);
-        in.close();
-
+        try {
+            world.readData(in);
+            in.close();
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void saveWorld(String name) throws IOException {

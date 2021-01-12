@@ -104,7 +104,6 @@ public class ServerPacketManager {
         out.putFloat(e.getVelocity().x);
         out.putFloat(e.getVelocity().y);
         out.putFloat(e.getBody().getAngle());
-        System.out.println("S: putting move: x: "+e.getLocation().x+" y: "+e.getLocation().y);
     }
 
     public void putEntitySpawnPacket(ExpiEntity e) {

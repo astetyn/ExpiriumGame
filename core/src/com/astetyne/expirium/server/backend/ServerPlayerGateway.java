@@ -66,7 +66,6 @@ public class ServerPlayerGateway extends TerminableLooper {
 
                 synchronized(gameServer.getTickLooper().getTickLock()) {
                     gameServer.getTickLooper().getTickLock().wait();
-                    System.out.println("S: swappping!");
                     in.swap();
                     out.swap();
                 }

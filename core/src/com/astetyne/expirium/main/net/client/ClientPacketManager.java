@@ -1,10 +1,10 @@
 package com.astetyne.expirium.main.net.client;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.data.ThumbStickData;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.gui.roots.DoubleInventoryRoot;
-import com.astetyne.expirium.main.gui.widget.ThumbStick;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
@@ -86,13 +86,11 @@ public class ClientPacketManager {
                     break;
 
                 case 24: //InvFeedPacket
-                    GameScreen.get().getInventoryHandler().getMainData().feed(in);
-                    GameScreen.get().getInventoryHandler().getSecondData().feed(in);
-                    GameScreen.get().getActiveRoot().refresh();
+                    GameScreen.get().getPlayerData().feedInventory(in);
                     break;
 
                 case 27: //living stats
-                    GameScreen.get().getPlayerDataHandler().feed(in);
+                    GameScreen.get().getPlayerData().feedLivingStats(in);
                     break;
 
                 case 28: //EnviroPacket
@@ -101,7 +99,7 @@ public class ClientPacketManager {
                     break;
 
                 case 30: //InvHotSlotsFeedPacket
-                    GameScreen.get().getInventoryHandler().getHotSlotsData().feed(in);
+                    GameScreen.get().getPlayerData().getHotSlotsData().feed(in);
                     GameScreen.get().getActiveRoot().refresh();
                     break;
                 case 31: //OpenDoubleInvPacket
@@ -116,13 +114,15 @@ public class ClientPacketManager {
         out.putString(name);
     }
 
-    public void putTSPacket(ThumbStick ts1, ThumbStick ts2) {
+    public void putTSPacket() {
+        ThumbStickData data1 = GameScreen.get().getPlayerData().getThumbStickData1();
+        ThumbStickData data2 = GameScreen.get().getPlayerData().getThumbStickData2();
+
         out.startPacket(14);
-        out.putFloat(ts1.getHorz());
-        out.putFloat(ts1.getVert());
-        out.putFloat(ts2.getHorz());
-        out.putFloat(ts2.getVert());
-        System.out.println("C: putting TS Packet: "+ts1.getHorz()+" "+ts1.getVert());
+        out.putFloat(data1.horz);
+        out.putFloat(data1.vert);
+        out.putFloat(data2.horz);
+        out.putFloat(data2.vert);
     }
 
     public void putInteractPacket(float x, float y, InteractType type) {
@@ -132,7 +132,7 @@ public class ClientPacketManager {
         out.putInt(type.getID());
     }
 
-    public void putInvInteractPacket(UIInteractType action) {
+    public void putUIInteractPacket(UIInteractType action) {
         out.startPacket(29);
         out.putInt(action.getID());
     }

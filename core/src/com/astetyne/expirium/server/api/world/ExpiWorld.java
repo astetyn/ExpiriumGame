@@ -4,6 +4,7 @@ import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.WeatherType;
+import com.astetyne.expirium.main.world.WorldLoadingException;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.Saveable;
@@ -44,12 +45,16 @@ public class ExpiWorld implements Saveable {
     private int worldTime;
     private WorldSettings settings;
 
-    public ExpiWorld(WorldSettings settings, boolean createNew) throws Exception {
+    public ExpiWorld(WorldSettings settings, boolean createNew) {
 
         fileManager = new WorldFileManager(this);
 
         if(!createNew) {
-            fileManager.loadWorld(settings.name);
+            try {
+                fileManager.loadWorld(settings.name);
+            }catch(WorldLoadingException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -110,12 +115,16 @@ public class ExpiWorld implements Saveable {
             worldTime = 0;
         }
 
-        stepsTimeAccumulator += 1f / Consts.SERVER_DEFAULT_TPS;
+        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            pp.applyPhysics();
+        }
 
+        stepsTimeAccumulator += 1f / Consts.SERVER_DEFAULT_TPS;
         while(stepsTimeAccumulator >= 1/60f) {
             b2dWorld.step(1/60f, 6, 2);
             stepsTimeAccumulator -= 1/60f;
         }
+        //b2dWorld.step(1f/Consts.SERVER_DEFAULT_TPS, 6, 2);
 
         for(ExpiEntity ee : GameServer.get().getEntities()) {
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {

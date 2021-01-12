@@ -8,12 +8,12 @@ import com.badlogic.gdx.math.Vector2;
 public class PlayerEntityAnimator {
 
     private final SpriteBatch batch;
-    private final PlayerEntity player;
+    private final Entity player;
 
     private float timer;
     private int lastState;
 
-    public PlayerEntityAnimator(SpriteBatch batch, PlayerEntity player) {
+    public PlayerEntityAnimator(SpriteBatch batch, Entity player) {
 
         this.batch = batch;
         this.player = player;

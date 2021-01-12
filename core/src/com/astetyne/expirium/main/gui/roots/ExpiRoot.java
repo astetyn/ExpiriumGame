@@ -10,6 +10,6 @@ public interface ExpiRoot {
 
     void refresh();
 
-    //todo canInteractWithWorld() ? - pretoze to tileplacer potrebuje
+    boolean canInteractWithWorld();
 
 }

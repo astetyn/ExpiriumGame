@@ -1,9 +1,8 @@
 package com.astetyne.expirium.main.screens;
 
 import com.astetyne.expirium.main.ExpiGame;
-import com.astetyne.expirium.main.InventoryHandler;
-import com.astetyne.expirium.main.PlayerDataHandler;
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.data.PlayerDataHandler;
 import com.astetyne.expirium.main.gui.roots.ExpiRoot;
 import com.astetyne.expirium.main.gui.roots.GameRoot;
 import com.astetyne.expirium.main.utils.Consts;
@@ -28,13 +27,15 @@ public class GameScreen implements Screen {
     private final GameWorld gameWorld;
     private int serverTime;
     private int serverTPS;
-    private final InventoryHandler inventoryHandler;
     private final PlayerDataHandler playerDataHandler;
     private ExpiRoot activeRoot;
+    private boolean buildViewActive;
 
     public GameScreen(PacketInputStream in) {
 
         gameScreen = this;
+
+        buildViewActive = false;
 
         serverTPS = Consts.SERVER_DEFAULT_TPS;
 
@@ -42,11 +43,11 @@ public class GameScreen implements Screen {
         multiplexer = new InputMultiplexer();
         gameWorld = new GameWorld();
 
-        inventoryHandler = new InventoryHandler();
         playerDataHandler = new PlayerDataHandler();
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
         setRoot(new GameRoot());
+        //setRoot(new TestRoot());
 
         multiplexer.addProcessor(stage);
 
@@ -104,7 +105,7 @@ public class GameScreen implements Screen {
 
         gameWorld.render();
 
-        if(false) {
+        if(activeRoot.isDimmed()) {
             batch.setColor(0, 0, 0, 0.5f);
             batch.draw(Res.WHITE_TILE, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.setColor(1, 1, 1, 1);
@@ -194,15 +195,19 @@ public class GameScreen implements Screen {
         return serverTPS;
     }
 
-    public InventoryHandler getInventoryHandler() {
-        return inventoryHandler;
-    }
-
-    public PlayerDataHandler getPlayerDataHandler() {
+    public PlayerDataHandler getPlayerData() {
         return playerDataHandler;
     }
 
     public ExpiRoot getActiveRoot() {
         return activeRoot;
+    }
+
+    public boolean isBuildViewActive() {
+        return buildViewActive;
+    }
+
+    public void toggleBuildViewActive() {
+        buildViewActive = !buildViewActive;
     }
 }

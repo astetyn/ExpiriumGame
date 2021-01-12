@@ -28,7 +28,7 @@ public class GameServer implements Runnable {
     private final List<ExpiPlayer> players;
 
     // you MUST create this object on dedicated thread, it will create endless loop
-    public GameServer(WorldSettings worldSettings, boolean createNew, int tps, int port) throws Exception {
+    public GameServer(WorldSettings worldSettings, boolean createNew, int tps, int port) {
 
         server = this;
 

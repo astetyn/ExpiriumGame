@@ -26,7 +26,7 @@ public class HostCreatorRoot extends Table {
     private Label lastWorld;
     private final TextButton launchButton;
 
-    public HostCreatorRoot(String playerName) {
+    public HostCreatorRoot() {
 
         Table leftTable = new Table();
         Table rightTable = new Table();
@@ -49,7 +49,7 @@ public class HostCreatorRoot extends Table {
             public void changed(ChangeEvent event, Actor actor) {
                 ExpiGame.get().startServer(new WorldSettings(selectedWorld.name()), false, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 LauncherScreen.get().setRoot(new LoadingRoot("Loading world..."));
-                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress(), playerName);
+                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
             }
         });
 
@@ -73,30 +73,38 @@ public class HostCreatorRoot extends Table {
         // world creator table
         Label worldCreatorTitle = new Label("Create new world", Res.LABEL_STYLE);
         worldCreatorTitle.setAlignment(Align.center);
+        Image returnButton = new Image(Res.CROSS_ICON);
+        returnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                LauncherScreen.get().setRoot(new LauncherRoot());
+            }
+        });
         TextField tf = new TextField("", Res.TEXT_FIELD_STYLE);
         tf.setMessageText("Enter world name");
         tf.setAlignment(Align.center);
-        tf.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z]"));
+        tf.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z ]"));
         TextButton createNewButton = new TextButton("Create new!", Res.TEXT_BUTTON_STYLE);
         createNewButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(tf.getText().isEmpty()) {
+                if(tf.getText().trim().isEmpty()) {
                     //todo: check: existujuce meno + vymazat svet (vo saved worlds)
                     //todo: oznamit to?
                     return;
                 }
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
-                ExpiGame.get().startServer(new WorldSettings(tf.getText(), 60, 60, 0), true, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
-                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress(), playerName);
+                ExpiGame.get().startServer(new WorldSettings(tf.getText().trim(), 60, 60, 0), true, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
             }
         });
 
         rightTable.add(worldCreatorTitle).expandX().padTop(50).align(Align.top);
+        rightTable.add(returnButton).width(100).height(Utils.percFromW(100)).align(Align.topRight).pad(10, 0, 0, 20);
         rightTable.row();
-        rightTable.add(tf).width(600).height(100).expandY();
+        rightTable.add(tf).width(600).height(100).expandY().colspan(2);
         rightTable.row();
-        rightTable.add(createNewButton).width(400).height(100).align(Align.bottom).padBottom(50);
+        rightTable.add(createNewButton).width(400).height(100).align(Align.bottom).padBottom(50).colspan(2);
         rightTable.background(new TextureRegionDrawable(Res.INV_CHOOSE_BACK));
 
         add(leftTable).width(1000).growY();

@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main;
 
 import com.astetyne.expirium.main.net.client.ClientGateway;
+import com.astetyne.expirium.main.net.client.ClientPacketManager;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.server.GameServer;
@@ -15,20 +16,22 @@ public class ExpiGame extends Game {
 
 	private static ExpiGame expiGame;
 
-	private GameServer server;
 	private final ClientGateway clientGateway;
 	private final Object serverTickLock;
-	private boolean available;
+	private boolean nextPacketsAvailable;
 	private String playerName;
 	private float timeSinceStart;
 	private SpriteBatch batch;
+	private boolean hostingServer;
 
 	public ExpiGame() {
 		expiGame = this;
-		available = false;
+		nextPacketsAvailable = false;
 		serverTickLock = new Object();
 		clientGateway = new ClientGateway();
 		timeSinceStart = 0;
+		playerName = "";
+		hostingServer = false;
 	}
 
 	@Override
@@ -53,17 +56,16 @@ public class ExpiGame extends Game {
 	public void dispose () {
 		super.dispose();
 		getScreen().dispose();
-
-		if(server != null) {
-			server.stop();
-		}
 		clientGateway.end();
 		Res.dispose();
-
 	}
 
 	public ClientGateway getClientGateway() {
 		return clientGateway;
+	}
+
+	public ClientPacketManager getNetManager() {
+		return clientGateway.getManager();
 	}
 
 	public static ExpiGame get() {
@@ -72,38 +74,31 @@ public class ExpiGame extends Game {
 
 	public void notifyServerUpdate() {
 		synchronized(serverTickLock) {
-			available = true;
+			nextPacketsAvailable = true;
 		}
 	}
 
 	public void checkServerMessages() {
 		synchronized(serverTickLock) {
-			if(!available) return;
-			available = false;
+			if(!nextPacketsAvailable) return;
+			nextPacketsAvailable = false;
 		}
-		System.out.println("C: swapping!");
+		if(GameScreen.get() != null) {
+			clientGateway.getManager().putTSPacket();
+		}
 		clientGateway.swapBuffers();
 		clientGateway.getManager().processIncomingPackets();
-
-		if(GameScreen.get() != null) {
-			GameScreen.get().getWorld().getPlayer().sendTSPacket();
-		}
-
 	}
 
 	public void startServer(WorldSettings settings, boolean createNew, int tps, int port) {
-		try {
-			server = new GameServer(settings, createNew, tps, port);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		hostingServer = true;
+		GameServer server = new GameServer(settings, createNew, tps, port);
 		Thread t = new Thread(server);
 		t.setName("Game Server");
 		t.start();
 	}
 
-	public void startClient(Inet4Address address, String playerName) {
-		this.playerName = playerName;
+	public void startClient(Inet4Address address) {
 		clientGateway.setIpAddress(address);
 		Thread t = new Thread(clientGateway);
 		t.setName("Client gateway");
@@ -114,11 +109,23 @@ public class ExpiGame extends Game {
 		return playerName;
 	}
 
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
+
 	public float getTime() {
 		return timeSinceStart;
 	}
 
 	public SpriteBatch getBatch() {
 		return batch;
+	}
+
+	public boolean isHostingServer() {
+		return hostingServer;
+	}
+
+	public void setHostingServer(boolean hostingServer) {
+		this.hostingServer = hostingServer;
 	}
 }

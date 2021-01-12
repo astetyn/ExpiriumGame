@@ -1,5 +1,7 @@
-package com.astetyne.expirium.main.items;
+package com.astetyne.expirium.main.data;
 
+import com.astetyne.expirium.main.items.Item;
+import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 

@@ -29,7 +29,7 @@ public class HotBarSlot extends Widget {
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ExpiGame.get().getClientGateway().getManager().putInvInteractPacket(slotType.getOnClick());
+                ExpiGame.get().getClientGateway().getManager().putUIInteractPacket(slotType.getOnClick());
             }
         });
     }

@@ -7,7 +7,7 @@ public class Consts {
     // networking
     public static final int SERVER_PORT = 1414;
     public static final int BUFFER_SIZE = 32768; //262144, 2097152, 32768
-    public static final int SERVER_DEFAULT_TPS = 20;
+    public static final int SERVER_DEFAULT_TPS = 30;
 
     // world
     public static final int BREAKING_PRECISION = 6;
@@ -29,6 +29,7 @@ public class Consts {
     public static final int PLAYER_INV_COLUMNS = 5;
     public static final int PLAYER_INV_ROWS = 5;
     public static final int PLAYER_INV_MAX_WEIGHT = 10;
+    public static final int JUMP_DELAY = 200;
 
     // gui
     public static final int INV_TILE_MLT = 60;

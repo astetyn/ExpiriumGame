@@ -2,9 +2,9 @@ package com.astetyne.expirium.main.gui.roots;
 
 import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
+import com.astetyne.expirium.main.data.StorageGridData;
 import com.astetyne.expirium.main.gui.widget.StorageGrid;
 import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.items.StorageGridData;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.utils.Utils;
@@ -28,12 +28,12 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
 
     public DoubleInventoryRoot(PacketInputStream in) {
 
-        StorageGridData secondData = GameScreen.get().getInventoryHandler().getSecondData();
+        StorageGridData secondData = GameScreen.get().getPlayerData().getSecondData();
         secondData.rows = in.getInt();
         secondData.columns = in.getInt();
 
-        storage1 = new StorageGrid(GameScreen.get().getInventoryHandler().getMainData(), true);
-        storage2 = new StorageGrid(GameScreen.get().getInventoryHandler().getSecondData(), false);
+        storage1 = new StorageGrid(GameScreen.get().getPlayerData().getMainData(), true);
+        storage2 = new StorageGrid(secondData, false);
 
         returnButton = new Image(Res.CROSS_ICON);
         returnButton.addListener(new ClickListener() {
@@ -119,5 +119,10 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
     public void refresh() {
         storage1.refreshLabels();
         storage2.refreshLabels();
+    }
+
+    @Override
+    public boolean canInteractWithWorld() {
+        return false;
     }
 }

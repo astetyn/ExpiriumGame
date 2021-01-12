@@ -21,6 +21,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     private ExpiInventory secondInv;
     private final ExpiTileBreaker tileBreaker;
     private float ts1H, ts1V, ts2H, ts2V;
+    private long lastJump;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
         super(EntityType.PLAYER, 0.9f, 1.25f);
@@ -35,6 +36,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         ts1H = ts1V = ts2H = ts2V = 0;
         TickLooper.getListeners().add(this);
+        lastJump = 0;
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -42,7 +44,6 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         ts1V = in.getFloat();
         ts2H = in.getFloat();
         ts2V = in.getFloat();
-        System.out.println("S: updating TS: "+ts1H+" "+ts1V);
     }
 
     public void onInvMove(PacketInputStream in) {
@@ -156,10 +157,29 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         getNetManager().putInvFeedPacket();
     }
 
+    public void applyPhysics() {
+
+        if(onGround) {
+            Vector2 center = body.getWorldCenter();
+            if(ts1V >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+                body.applyLinearImpulse(0, 200, center.x, center.y, true);
+                lastJump = System.currentTimeMillis();
+            }
+        }
+        float vY = body.getLinearVelocity().y;
+        if((body.getLinearVelocity().x >= 3 && ts1H > 0)) {
+            ts1H = 0;
+            //body.setLinearVelocity(3, vY);
+        }else if(body.getLinearVelocity().x <= -3 && ts1H < 0) {
+            ts1H = 0;
+            //body.setLinearVelocity(-3, vY);
+        }else {
+            body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * ts1H, 0, true);
+        }
+    }
+
     @Override
     public void onTick() {
-
-        System.out.println("S: applying TS: "+ts1H+" "+ts1V);
 
         foodLevel -= (1f / Consts.SERVER_DEFAULT_TPS) / 10; // tenth of second = 1 for 10 seconds
 
@@ -172,25 +192,14 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         }
 
         tileBreaker.update(ts2H, ts2V);
-
-        Vector2 center = body.getWorldCenter();
-        float jump = 0;
-        if(onGround || Consts.DEBUG) {
-            if(body.getLinearVelocity().y < 5 && ts1V >= 0.6f) {
-                jump = 1;
-            }
-        }
-        if((body.getLinearVelocity().x >= 3 && ts1H > 0) || (body.getLinearVelocity().x <= -3 && ts1H < 0)) {
-            ts1H = 0;
-        }
-        body.applyLinearImpulse(0, Math.min((3200.0f/Consts.SERVER_DEFAULT_TPS), 200)*jump, center.x, center.y, true);
-        body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * ts1H, 0, true);
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
         for(ItemStack is : recipe.getRequiredItems()) {
             if(!mainInv.contains(is)) return;
         }
+        if(!mainInv.canBeAdded(recipe.getProduct().getItem(), recipe.getProduct().getAmount())) return;
+
         for(ItemStack is : recipe.getRequiredItems()) {
             mainInv.removeItem(is);
         }
@@ -215,6 +224,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         return EntityType.PLAYER;
     }
 
+    @Override
     public void destroy() {
         destroySafe();
         GameServer.get().getPlayers().remove(this);

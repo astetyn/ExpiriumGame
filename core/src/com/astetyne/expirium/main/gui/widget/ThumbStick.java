@@ -1,6 +1,6 @@
 package com.astetyne.expirium.main.gui.widget;
 
-import com.astetyne.expirium.main.utils.Utils;
+import com.astetyne.expirium.main.data.ThumbStickData;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,15 +12,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 public class ThumbStick extends Widget {
 
     private final ThumbStickStyle style;
+    private final ThumbStickData data;
 
     private float circleX, circleY;
     private float radius;
-    private float xR, yR, angle;
     private boolean touched;
     private int touchID;
     private final Vector2 touchVec;
 
-    public ThumbStick(ThumbStickStyle style) {
+    public ThumbStick(ThumbStickData data, ThumbStickStyle style) {
+
+        this.data = data;
 
         touchVec = new Vector2();
 
@@ -61,25 +63,26 @@ public class ThumbStick extends Widget {
         radius = getWidth()/2.0f;
         circleX = (int) (getX()+getWidth()/2);
         circleY = (int) (getY()+getHeight()/2);
-        xR = 0;
-        yR = 0;
+        data.horz = 0;
+        data.vert = 0;
     }
 
     private void recalculate(float xi, float yi) {
 
         touchVec.set(xi - getX() - radius, yi- getY() - getHeight()/2.0f);
-        angle = touchVec.angleDeg();
+        float angle = touchVec.angleDeg();
         float radiusMaxX = Math.min(touchVec.len(), radius);
         float radiusMaxY = Math.min(touchVec.len(), getHeight()/2);
         circleX = getX()+getWidth()/2.0f+(float)Math.cos(Math.toRadians(angle))*radiusMaxX;
         circleY = getY()+getHeight()/2.0f+(float)Math.sin(Math.toRadians(angle))*radiusMaxY;
-        xR = (circleX - (getX()+ radius)) / (radius);
-        yR = (circleY - (getY()+getHeight()/2.0f)) / (getHeight()/2.0f);
+        data.horz = (circleX - (getX()+ radius)) / (radius);
+        data.vert = (circleY - (getY()+getHeight()/2.0f)) / (getHeight()/2.0f);
 
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        validate();
         if(touched) {
             batch.setColor(1,1,1,0.8f);
         }else {
@@ -88,28 +91,6 @@ public class ThumbStick extends Widget {
         batch.draw(style.background, getX(), getY(), getWidth(), getHeight());
         batch.draw(style.foreground, circleX - getWidth()/4.0f, circleY - getHeight()/4.0f, radius, getHeight()/2.0f);
         batch.setColor(Color.WHITE);
-    }
-
-    @Override
-    public float getPrefWidth() {
-        return Utils.fromCMToPercW(3);
-    }
-
-    @Override
-    public float getPrefHeight() {
-        return Utils.percFromW(getPrefWidth());
-    }
-
-    public float getHorz() {
-        return xR;
-    }
-
-    public float getVert() {
-        return yR;
-    }
-
-    public float getAngle() {
-        return angle;
     }
 
     public static class ThumbStickStyle {
