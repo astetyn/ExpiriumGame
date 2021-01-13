@@ -77,7 +77,7 @@ public class HostCreatorRoot extends Table {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                LauncherScreen.get().setRoot(new LauncherRoot());
+                LauncherScreen.get().setRoot(new LauncherRoot(""));
             }
         });
         TextField tf = new TextField("", Res.TEXT_FIELD_STYLE);
@@ -94,7 +94,7 @@ public class HostCreatorRoot extends Table {
                     return;
                 }
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
-                ExpiGame.get().startServer(new WorldSettings(tf.getText().trim(), 60, 60, 0), true, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ExpiGame.get().startServer(new WorldSettings(tf.getText().trim(), 2000, 256, 0), true, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
             }
         });

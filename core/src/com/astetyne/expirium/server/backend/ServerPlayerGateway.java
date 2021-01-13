@@ -8,7 +8,6 @@ import java.net.Socket;
 
 public class ServerPlayerGateway extends TerminableLooper {
 
-    private final GameServer gameServer;
     private final Socket client;
     private final Object joinLock;
     private PacketInputStream in;
@@ -16,9 +15,9 @@ public class ServerPlayerGateway extends TerminableLooper {
     private ServerPacketManager packetManager;
     private int traffic;
     private long time;
+    private ExpiPlayer owner;
 
     public ServerPlayerGateway(Socket client) {
-        this.gameServer = GameServer.get();
         this.client = client;
         joinLock = new Object();
         traffic = 0;
@@ -42,7 +41,7 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             //System.out.println("Server reading init: "+readBytes);
 
-            gameServer.playerPreJoinAsync(this);
+            GameServer.get().getServerGateway().playerPreJoinAsync(this);
 
             synchronized(joinLock) {
                 joinLock.wait(); // wait until main looper recognize new player and populate init actions
@@ -55,7 +54,7 @@ public class ServerPlayerGateway extends TerminableLooper {
                 //System.out.println("Server flushing.");
                 client.setSoTimeout(5000);
                 readBytes = in.fillBuffer();
-                if(readBytes == -1) end();//System.out.println("Server reading: "+readBytes+"\n"+in);
+                if(readBytes == -1) GameServer.get().getServerGateway().playerPreLeaveAsync(this);//System.out.println("Server reading: "+readBytes+"\n"+in);
 
                 traffic += readBytes;
                 if(time + 5000 < System.currentTimeMillis()) {
@@ -64,21 +63,17 @@ public class ServerPlayerGateway extends TerminableLooper {
                     traffic = 0;
                 }
 
-                synchronized(gameServer.getTickLooper().getTickLock()) {
-                    gameServer.getTickLooper().getTickLock().wait();
+                synchronized(GameServer.get().getTickLooper().getTickLock()) {
+                    GameServer.get().getTickLooper().getTickLock().wait();
                     in.swap();
                     out.swap();
                 }
             }
 
         }catch(IOException | InterruptedException e) {
-            System.out.println("Channel with client failed.");
-            try {
-                client.close();
-            }catch(IOException ignored) {
-            }
-            gameServer.playerPreLeaveAsync(this);
+            GameServer.get().getServerGateway().playerPreLeaveAsync(this);
         }
+        System.out.println("Channel with client \""+owner.getName()+"\" closed.");
     }
 
     @Override
@@ -86,13 +81,11 @@ public class ServerPlayerGateway extends TerminableLooper {
         super.end();
         try {
             client.close();
-        }catch(IOException ignored) {
-        }
-        gameServer.playerPreLeaveAsync(this);
-        System.out.println("Channel with client closed.");
+        }catch(IOException ignored) {}
     }
 
     public void setOwner(ExpiPlayer owner) {
+        this.owner = owner;
         packetManager = new ServerPacketManager(owner);
     }
 

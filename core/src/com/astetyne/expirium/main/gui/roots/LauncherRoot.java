@@ -23,7 +23,7 @@ public class LauncherRoot extends Table {
     private final TextButton joinButton, hostServerButton;
     private final Label title, infoLabel, creditsLabel;
 
-    public LauncherRoot() {
+    public LauncherRoot(String info) {
 
         if(Consts.DEBUG) setDebug(true);
         if(Consts.DEBUG) ExpiGame.get().setPlayerName("palko");
@@ -55,8 +55,9 @@ public class LauncherRoot extends Table {
         title = new Label("Expirium", Res.TITLE_LABEL_STYLE);
         title.setAlignment(Align.center);
 
-        infoLabel = new Label("", Res.LABEL_STYLE);
+        infoLabel = new Label(info, Res.LABEL_STYLE);
         infoLabel.setAlignment(Align.center);
+        infoLabel.setColor(Color.RED);
 
         creditsLabel = new Label("- Created by astetyne -", Res.LABEL_STYLE);
         creditsLabel.setAlignment(Align.center);

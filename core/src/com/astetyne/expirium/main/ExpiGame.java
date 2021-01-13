@@ -4,6 +4,7 @@ import com.astetyne.expirium.main.net.client.ClientGateway;
 import com.astetyne.expirium.main.net.client.ClientPacketManager;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.screens.LauncherScreen;
+import com.astetyne.expirium.main.utils.Utils;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.world.WorldSettings;
 import com.badlogic.gdx.Game;
@@ -11,27 +12,30 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
 public class ExpiGame extends Game {
 
 	private static ExpiGame expiGame;
 
-	private final ClientGateway clientGateway;
+	private ClientGateway clientGateway;
 	private final Object serverTickLock;
 	private boolean nextPacketsAvailable;
 	private String playerName;
 	private float timeSinceStart;
 	private SpriteBatch batch;
 	private boolean hostingServer;
+	private String gameCode;
+	public GameServer server;
 
 	public ExpiGame() {
 		expiGame = this;
 		nextPacketsAvailable = false;
 		serverTickLock = new Object();
-		clientGateway = new ClientGateway();
 		timeSinceStart = 0;
 		playerName = "";
 		hostingServer = false;
+		gameCode = "";
 	}
 
 	@Override
@@ -92,14 +96,26 @@ public class ExpiGame extends Game {
 
 	public void startServer(WorldSettings settings, boolean createNew, int tps, int port) {
 		hostingServer = true;
-		GameServer server = new GameServer(settings, createNew, tps, port);
+		try {
+			gameCode = Utils.getCodeFromAddress((Inet4Address) Inet4Address.getLocalHost());
+		}catch(UnknownHostException e) {
+			e.printStackTrace();
+		}
+		server = new GameServer(settings, createNew, tps, port);
 		Thread t = new Thread(server);
 		t.setName("Game Server");
 		t.start();
 	}
 
+	public void stopServer() {
+		if(server == null) return;
+		server.stop();
+		server = null;
+	}
+
 	public void startClient(Inet4Address address) {
-		clientGateway.setIpAddress(address);
+		clientGateway = new ClientGateway(address);
+		if(!hostingServer) gameCode = Utils.getCodeFromAddress(address);
 		Thread t = new Thread(clientGateway);
 		t.setName("Client gateway");
 		t.start();
@@ -128,4 +144,9 @@ public class ExpiGame extends Game {
 	public void setHostingServer(boolean hostingServer) {
 		this.hostingServer = hostingServer;
 	}
+
+	public String getGameCode() {
+		return gameCode;
+	}
+
 }

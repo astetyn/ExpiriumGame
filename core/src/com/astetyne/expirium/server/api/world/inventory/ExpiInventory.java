@@ -4,16 +4,12 @@ import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 public class ExpiInventory {
 
-    private static final HashMap<Integer, ExpiInventory> inventoriesID = new HashMap<>();
-
     protected final List<ItemStack> items;
-    protected final int id;
     protected final ItemStack[][] grid;
     protected float totalWeight;
     protected final float maxWeight;
@@ -26,12 +22,6 @@ public class ExpiInventory {
         this.rows = rows;
         this.columns = columns;
         items = new ArrayList<>();
-        int randomID;
-        do {
-            randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(inventoriesID.containsKey(randomID));
-        inventoriesID.put(randomID, this);
-        id = randomID;
         grid = new ItemStack[rows][columns];
         totalWeight = 0;
         this.maxWeight = maxWeight;
@@ -210,10 +200,6 @@ public class ExpiInventory {
 
     public boolean isInside(int r, int c) {
         return r < rows && c < columns; // aj tak tu chyba 0
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getLabel() {

@@ -1,4 +1,4 @@
-package com.astetyne.expirium.main.world;
+package com.astetyne.expirium.server.api.world;
 
 import java.util.HashMap;
 

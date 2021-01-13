@@ -22,16 +22,16 @@ public class WorldGenerator {
             for(int i = 0; i < h; i++) {
                 if(i == hh) {
                     if(Math.random() > 0.8) {
-                        worldTerrain[i][j] = new ExpiTile(TileType.TREE1, j, i);
+                        worldTerrain[i][j] = new ExpiTile(TileType.TREE1, TileType.AIR, j, i);
                     }else {
-                        worldTerrain[i][j] = new ExpiTile(TileType.GRASS, j, i);
+                        worldTerrain[i][j] = new ExpiTile(TileType.GRASS, TileType.AIR, j, i);
                     }
                 }else if(i < hh && i > hh-5) {
-                    worldTerrain[i][j] = new ExpiTile(TileType.DIRT, j, i);
+                    worldTerrain[i][j] = new ExpiTile(TileType.DIRT, TileType.AIR, j, i);
                 }else if(i < hh) {
-                    worldTerrain[i][j] = new ExpiTile(TileType.STONE, j, i);
+                    worldTerrain[i][j] = new ExpiTile(TileType.STONE, TileType.AIR, j, i);
                 }else {
-                    worldTerrain[i][j] = new ExpiTile(TileType.AIR, j, i);
+                    worldTerrain[i][j] = new ExpiTile(TileType.AIR, TileType.AIR, j, i);
                 }
             }
 

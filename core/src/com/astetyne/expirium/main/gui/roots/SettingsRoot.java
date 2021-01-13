@@ -8,9 +8,11 @@ import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 public class SettingsRoot extends WidgetGroup implements ExpiRoot {
 
@@ -18,6 +20,8 @@ public class SettingsRoot extends WidgetGroup implements ExpiRoot {
 
         Image returnButton = new Image(Res.CROSS_ICON);
         TextButton leaveButton = new TextButton("Leave server", Res.TEXT_BUTTON_STYLE);
+        Label codeLabel = new Label("Game code: "+ExpiGame.get().getGameCode(), Res.LABEL_STYLE);
+        codeLabel.setAlignment(Align.center);
 
         returnButton.addListener(new ClickListener() {
             @Override
@@ -29,15 +33,17 @@ public class SettingsRoot extends WidgetGroup implements ExpiRoot {
         leaveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //todo: poslat serveru leave spravu a ukoncit clienta
-                //todo: co ak je spusteny server? - jemne ho ukoncit
+                ExpiGame.get().getClientGateway().end();
+                if(ExpiGame.get().isHostingServer()) {
+                    ExpiGame.get().stopServer();
+                }
                 ExpiGame.get().setScreen(new LauncherScreen());
             }
         });
         returnButton.setBounds(1880, 890, 100, Utils.percFromW(100));
-        returnButton.setDebug(true);
-        setDebug(true);
         addActor(returnButton);
+        codeLabel.setBounds(760, 720, 440, 160);
+        addActor(codeLabel);
         leaveButton.setBounds(760, 420, 440, 160);
         addActor(leaveButton);
 

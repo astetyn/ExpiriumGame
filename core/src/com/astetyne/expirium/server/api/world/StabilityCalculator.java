@@ -68,11 +68,11 @@ public class StabilityCalculator {
 
     public boolean canBeAdjusted(ExpiTile t, TileType checkType) {
 
-        TileType oldType = t.getType();
+        TileType oldType = t.getTypeFront();
 
-        t.setType(checkType);
+        t.setTypeFront(checkType);
         int actualS = getActualStability(t);
-        t.setType(oldType);
+        t.setTypeFront(oldType);
         return actualS != 0;
     }
 
@@ -96,7 +96,7 @@ public class StabilityCalculator {
     }
 
     private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
-        if(t.getType() == TileType.AIR) return;
+        if(t.getTypeFront() == TileType.AIR) return;
         if(t.getStability() > getActualStability(t)) {
             findStrongConnections(t, pack);
         }else {
@@ -122,7 +122,7 @@ public class StabilityCalculator {
         if(x != w-1 && !worldTerrain[y][x+1].isLabile())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
 
-        if(t.getType().isOnlyOnSolid()) {
+        if(t.getTypeFront().isOnlyOnSolid()) {
             maxAvailStab = 0; // the three steps above are redundant is this case
         }
 
@@ -145,7 +145,7 @@ public class StabilityCalculator {
                 }
             }
         }
-        return Math.min(t.getType().getStability(), maxAvailStab);
+        return Math.min(t.getTypeFront().getStability(), maxAvailStab);
     }
 
     /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/
@@ -166,7 +166,7 @@ public class StabilityCalculator {
     }
 
     private void checkRealStability(ExpiTile t, HashSet<ExpiTile> changed) {
-        if(t.getType() == TileType.AIR) return;
+        if(t.getTypeFront() == TileType.AIR) return;
         int realStability = getActualStability(t);
         if(realStability > t.getStability()) {
             t.setStability(realStability);

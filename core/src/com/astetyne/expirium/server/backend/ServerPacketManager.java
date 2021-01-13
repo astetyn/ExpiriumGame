@@ -58,6 +58,7 @@ public class ServerPacketManager {
                 }
                 case 29://InvInteractPacket
                     owner.getInv().onInteract(UIInteractType.getType(in.getInt()));
+                    break;
             }
         }
 
@@ -90,7 +91,7 @@ public class ServerPacketManager {
         for(int i = 0; i < terrain[0].length; i++) {
             for(int j = yOff; j < yOff + partHeight; j++) {
                 ExpiTile t = terrain[j][i];
-                out.putByte((byte) t.getType().getID());
+                out.putByte((byte) t.getTypeFront().getID());
                 out.putByte((byte) t.getStability());
             }
         }
@@ -159,7 +160,7 @@ public class ServerPacketManager {
 
     public void putTileChangePacket(ExpiTile t) {
         out.startPacket(22);
-        out.putInt(t.getType().getID());
+        out.putInt(t.getTypeFront().getID());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }
@@ -170,7 +171,7 @@ public class ServerPacketManager {
         for(ExpiTile t : affectedTiles) {
             out.putInt(t.getX());
             out.putInt(t.getY());
-            out.putInt(t.getStability());
+            out.putByte((byte) t.getStability());
         }
     }
 

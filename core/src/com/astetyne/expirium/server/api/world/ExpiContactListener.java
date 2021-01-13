@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.world.Collidable;
+import com.astetyne.expirium.server.api.entity.Collidable;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.HashMap;

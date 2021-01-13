@@ -7,7 +7,7 @@ import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.world.event.TickListener;
+import com.astetyne.expirium.server.api.event.TickListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.backend.*;
@@ -35,7 +35,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         GameServer.get().getPlayers().add(this);
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         ts1H = ts1V = ts2H = ts2V = 0;
-        TickLooper.getListeners().add(this);
+        GameServer.get().getEventManager().getTickListeners().add(this);
         lastJump = 0;
     }
 
@@ -191,7 +191,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
             secondInv.setInvalid(false);
         }
 
-        tileBreaker.update(ts2H, ts2V);
+        tileBreaker.onTick(ts2H, ts2V);
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -232,7 +232,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
     public void destroySafe() {
         super.destroy();
-        TickLooper.getListeners().remove(this);
+        GameServer.get().getEventManager().getTickListeners().remove(this);
     }
 
     @Override

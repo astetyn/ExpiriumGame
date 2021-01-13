@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.world.WorldLoadingException;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 

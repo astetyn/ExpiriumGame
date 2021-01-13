@@ -1,54 +1,57 @@
 package com.astetyne.expirium.main.world.tiles;
 
-import com.astetyne.expirium.main.world.LightSource;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
-import java.util.HashSet;
-
 public class Tile {
 
-    private TileType type;
-    private final int x, y;
-    private int stability;
-    private final HashSet<LightSource> attachedLights;
+    private TileType typeFront, typeBack;
+    private byte stability;
+    private byte lightR, lightG, lightB;
 
-    public Tile(TileType type, int x, int y, int stability) {
-        this.type = type;
-        this.x = x;
-        this.y = y;
+    public Tile(TileType type, byte stability) {
+        this.typeFront = type;
+        this.typeBack = TileType.AIR;
         this.stability = stability;
-        attachedLights = new HashSet<>();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
+        lightR = lightG = lightB = -1; // 255: full light
     }
 
     public int getStability() {
         return stability;
     }
 
-    public void setStability(int stability) {
+    public void setStability(byte stability) {
         this.stability = stability;
     }
 
-    public TileType getType() {
-        return type;
+    public TileType getTypeFront() {
+        return typeFront;
     }
 
-    public void setType(TileType type) {
-        this.type = type;
+    public void setTypeFront(TileType type) {
+        this.typeFront = type;
     }
 
-    public TextureRegion getTex() {
-        return type.getTexture();
+    public TileType getTypeBack() {
+        return typeBack;
     }
 
-    public HashSet<LightSource> getAttachedLights() {
-        return attachedLights;
+    public void setTypeBack(TileType typeBack) {
+        this.typeBack = typeBack;
+    }
+
+    public void setLight(byte r, byte g, byte b) {
+        lightR = r;
+        lightG = g;
+        lightB = b;
+    }
+
+    public byte getR() {
+        return lightR;
+    }
+
+    public byte getG() {
+        return lightG;
+    }
+
+    public byte getB() {
+        return lightB;
     }
 }

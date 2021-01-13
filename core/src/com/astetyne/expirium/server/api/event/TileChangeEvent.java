@@ -1,14 +1,10 @@
-package com.astetyne.expirium.server.api.world.event;
+package com.astetyne.expirium.server.api.event;
 
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 
-import java.util.HashSet;
-
 public class TileChangeEvent implements Cancellable {
-
-    private static final HashSet<TileChangeListener> listeners = new HashSet<>();
 
     private final ExpiTile tile;
     private final TileType from;
@@ -22,10 +18,6 @@ public class TileChangeEvent implements Cancellable {
         this.player = player;
         this.source = source;
         cancelled = false;
-
-        for(TileChangeListener listener :  listeners) {
-            listener.onTileChange(this);
-        }
     }
 
     public ExpiTile getTile() {
@@ -52,10 +44,6 @@ public class TileChangeEvent implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    public static HashSet<TileChangeListener> getListeners() {
-        return listeners;
     }
 
 }

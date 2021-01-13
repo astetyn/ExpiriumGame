@@ -5,9 +5,9 @@ import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
-import com.astetyne.expirium.server.api.world.event.Source;
 import com.badlogic.gdx.math.Vector2;
 
 public class ExpiTileBreaker {
@@ -27,7 +27,7 @@ public class ExpiTileBreaker {
         world = GameServer.get().getWorld();
     }
 
-    public void update(float horz, float vert) {
+    public void onTick(float horz, float vert) {
 
         // check if breaking
         if(horz == 0 && vert == 0) {
@@ -47,14 +47,14 @@ public class ExpiTileBreaker {
                 targetTile = null;
                 break;
             }
-            ExpiTile newTarget = world.getTileAt(tempVec);
+            ExpiTile newTarget = GameServer.get().getWorld().getTileAt(tempVec);
             if(newTarget == null) {
                 timeAccumulator = 0;
                 if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
                 break;
             }
-            if(newTarget.getType() != TileType.AIR) {
+            if(newTarget.getTypeFront() != TileType.AIR) {
                 if(newTarget != targetTile) {
                     timeAccumulator = 0;
                     if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
@@ -71,13 +71,13 @@ public class ExpiTileBreaker {
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
-            if(timeAccumulator >= targetTile.getType().getBreakTime()) {
+            if(timeAccumulator >= targetTile.getTypeFront().getBreakTime()) {
                 GameServer.get().getWorld().changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
                 owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
             }else {
-                owner.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator);
+                owner.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getTypeFront().getBreakTime());
             }
         }
 

@@ -1,50 +1,61 @@
 package com.astetyne.expirium.server;
 
+import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.api.event.EventManager;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 import com.astetyne.expirium.server.api.world.WorldSettings;
 import com.astetyne.expirium.server.backend.ServerGateway;
-import com.astetyne.expirium.server.backend.ServerPlayerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
+import com.badlogic.gdx.utils.Disposable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class GameServer implements Runnable {
-
-    private static GameServer server;
+public class GameServer implements Runnable, Disposable {
 
     private final ExpiWorld expiWorld;
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
-    private final List<ServerPlayerGateway> joiningClients;
-    private final List<ServerPlayerGateway> leavingClients;
     private final List<WorldLoader> worldLoaders;
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
 
+    private final HashMap<Integer, ExpiEntity> entitiesID;
+
+    private final EventManager eventManager;
+
     // you MUST create this object on dedicated thread, it will create endless loop
     public GameServer(WorldSettings worldSettings, boolean createNew, int tps, int port) {
 
-        server = this;
+        ExpiGame.get().server = this;
 
         System.out.println("Booting server...");
 
-        joiningClients = new ArrayList<>();
-        leavingClients = new ArrayList<>();
         worldLoaders = new ArrayList<>();
         entities = new ArrayList<>();
         players = new ArrayList<>();
+        entitiesID = new HashMap<>();
+
+        eventManager = new EventManager();
 
         expiWorld = new ExpiWorld(worldSettings, createNew);
 
         tickLooper = new TickLooper(tps);
         serverGateway = new ServerGateway(port);
 
+        System.out.println("CREATINGGG: "+this);
+
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("REMOVINGGG: "+this);
     }
 
     @Override
@@ -57,9 +68,18 @@ public class GameServer implements Runnable {
 
     public void stop() {
         tickLooper.end();
+        serverGateway.end();
         for(ExpiPlayer p : players) {
             p.getGateway().end();
         }
+        synchronized(GameServer.get().getTickLooper().getTickLock()) {
+            GameServer.get().getTickLooper().getTickLock().notifyAll();
+        }
+        dispose();
+    }
+
+    public void dispose() {
+        expiWorld.dispose();
     }
 
     public void onTick() {
@@ -86,18 +106,6 @@ public class GameServer implements Runnable {
         return players;
     }
 
-    public void playerPreJoinAsync(ServerPlayerGateway p) {
-        synchronized(joiningClients) {
-            joiningClients.add(p);
-        }
-    }
-
-    public void playerPreLeaveAsync(ServerPlayerGateway p) {
-        synchronized(leavingClients) {
-            leavingClients.add(p);
-        }
-    }
-
     public ExpiWorld getWorld() {
         return expiWorld;
     }
@@ -107,22 +115,22 @@ public class GameServer implements Runnable {
     }
 
     public static GameServer get() {
-        return server;
+        return ExpiGame.get().server;
     }
 
     public ServerGateway getServerGateway() {
         return serverGateway;
     }
 
-    public List<ServerPlayerGateway> getJoiningClients() {
-        return joiningClients;
-    }
-
-    public List<ServerPlayerGateway> getLeavingClients() {
-        return leavingClients;
-    }
-
     public List<WorldLoader> getWorldLoaders() {
         return worldLoaders;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public HashMap<Integer, ExpiEntity> getEntitiesID() {
+        return entitiesID;
     }
 }

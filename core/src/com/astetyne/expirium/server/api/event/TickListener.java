@@ -1,4 +1,4 @@
-package com.astetyne.expirium.server.api.world.event;
+package com.astetyne.expirium.server.api.event;
 
 public interface TickListener {
     void onTick();

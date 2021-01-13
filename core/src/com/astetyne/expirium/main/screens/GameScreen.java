@@ -141,12 +141,13 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        dispose();
+        gameScreen = null;
     }
 
     @Override
     public void dispose() {
-        gameWorld.dispose();
+        stage.dispose();
     }
 
     public void setRoot(ExpiRoot root) {

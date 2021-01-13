@@ -3,16 +3,15 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.WeatherType;
-import com.astetyne.expirium.main.world.WorldLoadingException;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.world.event.Source;
-import com.astetyne.expirium.server.api.world.event.TileChangeEvent;
+import com.astetyne.expirium.server.api.event.Source;
+import com.astetyne.expirium.server.api.event.TileChangeEvent;
+import com.astetyne.expirium.server.api.event.TileChangeListener;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.api.world.listeners.TreeListener;
 import com.astetyne.expirium.server.backend.FixRes;
@@ -20,6 +19,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExpiWorld implements Saveable {
+public class ExpiWorld implements Saveable, Disposable {
 
     private ExpiTile[][] worldTerrain;
     private int partHeight;
@@ -48,7 +48,7 @@ public class ExpiWorld implements Saveable {
     public ExpiWorld(WorldSettings settings, boolean createNew) {
 
         fileManager = new WorldFileManager(this);
-
+        System.out.println("CREATEE WORLD: "+this);
         if(!createNew) {
             try {
                 fileManager.loadWorld(settings.name);
@@ -73,6 +73,11 @@ public class ExpiWorld implements Saveable {
         }catch(IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("DESTROY WORLD: "+this);
     }
 
     private void initAfterCreation() {
@@ -133,6 +138,10 @@ public class ExpiWorld implements Saveable {
         }
     }
 
+    public void dispose() {
+        b2dWorld.dispose();
+    }
+
     public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
 
         if(!isTileFree(t, item)) return;
@@ -148,21 +157,21 @@ public class ExpiWorld implements Saveable {
 
     public void changeTile(ExpiTile t, TileType to, boolean withDrops, ExpiPlayer p, Source source) {
 
-        TileType from = t.getType();
+        TileType from = t.getTypeFront();
 
         Vector2 tempVec = new Vector2();
 
         float off = (1 - Consts.D_I_SIZE)/2;
 
-        if(to == TileType.AIR && withDrops && t.getType() != TileType.AIR) {
+        if(to == TileType.AIR && withDrops && t.getTypeFront() != TileType.AIR) {
             tempVec.set(t.getX() + off, t.getY() + off);
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getType().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getTypeFront().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(droppedItem);
             }
         }
 
-        t.setType(to);
+        t.setTypeFront(to);
         fixtureCalc.recalcTileFixturesPlus(t);
 
         List<ExpiTile> changedTiles = new ArrayList<>();
@@ -173,14 +182,14 @@ public class ExpiWorld implements Saveable {
         while(it.hasNext()) {
             ExpiTile t2 = it.next();
             if(t2.getStability() == 0) {
-                if(Math.random() < 1 && withDrops && t2.getType().getDropItem() != null) {
+                if(Math.random() < 1 && withDrops && t2.getTypeFront().getDropItem() != null) {
                     tempVec.set(t2.getX()+off, t2.getY()+off);
-                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getType().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
+                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getTypeFront().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                         pp.getNetManager().putEntitySpawnPacket(edi);
                     }
                 }
-                t2.setType(TileType.AIR);
+                t2.setTypeFront(TileType.AIR);
                 fixtureCalc.clearTileFixtures(t2);
                 changedTiles.add(t2);
                 it.remove();
@@ -194,7 +203,11 @@ public class ExpiWorld implements Saveable {
             pp.getNetManager().putStabilityPacket(affectedTiles);
         }
 
-        new TileChangeEvent(t, from, p, source);
+        TileChangeEvent e = new TileChangeEvent(t, from, p, source);
+        List<TileChangeListener> list = GameServer.get().getEventManager().getTileChangeListeners();
+        for(int i = list.size() - 1; i >= 0; i--) {
+            list.get(i).onTileChange(e);
+        }
     }
 
     private boolean isTileFree(ExpiTile t, Item toPlace) {
@@ -221,7 +234,7 @@ public class ExpiWorld implements Saveable {
 
     public Vector2 getSaveLocationForSpawn() {
         int i = 0;
-        while(i != settings.height && worldTerrain[i][10].getType() != TileType.AIR) {
+        while(i != settings.height && worldTerrain[i][10].getTypeFront() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);
@@ -285,7 +298,7 @@ public class ExpiWorld implements Saveable {
 
         for(int h = 0; h < settings.height; h++) {
             for(int w = 0; w < settings.width; w++) {
-                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), w, h);
+                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.AIR, w, h);
             }
         }
 
@@ -304,7 +317,7 @@ public class ExpiWorld implements Saveable {
 
         for(int h = 0; h < settings.height; h++) {
             for(int w = 0; w < settings.width; w++) {
-                out.writeByte(worldTerrain[h][w].getType().getID());
+                out.writeByte(worldTerrain[h][w].getTypeFront().getID());
             }
         }
 

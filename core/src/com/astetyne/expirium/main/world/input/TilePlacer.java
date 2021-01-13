@@ -23,9 +23,9 @@ public class TilePlacer implements InputProcessor {
 
     }
 
-    public void render(Tile t) {
+    public void render(Tile t, int x, int y) {
 
-        if(t.getType() == TileType.AIR) return;
+        if(t.getTypeFront() == TileType.AIR) return;
 
         if(GameScreen.get().isBuildViewActive()) {
 
@@ -38,10 +38,10 @@ public class TilePlacer implements InputProcessor {
             }else if(t.getStability() == 4) {
                 batch.setColor(0.9f, 0.9f, 0f, 1);
             }
-            batch.draw(Res.WHITE_TILE, t.getX(), t.getY(), 1, 1);
+            batch.draw(Res.WHITE_TILE, x, y, 1, 1);
             batch.setColor(1, 1, 1, 1);
         }else {
-            batch.draw(t.getTex(), t.getX(), t.getY(), 1, 1);
+            batch.draw(t.getTypeFront().getTexture(), x, y, 1, 1);
         }
 
     }

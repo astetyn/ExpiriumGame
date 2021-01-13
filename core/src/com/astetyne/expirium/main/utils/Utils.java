@@ -72,8 +72,8 @@ public class Utils {
     // main only for testing
     public static void main(String[] args) throws UnknownHostException {
         System.out.println("-- running main for testing --");
-        System.out.println(getCodeFromAddress((Inet4Address) Inet4Address.getByName("192.168.0.113")));
-        System.out.println(getAddressFromCode("palko"));
+        System.out.println(getCodeFromAddress((Inet4Address) Inet4Address.getByName("127.0.0.1")));
+        System.out.println(getAddressFromCode("CUMOEx"));
     }
 
     public static Inet4Address getAddressFromCode(String code) throws UnknownHostException {

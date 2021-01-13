@@ -8,25 +8,34 @@ import java.util.List;
 
 public class ExpiTile {
 
-    private TileType type;
+    private TileType typeFront, typeBack;
     private final List<Fixture> fixtures;
     private final int x, y;
     private int stability;
 
-    public ExpiTile(TileType type, int x, int y) {
-        this.type = type;
+    public ExpiTile(TileType typeFront, TileType typeBack, int x, int y) {
+        this.typeFront = typeFront;
+        this.typeBack = typeBack;
         fixtures = new ArrayList<>();
         this.x = x;
         this.y = y;
         stability = 0;
     }
 
-    public void setType(TileType type) {
-        this.type = type;
+    public void setTypeFront(TileType type) {
+        this.typeFront = type;
     }
 
-    public TileType getType() {
-        return type;
+    public TileType getTypeFront() {
+        return typeFront;
+    }
+
+    public TileType getTypeBack() {
+        return typeBack;
+    }
+
+    public void setTypeBack(TileType typeBack) {
+        this.typeBack = typeBack;
     }
 
     public void setStability(int stability) {
@@ -38,7 +47,7 @@ public class ExpiTile {
     }
 
     public boolean isLabile() {
-        return type.getSolidity().isLabile();
+        return typeFront.getSolidity().isLabile();
     }
 
     public List<Fixture> getFixtures() {

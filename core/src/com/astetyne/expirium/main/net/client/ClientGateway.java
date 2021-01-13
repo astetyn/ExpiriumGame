@@ -1,6 +1,8 @@
 package com.astetyne.expirium.main.net.client;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.gui.roots.LauncherRoot;
+import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
@@ -23,7 +25,8 @@ public class ClientGateway extends TerminableLooper {
     private int traffic;
     private long time;
 
-    public ClientGateway() {
+    public ClientGateway(Inet4Address address) {
+        this.ipAddress = address;
         game = ExpiGame.get();
         nextReadLock = new Object();
         traffic = 0;
@@ -40,7 +43,7 @@ public class ClientGateway extends TerminableLooper {
             socket.connect(new InetSocketAddress(ipAddress, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
             System.out.println("Exception during connecting to server.");
-            //LauncherScreen.get().showError("Can't connect to server.\n Are you on the same network?");
+            LauncherScreen.get().setRoot(new LauncherRoot("Can't connect to server.\n Are you on the same network?"));
             return;
         }
 
@@ -81,6 +84,12 @@ public class ClientGateway extends TerminableLooper {
             }
         }catch(IOException e) {
             System.out.println("Exception during messaging with server.");
+            try {
+                if(socket != null) {
+                    socket.close();
+                }
+            }catch(IOException ignored) {}
+            //todo: otvorit launcher screen, pozor na end(), if(isRunning())?
         }catch(InterruptedException e) {
             e.printStackTrace();
         }
@@ -93,8 +102,9 @@ public class ClientGateway extends TerminableLooper {
             if(socket != null) {
                 socket.close();
             }
-        }catch(IOException ignored) {
-        }
+        }catch(IOException ignored) {}
+        in.reset();
+        out.reset();
         System.out.println("Client successfully closed socket.");
     }
 
@@ -105,10 +115,6 @@ public class ClientGateway extends TerminableLooper {
         synchronized(nextReadLock) {
             nextReadLock.notify();
         }
-    }
-
-    public void setIpAddress(Inet4Address address) {
-        ipAddress = address;
     }
 
     public ClientPacketManager getManager() {

@@ -96,29 +96,29 @@ public class FixtureCalculator {
         }
         t.getFixtures().clear();
 
-        if(t.getType().getEdgesData() != null) {
-            FixRes.EdgesData data = t.getType().getEdgesData();
+        if(t.getTypeFront().getEdgesData() != null) {
+            FixRes.EdgesData data = t.getTypeFront().getEdgesData();
             for(int i = 0; i < data.l1.size(); i++) {
                 shape.set(data.l1.get(i).x + x, data.l1.get(i).y + y, data.l2.get(i).x + x, data.l2.get(i).y + y);
                 createFixture(fixDef, t);
             }
         }
 
-        if(t.getType().getSolidity() != Solidity.SOLID) return;
+        if(t.getTypeFront().getSolidity() != Solidity.SOLID) return;
 
-        if(y != 0 && worldTerrain[y-1][x].getType().getSolidity() != Solidity.SOLID) {
+        if(y != 0 && worldTerrain[y-1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x+1,y);
             createFixture(fixDef, t);
         }
-        if(y != h-1 && worldTerrain[y+1][x].getType().getSolidity() != Solidity.SOLID) {
+        if(y != h-1 && worldTerrain[y+1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x, y+1, x+1,y+1);
             createFixture(fixDef, t);
         }
-        if(x != 0 && worldTerrain[y][x-1].getType().getSolidity() != Solidity.SOLID) {
+        if(x != 0 && worldTerrain[y][x-1].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x,y+1);
             createFixture(fixDef, t);
         }
-        if(x != w-1 && worldTerrain[y][x+1].getType().getSolidity() != Solidity.SOLID) {
+        if(x != w-1 && worldTerrain[y][x+1].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x+1, y, x+1,y+1);
             createFixture(fixDef, t);
         }

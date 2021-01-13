@@ -6,12 +6,13 @@ import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.MainPlayer;
 import com.astetyne.expirium.main.screens.GameScreen;
+import com.astetyne.expirium.main.utils.IntVector2;
+import com.astetyne.expirium.main.world.tiles.BreakingTile;
 import com.astetyne.expirium.main.world.tiles.Tile;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,7 +24,6 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameWorld {
 
@@ -36,10 +36,8 @@ public class GameWorld {
     private MainPlayer player;
     private final OrthographicCamera camera;
     private final FrameBuffer lightsFrameBuffer;
-    private final List<LightSource> activeLights;
     private final Matrix4 screenMatrix;
     private int terrainWidth, terrainHeight;
-    private final HashMap<Tile, Float> breakingTiles;
 
     public GameWorld() {
 
@@ -47,8 +45,6 @@ public class GameWorld {
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
-        activeLights = new ArrayList<>();
-        breakingTiles = new HashMap<>();
 
         screenMatrix = new Matrix4().setToOrtho2D(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         lightsFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);
@@ -67,7 +63,7 @@ public class GameWorld {
 
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = 0; j < terrainHeight; j++) {
-                worldTerrain[i][j] = new Tile(TileType.AIR, i, j, 0);
+                worldTerrain[i][j] = new Tile(TileType.AIR, (byte)0);
             }
         }
 
@@ -104,21 +100,18 @@ public class GameWorld {
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 Tile t = worldTerrain[i][j];
-                if(t.getType() == TileType.AIR) continue;
+                if(t.getTypeFront() == TileType.AIR) continue;
 
                 if(GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT) {
-                    player.getTilePlacer().render(t);
+                    player.getTilePlacer().render(t, i, j);
                     continue;
                 }
-                batch.draw(t.getTex(), i, j, 1, 1);
+                batch.draw(t.getTypeFront().getTexture(), i, j, 1, 1);
             }
         }
 
-        for(Map.Entry<Tile, Float> entry : breakingTiles.entrySet()) {
-            Tile tile = entry.getKey();
-            float state = entry.getValue();
-            float durability = state / tile.getType().getBreakTime();
-            batch.draw(Res.TILE_BREAK_ANIM.getKeyFrame(durability), tile.getX(), tile.getY(), 1, 1);
+        for(BreakingTile bt : BreakingTile.getBreakingTiles().values()) {
+            batch.draw(Res.TILE_BREAK_ANIM.getKeyFrame(bt.getState()), bt.getLoc().x, bt.getLoc().y, 1, 1);
         }
 
         // render entities
@@ -140,7 +133,7 @@ public class GameWorld {
 
         batch.end();
 
-        lightsFrameBuffer.begin();
+        /*lightsFrameBuffer.begin();
 
         Gdx.gl.glClearColor(0f,0f,0f,0f); // ambient color
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -159,21 +152,19 @@ public class GameWorld {
         lightsFrameBuffer.end();
 
         Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);
+        Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);*/
 
         batch.setProjectionMatrix(screenMatrix);
 
-        float sw = Gdx.graphics.getWidth();
+        /*float sw = Gdx.graphics.getWidth();
         float sh = Gdx.graphics.getHeight();
         int fw = lightsFrameBuffer.getWidth();
-        int fh = lightsFrameBuffer.getHeight();
+        int fh = lightsFrameBuffer.getHeight();*/
 
         batch.begin();
-        batch.draw(lightsFrameBuffer.getColorBufferTexture(), 0, 0, sw, sh,  0, 0, fw, fh, false, true);
+        //batch.draw(lightsFrameBuffer.getColorBufferTexture(), 0, 0, sw, sh,  0, 0, fw, fh, false, true);
 
     }
-
-    public void dispose() { }
 
     public void onFeedWorldEvent(PacketInputStream in) {
 
@@ -185,8 +176,8 @@ public class GameWorld {
             for(int j = yOff; j < yOff + partHeight; j++) {
                 Tile t = worldTerrain[i][j];
                 TileType type = TileType.getType(in.getByte());
-                int stability = in.getByte();
-                t.setType(type);
+                byte stability = in.getByte();
+                t.setTypeFront(type);
                 t.setStability(stability);
             }
         }
@@ -194,25 +185,13 @@ public class GameWorld {
 
     public void onTileChange(PacketInputStream in) {
 
-        TileType type = TileType.getType(in.getInt());
+        TileType type = TileType.getType((byte) in.getInt());
         int x = in.getInt();
         int y = in.getInt();
 
         Tile t = worldTerrain[x][y];
 
-        for(LightSource ls : t.getAttachedLights()) {
-            activeLights.remove(ls);
-        }
-        t.getAttachedLights().clear();
-
-        t.setType(type);
-
-        if(type == TileType.CAMPFIRE_BIG) {
-            LightSource ls = new LightSource(LightType.TRANSP_SPHERE_MEDIUM, new Vector2(x + 0.5f, y+0.5f));
-            activeLights.add(ls);
-            t.getAttachedLights().add(ls);
-        }
-
+        t.setTypeFront(type);
     }
 
     public void onStabilityChange(PacketInputStream in) {
@@ -220,7 +199,7 @@ public class GameWorld {
         for(int i = 0; i < size; i++) {
             int x = in.getInt();
             int y = in.getInt();
-            int stability = in.getInt();
+            byte stability = in.getByte();
             worldTerrain[x][y].setStability(stability);
         }
     }
@@ -231,10 +210,14 @@ public class GameWorld {
         float state = in.getFloat();
         Tile t = worldTerrain[x][y];
         if(state == -1) {
-            breakingTiles.remove(t);
+            BreakingTile.getBreakingTiles().remove(t);
             return;
         }
-        breakingTiles.put(t, state);
+        if(BreakingTile.getBreakingTiles().containsKey(t)) {
+            BreakingTile.getBreakingTiles().get(t).setState(state);
+        }else {
+            BreakingTile.getBreakingTiles().put(t, new BreakingTile(new IntVector2(x, y), state));
+        }
     }
 
     private void cameraCenter() {
@@ -259,10 +242,6 @@ public class GameWorld {
 
     public List<Entity> getEntities() {
         return entities;
-    }
-
-    public List<LightSource> getActiveLights() {
-        return activeLights;
     }
 
     public int getTerrainWidth() {

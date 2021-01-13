@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.net.client;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.main.GameInfo;
 import com.astetyne.expirium.main.data.ThumbStickData;
 import com.astetyne.expirium.main.entity.Entity;
 import com.astetyne.expirium.main.entity.EntityType;
@@ -9,8 +10,8 @@ import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.world.GameWorld;
-import com.astetyne.expirium.main.world.WeatherType;
 import com.astetyne.expirium.main.world.input.InteractType;
+import com.astetyne.expirium.server.api.world.WeatherType;
 import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
@@ -148,5 +149,10 @@ public class ClientPacketManager {
     public void putInvItemMakeReqPacket(ItemRecipe recipe) {
         out.startPacket(26);
         out.putInt(recipe.getId());
+    }
+
+    public void putGameInfoPacket(GameInfo gameInfo) {
+        out.startPacket(12);
+        out.putInt(gameInfo.getID());
     }
 }

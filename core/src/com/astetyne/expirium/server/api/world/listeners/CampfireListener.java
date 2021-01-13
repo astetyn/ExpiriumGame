@@ -1,13 +1,11 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
-import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.api.event.TileChangeEvent;
+import com.astetyne.expirium.server.api.event.TileChangeListener;
 import com.astetyne.expirium.server.api.world.ExpiTile;
-import com.astetyne.expirium.server.api.world.event.*;
-import com.astetyne.expirium.server.api.world.inventory.CookingInventory;
-import com.astetyne.expirium.server.backend.TickLooper;
+import com.astetyne.expirium.server.api.world.tiles.Campfire;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +19,14 @@ public class CampfireListener implements TileChangeListener {
     public CampfireListener() {
         activeCampfires = new ArrayList<>();
         lookUp = new HashMap<>();
-        TileChangeEvent.getListeners().add(this);
+        GameServer.get().getEventManager().getTileChangeListeners().add(this);
     }
 
     @Override
     public void onTileChange(TileChangeEvent event) {
 
         TileType from = event.getFrom();
-        TileType toType = event.getTile().getType();
+        TileType toType = event.getTile().getTypeFront();
 
         if(from == TileType.CAMPFIRE_BIG && toType == TileType.CAMPFIRE_SMALL) {
             return;
@@ -37,53 +35,17 @@ public class CampfireListener implements TileChangeListener {
         if(from == TileType.CAMPFIRE_BIG || from == TileType.CAMPFIRE_SMALL) {
             Campfire campfire = lookUp.get(event.getTile());
             activeCampfires.remove(campfire);
-            PlayerInteractEvent.getListeners().remove(campfire);
-            TickLooper.getListeners().remove(campfire);
+            GameServer.get().getEventManager().getPlayerInteractListeners().remove(campfire);
+            GameServer.get().getEventManager().getTickListeners().remove(campfire);
         }
 
         if(toType == TileType.CAMPFIRE_BIG) {
             Campfire cf = new Campfire(event.getTile());
-            PlayerInteractEvent.getListeners().add(cf);
-            TickLooper.getListeners().add(cf);
+            GameServer.get().getEventManager().getPlayerInteractListeners().add(cf);
+            GameServer.get().getEventManager().getTickListeners().add(cf);
             activeCampfires.add(cf);
-            lookUp.put(cf.tile, cf);
+            lookUp.put(cf.getTile(), cf);
         }
 
-    }
-
-    class Campfire implements PlayerInteractListener, TickListener {
-
-        private final ExpiTile tile;
-        private float remainingTime;
-        private final CookingInventory inventory;
-        private final long placeTime;
-
-        public Campfire(ExpiTile tile) {
-            this.tile = tile;
-            this.remainingTime = Consts.CAMPFIRE_TIME;
-            this.inventory = new CookingInventory(2, 2, 5);
-            placeTime = System.currentTimeMillis();
-        }
-
-        @Override
-        public void onInteract(PlayerInteractEvent event) {
-            if(event.getTile() != tile || placeTime + 500 > System.currentTimeMillis()) return;
-            ExpiPlayer p = event.getPlayer();
-            p.setSecondInv(inventory);
-            p.getNetManager().putOpenDoubleInvPacket();
-            p.getNetManager().putInvFeedPacket();
-        }
-
-        @Override
-        public void onTick() {
-            remainingTime -= 1f / Consts.SERVER_DEFAULT_TPS;
-            if(remainingTime <= 0) {
-                GameServer.get().getWorld().changeTile(tile, TileType.AIR, false, null, Source.SERVER);
-                activeCampfires.remove(this);
-            }else if(tile.getType() == TileType.CAMPFIRE_BIG && remainingTime < 5) {
-                GameServer.get().getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.SERVER);
-            }
-            inventory.onTick();
-        }
     }
 }

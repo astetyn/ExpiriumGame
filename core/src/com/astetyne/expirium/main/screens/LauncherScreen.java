@@ -16,11 +16,15 @@ public class LauncherScreen implements Screen {
     private final Stage stage;
 
     public LauncherScreen() {
+        this("");
+    }
+
+    public LauncherScreen(String info) {
 
         launcherScreen = this;
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
-        setRoot(new LauncherRoot());
+        setRoot(new LauncherRoot(info));
     }
 
     @Override
@@ -51,6 +55,8 @@ public class LauncherScreen implements Screen {
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
+        dispose();
+        launcherScreen = null;
     }
 
     @Override

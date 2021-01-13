@@ -1,13 +1,9 @@
-package com.astetyne.expirium.server.api.world.event;
+package com.astetyne.expirium.server.api.event;
 
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiTile;
 
-import java.util.HashSet;
-
 public class PlayerInteractEvent implements Cancellable {
-
-    private static final HashSet<PlayerInteractListener> listeners = new HashSet<>();
 
     private final ExpiPlayer player;
     private final float x, y;
@@ -19,9 +15,6 @@ public class PlayerInteractEvent implements Cancellable {
         this.x = x;
         this.y = y;
         this.tile = tile;
-        for(PlayerInteractListener listener : listeners) {
-            listener.onInteract(this);
-        }
     }
 
     public ExpiPlayer getPlayer() {
@@ -48,10 +41,6 @@ public class PlayerInteractEvent implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    public static HashSet<PlayerInteractListener> getListeners() {
-        return listeners;
     }
 
 }
