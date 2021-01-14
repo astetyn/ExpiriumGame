@@ -1,8 +1,13 @@
 package com.astetyne.expirium.server.api.entity;
 
 import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.server.api.Saveable;
 
-public abstract class LivingEntity extends ExpiEntity {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public abstract class LivingEntity extends ExpiEntity implements Saveable {
 
     private final static float MAX_HEALTH_LEVEL = 100;
     private final static float MAX_FOOD_LEVEL = 100;
@@ -14,6 +19,13 @@ public abstract class LivingEntity extends ExpiEntity {
         healthLevel = 100;
         foodLevel = 100;
         temperatureLevel = 22;
+    }
+
+    public LivingEntity(EntityType type, float width, float height, DataInputStream in) throws IOException {
+        super(type, width, height);
+        healthLevel = in.readFloat();
+        foodLevel = in.readFloat();
+        temperatureLevel = in.readFloat();
     }
 
     public float getHealthLevel() {
@@ -46,5 +58,12 @@ public abstract class LivingEntity extends ExpiEntity {
 
     public void increaseFoodLevel(float i) {
         foodLevel = Math.min(foodLevel + i, MAX_FOOD_LEVEL);
+    }
+
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        out.writeFloat(healthLevel);
+        out.writeFloat(foodLevel);
+        out.writeFloat(temperatureLevel);
     }
 }

@@ -7,9 +7,12 @@ import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.event.TickListener;
-import com.astetyne.expirium.server.backend.PacketInputStream;
 import com.astetyne.expirium.server.backend.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class ExpiDroppedItem extends ExpiEntity implements TickListener {
 
@@ -20,11 +23,21 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
     public ExpiDroppedItem(Vector2 loc, Item item, float pickCooldown) {
         super(EntityType.DROPPED_ITEM, Consts.D_I_SIZE, Consts.D_I_SIZE);
         body = EntityBodyFactory.createDroppedEntityBody(loc);
-        livingTime = 0;
-        despawnTime = 10; // in seconds
         this.item = item;
         this.pickCooldown = pickCooldown;
+        livingTime = 0;
+        despawnTime = Consts.ITEM_DESPAWN_TIME;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);
+        GameServer.get().getEventManager().getTickListeners().add(this);
+    }
+
+    public ExpiDroppedItem(DataInputStream in) throws IOException {
+        super(EntityType.DROPPED_ITEM, Consts.D_I_SIZE, Consts.D_I_SIZE);
+        body = EntityBodyFactory.createDroppedEntityBody(new Vector2(in.readFloat(), in.readFloat()));
+        item = Item.getType(in.readInt());
+        pickCooldown = 5;
+        livingTime = 0;
+        despawnTime = Consts.ITEM_DESPAWN_TIME;
         GameServer.get().getEventManager().getTickListeners().add(this);
     }
 
@@ -66,13 +79,14 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
     }
 
     @Override
-    public void readMeta(PacketInputStream in) {
-        item = Item.getType(in.getInt());
-    }
-
-    @Override
     public void writeMeta(PacketOutputStream out) {
         out.putInt(item.getId());
     }
 
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        out.writeFloat(getLocation().x);
+        out.writeFloat(getLocation().y);
+        out.writeInt(item.getId());
+    }
 }

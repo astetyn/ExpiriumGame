@@ -73,7 +73,7 @@ public class GameWorld {
 
         int size = in.getInt();
         for(int i = 0; i < size; i++) {
-            EntityType.getType(in.getInt()).initEntity();
+            EntityType.getType(in.getInt()).initEntity(in);
         }
 
     }

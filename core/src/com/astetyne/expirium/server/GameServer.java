@@ -1,11 +1,15 @@
 package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.main.ExpiGame;
+import com.astetyne.expirium.server.api.CreateWorldPreferences;
+import com.astetyne.expirium.server.api.LoadWorldPreferences;
+import com.astetyne.expirium.server.api.ServerPreferences;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.EventManager;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
-import com.astetyne.expirium.server.api.world.WorldSettings;
+import com.astetyne.expirium.server.api.world.WorldFileManager;
+import com.astetyne.expirium.server.api.world.WorldLoadingException;
 import com.astetyne.expirium.server.backend.ServerGateway;
 import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
@@ -29,9 +33,20 @@ public class GameServer implements Runnable, Disposable {
     private final HashMap<Integer, ExpiEntity> entitiesID;
 
     private final EventManager eventManager;
+    private final WorldFileManager fileManager;
 
-    // you MUST create this object on dedicated thread, it will create endless loop
-    public GameServer(WorldSettings worldSettings, boolean createNew, int tps, int port) {
+    /** Object representing whole game server.
+     * Note that you can create only one instance of this object and because server can be stopped in any
+     * moment and garbage collected, there MUST NOT be any static references to this server or its sub-parts.
+     *
+     * You should create this object on dedicated thread, it will create endless loop.
+     *
+     * @param worldSettings Settings for loading or creating new world, for loading name is enough.
+     * @param createNew If server should create new world.
+     * @param tps Target TPS on which server will run.
+     * @param port Server port for TCP socket.
+     */
+    public GameServer(ServerPreferences serverPreferences) throws WorldLoadingException {
 
         ExpiGame.get().server = this;
 
@@ -44,18 +59,17 @@ public class GameServer implements Runnable, Disposable {
 
         eventManager = new EventManager();
 
-        expiWorld = new ExpiWorld(worldSettings, createNew);
+        fileManager = new WorldFileManager(serverPreferences.worldPreferences.worldName);
 
-        tickLooper = new TickLooper(tps);
-        serverGateway = new ServerGateway(port);
+        if(serverPreferences.worldPreferences instanceof LoadWorldPreferences) {
+            expiWorld = new ExpiWorld(fileManager.loadWorld());
+        }else {
+            expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences);
+        }
 
-        System.out.println("CREATINGGG: "+this);
+        tickLooper = new TickLooper(serverPreferences.tps);
+        serverGateway = new ServerGateway(serverPreferences.port);
 
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        System.out.println("REMOVINGGG: "+this);
     }
 
     @Override
@@ -132,5 +146,9 @@ public class GameServer implements Runnable, Disposable {
 
     public HashMap<Integer, ExpiEntity> getEntitiesID() {
         return entitiesID;
+    }
+
+    public WorldFileManager getFileManager() {
+        return fileManager;
     }
 }

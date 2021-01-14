@@ -201,6 +201,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
         switch(data.getChosenSlot()) {
             case TOOL_SLOT:
+                if(toolSlot.isFocused()) break;
                 toolSlot.setFocus(true);
                 materialSlot.setFocus(false);
                 consumableSlot.setFocus(false);
@@ -210,6 +211,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
                 activeLeftActor = breakTS;
                 break;
             case MATERIAL_SLOT:
+                if(materialSlot.isFocused()) break;
                 toolSlot.setFocus(false);
                 materialSlot.setFocus(true);
                 consumableSlot.setFocus(false);
@@ -219,6 +221,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
                 activeLeftActor = buildViewButton;
                 break;
             case CONSUMABLE_SLOT:
+                if(consumableSlot.isFocused()) break;
                 toolSlot.setFocus(false);
                 materialSlot.setFocus(false);
                 consumableSlot.setFocus(true);

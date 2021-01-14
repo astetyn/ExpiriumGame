@@ -51,6 +51,7 @@ public class TickLooper extends TerminableLooper {
         }catch(InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("Tick looper ended.");
     }
 
     public Object getTickLock() {
@@ -60,7 +61,6 @@ public class TickLooper extends TerminableLooper {
     @Override
     public void end() {
         super.end();
-        System.out.println("Tick looper ended.");
     }
 
     public int getTps() {

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.entity;
 
+import com.astetyne.expirium.main.data.ThumbStickData;
 import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.ItemRecipe;
@@ -13,14 +14,18 @@ import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.backend.*;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class ExpiPlayer extends LivingEntity implements TickListener {
 
-    private final ServerPlayerGateway gateway;
+    private ServerPlayerGateway gateway;
     private String name;
     private final ExpiPlayerInventory mainInv;
     private ExpiInventory secondInv;
     private final ExpiTileBreaker tileBreaker;
-    private float ts1H, ts1V, ts2H, ts2V;
+    private ThumbStickData tsData1, tsData2;
     private long lastJump;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
@@ -34,16 +39,37 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         tileBreaker = new ExpiTileBreaker(this);
         GameServer.get().getPlayers().add(this);
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
-        ts1H = ts1V = ts2H = ts2V = 0;
+        tsData1 = new ThumbStickData();
+        tsData2 = new ThumbStickData();
+        GameServer.get().getEventManager().getTickListeners().add(this);
+        lastJump = 0;
+    }
+
+    public ExpiPlayer(DataInputStream in) throws IOException {
+        super(EntityType.PLAYER, 0.9f, 1.25f, in);
+        body = EntityBodyFactory.createPlayerBody(new Vector2(in.readFloat(), in.readFloat()));
+        GameServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
+        int nameLength = in.readInt();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < nameLength; i++) {
+            sb.append(in.readChar());
+        }
+        name = sb.toString();
+        secondInv = new ExpiInventory(1, 1, 1, false);
+        tileBreaker = new ExpiTileBreaker(this);
+        GameServer.get().getPlayers().add(this);
+        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
+        tsData1 = new ThumbStickData();
+        tsData2 = new ThumbStickData();
         GameServer.get().getEventManager().getTickListeners().add(this);
         lastJump = 0;
     }
 
     public void updateThumbSticks(PacketInputStream in) {
-        ts1H = in.getFloat();
-        ts1V = in.getFloat();
-        ts2H = in.getFloat();
-        ts2V = in.getFloat();
+        tsData1.horz = in.getFloat();
+        tsData1.vert = in.getFloat();
+        tsData2.horz = in.getFloat();
+        tsData2.vert = in.getFloat();
     }
 
     public void onInvMove(PacketInputStream in) {
@@ -161,20 +187,20 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
         if(onGround) {
             Vector2 center = body.getWorldCenter();
-            if(ts1V >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if(tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 body.applyLinearImpulse(0, 200, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
             }
         }
         float vY = body.getLinearVelocity().y;
-        if((body.getLinearVelocity().x >= 3 && ts1H > 0)) {
-            ts1H = 0;
+        if((body.getLinearVelocity().x >= 3 && tsData1.horz > 0)) {
+            tsData1.horz = 0;
             //body.setLinearVelocity(3, vY);
-        }else if(body.getLinearVelocity().x <= -3 && ts1H < 0) {
-            ts1H = 0;
+        }else if(body.getLinearVelocity().x <= -3 && tsData1.horz < 0) {
+            tsData1.horz = 0;
             //body.setLinearVelocity(-3, vY);
         }else {
-            body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * ts1H, 0, true);
+            body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * tsData1.horz, 0, true);
         }
     }
 
@@ -191,7 +217,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
             secondInv.setInvalid(false);
         }
 
-        tileBreaker.onTick(ts2H, ts2V);
+        tileBreaker.onTick(tsData2);
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -215,6 +241,11 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         return gateway;
     }
 
+    public void setGateway(ServerPlayerGateway gateway) {
+        this.gateway = gateway;
+        gateway.setOwner(this);
+    }
+
     public String getName() {
         return name;
     }
@@ -236,11 +267,6 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     }
 
     @Override
-    public void readMeta(PacketInputStream in) {
-        name = in.getString();
-    }
-
-    @Override
     public void writeMeta(PacketOutputStream out) {
         out.putString(name);
     }
@@ -257,5 +283,12 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         this.secondInv = secondInv;
     }
 
-
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        super.writeData(out);
+        out.writeFloat(getLocation().x);
+        out.writeFloat(getLocation().y);
+        out.writeInt(name.length());
+        out.writeChars(name);
+    }
 }

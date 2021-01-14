@@ -159,7 +159,7 @@ public class GameScreen implements Screen {
 
     private Color getSkyColor() {
         //todo
-        return new Color(0.5f,0.5f,1,1);
+        return new Color(0.4f,0.6f,1,1);
     }
 
     private Color getBGColor() {

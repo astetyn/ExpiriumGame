@@ -1,10 +1,12 @@
 package com.astetyne.expirium.server.api.world;
 
+import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.CreateWorldPreferences;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
@@ -40,27 +42,18 @@ public class ExpiWorld implements Saveable, Disposable {
     private WeatherType weatherType;
     private InteractHandler interactHandler;
     private ExpiContactListener contactListener;
-    private final WorldFileManager fileManager;
     private float stepsTimeAccumulator;
     private int worldTime;
-    private WorldSettings settings;
+    private int width, height;
+    private long seed;
 
-    public ExpiWorld(WorldSettings settings, boolean createNew) {
+    public ExpiWorld(CreateWorldPreferences preferences) {
 
-        fileManager = new WorldFileManager(this);
-        System.out.println("CREATEE WORLD: "+this);
-        if(!createNew) {
-            try {
-                fileManager.loadWorld(settings.name);
-            }catch(WorldLoadingException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
+        width = preferences.width;
+        height = preferences.height;
+        seed = preferences.seed;
 
-        this.settings = settings;
-
-        worldTerrain = new ExpiTile[settings.height][settings.width];
+        worldTerrain = new ExpiTile[preferences.height][preferences.width];
         new WorldGenerator(worldTerrain).generateWorld();
 
         worldTime = 0;
@@ -68,16 +61,39 @@ public class ExpiWorld implements Saveable, Disposable {
 
         initAfterCreation();
 
-        try {
-            fileManager.saveWorld(settings.name);
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        System.out.println("DESTROY WORLD: "+this);
+    public ExpiWorld(DataInputStream in) throws WorldLoadingException {
+
+        try {
+
+            width = in.readInt();
+            height = in.readInt();
+            seed = in.readLong();
+
+            worldTerrain = new ExpiTile[height][width];
+
+            for(int h = 0; h < height; h++) {
+                for(int w = 0; w < width; w++) {
+                    worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.getType(in.readByte()), w, h);
+                }
+            }
+
+            int entitiesSize = in.readInt();
+            for(int i = 0; i < entitiesSize; i++) {
+                EntityType.getType(in.readInt()).initEntity(in);
+            }
+
+            //todo: len docasne zatial
+            worldTime = 0;
+            weatherType = WeatherType.SUNNY;
+
+            initAfterCreation();
+
+        }catch(IOException ignored) {
+            throw new WorldLoadingException("IO Exception during world loading.");
+        }
+
     }
 
     private void initAfterCreation() {
@@ -234,7 +250,7 @@ public class ExpiWorld implements Saveable, Disposable {
 
     public Vector2 getSaveLocationForSpawn() {
         int i = 0;
-        while(i != settings.height && worldTerrain[i][10].getTypeFront() != TileType.AIR) {
+        while(i != height && worldTerrain[i][10].getTypeFront() != TileType.AIR) {
             i++;
         }
         return new Vector2(10, i+2);
@@ -277,11 +293,11 @@ public class ExpiWorld implements Saveable, Disposable {
     }
 
     public int getTerrainWidth() {
-        return settings.width;
+        return width;
     }
 
     public int getTerrainHeight() {
-        return settings.height;
+        return height;
     }
 
     public int getPartHeight() {
@@ -289,36 +305,29 @@ public class ExpiWorld implements Saveable, Disposable {
     }
 
     @Override
-    public void readData(DataInputStream in) throws IOException {
+    public void writeData(DataOutputStream out) throws IOException {
 
-        settings = new WorldSettings();
-        settings.readData(in);
+        out.writeInt(width);
+        out.writeInt(height);
+        out.writeLong(seed);
 
-        worldTerrain = new ExpiTile[settings.height][settings.width];
-
-        for(int h = 0; h < settings.height; h++) {
-            for(int w = 0; w < settings.width; w++) {
-                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.AIR, w, h);
+        for(int h = 0; h < height; h++) {
+            for(int w = 0; w < width; w++) {
+                out.writeByte(worldTerrain[h][w].getTypeFront().getID());
+                out.writeByte(worldTerrain[h][w].getTypeBack().getID());
             }
         }
 
-        //todo: len docasne zatial
-        worldTime = 0;
-        weatherType = WeatherType.SUNNY;
-
-        initAfterCreation();
-
-    }
-
-    @Override
-    public void writeData(DataOutputStream out) throws IOException {
-
-        settings.writeData(out);
-
-        for(int h = 0; h < settings.height; h++) {
-            for(int w = 0; w < settings.width; w++) {
-                out.writeByte(worldTerrain[h][w].getTypeFront().getID());
-            }
+        int entitiesSize = 0;
+        for(ExpiEntity e : GameServer.get().getEntities()) {
+            if(e instanceof ExpiPlayer) continue;
+            entitiesSize++;
+        }
+        out.writeInt(entitiesSize);
+        for(ExpiEntity e : GameServer.get().getEntities()) {
+            if(e instanceof ExpiPlayer) continue;
+            out.writeInt(e.getType().getID());
+            e.writeData(out);
         }
 
     }

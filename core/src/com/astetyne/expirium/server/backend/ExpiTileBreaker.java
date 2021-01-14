@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
+import com.astetyne.expirium.main.data.ThumbStickData;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.world.tiles.TileType;
@@ -27,7 +28,10 @@ public class ExpiTileBreaker {
         world = GameServer.get().getWorld();
     }
 
-    public void onTick(float horz, float vert) {
+    public void onTick(ThumbStickData data) {
+
+        float horz = data.horz;
+        float vert = data.vert;
 
         // check if breaking
         if(horz == 0 && vert == 0) {

@@ -1,9 +1,11 @@
 package com.astetyne.expirium.server.backend;
 
+import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,7 +43,11 @@ public class ServerGateway extends TerminableLooper {
 
             }
 
-        }catch(IOException e) {
+        }catch(IOException | IllegalArgumentException e) {
+            if(isRunning()) {
+                GameServer.get().stop();
+                System.out.println("Server gateway fatal fail.");
+            }
             end();
         }
         System.out.println("Server GW closed.");
@@ -102,7 +108,14 @@ public class ServerGateway extends TerminableLooper {
                     continue;
                 }
                 String name = in.getString();
-                ExpiPlayer ep = new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
+                DataInputStream dataIn = GameServer.get().getFileManager().getPlayerDataStream(name);
+                ExpiPlayer ep;
+                if(dataIn == null) {
+                    ep = new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
+                }else {
+                    ep = (ExpiPlayer) EntityType.PLAYER.initEntity(dataIn);
+                    ep.setGateway(gateway);
+                }
                 joiningPlayers.add(ep);
                 GameServer.get().getWorldLoaders().add(new WorldLoader(ep));
             }

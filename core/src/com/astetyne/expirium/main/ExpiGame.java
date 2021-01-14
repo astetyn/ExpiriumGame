@@ -6,7 +6,8 @@ import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.main.utils.Utils;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.world.WorldSettings;
+import com.astetyne.expirium.server.api.ServerPreferences;
+import com.astetyne.expirium.server.api.world.WorldLoadingException;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -48,6 +49,13 @@ public class ExpiGame extends Game {
 	public void update() {
 		timeSinceStart += Gdx.graphics.getDeltaTime();
 		checkServerMessages();
+		if(clientGateway != null && clientGateway.isConnectionBroken()) {
+			if(isHostingServer()) {
+				stopServer();
+			}
+			setScreen(new LauncherScreen("You were disconnected due to connection issue."));
+			clientGateway = null;
+		}
 	}
 
 	@Override
@@ -62,6 +70,7 @@ public class ExpiGame extends Game {
 		getScreen().dispose();
 		clientGateway.end();
 		Res.dispose();
+		System.out.println("discoseeeeeeeeeeeeeeee");
 	}
 
 	public ClientGateway getClientGateway() {
@@ -94,14 +103,15 @@ public class ExpiGame extends Game {
 		clientGateway.getManager().processIncomingPackets();
 	}
 
-	public void startServer(WorldSettings settings, boolean createNew, int tps, int port) {
+	public void startServer(ServerPreferences preferences) {
 		hostingServer = true;
 		try {
 			gameCode = Utils.getCodeFromAddress((Inet4Address) Inet4Address.getLocalHost());
-		}catch(UnknownHostException e) {
+			server = new GameServer(preferences);
+			//todo: port free check
+		}catch(UnknownHostException | WorldLoadingException e) {
 			e.printStackTrace();
 		}
-		server = new GameServer(settings, createNew, tps, port);
 		Thread t = new Thread(server);
 		t.setName("Game Server");
 		t.start();

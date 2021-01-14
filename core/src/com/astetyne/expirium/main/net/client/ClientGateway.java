@@ -24,6 +24,7 @@ public class ClientGateway extends TerminableLooper {
     private final Object nextReadLock;
     private int traffic;
     private long time;
+    private boolean connectionBroken;
 
     public ClientGateway(Inet4Address address) {
         this.ipAddress = address;
@@ -31,6 +32,7 @@ public class ClientGateway extends TerminableLooper {
         nextReadLock = new Object();
         traffic = 0;
         time = 0;
+        connectionBroken = false;
     }
 
     @Override
@@ -85,11 +87,13 @@ public class ClientGateway extends TerminableLooper {
         }catch(IOException e) {
             System.out.println("Exception during messaging with server.");
             try {
-                if(socket != null) {
-                    socket.close();
-                }
+                if(socket != null) socket.close();
             }catch(IOException ignored) {}
-            //todo: otvorit launcher screen, pozor na end(), if(isRunning())?
+            if(isRunning()) {
+                synchronized(this) {
+                    connectionBroken = true;
+                }
+            }
         }catch(InterruptedException e) {
             e.printStackTrace();
         }
@@ -99,9 +103,7 @@ public class ClientGateway extends TerminableLooper {
     public void end() {
         super.end();
         try {
-            if(socket != null) {
-                socket.close();
-            }
+            if(socket != null) socket.close();
         }catch(IOException ignored) {}
         in.reset();
         out.reset();
@@ -127,5 +129,11 @@ public class ClientGateway extends TerminableLooper {
 
     public PacketOutputStream getOut() {
         return out;
+    }
+
+    public boolean isConnectionBroken() {
+        synchronized(this) {
+            return connectionBroken;
+        }
     }
 }

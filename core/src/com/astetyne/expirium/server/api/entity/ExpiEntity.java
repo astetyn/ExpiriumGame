@@ -3,11 +3,12 @@ package com.astetyne.expirium.server.api.entity;
 import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.main.entity.Metaable;
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.Saveable;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-public abstract class ExpiEntity implements Metaable, Collidable {
+public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
 
     private final int ID;
     private final float width, height;

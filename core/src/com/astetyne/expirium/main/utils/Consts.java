@@ -25,6 +25,8 @@ public class Consts {
     public static final float ITEM_COOLDOWN_BREAK = 1;
     public static final float ITEM_COOLDOWN_DROP = 6;
 
+    public static final float ITEM_DESPAWN_TIME = 10; // in seconds
+
     // player
     public static final int PLAYER_INV_COLUMNS = 5;
     public static final int PLAYER_INV_ROWS = 5;

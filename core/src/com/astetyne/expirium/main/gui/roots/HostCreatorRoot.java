@@ -5,7 +5,9 @@ import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.screens.LauncherScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.Utils;
-import com.astetyne.expirium.server.api.world.WorldSettings;
+import com.astetyne.expirium.server.api.CreateWorldPreferences;
+import com.astetyne.expirium.server.api.LoadWorldPreferences;
+import com.astetyne.expirium.server.api.ServerPreferences;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -47,7 +49,9 @@ public class HostCreatorRoot extends Table {
         launchButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ExpiGame.get().startServer(new WorldSettings(selectedWorld.name()), false, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                LoadWorldPreferences worldPref = new LoadWorldPreferences(selectedWorld.name());
+                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ExpiGame.get().startServer(pref);
                 LauncherScreen.get().setRoot(new LoadingRoot("Loading world..."));
                 ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
             }
@@ -88,13 +92,21 @@ public class HostCreatorRoot extends Table {
         createNewButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(tf.getText().trim().isEmpty()) {
+                String worldName = tf.getText().trim();
+                if(worldName.isEmpty()) {
                     //todo: check: existujuce meno + vymazat svet (vo saved worlds)
                     //todo: oznamit to?
                     return;
                 }
+                for(FileHandle fh : Gdx.files.local("worlds").list()) {
+                    if(fh.name().equals(worldName)) {
+                        return;
+                    }
+                }
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
-                ExpiGame.get().startServer(new WorldSettings(tf.getText().trim(), 2000, 256, 0), true, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 2000, 256, 0);
+                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ExpiGame.get().startServer(pref);
                 ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
             }
         });

@@ -74,7 +74,7 @@ public class ClientPacketManager {
                     break;
 
                 case 20: //EntitySpawnPacket
-                    EntityType.getType(in.getInt()).initEntity();
+                    EntityType.getType(in.getInt()).initEntity(in);
                     break;
 
                 case 21: //EntityDespawnPacket
