@@ -1,7 +1,8 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.tiles.Solidity;
+import com.astetyne.expirium.client.tiles.Solidity;
+import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.physics.box2d.*;
 

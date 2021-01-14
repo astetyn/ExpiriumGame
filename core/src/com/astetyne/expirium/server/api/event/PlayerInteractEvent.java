@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.event;
 
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.world.ExpiTile;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 
 public class PlayerInteractEvent implements Cancellable {
 

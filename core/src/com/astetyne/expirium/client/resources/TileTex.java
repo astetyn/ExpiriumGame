@@ -1,0 +1,43 @@
+package com.astetyne.expirium.client.resources;
+
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+public enum TileTex implements Textureable {
+
+    STONE("stone_tile"),
+    RHYOLITE("rhyolite_tile"),
+    GRASS("grass"),
+    GRASS_SLOPE_R("grass_slope_right"),
+    GRASS_SLOPE_L("grass_slope_left"),
+    DIRT("dirt_tile"),
+    TREE1("tree1"),
+    TREE2("tree2"),
+    TREE3("tree3"),
+    TREE4("tree4"),
+    TREE5("tree5"),
+    TREE6("tree6"),
+    WOODEN_WALL("wooden_wall"),
+    WHITE_TILE("white_tile"),
+    COAL_ORE("coal_ore_tile"),
+    RASPBERRY_BUSH_1("raspberry_bush_tile"),
+    RASPBERRY_BUSH_2("raspberry_bush2_tile");
+
+    private final String regionName;
+    private TextureRegion textureRegion;
+
+    TileTex(String regionName) {
+        this.regionName = regionName;
+    }
+
+    public static void loadTextures() {
+        TextureAtlas world = new TextureAtlas("world.atlas");
+        for(TileTex tileTex : values()) {
+            tileTex.textureRegion = world.findRegion(tileTex.regionName);
+        }
+    }
+
+    public TextureRegion getTex() {
+        return textureRegion;
+    }
+}

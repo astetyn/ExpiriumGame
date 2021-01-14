@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.world.inventory;
 
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.items.ItemStack;
 
 public enum CookingRecipe {
 

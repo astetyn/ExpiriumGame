@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server.api.world.inventory;
 
-import com.astetyne.expirium.main.items.GridItemStack;
-import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.client.items.GridItemStack;
+import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.utils.Consts;
 
 public class CookingInventory extends ExpiInventory {
 

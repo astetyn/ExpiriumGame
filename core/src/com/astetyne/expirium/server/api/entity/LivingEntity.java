@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.entity;
 
-import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.server.api.Saveable;
 
 import java.io.DataInputStream;

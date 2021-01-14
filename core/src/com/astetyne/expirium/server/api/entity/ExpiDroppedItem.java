@@ -1,13 +1,13 @@
 package com.astetyne.expirium.server.api.entity;
 
-import com.astetyne.expirium.main.entity.EntityBodyFactory;
-import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.client.entity.EntityBodyFactory;
+import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.event.TickListener;
-import com.astetyne.expirium.server.backend.PacketOutputStream;
+import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;

@@ -1,12 +1,12 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
-import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.tiles.ItemDropper;
+import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
-import com.astetyne.expirium.server.api.CreateWorldPreferences;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
@@ -14,8 +14,12 @@ import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.event.TileChangeListener;
+import com.astetyne.expirium.server.api.world.generator.CreateWorldPreferences;
+import com.astetyne.expirium.server.api.world.generator.WorldGenerator;
+import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.api.world.listeners.TreeListener;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -196,7 +200,9 @@ public class ExpiWorld implements Saveable, Disposable {
 
         if(to == TileType.AIR && withDrops && t.getTypeFront() != TileType.AIR) {
             tempVec.set(t.getX() + off, t.getY() + off);
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, t.getTypeFront().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
+            ItemDropper dropper = t.getTypeFront().getItemDropper();
+            //todo: prepocitat pravdepodobnosti
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, dropper.items[0], Consts.ITEM_COOLDOWN_BREAK);
             for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(droppedItem);
             }
@@ -213,9 +219,12 @@ public class ExpiWorld implements Saveable, Disposable {
         while(it.hasNext()) {
             ExpiTile t2 = it.next();
             if(t2.getStability() == 0) {
-                if(Math.random() < 1 && withDrops && t2.getTypeFront().getDropItem() != null) {
+                //todo: redukcia vela itemov pri pade?
+                if(Math.random() < 1 && withDrops && t2.getTypeFront() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
                     tempVec.set(t2.getX()+off, t2.getY()+off);
-                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, t2.getTypeFront().getDropItem(), Consts.ITEM_COOLDOWN_BREAK);
+                    ItemDropper dropper = t2.getTypeFront().getItemDropper();
+                    //todo: prepocitat pravdepodobnosti
+                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, dropper.items[0], Consts.ITEM_COOLDOWN_BREAK);
                     for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                         pp.getNetManager().putEntitySpawnPacket(edi);
                     }

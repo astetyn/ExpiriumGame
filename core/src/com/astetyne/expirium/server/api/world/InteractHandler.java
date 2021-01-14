@@ -1,12 +1,13 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.items.ItemCategory;
-import com.astetyne.expirium.main.world.input.InteractType;
-import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.client.items.ItemCategory;
+import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
 import com.astetyne.expirium.server.api.event.PlayerInteractListener;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 
 import java.util.List;
 

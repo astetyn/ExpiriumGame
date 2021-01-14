@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.utils.Consts;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.TickListener;

@@ -1,14 +1,13 @@
 package com.astetyne.expirium.server.api.world.tiles;
 
-import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
 import com.astetyne.expirium.server.api.event.PlayerInteractListener;
 import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.event.TickListener;
-import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.inventory.CookingInventory;
 
 public class Campfire implements PlayerInteractListener, TickListener {

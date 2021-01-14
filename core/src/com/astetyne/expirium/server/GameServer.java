@@ -1,18 +1,17 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.main.ExpiGame;
-import com.astetyne.expirium.server.api.CreateWorldPreferences;
-import com.astetyne.expirium.server.api.LoadWorldPreferences;
-import com.astetyne.expirium.server.api.ServerPreferences;
+import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.EventManager;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 import com.astetyne.expirium.server.api.world.WorldFileManager;
-import com.astetyne.expirium.server.api.world.WorldLoadingException;
-import com.astetyne.expirium.server.backend.ServerGateway;
+import com.astetyne.expirium.server.api.world.generator.CreateWorldPreferences;
+import com.astetyne.expirium.server.api.world.generator.LoadWorldPreferences;
+import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
 import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
+import com.astetyne.expirium.server.net.ServerGateway;
 import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;

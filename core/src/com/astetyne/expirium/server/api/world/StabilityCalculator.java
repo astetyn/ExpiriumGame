@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.main.world.tiles.TileType;
-import com.astetyne.expirium.server.backend.StabilityPack;
+import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 
 import java.util.HashSet;
 
@@ -49,7 +49,6 @@ public class StabilityCalculator {
         if(newStability > t.getStability()) {
 
             t.setStability(newStability);
-            affectedTiles.add(t);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
 
         }else if(newStability < t.getStability()) {
@@ -121,11 +120,6 @@ public class StabilityCalculator {
         // right tile
         if(x != w-1 && !worldTerrain[y][x+1].isLabile())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
-
-        if(t.getTypeFront().isOnlyOnSolid()) {
-            maxAvailStab = 0; // the three steps above are redundant is this case
-        }
-
         // bottom tile
         if(y != 0 && !worldTerrain[y-1][x].isLabile())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y-1][x].getStability());
@@ -145,7 +139,7 @@ public class StabilityCalculator {
                 }
             }
         }
-        return Math.min(t.getTypeFront().getStability(), maxAvailStab);
+        return Math.min(t.getTypeFront().getMaxStability(), maxAvailStab);
     }
 
     /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/

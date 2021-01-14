@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.entity;
 
-import com.astetyne.expirium.main.entity.EntityType;
-import com.astetyne.expirium.main.entity.Metaable;
+import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.entity.Metaable;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.badlogic.gdx.math.Vector2;

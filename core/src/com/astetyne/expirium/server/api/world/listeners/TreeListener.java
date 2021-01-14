@@ -1,15 +1,15 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.utils.Consts;
-import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.event.TileChangeListener;
-import com.astetyne.expirium.server.api.world.ExpiTile;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 import com.badlogic.gdx.math.Vector2;
 
 public class TreeListener implements TileChangeListener {

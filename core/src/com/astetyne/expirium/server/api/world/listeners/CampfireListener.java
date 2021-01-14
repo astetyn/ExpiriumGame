@@ -1,11 +1,11 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
-import com.astetyne.expirium.main.world.tiles.TileType;
+import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.event.TileChangeEvent;
 import com.astetyne.expirium.server.api.event.TileChangeListener;
-import com.astetyne.expirium.server.api.world.ExpiTile;
 import com.astetyne.expirium.server.api.world.tiles.Campfire;
+import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 
 import java.util.ArrayList;
 import java.util.HashMap;

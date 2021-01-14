@@ -8,6 +8,7 @@ import java.util.List;
 public class FixRes {
 
     public static EdgesData CAMPFIRE;
+    public static EdgesData GRASS_SLOPE_R, GRASS_SLOPE_L;
 
     public static void load() {
 
@@ -16,6 +17,10 @@ public class FixRes {
         CAMPFIRE.add(0.8f, 0, 0.8f, 0.3f);
         CAMPFIRE.add(0.8f, 0.3f, 0.2f, 0.3f);
         CAMPFIRE.add(0.2f, 0.3f, 0.2f, 0);
+
+        GRASS_SLOPE_R = new EdgesData();
+
+        GRASS_SLOPE_L = new EdgesData();
 
     }
 

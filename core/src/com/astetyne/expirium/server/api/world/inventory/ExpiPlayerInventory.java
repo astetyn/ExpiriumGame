@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server.api.world.inventory;
 
-import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemCategory;
-import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.items.ItemCategory;
+import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
