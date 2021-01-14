@@ -54,7 +54,10 @@ public class ServerPlayerGateway extends TerminableLooper {
                 //System.out.println("Server flushing.");
                 client.setSoTimeout(5000);
                 readBytes = in.fillBuffer();
-                if(readBytes == -1) GameServer.get().getServerGateway().playerPreLeaveAsync(this);//System.out.println("Server reading: "+readBytes+"\n"+in);
+                if(readBytes == -1) {
+                    GameServer.get().getServerGateway().playerPreLeaveAsync(owner);
+                    return;//System.out.println("Server reading: "+readBytes+"\n"+in);
+                }
 
                 traffic += readBytes;
                 if(time + 5000 < System.currentTimeMillis()) {
@@ -71,7 +74,7 @@ public class ServerPlayerGateway extends TerminableLooper {
             }
 
         }catch(IOException | InterruptedException e) {
-            GameServer.get().getServerGateway().playerPreLeaveAsync(this);
+            GameServer.get().getServerGateway().playerPreLeaveAsync(owner);
         }
         System.out.println("Channel with client \""+owner.getName()+"\" closed.");
     }

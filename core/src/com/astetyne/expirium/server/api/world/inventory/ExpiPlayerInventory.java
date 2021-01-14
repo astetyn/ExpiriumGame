@@ -3,12 +3,16 @@ package com.astetyne.expirium.server.api.world.inventory;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemCategory;
 import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpiPlayerInventory extends ExpiInventory {
+public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
 
     private final ExpiPlayer owner;
     private ItemStack itemInHand;
@@ -27,6 +31,20 @@ public class ExpiPlayerInventory extends ExpiInventory {
         isCon = new ItemStack(Item.EMPTY);
         chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
+        label = "This is better than minecraft.";
+    }
+
+    public ExpiPlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {
+        super(rows, columns, maxWeight, true, in);
+        this.owner = owner;
+        indexTools = in.readInt();
+        indexMats = in.readInt();
+        indexCons = in.readInt();
+        isTool = new ItemStack(Item.getType(in.readInt()));
+        isMat = new ItemStack(Item.getType(in.readInt()));
+        isCon = new ItemStack(Item.getType(in.readInt()));
+        chosenSlot = ChosenSlot.getSlot(in.readInt());
+        itemInHand = new ItemStack(Item.getType(in.readInt()));
         label = "This is better than minecraft.";
     }
 
@@ -151,5 +169,18 @@ public class ExpiPlayerInventory extends ExpiInventory {
 
     public ItemStack getItemInHand() {
         return itemInHand;
+    }
+
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        super.writeData(out);
+        out.writeInt(indexTools);
+        out.writeInt(indexMats);
+        out.writeInt(indexCons);
+        out.writeInt(isTool.getItem().getId());
+        out.writeInt(isMat.getItem().getId());
+        out.writeInt(isCon.getItem().getId());
+        out.writeInt(chosenSlot.getId());
+        out.writeInt(itemInHand.getItem().getId());
     }
 }

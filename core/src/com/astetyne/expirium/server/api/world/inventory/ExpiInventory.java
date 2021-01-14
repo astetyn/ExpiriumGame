@@ -1,16 +1,21 @@
 package com.astetyne.expirium.server.api.world.inventory;
 
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.Item;
 import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.server.api.Saveable;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExpiInventory {
+public class ExpiInventory implements Saveable {
 
-    protected final List<ItemStack> items;
-    protected final ItemStack[][] grid;
+    protected final List<GridItemStack> items;
+    protected final GridItemStack[][] grid;
     protected float totalWeight;
     protected final float maxWeight;
     protected String label;
@@ -21,13 +26,22 @@ public class ExpiInventory {
     public ExpiInventory(int rows, int columns, float maxWeight, boolean withUtils) {
         this.rows = rows;
         this.columns = columns;
-        items = new ArrayList<>();
-        grid = new ItemStack[rows][columns];
-        totalWeight = 0;
         this.maxWeight = maxWeight;
         this.withUtils = withUtils;
+        items = new ArrayList<>();
+        grid = new GridItemStack[rows][columns];
+        totalWeight = 0;
         label = "";
         invalid = false;
+    }
+
+    public ExpiInventory(int rows, int columns, float maxWeight, boolean withUtils, DataInputStream in) throws IOException {
+        this(rows, columns, maxWeight, withUtils);
+        int itemsSize = in.readInt();
+        for(int i = 0; i < itemsSize; i++) {
+            items.add(new GridItemStack(in));
+        }
+        totalWeight = in.readFloat();
     }
 
     /**
@@ -51,28 +65,28 @@ public class ExpiInventory {
      * @return true if item was added, otherwise false
      */
     public boolean addItem(ItemStack addIS, boolean merge) {
-        ItemStack copyIS = new ItemStack(addIS);
+        GridItemStack gridIS = new GridItemStack(addIS);
 
         if(merge) {
             for(ItemStack is : items) {
-                if(is.getItem() == copyIS.getItem()) {
-                    is.increaseAmount(copyIS.getAmount());
-                    totalWeight += copyIS.getItem().getWeight() * copyIS.getAmount();
+                if(is.getItem() == gridIS.getItem()) {
+                    is.increaseAmount(gridIS.getAmount());
+                    totalWeight += gridIS.getItem().getWeight() * gridIS.getAmount();
                     return true;
                 }
             }
         }
 
-        int w = copyIS.getItem().getGridWidth();
-        int h = copyIS.getItem().getGridHeight();
+        int w = gridIS.getItem().getGridWidth();
+        int h = gridIS.getItem().getGridHeight();
         for(int r = rows - h; r >= 0; r--) {
             for(int c = 0; c <= columns - w; c++) {
-                if(!isPlaceFor(copyIS.getItem(), r, c, -1, -1)) continue;
-                copyIS.getGridPos().set(c, r);
-                insertToGrid(copyIS);
-                items.add(copyIS);
-                totalWeight += copyIS.getItem().getWeight() * copyIS.getAmount();
-                System.out.println("adding: "+copyIS+" to "+copyIS.getGridPos());
+                if(!isPlaceFor(gridIS.getItem(), r, c, -1, -1)) continue;
+                gridIS.getGridPos().set(c, r);
+                insertToGrid(gridIS);
+                items.add(gridIS);
+                totalWeight += gridIS.getItem().getWeight() * gridIS.getAmount();
+                System.out.println("adding: "+gridIS+" to "+gridIS.getGridPos());
                 return true;
             }
         }
@@ -80,14 +94,14 @@ public class ExpiInventory {
     }
 
     public boolean contains(Item item) {
-        for(ItemStack is : items) {
+        for(GridItemStack is : items) {
             if(is.getItem() == item) return true;
         }
         return false;
     }
 
     public boolean contains(ItemStack conIS) {
-        for(ItemStack is : items) {
+        for(GridItemStack is : items) {
             if(is.getItem() == conIS.getItem() && is.getAmount() >= conIS.getAmount()) return true;
         }
         return false;
@@ -97,7 +111,7 @@ public class ExpiInventory {
      * Removes given ItemStack from inventory. Given ItemStack must be already in the inventory. (this method is not safe)
      * @param remIS
      */
-    public void removeItemStack(ItemStack remIS) {
+    public void removeItemStack(GridItemStack remIS) {
         System.out.println("removing: "+remIS+" from "+remIS.getGridPos());
         items.remove(remIS);
         cleanGridFrom(remIS);
@@ -112,9 +126,9 @@ public class ExpiInventory {
      */
     public void removeItem(ItemStack remIS) {
         int removedAmount = 0;
-        Iterator<ItemStack> it = items.iterator();
+        Iterator<GridItemStack> it = items.iterator();
         while(it.hasNext()) {
-            ItemStack is = it.next();
+            GridItemStack is = it.next();
             if(is.getItem() == remIS.getItem()) {
                 int toBeRemoved = Math.min(is.getAmount(), remIS.getAmount() - removedAmount);
                 removedAmount += toBeRemoved;
@@ -134,14 +148,14 @@ public class ExpiInventory {
     }
 
     public void clear() {
-        for(ItemStack is : items) {
+        for(GridItemStack is : items) {
             cleanGridFrom(is);
         }
         totalWeight = 0;
         items.clear();
     }
 
-    public void insertToGrid(ItemStack is) {
+    public void insertToGrid(GridItemStack is) {
         for(int i = 0; i < is.getItem().getGridHeight(); i++) {
             for(int j = 0; j < is.getItem().getGridWidth(); j++) {
                 grid[is.getGridPos().y+i][is.getGridPos().x+j] = is;
@@ -149,7 +163,7 @@ public class ExpiInventory {
         }
     }
 
-    public void cleanGridFrom(ItemStack is) {
+    public void cleanGridFrom(GridItemStack is) {
         for(int i = 0; i < is.getItem().getGridHeight(); i++) {
             for(int j = 0; j < is.getItem().getGridWidth(); j++) {
                 grid[is.getGridPos().y+i][is.getGridPos().x+j] = null;
@@ -206,7 +220,7 @@ public class ExpiInventory {
         return label;
     }
 
-    public List<ItemStack> getItems() {
+    public List<GridItemStack> getItems() {
         return items;
     }
 
@@ -218,7 +232,7 @@ public class ExpiInventory {
         return maxWeight;
     }
 
-    public ItemStack[][] getGrid() {
+    public GridItemStack[][] getGrid() {
         return grid;
     }
 
@@ -244,5 +258,14 @@ public class ExpiInventory {
 
     public void setInvalid(boolean invalid) {
         this.invalid = invalid;
+    }
+
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        out.writeInt(items.size());
+        for(GridItemStack is : items) {
+            is.writeData(out);
+        }
+        out.writeFloat(totalWeight);
     }
 }

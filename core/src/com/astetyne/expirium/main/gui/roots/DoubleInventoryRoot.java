@@ -4,7 +4,7 @@ import com.astetyne.expirium.main.ExpiGame;
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.data.StorageGridData;
 import com.astetyne.expirium.main.gui.widget.StorageGrid;
-import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.utils.Utils;
@@ -54,8 +54,8 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 //System.out.println("x: "+x+" y: "+y);
-                ItemStack is = storage1.getItemAt(x - storageCell1.getActorX(), y - storageCell1.getActorY());
-                ItemStack is2 = storage2.getItemAt(x - storageCell2.getActorX(), y - storageCell2.getActorY());
+                GridItemStack is = storage1.getItemAt(x - storageCell1.getActorX(), y - storageCell1.getActorY());
+                GridItemStack is2 = storage2.getItemAt(x - storageCell2.getActorX(), y - storageCell2.getActorY());
                 if(is != null) {
                     storage1.getGrid().setSelectedItem(is);
                     storage1.getGrid().updateVec(x, y);
@@ -84,7 +84,7 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
                 }else if(pos2.x != -1) {
                     finalPos = pos2;
                 }
-                ItemStack selItem;
+                GridItemStack selItem;
                 if(fromMain) {
                     selItem = storage1.getGrid().getSelectedItem();
                 }else {

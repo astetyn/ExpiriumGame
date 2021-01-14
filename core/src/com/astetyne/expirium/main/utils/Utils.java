@@ -1,6 +1,7 @@
 package com.astetyne.expirium.main.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
@@ -45,6 +46,29 @@ public class Utils {
             ignored.printStackTrace();
         }
         return -1;
+    }
+
+    public static int getDirSize(FileHandle dir) {
+        int size = 0;
+        for(FileHandle fh : dir.list()) {
+            if(fh.isDirectory()) {
+                size += getDirSize(fh);
+            }else {
+                size += fh.length();
+            }
+        }
+        return size;
+    }
+
+    public static void deleteDir(FileHandle dir) {
+        for(FileHandle fh : dir.list()) {
+            if(fh.isDirectory()) {
+                deleteDir(fh);
+            }else {
+                fh.delete();
+            }
+        }
+        dir.delete();
     }
 
     public static float getTextWidth(String text, BitmapFont font) {

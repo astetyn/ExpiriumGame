@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.world.inventory;
 
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
 
@@ -76,7 +77,7 @@ public class CookingInventory extends ExpiInventory {
     }
 
     @Override
-    public void removeItemStack(ItemStack remIS) {
+    public void removeItemStack(GridItemStack remIS) {
         super.removeItemStack(remIS);
         matchRecipe();
     }

@@ -15,6 +15,8 @@ import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
 import com.badlogic.gdx.utils.Disposable;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -62,7 +64,9 @@ public class GameServer implements Runnable, Disposable {
         fileManager = new WorldFileManager(serverPreferences.worldPreferences.worldName);
 
         if(serverPreferences.worldPreferences instanceof LoadWorldPreferences) {
-            expiWorld = new ExpiWorld(fileManager.loadWorld());
+            DataInputStream in = fileManager.getWorldDataStream();
+            expiWorld = new ExpiWorld(in);
+            expiWorld.loadWorldStuff(in);
         }else {
             expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences);
         }
@@ -88,6 +92,11 @@ public class GameServer implements Runnable, Disposable {
         }
         synchronized(GameServer.get().getTickLooper().getTickLock()) {
             GameServer.get().getTickLooper().getTickLock().notifyAll();
+        }
+        try {
+            fileManager.saveWorld(expiWorld);
+        }catch(IOException e) {
+            e.printStackTrace();
         }
         dispose();
     }

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.world.input.InteractType;
@@ -125,7 +126,7 @@ public class ServerPacketManager {
         out.putFloat(inv1.getTotalWeight());
         out.putFloat(inv1.getMaxWeight());
         out.putInt(inv1.getItems().size());
-        for(ItemStack is : inv1.getItems()) {
+        for(GridItemStack is : inv1.getItems()) {
             out.putInt(is.getItem().getId());
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());
@@ -134,7 +135,7 @@ public class ServerPacketManager {
         out.putFloat(inv2.getTotalWeight());
         out.putFloat(inv2.getMaxWeight());
         out.putInt(inv2.getItems().size());
-        for(ItemStack is : inv2.getItems()) {
+        for(GridItemStack is : inv2.getItems()) {
             out.putInt(is.getItem().getId());
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());

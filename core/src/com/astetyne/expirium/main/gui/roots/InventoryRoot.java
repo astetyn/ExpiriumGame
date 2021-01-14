@@ -5,7 +5,7 @@ import com.astetyne.expirium.main.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.main.gui.widget.RecipeList;
 import com.astetyne.expirium.main.gui.widget.RecipeListTable;
 import com.astetyne.expirium.main.gui.widget.StorageGrid;
-import com.astetyne.expirium.main.items.ItemStack;
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.screens.GameScreen;
 import com.astetyne.expirium.main.utils.Consts;
 import com.astetyne.expirium.main.utils.IntVector2;
@@ -39,7 +39,7 @@ public class InventoryRoot extends Table implements ExpiRoot {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                ItemStack is = storage.getItemAt(x, y);
+                GridItemStack is = storage.getItemAt(x, y);
                 if(is != null) {
                     storage.getGrid().setSelectedItem(is);
                     storage.getGrid().updateVec(storageCell.getActorX() + x, storageCell.getActorY() + y);

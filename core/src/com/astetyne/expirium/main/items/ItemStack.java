@@ -1,31 +1,22 @@
 package com.astetyne.expirium.main.items;
 
-import com.astetyne.expirium.main.utils.IntVector2;
-
 public class ItemStack {
 
-    private final Item item;
-    private int amount;
-    private final IntVector2 gridPos;
+    protected final Item item;
+    protected int amount;
 
     public ItemStack(ItemStack is) {
         this.item = is.getItem();
         this.amount = is.getAmount();
-        this.gridPos = new IntVector2(is.getGridPos());
     }
 
     public ItemStack(Item item) {
-        this(item, 1, new IntVector2(0,0));
+        this(item, 1);
     }
 
     public ItemStack(Item item, int amount) {
-        this(item, amount, new IntVector2(0,0));
-    }
-
-    public ItemStack(Item item, int amount, IntVector2 pos) {
         this.item = item;
         this.amount = amount;
-        gridPos = pos;
     }
 
     public Item getItem() {
@@ -46,10 +37,6 @@ public class ItemStack {
 
     public void decreaseAmount(int decreaseAmount) {
         amount -= decreaseAmount;
-    }
-
-    public IntVector2 getGridPos() {
-        return gridPos;
     }
 
 }

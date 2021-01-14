@@ -39,6 +39,7 @@ public enum EntityType {
     }
 
     public ExpiEntity initEntity(DataInputStream in) {
+        if(this == EntityType.PLAYER) return null;
         try {
             return entityClazz2.getConstructor(DataInputStream.class).newInstance(in);
         }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {

@@ -2,8 +2,8 @@ package com.astetyne.expirium.main.gui.widget;
 
 import com.astetyne.expirium.main.Res;
 import com.astetyne.expirium.main.data.StorageGridData;
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.main.utils.Utils;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -15,7 +15,7 @@ public class BaseGrid extends Widget {
 
     private final BaseGridStyle style;
     private final StorageGridData data;
-    private ItemStack selectedItem;
+    private GridItemStack selectedItem;
     private final Vector2 itemVec;
     private final boolean withUtils;
 
@@ -43,7 +43,7 @@ public class BaseGrid extends Widget {
                 batch.draw(style.gridTile, getX()+j*tileSizeX, getY()+i*tileSizeY, tileSizeX, tileSizeY);
             }
         }
-        for(ItemStack is : data.items) {
+        for(GridItemStack is : data.items) {
             IntVector2 pos = is.getGridPos();
             TextureRegion tex = is.getItem().getItemTextureInGrid();
             int w = is.getItem().getGridWidth();
@@ -66,10 +66,10 @@ public class BaseGrid extends Widget {
         }
     }
 
-    public ItemStack getItemAt(float x, float y) {
+    public GridItemStack getItemAt(float x, float y) {
         x /= (getWidth() / data.columns);
         y /= (getHeight() / data.rows);
-        for(ItemStack is : data.items) {
+        for(GridItemStack is : data.items) {
             Item item = is.getItem();
             IntVector2 pos = is.getGridPos();
             int w = item.getGridWidth();
@@ -99,11 +99,11 @@ public class BaseGrid extends Widget {
         }
     }
 
-    public ItemStack getSelectedItem() {
+    public GridItemStack getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(ItemStack selectedItem) {
+    public void setSelectedItem(GridItemStack selectedItem) {
         this.selectedItem = selectedItem;
     }
 

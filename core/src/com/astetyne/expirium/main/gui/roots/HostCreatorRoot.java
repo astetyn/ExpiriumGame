@@ -61,7 +61,7 @@ public class HostCreatorRoot extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(selectedWorld == null) return;
-                selectedWorld.delete();
+                Utils.deleteDir(selectedWorld);
                 rebuildSavedWorldsTable();
             }
         });
@@ -126,8 +126,9 @@ public class HostCreatorRoot extends Table {
     private void rebuildSavedWorldsTable() {
         savedWorlds.clear();
         for(FileHandle fh : Gdx.files.local("worlds").list()) {
+            int size = Utils.getDirSize(fh);
             Table world = new Table();
-            Label worldLabel = new Label(fh.name() +" ("+Math.round(fh.length() * 10 / 1024f)/10f+"kB)", Res.LABEL_STYLE);
+            Label worldLabel = new Label(fh.name() +" ("+Math.round(size * 10 / 1024f)/10f+"kB)", Res.LABEL_STYLE);
             worldLabel.setAlignment(Align.center);
             worldLabel.setColor(Color.LIGHT_GRAY);
             world.add(worldLabel).grow();

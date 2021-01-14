@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.main.entity.EntityType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ServerGateway extends TerminableLooper {
@@ -18,12 +16,12 @@ public class ServerGateway extends TerminableLooper {
     private ServerSocket server;
     private final int port;
     private final List<ServerPlayerGateway> joiningClients;
-    private final List<ServerPlayerGateway> leavingClients;
+    private final List<ExpiPlayer> leavingPlayers;
 
     public ServerGateway(int port) {
         this.port = port;
         joiningClients = new ArrayList<>();
-        leavingClients = new ArrayList<>();
+        leavingPlayers = new ArrayList<>();
     }
 
     @Override
@@ -67,32 +65,31 @@ public class ServerGateway extends TerminableLooper {
         }
     }
 
-    public void playerPreLeaveAsync(ServerPlayerGateway p) {
-        synchronized(leavingClients) {
-            leavingClients.add(p);
+    public void playerPreLeaveAsync(ExpiPlayer p) {
+        synchronized(leavingPlayers) {
+            leavingPlayers.add(p);
         }
     }
 
     public void resolveJoiningAndLeavingPlayers() {
 
-        synchronized(leavingClients) {
-            for(ServerPlayerGateway gateway : leavingClients) {
-                Iterator<ExpiPlayer> it = GameServer.get().getPlayers().iterator();
-                while(it.hasNext()) {
-                    ExpiPlayer p = it.next();
-                    if(gateway == p.getGateway()) {
-                        it.remove();
-                        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                            pp.getNetManager().putEntityDespawnPacket(p);
-                        }
-                        p.destroySafe();
-                        p.getGateway().end();
-                        System.out.println("Player "+p.getName()+" left the server.");
-                        break;
-                    }
+        synchronized(leavingPlayers) {
+            for(ExpiPlayer p : leavingPlayers) {
+                GameServer.get().getPlayers().remove(p);
+                for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                    pp.getNetManager().putEntityDespawnPacket(p);
                 }
+                p.destroySafe();
+                p.getGateway().end();
+                try {
+                    GameServer.get().getFileManager().savePlayer(p);
+                }catch(IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Player "+p.getName()+" left the server.");
+                break;
             }
-            leavingClients.clear();
+            leavingPlayers.clear();
         }
 
         List<ExpiPlayer> joiningPlayers = new ArrayList<>();
@@ -109,12 +106,15 @@ public class ServerGateway extends TerminableLooper {
                 }
                 String name = in.getString();
                 DataInputStream dataIn = GameServer.get().getFileManager().getPlayerDataStream(name);
-                ExpiPlayer ep;
+                ExpiPlayer ep = null;
                 if(dataIn == null) {
                     ep = new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
                 }else {
-                    ep = (ExpiPlayer) EntityType.PLAYER.initEntity(dataIn);
-                    ep.setGateway(gateway);
+                    try {
+                        ep = new ExpiPlayer(dataIn, gateway);
+                    }catch(IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 joiningPlayers.add(ep);
                 GameServer.get().getWorldLoaders().add(new WorldLoader(ep));

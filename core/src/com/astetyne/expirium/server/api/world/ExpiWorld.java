@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ExpiWorld implements Saveable, Disposable {
 
-    private ExpiTile[][] worldTerrain;
+    private final ExpiTile[][] worldTerrain;
     private int partHeight;
     private World b2dWorld;
     private Body terrainBody;
@@ -44,8 +44,8 @@ public class ExpiWorld implements Saveable, Disposable {
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
     private int worldTime;
-    private int width, height;
-    private long seed;
+    private final int width, height;
+    private final long seed;
 
     public ExpiWorld(CreateWorldPreferences preferences) {
 
@@ -59,12 +59,17 @@ public class ExpiWorld implements Saveable, Disposable {
         worldTime = 0;
         weatherType = WeatherType.SUNNY;
 
+        try {
+            GameServer.get().getFileManager().saveWorld(this);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+
         initAfterCreation();
 
     }
 
     public ExpiWorld(DataInputStream in) throws WorldLoadingException {
-
         try {
 
             width = in.readInt();
@@ -79,11 +84,6 @@ public class ExpiWorld implements Saveable, Disposable {
                 }
             }
 
-            int entitiesSize = in.readInt();
-            for(int i = 0; i < entitiesSize; i++) {
-                EntityType.getType(in.readInt()).initEntity(in);
-            }
-
             //todo: len docasne zatial
             worldTime = 0;
             weatherType = WeatherType.SUNNY;
@@ -93,7 +93,22 @@ public class ExpiWorld implements Saveable, Disposable {
         }catch(IOException ignored) {
             throw new WorldLoadingException("IO Exception during world loading.");
         }
+    }
 
+    /**
+     * This method is useful for world objects which require getWorld() from server in their constructor.
+     */
+    public void loadWorldStuff(DataInputStream in) throws WorldLoadingException {
+        try {
+
+            int entitiesSize = in.readInt();
+            for(int i = 0; i < entitiesSize; i++) {
+                EntityType.getType(in.readInt()).initEntity(in);
+            }
+
+        }catch(IOException ignored) {
+            throw new WorldLoadingException("IO Exception during world stuff loading.");
+        }
     }
 
     private void initAfterCreation() {
@@ -318,6 +333,7 @@ public class ExpiWorld implements Saveable, Disposable {
             }
         }
 
+        // world stuff from here
         int entitiesSize = 0;
         for(ExpiEntity e : GameServer.get().getEntities()) {
             if(e instanceof ExpiPlayer) continue;

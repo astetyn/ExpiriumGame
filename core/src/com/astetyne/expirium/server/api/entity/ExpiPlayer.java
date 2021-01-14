@@ -3,6 +3,7 @@ package com.astetyne.expirium.server.api.entity;
 import com.astetyne.expirium.main.data.ThumbStickData;
 import com.astetyne.expirium.main.entity.EntityBodyFactory;
 import com.astetyne.expirium.main.entity.EntityType;
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.ItemRecipe;
 import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.Consts;
@@ -20,12 +21,12 @@ import java.io.IOException;
 
 public class ExpiPlayer extends LivingEntity implements TickListener {
 
-    private ServerPlayerGateway gateway;
-    private String name;
+    private final ServerPlayerGateway gateway;
+    private final String name;
     private final ExpiPlayerInventory mainInv;
     private ExpiInventory secondInv;
     private final ExpiTileBreaker tileBreaker;
-    private ThumbStickData tsData1, tsData2;
+    private final ThumbStickData tsData1, tsData2;
     private long lastJump;
 
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
@@ -35,17 +36,17 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
+        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new ExpiInventory(1, 1, 1, false);
         tileBreaker = new ExpiTileBreaker(this);
-        GameServer.get().getPlayers().add(this);
-        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
-        GameServer.get().getEventManager().getTickListeners().add(this);
         lastJump = 0;
+        GameServer.get().getPlayers().add(this);
+        GameServer.get().getEventManager().getTickListeners().add(this);
     }
 
-    public ExpiPlayer(DataInputStream in) throws IOException {
+    public ExpiPlayer(DataInputStream in, ServerPlayerGateway gateway) throws IOException {
         super(EntityType.PLAYER, 0.9f, 1.25f, in);
         body = EntityBodyFactory.createPlayerBody(new Vector2(in.readFloat(), in.readFloat()));
         GameServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
@@ -54,15 +55,17 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         for(int i = 0; i < nameLength; i++) {
             sb.append(in.readChar());
         }
+        this.gateway = gateway;
+        gateway.setOwner(this);
         name = sb.toString();
+        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new ExpiInventory(1, 1, 1, false);
         tileBreaker = new ExpiTileBreaker(this);
-        GameServer.get().getPlayers().add(this);
-        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
-        GameServer.get().getEventManager().getTickListeners().add(this);
         lastJump = 0;
+        GameServer.get().getPlayers().add(this);
+        GameServer.get().getEventManager().getTickListeners().add(this);
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -89,7 +92,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         //System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
 
         if(fromMain) {
-            ItemStack is = mainInv.getGrid()[row1][column1];
+            GridItemStack is = mainInv.getGrid()[row1][column1];
             if(is == null) return;
 
             if(column2 == -1) {
@@ -129,7 +132,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
                 mainInv.removeItemStack(is);
             }
         }else {
-            ItemStack is = secondInv.getGrid()[row1][column1];
+            GridItemStack is = secondInv.getGrid()[row1][column1];
             if(is == null) return;
 
             if(column2 == -1) {
@@ -241,11 +244,6 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         return gateway;
     }
 
-    public void setGateway(ServerPlayerGateway gateway) {
-        this.gateway = gateway;
-        gateway.setOwner(this);
-    }
-
     public String getName() {
         return name;
     }
@@ -290,5 +288,6 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         out.writeFloat(getLocation().y);
         out.writeInt(name.length());
         out.writeChars(name);
+        mainInv.writeData(out);
     }
 }

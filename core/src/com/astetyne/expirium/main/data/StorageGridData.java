@@ -1,7 +1,7 @@
 package com.astetyne.expirium.main.data;
 
+import com.astetyne.expirium.main.items.GridItemStack;
 import com.astetyne.expirium.main.items.Item;
-import com.astetyne.expirium.main.items.ItemStack;
 import com.astetyne.expirium.main.utils.IntVector2;
 import com.astetyne.expirium.server.backend.PacketInputStream;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class StorageGridData {
 
-    public final List<ItemStack> items;
+    public final List<GridItemStack> items;
     public int rows, columns;
     public float totalWeight, maxWeight;
     public String label;
@@ -32,7 +32,7 @@ public class StorageGridData {
             int itemID = in.getInt();
             int amount = in.getInt();
             IntVector2 pos = in.getIntVector();
-            items.add(new ItemStack(Item.getType(itemID), amount, pos));
+            items.add(new GridItemStack(Item.getType(itemID), amount, pos));
         }
     }
 }
