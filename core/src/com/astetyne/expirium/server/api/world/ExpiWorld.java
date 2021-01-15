@@ -179,6 +179,8 @@ public class ExpiWorld implements Saveable, Disposable {
 
     public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
 
+        if(item.getBuildTile() == null) return;
+
         if(!isTileFree(t, item)) return;
 
         if(!stabilityCalc.canBeAdjusted(t, item.getBuildTile())) return;
@@ -235,6 +237,8 @@ public class ExpiWorld implements Saveable, Disposable {
                 it.remove();
             }
         }
+
+        affectedTiles.add(t);
 
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
             for(ExpiTile t2 : changedTiles) {

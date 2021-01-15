@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ExpiDroppedItem extends ExpiEntity implements TickListener {
 
     private float livingTime;
-    private Item item;
+    private final Item item;
     private final float pickCooldown, despawnTime;
 
     public ExpiDroppedItem(Vector2 loc, Item item, float pickCooldown) {

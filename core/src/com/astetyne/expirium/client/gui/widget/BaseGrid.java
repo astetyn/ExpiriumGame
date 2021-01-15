@@ -45,7 +45,7 @@ public class BaseGrid extends Widget {
         }
         for(GridItemStack is : data.items) {
             IntVector2 pos = is.getGridPos();
-            TextureRegion tex = is.getItem().getItemTextureInGrid();
+            TextureRegion tex = is.getItem().getGridTexture();
             int w = is.getItem().getGridWidth();
             int h = is.getItem().getGridHeight();
             if(is == selectedItem) {
@@ -61,7 +61,7 @@ public class BaseGrid extends Widget {
 
         if(selectedItem != null) {
             int size = 160;
-            TextureRegion tex = selectedItem.getItem().getItemTexture();
+            TextureRegion tex = selectedItem.getItem().getTexture();
             batch.draw(tex, itemVec.x - size/2f, itemVec.y - Utils.percFromW(size)/2, size, Utils.percFromW(size));
         }
     }

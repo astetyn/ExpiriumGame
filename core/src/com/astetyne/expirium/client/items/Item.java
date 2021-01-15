@@ -1,47 +1,75 @@
 package com.astetyne.expirium.client.items;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.tiles.TileType;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
 
 public enum Item {
 
-    EMPTY(ItemCategory.EMPTY, -1, -1, -1, 0, null, null, "error"),
-    STONE(ItemCategory.MATERIAL, 1, 1, 1, 0.5f, Res.STONE_ITEM, Res.STONE_ITEM, "Stone"),
-    GRASS(ItemCategory.MATERIAL, 2, 1, 1, 0.5f, Res.GRASS_ITEM, Res.GRASS_ITEM, "Grass"),
-    DIRT(ItemCategory.MATERIAL, 3, 1, 1, 0.5f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Dirt"),
-    RAW_WOOD(ItemCategory.MISC, 4, 1, 1, 0.5f, Res.RAW_WOOD_ITEM, Res.RAW_WOOD_ITEM, "Raw wood"),
-    PICKAXE(ItemCategory.TOOL, 0, 1, 2, 1, Res.RHYOLITE_PICKAXE_ITEM, Res.RHYOLITE_PICKAXE_ITEM, "Pickaxe"),
-    CAMPFIRE(ItemCategory.MATERIAL, 11, 2, 2, 2, Res.CAMPFIRE_ITEM, Res.CAMPFIRE_ITEM, "Campfire"),
-    WOODEN_WALL(ItemCategory.MATERIAL, 12, 1, 1, 0.5f, Res.WOODEN_WALL_ITEM, Res.WOODEN_WALL_ITEM, "Wooden wall"),
-    APPLE(ItemCategory.CONSUMABLE, 0, 1, 1, 0.1f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Apple"),
-    COOKED_APPLE(ItemCategory.CONSUMABLE, 0, 1, 1, 0.1f, Res.DIRT_ITEM, Res.DIRT_ITEM, "Cooked Apple");
+    EMPTY(ItemCategory.EMPTY, -1, -1, 0, null, "error"),
+    STONE(ItemCategory.MATERIAL, "STONE", 1, 1, 0.5f, "stone_item", "Stone"),
+    RHYOLITE(ItemCategory.MATERIAL, "RHYOLITE", 1, 1, 0.2f, "rhyolite_item", "Rhyolite"),
+    GRASS(ItemCategory.MATERIAL, "GRASS", 1, 1, 0.5f, "grass_item", "Grass"),
+    DIRT(ItemCategory.MATERIAL, "DIRT", 1, 1, 0.5f, "dirt_item", "Dirt"),
+    RAW_WOOD(ItemCategory.MISC, 1, 1, 0.5f, "raw_wood_item", "Raw wood"),
+    RHYOLITE_PICKAXE(ItemCategory.TOOL, 1, 2, 1, "rhyolite_pickaxe_item", "pickaxe_item_grid", "Pickaxe"),
+    CAMPFIRE(ItemCategory.MATERIAL, "CAMPFIRE_BIG", 2, 2, 2, "campfire_item", "Campfire"),
+    WOODEN_WALL(ItemCategory.MATERIAL, "WOODEN_WALL", 1, 1, 0.5f, "wooden_wall_item", "Wooden wall"),
+    APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "apple_item", "Apple"),
+    COOKED_APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "cooked_apple_item", "Cooked Apple"),
+    RASPBERRY_BUSH(ItemCategory.MATERIAL, "RASPBERRY_BUSH_1", 1, 1, 0.5f, "raspberry_bush_item", "Raspberry bush"),
+    RASPBERRY(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "raspberry_item", "Raspberries"),
+    WOODEN_BOWL(ItemCategory.MISC, 1, 1, 0.1f, "wooden_bowl_item", "Wooden bowl"),
+    FRUIT_JAM(ItemCategory.CONSUMABLE, 1, 1, 0.2f, "fruit_jam_item", "Fruit jam"),
+    COAL(ItemCategory.MISC, 1, 1, 0.2f, "coal_item", "Coal");
 
     ItemCategory category;
-    int buildTileID;
+    String buildTile;
     int gridWidth;
     int gridHeight;
     float weight;
-    TextureRegion itemTexture;
-    TextureRegion itemTextureInGrid;
+    String regionName, gridRegionName;
+    TextureRegion texture, gridTexture;
     String label;
 
-    Item(ItemCategory cat, int tileID, int gw, int gh, float weight, TextureRegion tex, TextureRegion tex2, String label) {
+    Item(ItemCategory cat, int gw, int gh, float weight, String regionName, String label) {
+        this(cat, "", gw, gh, weight, regionName, label);
+    }
+
+    Item(ItemCategory cat, String buildTile, int gw, int gh, float weight, String regionName, String label) {
+        this(cat, buildTile, gw, gh, weight, regionName, regionName, label);
+    }
+
+    Item(ItemCategory cat, int gw, int gh, float weight, String regionName, String gridRegionName, String label) {
+        this(cat, "", gw, gh, weight, regionName, gridRegionName, label);
+    }
+
+    Item(ItemCategory cat, String buildTile, int gw, int gh, float weight, String regionName, String gridRegionName, String label) {
         category = cat;
-        buildTileID = tileID;
+        this.buildTile = buildTile;
         gridWidth = gw;
         gridHeight = gh;
         this.weight = weight;
-        this.itemTexture = tex;
-        itemTextureInGrid = tex2;
+        this.regionName = regionName;
+        this.gridRegionName = gridRegionName;
         this.label = label;
+    }
+
+    public static void loadTextures() {
+        System.out.println("Loading textures for items.");
+        TextureAtlas gui = new TextureAtlas("gui.atlas");
+        for(Item item : values()) {
+            item.texture = gui.findRegion(item.regionName);
+            item.gridTexture = gui.findRegion(item.gridRegionName);
+        }
     }
 
     int id;
     private static final HashMap<Integer, Item> map;
     static {
+        System.out.println("Item class loading.");
         map = new HashMap<>();
         int i = 0;
         for(Item it : Item.values()) {
@@ -64,7 +92,8 @@ public enum Item {
     }
 
     public TileType getBuildTile() {
-        return TileType.getType(buildTileID);
+        if(buildTile.equals("")) return null;
+        return TileType.valueOf(buildTile);
     }
 
     public int getGridWidth() {
@@ -79,12 +108,12 @@ public enum Item {
         return weight;
     }
 
-    public TextureRegion getItemTexture() {
-        return itemTexture;
+    public TextureRegion getTexture() {
+        return texture;
     }
 
-    public TextureRegion getItemTextureInGrid() {
-        return itemTextureInGrid;
+    public TextureRegion getGridTexture() {
+        return gridTexture;
     }
 
     public String getLabel() {

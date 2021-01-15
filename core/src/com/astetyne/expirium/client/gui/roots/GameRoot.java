@@ -52,7 +52,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_UP, false);
         switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_DOWN, true);
         inventoryButton = new Image(Res.INVENTORY);
-        consumeButton = new Image(Res.CAMPFIRE_ITEM);
+        consumeButton = new Image(Res.TEMP_ICON);
         buildViewButton = new Image(Res.TEMP_ICON);
         settingsButton = new Image(Res.TEMP_ICON);
 

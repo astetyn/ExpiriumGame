@@ -43,17 +43,6 @@ public class Res {
     public static TextureRegion INV_WEIGHT;
     public static Drawable RECIPE_BACK;
 
-    // gui - items
-    public static TextureRegion RHYOLITE_PICKAXE_ITEM;
-    public static TextureRegion GRASS_ITEM;
-    public static TextureRegion DIRT_ITEM;
-    public static TextureRegion STONE_ITEM;
-    public static TextureRegion RAW_WOOD_ITEM;
-    public static TextureRegion WOODEN_WALL_ITEM;
-    public static TextureRegion CAMPFIRE_ITEM;
-
-    // gui - items - grid
-
     // entities
     public static Animation<TextureRegion> PLAYER_IDLE_ANIM_R;
     public static Animation<TextureRegion> PLAYER_IDLE_ANIM_L;
@@ -129,17 +118,6 @@ public class Res {
         INV_DETAIL_BACK = gui.findRegion("item_detail_back");
         INV_CHOOSE_BACK = gui.findRegion("item_choose_back");
         INV_WEIGHT = gui.findRegion("weight_icon");
-
-        // gui - items
-        RHYOLITE_PICKAXE_ITEM = gui.findRegion("rhyolite_pickaxe_item");
-        GRASS_ITEM = gui.findRegion("grass_item");
-        DIRT_ITEM = gui.findRegion("dirt_item");
-        STONE_ITEM = gui.findRegion("stone_item");
-        RAW_WOOD_ITEM = gui.findRegion("raw_wood_item");
-        WOODEN_WALL_ITEM = gui.findRegion("wooden_wall_item");
-        CAMPFIRE_ITEM = gui.findRegion("campfire_item");
-
-        // gui - items - grid
 
         // entities
         PLAYER_IDLE_ANIM_R = new Animation<>(0.5f, ent.findRegions("player_right_idle"), loop_pong);

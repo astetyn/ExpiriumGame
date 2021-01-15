@@ -5,6 +5,14 @@ import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 
 import java.util.HashSet;
 
+/**
+ * Basic rules of this system:
+ * - anything except AIR can not have 0 stability
+ * - everything marked as LABILE will have 1 stability
+ * - magic triangle is legit only when all bottom tiles are the same TileType
+ * - World generator can produce incorrect stability-situations, but they must meet these rules. So all these cases
+ * must be handled in generateStability().
+ */
 public class StabilityCalculator {
 
     private final ExpiTile[][] worldTerrain;
@@ -24,11 +32,19 @@ public class StabilityCalculator {
 
         for(int i = 1; i < h; i++) {
             for(int j = 0; j < w; j++) {
+                if(worldTerrain[i][j].isLabile()) {
+                    worldTerrain[i][j].setStability(1);
+                    continue;
+                }
                 worldTerrain[i][j].setStability(getActualStability(worldTerrain[i][j]));
             }
         }
         for(int i = 1; i < h; i++) {
             for(int j = w-1; j >= 0; j--) {
+                if(worldTerrain[i][j].isLabile()) {
+                    worldTerrain[i][j].setStability(1);
+                    continue;
+                }
                 worldTerrain[i][j].setStability(getActualStability(worldTerrain[i][j]));
             }
         }
@@ -46,10 +62,13 @@ public class StabilityCalculator {
 
         HashSet<ExpiTile> affectedTiles = new HashSet<>();
 
+        //System.out.println("NS: "+newStability+" OS: "+t.getStability());
+
         if(newStability > t.getStability()) {
 
             t.setStability(newStability);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
+            //System.out.println("AS:"+t.getStability());
 
         }else if(newStability < t.getStability()) {
 
@@ -65,6 +84,9 @@ public class StabilityCalculator {
         return affectedTiles;
     }
 
+    /**
+     * @return True if tile can be changed and stability will be correct.
+     */
     public boolean canBeAdjusted(ExpiTile t, TileType checkType) {
 
         TileType oldType = t.getTypeFront();
@@ -112,13 +134,13 @@ public class StabilityCalculator {
         int maxAvailStab = 0;
 
         // left tile
-        if(x != 0 && !worldTerrain[y][x-1].isLabile())
+        if(x != 0 && !worldTerrain[y][x-1].isLabile() && !t.getTypeFront().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x-1].getStability()-1);
         // top tile
-        if(y != h-1 && !worldTerrain[y+1][x].isLabile())
+        if(y != h-1 && !worldTerrain[y+1][x].isLabile() && !t.getTypeFront().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y+1][x].getStability()-2);
         // right tile
-        if(x != w-1 && !worldTerrain[y][x+1].isLabile())
+        if(x != w-1 && !worldTerrain[y][x+1].isLabile() && !t.getTypeFront().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
         // bottom tile
         if(y != 0 && !worldTerrain[y-1][x].isLabile())

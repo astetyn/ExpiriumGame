@@ -49,7 +49,7 @@ public class HotBarSlot extends Widget {
             Res.MAIN_FONT.draw(batch, emptyLabel, getX()+xOff, getY()+yOff);
             Res.MAIN_FONT.setColor(1,1,1,1);
         }else {
-            batch.draw(itemStack.getItem().getItemTexture(), getX()+getWidth()/8, getY()+getHeight()/8, getWidth()*(6f/8), getHeight()*(6f/8));
+            batch.draw(itemStack.getItem().getTexture(), getX()+getWidth()/8, getY()+getHeight()/8, getWidth()*(6f/8), getHeight()*(6f/8));
             String amount = itemStack.getAmount()+"";
             float xOff = getWidth()/2 - Utils.getTextWidth(amount, Res.MAIN_FONT)/2;
             float yOff = getHeight()/2 + Utils.getTextHeight(amount, Res.MAIN_FONT)/2;

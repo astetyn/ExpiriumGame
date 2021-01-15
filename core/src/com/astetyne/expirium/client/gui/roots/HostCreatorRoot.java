@@ -88,6 +88,7 @@ public class HostCreatorRoot extends Table {
         tf.setMessageText("Enter world name");
         tf.setAlignment(Align.center);
         tf.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z ]"));
+        if(Consts.DEBUG) tf.setText("test"+Gdx.files.local("worlds").list().length);
         TextButton createNewButton = new TextButton("Create new!", Res.TEXT_BUTTON_STYLE);
         createNewButton.addListener(new ClickListener() {
             @Override

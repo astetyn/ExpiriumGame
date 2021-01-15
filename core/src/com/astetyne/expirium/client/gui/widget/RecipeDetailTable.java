@@ -54,7 +54,7 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         clear();
 
         if(selectedRecipe == null) selectedRecipe = ItemRecipe.getRecipe(0);
-        Image imgDetail = new Image(selectedRecipe.getProduct().getItem().getItemTexture());
+        Image imgDetail = new Image(selectedRecipe.getProduct().getItem().getTexture());
         TextButton makeButton = new TextButton("Make", Res.TEXT_BUTTON_STYLE);
         makeButton.addListener(new ClickListener() {
             @Override

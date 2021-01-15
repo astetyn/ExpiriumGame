@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client;
 
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
 import com.astetyne.expirium.client.resources.TileTex;
@@ -46,6 +47,7 @@ public class ExpiGame extends Game {
 		Res.loadTextures();
 		TileTex.loadTextures();
 		TileTexAnim.loadTextures();
+		Item.loadTextures();
 		batch = new SpriteBatch();
 		setScreen(new LauncherScreen());
 	}

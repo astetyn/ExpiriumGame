@@ -7,35 +7,73 @@ public class WorldGenerator {
 
     private final ExpiTile[][] worldTerrain;
     private final int w, h;
+    private final int[] terrainLevel;
 
     public WorldGenerator(ExpiTile[][] worldTerrain) {
         this.worldTerrain = worldTerrain;
         this.h = worldTerrain.length;
         this.w = worldTerrain[0].length;
+        terrainLevel = new int[w];
     }
 
     public void generateWorld() {
 
-        for(int j = 0; j < w; j++) {
+        for(int x = 0; x < w; x++) {
 
-            int hh = (int) (30 + Noise.noise((j) / 32.0f, 0, 0) * 20);
+            int grassHeight = (int) (60 + Noise.noise((x) / 32.0f, 0, 0) * 20);
 
-            for(int i = 0; i < h; i++) {
-                if(i == hh) {
-                    if(Math.random() > 0.8) {
-                        worldTerrain[i][j] = new ExpiTile(TileType.TREE1, TileType.AIR, j, i);
-                    }else {
-                        worldTerrain[i][j] = new ExpiTile(TileType.GRASS, TileType.AIR, j, i);
-                    }
-                }else if(i < hh && i > hh-5) {
-                    worldTerrain[i][j] = new ExpiTile(TileType.DIRT, TileType.AIR, j, i);
-                }else if(i < hh) {
-                    worldTerrain[i][j] = new ExpiTile(TileType.STONE, TileType.AIR, j, i);
+            terrainLevel[x] = grassHeight;
+
+            for(int y = 0; y < h; y++) {
+                if(y == grassHeight) {
+                    worldTerrain[y][x] = new ExpiTile(TileType.GRASS, TileType.AIR, x, y);
+                }else if(y < grassHeight && y > grassHeight-7) {
+                    worldTerrain[y][x] = new ExpiTile(TileType.DIRT, TileType.AIR, x, y);
+                }else if(y < grassHeight) {
+                    worldTerrain[y][x] = new ExpiTile(TileType.STONE, TileType.AIR, x, y);
                 }else {
-                    worldTerrain[i][j] = new ExpiTile(TileType.AIR, TileType.AIR, j, i);
+                    worldTerrain[y][x] = new ExpiTile(TileType.AIR, TileType.AIR, x, y);
                 }
             }
+        }
+        generateTrees();
+    }
 
+    private void generateTrees() {
+
+        int lastTree = 0;
+
+        for(int x = 0; x < w; x++) {
+
+            int y = terrainLevel[x];
+
+            if(Math.random() < 0.8f || lastTree + 2 > x) {
+                continue;
+            }
+
+            int treeHeight = Math.max((int) (Math.random() * 10), 5);
+
+            // 3 tiles tall trunk fixed
+            for(int i = 0; i < 3; i++) {
+                worldTerrain[y + i][x].setTypeFront(TileType.TREE1);
+            }
+
+            // trunk random
+            for(int i = 3; i < treeHeight; i++) {
+
+                double rand = Math.random();
+
+                if(rand < 0.6) {
+                    worldTerrain[y + i][x].setTypeFront(TileType.TREE1);
+                }else if(rand < 0.8) {
+                    worldTerrain[y + i][x].setTypeFront(TileType.TREE2);
+                    if(x != w - 1) worldTerrain[y + i][x + 1].setTypeFront(TileType.TREE6);
+                }else {
+                    worldTerrain[y + i][x].setTypeFront(TileType.TREE3);
+                    worldTerrain[y + i][x - 1].setTypeFront(TileType.TREE5);
+                }
+            }
+            worldTerrain[y + treeHeight][x].setTypeFront(TileType.TREE4);
         }
     }
 

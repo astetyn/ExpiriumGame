@@ -20,7 +20,7 @@ public class RecipeListTable extends Table {
             Table t = new Table();
             if(Consts.DEBUG) t.debugAll();
             Item item = recipe.getProduct().getItem();
-            Image icon = new Image(item.getItemTexture());
+            Image icon = new Image(item.getTexture());
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
             t.add(icon).width(50).height(Utils.percFromW(50)).align(Align.left).pad(10, 5, 10, 5);
             t.add(label).grow();

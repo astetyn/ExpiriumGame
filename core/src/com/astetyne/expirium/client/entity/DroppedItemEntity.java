@@ -19,7 +19,7 @@ public class DroppedItemEntity extends Entity {
 
     @Override
     public void draw() {
-        batch.draw(dropItem.getItemTexture(), getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (angle*180/Math.PI));
+        batch.draw(dropItem.getTexture(), getLocation().x - width/2, getLocation().y - height/2, width/2, height/2, width, height, 1, 1, (float) (angle*180/Math.PI));
     }
 
     @Override
