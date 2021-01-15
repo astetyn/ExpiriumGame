@@ -65,9 +65,10 @@ public class TilePlacer implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
+        if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return false;
         }
+        System.out.println(vec.x+" "+vec.y);
         ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.PRESS);
         pressed = true;
         return true;
@@ -86,7 +87,7 @@ public class TilePlacer implements InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(!pressed) return false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
-        if(vec.x < 0 || vec.x >= world.getTerrainWidth() && vec.y < 0 || vec.y >= world.getTerrainHeight()) {
+        if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return true;
         }
         ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.DRAG);

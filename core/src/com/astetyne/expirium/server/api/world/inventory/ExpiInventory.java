@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Notes: 0,0 is in the bottom left corner, x and y are as normal
+ */
 public class ExpiInventory implements Saveable {
 
     protected final List<GridItemStack> items;
@@ -39,7 +42,9 @@ public class ExpiInventory implements Saveable {
         this(rows, columns, maxWeight, withUtils);
         int itemsSize = in.readInt();
         for(int i = 0; i < itemsSize; i++) {
-            items.add(new GridItemStack(in));
+            GridItemStack is = new GridItemStack(in);
+            items.add(is);
+            insertToGrid(is);
         }
         totalWeight = in.readFloat();
     }
@@ -66,7 +71,6 @@ public class ExpiInventory implements Saveable {
      */
     public boolean addItem(ItemStack addIS, boolean merge) {
         GridItemStack gridIS = new GridItemStack(addIS);
-
         if(merge) {
             for(ItemStack is : items) {
                 if(is.getItem() == gridIS.getItem()) {
@@ -210,10 +214,6 @@ public class ExpiInventory implements Saveable {
             }
         }
         return true;
-    }
-
-    public boolean isInside(int r, int c) {
-        return r < rows && c < columns; // aj tak tu chyba 0
     }
 
     public String getLabel() {

@@ -92,10 +92,11 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
         if(row1 == row2 && column1 == column2) return;
 
-        //System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
+        System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
 
         if(fromMain) {
             GridItemStack is = mainInv.getGrid()[row1][column1];
+            System.out.println("choosen item: "+is);
             if(is == null) return;
 
             if(column2 == -1) {
@@ -227,16 +228,20 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
+        System.out.println("Wants to make item");
         for(ItemStack is : recipe.getRequiredItems()) {
             if(!mainInv.contains(is)) return;
         }
+        System.out.println("Has req items");
         if(!mainInv.canBeAdded(recipe.getProduct().getItem(), recipe.getProduct().getAmount())) return;
+        System.out.println("Can be added");
 
         for(ItemStack is : recipe.getRequiredItems()) {
             mainInv.removeItem(is);
         }
         mainInv.addItem(recipe.getProduct(), true);
         getNetManager().putInvFeedPacket();
+        System.out.println("Added");
     }
 
     public ServerPacketManager getNetManager() {

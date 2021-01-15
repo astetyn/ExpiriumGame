@@ -7,10 +7,10 @@ import java.util.HashSet;
 
 /**
  * Basic rules of this system:
- * - anything except AIR can not have 0 stability
- * - everything marked as LABILE will have 1 stability
- * - magic triangle is legit only when all bottom tiles are the same TileType
- * - World generator can produce incorrect stability-situations, but they must meet these rules. So all these cases
+ * <p>- anything except AIR can not have 0 stability
+ * <p>- everything marked as LABILE will have 1 stability
+ * <p>- magic triangle is legit only when all bottom tiles have the same stability
+ * <p>- World generator can produce incorrect stability-situations, but they must meet these rules. So all these cases
  * must be handled in generateStability().
  */
 public class StabilityCalculator {
@@ -27,7 +27,7 @@ public class StabilityCalculator {
     public void generateStability() {
 
         for(int j = 0; j < w; j++) {
-            worldTerrain[0][j].setStability(10);
+            worldTerrain[0][j].setStability(worldTerrain[0][j].getTypeFront().getMaxStability());
         }
 
         for(int i = 1; i < h; i++) {
@@ -48,7 +48,6 @@ public class StabilityCalculator {
                 worldTerrain[i][j].setStability(getActualStability(worldTerrain[i][j]));
             }
         }
-
     }
 
     /** This method will calculate all required stability and return tiles which were affected. Call
@@ -56,7 +55,7 @@ public class StabilityCalculator {
      * @param t changed tile from which stability should be recalculated
      * @return all affected tiles
      */
-    public HashSet<ExpiTile> adjustStability(ExpiTile t) {
+    public HashSet<ExpiTile> updateStability(ExpiTile t) {
 
         int newStability = getActualStability(t);
 
@@ -68,6 +67,7 @@ public class StabilityCalculator {
 
             t.setStability(newStability);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
+            if(t.getY()-1 != h)recalculateStabilityForNearbyTiles(worldTerrain[t.getY()+1][t.getX()], affectedTiles);
             //System.out.println("AS:"+t.getStability());
 
         }else if(newStability < t.getStability()) {
@@ -87,7 +87,7 @@ public class StabilityCalculator {
     /**
      * @return True if tile can be changed and stability will be correct.
      */
-    public boolean canBeAdjusted(ExpiTile t, TileType checkType) {
+    public boolean canBeChanged(ExpiTile t, TileType checkType) {
 
         TileType oldType = t.getTypeFront();
 
@@ -114,11 +114,16 @@ public class StabilityCalculator {
         // bottom tile
         if(y != 0) checkStrongConnection(worldTerrain[y-1][x], pack);
 
+        // top left tile - for magic triangle
+        if(y != h-1) checkStrongConnection(worldTerrain[y+1][x-1], pack);
+        // top right tile - for magic triangle
+        if(y != h-1) checkStrongConnection(worldTerrain[y+1][x+1], pack);
+
     }
 
     private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
         if(t.getTypeFront() == TileType.AIR) return;
-        if(t.getStability() > getActualStability(t)) {
+        if(t.getStability() > getActualStability(t) && t.getY() != 0) {
             findStrongConnections(t, pack);
         }else {
             pack.strongTiles.add(t);

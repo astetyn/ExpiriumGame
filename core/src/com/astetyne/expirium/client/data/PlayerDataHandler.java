@@ -30,6 +30,7 @@ public class PlayerDataHandler {
         health = in.getFloat();
         food = in.getFloat();
         temperature = in.getFloat();
+        GameScreen.get().getActiveRoot().refresh();
     }
 
     public void feedInventory(PacketInputStream in) {

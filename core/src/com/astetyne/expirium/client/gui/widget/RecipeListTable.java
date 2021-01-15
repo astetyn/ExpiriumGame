@@ -22,7 +22,7 @@ public class RecipeListTable extends Table {
             Item item = recipe.getProduct().getItem();
             Image icon = new Image(item.getTexture());
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
-            t.add(icon).width(50).height(Utils.percFromW(50)).align(Align.left).pad(10, 5, 10, 5);
+            t.add(icon).width(100).height(Utils.percFromW(100)).align(Align.left).pad(10, 5, 10, 5);
             t.add(label).grow();
             t.setBackground(Res.RECIPE_BACK);
             t.addListener(new ClickListener() {
@@ -31,7 +31,7 @@ public class RecipeListTable extends Table {
                     listener.onRecipeChange(recipe);
                 }
             });
-            add(t).width(200);
+            add(t).width(400);
             row();
         }
     }

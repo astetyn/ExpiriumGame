@@ -183,7 +183,7 @@ public class ExpiWorld implements Saveable, Disposable {
 
         if(!isTileFree(t, item)) return;
 
-        if(!stabilityCalc.canBeAdjusted(t, item.getBuildTile())) return;
+        if(!stabilityCalc.canBeChanged(t, item.getBuildTile())) return;
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
@@ -216,7 +216,7 @@ public class ExpiWorld implements Saveable, Disposable {
         List<ExpiTile> changedTiles = new ArrayList<>();
         changedTiles.add(t);
 
-        HashSet<ExpiTile> affectedTiles = stabilityCalc.adjustStability(t);
+        HashSet<ExpiTile> affectedTiles = stabilityCalc.updateStability(t);
         Iterator<ExpiTile> it = affectedTiles.iterator();
         while(it.hasNext()) {
             ExpiTile t2 = it.next();

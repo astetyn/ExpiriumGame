@@ -58,7 +58,7 @@ public class ExpiTileBreaker {
                 break;
             }
             if(newTarget.getTypeFront() != TileType.AIR) {
-                if(newTarget != targetTile) {
+                if(newTarget != targetTile && newTarget.getY() != 0) {
                     timeAccumulator = 0;
                     if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                     targetTile = newTarget;

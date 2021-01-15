@@ -20,7 +20,7 @@ public class WorldGenerator {
 
         for(int x = 0; x < w; x++) {
 
-            int grassHeight = (int) (60 + Noise.noise((x) / 32.0f, 0, 0) * 20);
+            int grassHeight = (int) (0 + Noise.noise((x) / 32.0f, 0, 0) * 20);
 
             terrainLevel[x] = grassHeight;
 
@@ -47,9 +47,7 @@ public class WorldGenerator {
 
             int y = terrainLevel[x];
 
-            if(Math.random() < 0.8f || lastTree + 2 > x) {
-                continue;
-            }
+            if(Math.random() < 0.8f || lastTree + 2 > x) continue;
 
             int treeHeight = Math.max((int) (Math.random() * 10), 5);
 

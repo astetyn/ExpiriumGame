@@ -166,6 +166,8 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         consumeButton.setBounds(1750, 50, 200, 200);
         buildViewButton.setBounds(1750, 50, 200, 200);
 
+        refresh();
+
     }
 
     @Override
