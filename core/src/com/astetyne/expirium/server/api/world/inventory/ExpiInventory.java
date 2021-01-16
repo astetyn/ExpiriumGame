@@ -115,11 +115,15 @@ public class ExpiInventory implements Saveable {
      * Removes given ItemStack from inventory. Given ItemStack must be already in the inventory. (this method is not safe)
      * @param remIS
      */
-    public void removeItemStack(GridItemStack remIS) {
+    public void removeGridItem(GridItemStack remIS) {
         System.out.println("removing: "+remIS+" from "+remIS.getGridPos());
         items.remove(remIS);
         cleanGridFrom(remIS);
         totalWeight -= remIS.getItem().getWeight() * remIS.getAmount();
+    }
+
+    public void removeItem(Item item) {
+        removeItem(new ItemStack(item));
     }
 
     /**

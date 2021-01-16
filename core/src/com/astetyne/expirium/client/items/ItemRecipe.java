@@ -10,18 +10,6 @@ public enum ItemRecipe {
     WOODEN_WALL(new ItemStack(Item.WOODEN_WALL, 3), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Nepriestrelna stena."),
     CAMPFIRE(new ItemStack(Item.CAMPFIRE), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Ohnicek, ktory aj zahreje.");
 
-    private static final HashMap<Integer, ItemRecipe> map;
-    static {
-        map = new HashMap<>();
-        int i = 0;
-        for(ItemRecipe it : ItemRecipe.values()) {
-            it.id = i;
-            map.put(it.id, it);
-            i++;
-        }
-    }
-
-    int id;
     ItemStack product;
     List<ItemStack> requiredItems;
     String description;
@@ -50,5 +38,17 @@ public enum ItemRecipe {
 
     public static ItemRecipe getRecipe(int id) {
         return map.get(id);
+    }
+
+    int id;
+    private static final HashMap<Integer, ItemRecipe> map;
+    static {
+        map = new HashMap<>();
+        int i = 0;
+        for(ItemRecipe it : ItemRecipe.values()) {
+            it.id = i;
+            map.put(it.id, it);
+            i++;
+        }
     }
 }

@@ -137,9 +137,6 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         playerStatsTable.add(foodStat).padTop(10).height(50);
         playerStatsTable.add(foodImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10).padRight(10);
         playerStatsTable.row();
-        playerStatsTable.add(tempStat).padTop(10).height(50);
-        playerStatsTable.add(tempImage).width(iconSize).height(Utils.percFromW(iconSize)).padTop(10).padRight(10);
-        playerStatsTable.row();
         if(Consts.DEBUG) playerStatsTable.setDebug(true);
 
         settingsButton.setBounds(10, 890, 100, 100);

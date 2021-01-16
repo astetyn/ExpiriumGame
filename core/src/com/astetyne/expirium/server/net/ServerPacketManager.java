@@ -7,6 +7,8 @@ import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
+import com.astetyne.expirium.server.api.event.PlayerInteractListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
@@ -45,7 +47,12 @@ public class ServerPacketManager {
                     float x = in.getFloat();
                     float y = in.getFloat();
                     InteractType type = InteractType.getType(in.getInt());
-                    GameServer.get().getWorld().getInteractHandler().onInteract(owner, x, y, type);
+                    ExpiTile tile = GameServer.get().getWorld().getTileAt(x, y);
+                    PlayerInteractEvent e = new PlayerInteractEvent(owner, x, y, tile, type);
+                    List<PlayerInteractListener> list = GameServer.get().getEventManager().getPlayerInteractListeners();
+                    for(int j = list.size() - 1; j >= 0; j--) {
+                        list.get(j).onInteract(e);
+                    }
                     break;
 
                 case 25: {//InvItemMoveReqPacket
@@ -57,7 +64,7 @@ public class ServerPacketManager {
                     owner.wantsToMakeItem(recipe);
                     break;
                 }
-                case 29://InvInteractPacket
+                case 29://UIInteractPacket
                     owner.getInv().onInteract(UIInteractType.getType(in.getInt()));
                     break;
             }

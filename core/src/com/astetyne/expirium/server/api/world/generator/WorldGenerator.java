@@ -21,7 +21,6 @@ public class WorldGenerator {
         for(int x = 0; x < w; x++) {
 
             int grassHeight = (int) (0 + Noise.noise((x) / 32.0f, 0, 0) * 20);
-
             terrainLevel[x] = grassHeight;
 
             for(int y = 0; y < h; y++) {
@@ -36,7 +35,47 @@ public class WorldGenerator {
                 }
             }
         }
+        makeSlopes();
+        makeRhyoliteHills();
         generateTrees();
+        generateBushes();
+    }
+
+    private void makeSlopes() {
+        for(int x = 0; x < w; x++) {
+            int grassHeight = terrainLevel[x];
+
+            if(x != 0) {
+                if(grassHeight < terrainLevel[x - 1]) {
+                    worldTerrain[terrainLevel[x - 1]][x-1].setTypeFront(TileType.GRASS_SLOPE_L);
+                }else if(grassHeight > terrainLevel[x - 1]) {
+                    worldTerrain[grassHeight][x].setTypeFront(TileType.GRASS_SLOPE_R);
+                }
+            }
+        }
+    }
+
+    private void makeRhyoliteHills() {
+
+        int lastHill = 0;
+
+        for(int x = 0; x < w; x++) {
+
+            if(Math.random() < 0.6f || lastHill + 20 > x) continue;
+
+            int bottom = Math.max(terrainLevel[x] - 2, 0);
+
+            for(int i = 0; i < 2; i++) { // y-levels
+
+                int width = (int) (Math.min(Math.random() * 3 + 2, w - x));
+
+                int left = Math.max(x - width, 0);
+                for(int j = 0; j < width; j++) {
+                    worldTerrain[bottom + i][left + j].setTypeFront(TileType.RHYOLITE);
+                }
+            }
+            lastHill = x;
+        }
     }
 
     private void generateTrees() {
@@ -45,7 +84,9 @@ public class WorldGenerator {
 
         for(int x = 0; x < w; x++) {
 
-            int y = terrainLevel[x];
+            int y = terrainLevel[x] + 1;
+
+            if(worldTerrain[y-1][x].getTypeFront() != TileType.GRASS) continue;
 
             if(Math.random() < 0.8f || lastTree + 2 > x) continue;
 
@@ -72,7 +113,26 @@ public class WorldGenerator {
                 }
             }
             worldTerrain[y + treeHeight][x].setTypeFront(TileType.TREE4);
+
+            lastTree = x;
         }
+    }
+
+    private void generateBushes() {
+
+        int lastRasp = 0;
+
+        for(int x = 0; x < w; x++) {
+
+            int y = terrainLevel[x] + 1;
+
+            if(worldTerrain[y - 1][x].getTypeFront() != TileType.GRASS || worldTerrain[y][x].getTypeFront() != TileType.AIR) continue;
+
+            if(Math.random() < 0.8f || lastRasp + 2 > x) continue;
+
+            worldTerrain[y][x].setTypeFront(TileType.RASPBERRY_BUSH_2);
+        }
+
     }
 
 }

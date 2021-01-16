@@ -2,6 +2,7 @@ package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.items.ItemCategory;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.ItemDropper;
 import com.astetyne.expirium.client.tiles.TileType;
@@ -11,16 +12,13 @@ import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.event.Source;
-import com.astetyne.expirium.server.api.event.TileChangeEvent;
-import com.astetyne.expirium.server.api.event.TileChangeListener;
+import com.astetyne.expirium.server.api.event.*;
 import com.astetyne.expirium.server.api.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.api.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
 import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.api.world.listeners.TreeListener;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
-import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -35,7 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExpiWorld implements Saveable, Disposable {
+public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     private final ExpiTile[][] worldTerrain;
     private int partHeight;
@@ -44,7 +42,6 @@ public class ExpiWorld implements Saveable, Disposable {
     private StabilityCalculator stabilityCalc;
     private FixtureCalculator fixtureCalc;
     private WeatherType weatherType;
-    private InteractHandler interactHandler;
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
     private int worldTime;
@@ -119,8 +116,6 @@ public class ExpiWorld implements Saveable, Disposable {
 
         stepsTimeAccumulator = 0;
 
-        interactHandler = new InteractHandler(this);
-
         new CampfireListener();
         new TreeListener();
 
@@ -131,7 +126,6 @@ public class ExpiWorld implements Saveable, Disposable {
         contactListener = new ExpiContactListener();
         b2dWorld.setContactListener(contactListener);
 
-        FixRes.load();
         BodyDef terrainDef = new BodyDef();
         terrainDef.type = BodyDef.BodyType.StaticBody;
         terrainDef.position.set(0, 0);
@@ -146,6 +140,12 @@ public class ExpiWorld implements Saveable, Disposable {
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
 
+        GameServer.get().getEventManager().getPlayerInteractListeners().add(this);
+
+    }
+
+    public void dispose() {
+        b2dWorld.dispose();
     }
 
     public void onTick() {
@@ -173,11 +173,15 @@ public class ExpiWorld implements Saveable, Disposable {
         }
     }
 
-    public void dispose() {
-        b2dWorld.dispose();
-    }
+    public void onInteract(PlayerInteractEvent event) {
 
-    public void onTilePlaceReq(ExpiTile t, Item item, ExpiPlayer p) {
+        // this is only for tile breaking
+
+        ExpiPlayer p = event.getPlayer();
+        Item item = p.getInv().getItemInHand().getItem();
+        ExpiTile t = event.getTile();
+
+        if(item.getCategory() != ItemCategory.MATERIAL || event.getTile().getTypeFront() != TileType.AIR) return;
 
         if(item.getBuildTile() == null) return;
 
@@ -196,18 +200,8 @@ public class ExpiWorld implements Saveable, Disposable {
 
         TileType from = t.getTypeFront();
 
-        Vector2 tempVec = new Vector2();
-
-        float off = (1 - Consts.D_I_SIZE)/2;
-
-        if(to == TileType.AIR && withDrops && t.getTypeFront() != TileType.AIR) {
-            tempVec.set(t.getX() + off, t.getY() + off);
-            ItemDropper dropper = t.getTypeFront().getItemDropper();
-            //todo: prepocitat pravdepodobnosti
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(tempVec, dropper.items[0], Consts.ITEM_COOLDOWN_BREAK);
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                pp.getNetManager().putEntitySpawnPacket(droppedItem);
-            }
+        if(to == TileType.AIR && withDrops) {
+            createDroppedItem(t);
         }
 
         t.setTypeFront(to);
@@ -217,25 +211,18 @@ public class ExpiWorld implements Saveable, Disposable {
         changedTiles.add(t);
 
         HashSet<ExpiTile> affectedTiles = stabilityCalc.updateStability(t);
+        int size = affectedTiles.size();
         Iterator<ExpiTile> it = affectedTiles.iterator();
         while(it.hasNext()) {
             ExpiTile t2 = it.next();
-            if(t2.getStability() == 0) {
-                //todo: redukcia vela itemov pri pade?
-                if(Math.random() < 1 && withDrops && t2.getTypeFront() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
-                    tempVec.set(t2.getX()+off, t2.getY()+off);
-                    ItemDropper dropper = t2.getTypeFront().getItemDropper();
-                    //todo: prepocitat pravdepodobnosti
-                    ExpiDroppedItem edi = new ExpiDroppedItem(tempVec, dropper.items[0], Consts.ITEM_COOLDOWN_BREAK);
-                    for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-                        pp.getNetManager().putEntitySpawnPacket(edi);
-                    }
-                }
-                t2.setTypeFront(TileType.AIR);
-                fixtureCalc.clearTileFixtures(t2);
-                changedTiles.add(t2);
-                it.remove();
+            if(t2.getStability() != 0) continue;
+            if(Math.random() < 2.0 / size && withDrops && t2.getTypeFront() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
+                createDroppedItem(t2);
             }
+            t2.setTypeFront(TileType.AIR);
+            fixtureCalc.clearTileFixtures(t2);
+            changedTiles.add(t2);
+            it.remove();
         }
 
         affectedTiles.add(t);
@@ -251,6 +238,22 @@ public class ExpiWorld implements Saveable, Disposable {
         List<TileChangeListener> list = GameServer.get().getEventManager().getTileChangeListeners();
         for(int i = list.size() - 1; i >= 0; i--) {
             list.get(i).onTileChange(e);
+        }
+    }
+
+    /**
+     * Call right before tile is changed.
+     */
+    private void createDroppedItem(ExpiTile t) {
+        if(t == null || t.getTypeFront() == TileType.AIR) return;
+        float off = (1 - Consts.D_I_SIZE)/2;
+        Vector2 loc = new Vector2(t.getX() + off, t.getY() + off);
+        for(Item item : ItemDropper.chooseItems(t.getTypeFront().getItemDropper())) {
+            if(item == Item.EMPTY) return;
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, item, Consts.ITEM_COOLDOWN_BREAK);
+            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                pp.getNetManager().putEntitySpawnPacket(droppedItem);
+            }
         }
     }
 
@@ -302,10 +305,6 @@ public class ExpiWorld implements Saveable, Disposable {
 
     public WeatherType getWeather() {
         return weatherType;
-    }
-
-    public InteractHandler getInteractHandler() {
-        return interactHandler;
     }
 
     public ExpiContactListener getCL() {

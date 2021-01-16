@@ -77,8 +77,8 @@ public class CookingInventory extends ExpiInventory {
     }
 
     @Override
-    public void removeItemStack(GridItemStack remIS) {
-        super.removeItemStack(remIS);
+    public void removeGridItem(GridItemStack remIS) {
+        super.removeGridItem(remIS);
         matchRecipe();
     }
 

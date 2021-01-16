@@ -3,7 +3,6 @@ package com.astetyne.expirium.server.api.world;
 import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
-import com.astetyne.expirium.server.backend.FixRes;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class FixtureCalculator {
@@ -97,11 +96,19 @@ public class FixtureCalculator {
         }
         t.getFixtures().clear();
 
-        if(t.getTypeFront().getEdgesData() != null) {
-            FixRes.EdgesData data = t.getTypeFront().getEdgesData();
-            for(int i = 0; i < data.l1.size(); i++) {
-                shape.set(data.l1.get(i).x + x, data.l1.get(i).y + y, data.l2.get(i).x + x, data.l2.get(i).y + y);
+        if(t.getTypeFront().getTileFix() != null) {
+            float[] vertices = t.getTypeFront().getTileFix().getVertices();
+            if(vertices.length < 4)  {
+                System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getTypeFront().getTileFix());
+                return;
+            }
+            float lastX = vertices[0];
+            float lastY = vertices[1];
+            for(int i = 2; i < vertices.length; i+=2) {
+                shape.set(lastX + x, lastY + y, vertices[i] + x, vertices[i+1] + y);
                 createFixture(fixDef, t);
+                lastX = vertices[i];
+                lastY = vertices[i+1];
             }
         }
 

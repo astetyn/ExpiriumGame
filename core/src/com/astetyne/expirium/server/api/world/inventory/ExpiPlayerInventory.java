@@ -82,16 +82,16 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
                 switch(itemInHand.getItem()) {
                     case APPLE:
                         owner.increaseFoodLevel(10);
+                        removeItem(Item.APPLE);
                         break;
                     case COOKED_APPLE:
                         owner.increaseFoodLevel(15);
+                        removeItem(Item.COOKED_APPLE);
                         break;
                 }
-
                 break;
         }
         updateHotSlots();
-
     }
 
     private void updateHotSlots() {

@@ -21,7 +21,7 @@ public enum TileTex implements Textureable {
     WHITE_TILE("white_tile"),
     COAL_ORE("coal_ore_tile"),
     RASPBERRY_BUSH_1("raspberry_bush_tile"),
-    RASPBERRY_BUSH_2("raspberry_bush2_tile");
+    RASPBERRY_BUSH_2("raspberry_bush_2_tile");
 
     private final String regionName;
     private TextureRegion textureRegion;

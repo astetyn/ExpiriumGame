@@ -100,7 +100,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
             if(is == null) return;
 
             if(column2 == -1) {
-                mainInv.removeItemStack(is);
+                mainInv.removeGridItem(is);
                 throwAwayItem(is);
                 return;
             }
@@ -114,7 +114,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
                     getNetManager().putInvFeedPacket();
                     return;
                 }else if(row2 == 0 && column2 == mainInv.getColumns() - 1) { //throw
-                    mainInv.removeItemStack(is);
+                    mainInv.removeGridItem(is);
                     throwAwayItem(is);
                     return;
                 }
@@ -122,7 +122,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
                 if(destIS != null && destIS != is && destIS.getItem() == is.getItem()) {
                     destIS.increaseAmount(is.getAmount());
                     mainInv.increaseWeight(is.getItem().getWeight() * is.getAmount());
-                    mainInv.removeItemStack(is);
+                    mainInv.removeGridItem(is);
                     getNetManager().putInvFeedPacket();
                     return;
                 }
@@ -133,14 +133,14 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
             }else {
                 if(!secondInv.canBeAdded(is.getItem(), is.getAmount())) return;
                 secondInv.addItem(is, true);
-                mainInv.removeItemStack(is);
+                mainInv.removeGridItem(is);
             }
         }else {
             GridItemStack is = secondInv.getGrid()[row1][column1];
             if(is == null) return;
 
             if(column2 == -1) {
-                secondInv.removeItemStack(is);
+                secondInv.removeGridItem(is);
                 throwAwayItem(is);
                 return;
             }
@@ -154,19 +154,19 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
                     getNetManager().putInvFeedPacket();
                     return;
                 }else if(row2 == 0 && column2 == mainInv.getColumns() - 1) { //throw
-                    secondInv.removeItemStack(is);
+                    secondInv.removeGridItem(is);
                     throwAwayItem(is);
                     return;
                 }
                 if(!mainInv.canBeAdded(is.getItem(), is.getAmount())) return;
                 mainInv.addItem(is, true);
-                secondInv.removeItemStack(is);
+                secondInv.removeGridItem(is);
             }else {
                 ItemStack destIS = secondInv.getGrid()[row2][column2];
                 if(destIS != null && destIS != is && destIS.getItem() == is.getItem()) {
                     destIS.increaseAmount(is.getAmount());
                     secondInv.increaseWeight(is.getItem().getWeight() * is.getAmount());
-                    secondInv.removeItemStack(is);
+                    secondInv.removeGridItem(is);
                     getNetManager().putInvFeedPacket();
                     return;
                 }
