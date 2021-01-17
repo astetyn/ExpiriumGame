@@ -39,7 +39,7 @@ public class Campfire implements PlayerInteractListener, TickListener {
         if(remainingTime <= 0) {
             GameServer.get().getWorld().changeTile(tile, TileType.AIR, false, null, Source.SERVER);
             //activeCampfires.remove(this);
-        }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 5) {
+        }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 10) {
             GameServer.get().getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.SERVER);
         }
         inventory.onTick();

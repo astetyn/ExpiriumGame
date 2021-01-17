@@ -94,18 +94,14 @@ public class HostCreatorRoot extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String worldName = tf.getText().trim();
-                if(worldName.isEmpty()) {
-                    //todo: check: existujuce meno + vymazat svet (vo saved worlds)
-                    //todo: oznamit to?
-                    return;
-                }
+                if(worldName.isEmpty()) return;
                 for(FileHandle fh : Gdx.files.local("worlds").list()) {
                     if(fh.name().equals(worldName)) {
                         return;
                     }
                 }
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
-                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 50, 30, 0);
+                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 1000, 256, 0);
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref);
                 ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());

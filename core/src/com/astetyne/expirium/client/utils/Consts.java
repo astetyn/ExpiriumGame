@@ -18,16 +18,16 @@ public class Consts {
     public static final float D_I_SIZE = 0.5f;
     public static final float D_I_PICK_DIST = 1.3f;
 
-    public static final int DAY_TIME_SEC = 300;
+    public static final int DAY_TIME_SEC = 1200;
 
-    public static final float CAMPFIRE_TIME = 20;
+    public static final float CAMPFIRE_TIME = 30;
 
     public static final float ITEM_COOLDOWN_BREAK = 1;
     public static final float ITEM_COOLDOWN_DROP = 6;
 
     public static final float ITEM_DESPAWN_TIME = 10; // in seconds
 
-    public static final byte MAX_LIGHT_LEVEL = 2;
+    public static final byte MAX_LIGHT_LEVEL = 15;
 
     // player
     public static final int PLAYER_INV_COLUMNS = 5;

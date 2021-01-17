@@ -87,7 +87,7 @@ public class GameWorld {
 
         batch.setProjectionMatrix(camera.combined);
 
-        // render world
+        // tiles
         int renderOffsetX = (int) (Gdx.graphics.getWidth() / (PPM * 2)) + 2;
         int renderOffsetY = (int) (Gdx.graphics.getHeight() / (PPM * 2)) + 2;
         int left = (int) Math.max(camera.position.x - renderOffsetX, 0);
@@ -109,18 +109,18 @@ public class GameWorld {
             }
         }
 
+        // breaking anim
         for(BreakingTile bt : BreakingTile.getBreakingTiles().values()) {
             batch.draw(TileTexAnim.TILE_BREAK.getAnim().getKeyFrame(bt.getState()), bt.getLoc().x, bt.getLoc().y, 1, 1);
         }
 
-        // render entities
+        // entities + player
         for(Entity e : entities) {
             // this is for entities from entities.atlas
             if(e.getType() != EntityType.DROPPED_ITEM) {
                 e.draw();
             }
         }
-
         player.draw();
 
         for(Entity e : entities) {
@@ -130,25 +130,25 @@ public class GameWorld {
             }
         }
 
+        // lightning
+        // background must be also darkened during night, because light mask will light it
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 Tile t = worldTerrain[i][j];
                 float light = t.getLocalLight();
-                float serverTime = GameScreen.get().getServerTime();
-                if(serverTime >= 0 && serverTime < 50) {
-                    light = Math.max(light, t.getSkyLight() / 50f * serverTime);
-                    System.out.println("--"+t.getSkyLight()+" "+serverTime);
-                }else if(serverTime >= 50 && serverTime < 600) {
+                //float dayTime = GameScreen.get().getDayTime();
+                float dayTime = 0;
+                if(dayTime >= 0 && dayTime < 25) {
+                    light = Math.max(light, t.getSkyLight() / 25f * dayTime + 2);
+                }else if(dayTime >= 25 && dayTime < 600) {
                     light = Math.max(light, t.getSkyLight());
-                }else if(serverTime >= 600 && serverTime < 700) {
-                    light = Math.max(light, t.getSkyLight() / 100f * serverTime);
+                }else if(dayTime >= 600 && dayTime < 625) {
+                    light = Math.max(light, t.getSkyLight() / 25f * (625 - dayTime));
                 }else {
-                    light = Math.max(light, t.getSkyLight() / 100f * 10);
+                    light = Math.max(light, t.getSkyLight() * 0.1f); // moon sky lightning
                 }
                 batch.setColor(0, 0, 0, 1f / Consts.MAX_LIGHT_LEVEL * (Consts.MAX_LIGHT_LEVEL - light));
-                System.out.println(1f / Consts.MAX_LIGHT_LEVEL * (Consts.MAX_LIGHT_LEVEL - light));
                 batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
-                //System.out.println(GameScreen.get().getServerTime());
             }
         }
         batch.setColor(Color.WHITE);
@@ -184,9 +184,11 @@ public class GameWorld {
 
         Tile t = worldTerrain[x][y];
 
+        TileType oldType = t.getTypeFront();
+
         t.setTypeFront(type);
 
-        lightCalculator.onTileChange(x);
+        lightCalculator.onTileChange(oldType, type, x, y);
 
     }
 

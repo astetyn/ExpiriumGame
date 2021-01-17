@@ -20,7 +20,7 @@ public class WorldGenerator {
 
         for(int x = 0; x < w; x++) {
 
-            int grassHeight = (int) (0 + Noise.noise((x) / 32.0f, 0, 0) * 20);
+            int grassHeight = (int) (50 + Noise.noise((x) / 16.0f, 0, 0) * 20);
             terrainLevel[x] = grassHeight;
 
             for(int y = 0; y < h; y++) {

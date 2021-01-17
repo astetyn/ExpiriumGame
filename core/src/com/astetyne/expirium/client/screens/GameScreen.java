@@ -26,7 +26,7 @@ public class GameScreen implements Screen {
     private final InputMultiplexer multiplexer;
     private final Stage stage;
     private final GameWorld gameWorld;
-    private float serverTime;
+    private float dayTime;
     private final int serverTPS;
     private final PlayerDataHandler playerDataHandler;
     private ExpiRoot activeRoot;
@@ -93,8 +93,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        // parallax - needs projection matrix from gui (1000*1000)
-        //batch.setColor(1f, 0.8f, 0.4f, 1);
+        // parallax - needs projection matrix from gui (2000*1000)
         batch.setColor(getBGColor());
         batch.draw(Res.BG_1, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
         batch.draw(Res.BG_1, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
@@ -181,12 +180,12 @@ public class GameScreen implements Screen {
         return gameScreen;
     }
 
-    public float getServerTime() {
-        return serverTime;
+    public float getDayTime() {
+        return dayTime;
     }
 
-    public void setServerTime(float serverTime) {
-        this.serverTime = serverTime;
+    public void setDayTime(float dayTime) {
+        this.dayTime = dayTime;
     }
 
     public InputMultiplexer getMultiplexer() {

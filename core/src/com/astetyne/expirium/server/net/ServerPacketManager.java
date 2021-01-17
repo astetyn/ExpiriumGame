@@ -185,7 +185,7 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putFloat(GameServer.get().getWorld().getWorldTime());
+        out.putFloat(GameServer.get().getWorld().getDayTime());
         out.putInt(GameServer.get().getWorld().getWeather().getID());
     }
 

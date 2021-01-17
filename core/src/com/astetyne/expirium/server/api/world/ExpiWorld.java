@@ -44,7 +44,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private WeatherType weatherType;
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
-    private float worldTime;
+    private float dayTime;
     private final int width, height;
     private final long seed;
 
@@ -57,7 +57,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         worldTerrain = new ExpiTile[preferences.height][preferences.width];
         new WorldGenerator(worldTerrain).generateWorld();
 
-        worldTime = 0;
+        dayTime = 50; // 7:00
         weatherType = WeatherType.SUNNY;
 
         try {
@@ -85,8 +85,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
                 }
             }
 
+            dayTime = in.readFloat();
+
             //todo: len docasne zatial
-            worldTime = 0;
             weatherType = WeatherType.SUNNY;
 
             initAfterCreation();
@@ -150,9 +151,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     public void onTick() {
 
-        worldTime += 1f / Consts.SERVER_DEFAULT_TPS;
-        if(worldTime == Consts.SERVER_DEFAULT_TPS * Consts.DAY_TIME_SEC) {
-            worldTime = 0;
+        dayTime += 100f / Consts.SERVER_DEFAULT_TPS;
+        if(dayTime >= Consts.DAY_TIME_SEC) {
+            dayTime = 0;
         }
 
         for(ExpiPlayer pp : GameServer.get().getPlayers()) {
@@ -311,8 +312,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return contactListener;
     }
 
-    public float getWorldTime() {
-        return worldTime;
+    public float getDayTime() {
+        return dayTime;
     }
 
     public ExpiTile[][] getTerrain() {
@@ -344,6 +345,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
                 out.writeByte(worldTerrain[h][w].getTypeBack().getID());
             }
         }
+
+        out.writeFloat(dayTime);
 
         // world stuff from here
         int entitiesSize = 0;
