@@ -26,8 +26,8 @@ public class GameScreen implements Screen {
     private final InputMultiplexer multiplexer;
     private final Stage stage;
     private final GameWorld gameWorld;
-    private int serverTime;
-    private int serverTPS;
+    private float serverTime;
+    private final int serverTPS;
     private final PlayerDataHandler playerDataHandler;
     private ExpiRoot activeRoot;
     private boolean buildViewActive;
@@ -84,12 +84,12 @@ public class GameScreen implements Screen {
         int parallaxWidth3 = 2000;
         int parallaxHeight = 1300;
 
-        float xShift1 = (gameWorld.getPlayer().getLocation().x*2) % parallaxWidth;
-        float yShift1 = gameWorld.getPlayer().getLocation().y*4;
-        float xShift2 = (gameWorld.getPlayer().getLocation().x*6) % parallaxWidth2;
-        float yShift2 = gameWorld.getPlayer().getLocation().y*7;
-        float xShift3 = (gameWorld.getPlayer().getLocation().x*8) % parallaxWidth3;
-        float yShift3 = gameWorld.getPlayer().getLocation().y*8;
+        float xShift1 = (gameWorld.getCamera().position.x*2) % parallaxWidth;
+        float yShift1 = gameWorld.getCamera().position.y*4;
+        float xShift2 = (gameWorld.getCamera().position.x*6) % parallaxWidth2;
+        float yShift2 = gameWorld.getCamera().position.y*7;
+        float xShift3 = (gameWorld.getCamera().position.x*8) % parallaxWidth3;
+        float yShift3 = gameWorld.getCamera().position.y*8;
 
         batch.begin();
 
@@ -181,11 +181,11 @@ public class GameScreen implements Screen {
         return gameScreen;
     }
 
-    public int getServerTime() {
+    public float getServerTime() {
         return serverTime;
     }
 
-    public void setServerTime(int serverTime) {
+    public void setServerTime(float serverTime) {
         this.serverTime = serverTime;
     }
 

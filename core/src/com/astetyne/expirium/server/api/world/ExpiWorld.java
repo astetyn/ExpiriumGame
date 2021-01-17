@@ -44,7 +44,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private WeatherType weatherType;
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
-    private int worldTime;
+    private float worldTime;
     private final int width, height;
     private final long seed;
 
@@ -150,7 +150,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     public void onTick() {
 
-        worldTime++;
+        worldTime += 1f / Consts.SERVER_DEFAULT_TPS;
         if(worldTime == Consts.SERVER_DEFAULT_TPS * Consts.DAY_TIME_SEC) {
             worldTime = 0;
         }
@@ -311,7 +311,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return contactListener;
     }
 
-    public int getWorldTime() {
+    public float getWorldTime() {
         return worldTime;
     }
 

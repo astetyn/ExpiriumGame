@@ -4,13 +4,14 @@ public class Tile {
 
     private TileType typeFront, typeBack;
     private byte stability;
-    private byte lightR, lightG, lightB;
+    private byte skyLight, localLight;
 
     public Tile(TileType type, byte stability) {
         this.typeFront = type;
         this.typeBack = TileType.AIR;
         this.stability = stability;
-        lightR = lightG = lightB = -1; // 255: full light
+        skyLight = 0;
+        localLight = 0;
     }
 
     public int getStability() {
@@ -37,21 +38,19 @@ public class Tile {
         this.typeBack = typeBack;
     }
 
-    public void setLight(byte r, byte g, byte b) {
-        lightR = r;
-        lightG = g;
-        lightB = b;
+    public byte getSkyLight() {
+        return skyLight;
     }
 
-    public byte getR() {
-        return lightR;
+    public void setSkyLight(byte skyLight) {
+        this.skyLight = skyLight;
     }
 
-    public byte getG() {
-        return lightG;
+    public byte getLocalLight() {
+        return localLight;
     }
 
-    public byte getB() {
-        return lightB;
+    public void setLocalLight(byte localLight) {
+        this.localLight = localLight;
     }
 }

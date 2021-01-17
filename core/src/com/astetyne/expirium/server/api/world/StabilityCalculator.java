@@ -115,9 +115,9 @@ public class StabilityCalculator {
         if(y != 0) checkStrongConnection(worldTerrain[y-1][x], pack);
 
         // top left tile - for magic triangle
-        if(y != h-1) checkStrongConnection(worldTerrain[y+1][x-1], pack);
+        if(y != h-1 && x != 0) checkStrongConnection(worldTerrain[y+1][x-1], pack);
         // top right tile - for magic triangle
-        if(y != h-1) checkStrongConnection(worldTerrain[y+1][x+1], pack);
+        if(y != h-1 && x != w-1) checkStrongConnection(worldTerrain[y+1][x+1], pack);
 
     }
 

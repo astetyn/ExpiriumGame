@@ -4,20 +4,20 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
+import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.BreakingTile;
 import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 45;
+    public static float PPM = 32;
 
     private final SpriteBatch batch;
     private Tile[][] worldTerrain;
@@ -35,9 +35,8 @@ public class GameWorld {
     private final List<Entity> entities;
     private MainPlayer player;
     private final OrthographicCamera camera;
-    private final FrameBuffer lightsFrameBuffer;
-    private final Matrix4 screenMatrix;
     private int terrainWidth, terrainHeight;
+    private LightCalculator lightCalculator;
 
     public GameWorld() {
 
@@ -45,9 +44,6 @@ public class GameWorld {
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
-
-        screenMatrix = new Matrix4().setToOrtho2D(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        lightsFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
@@ -66,6 +62,8 @@ public class GameWorld {
                 worldTerrain[i][j] = new Tile(TileType.AIR, (byte)0);
             }
         }
+
+        lightCalculator = new LightCalculator(worldTerrain);
 
         int pID = in.getInt();
         Vector2 loc = in.getVector();
@@ -92,16 +90,17 @@ public class GameWorld {
         // render world
         int renderOffsetX = (int) (Gdx.graphics.getWidth() / (PPM * 2)) + 2;
         int renderOffsetY = (int) (Gdx.graphics.getHeight() / (PPM * 2)) + 2;
-        int left = (int) Math.max(player.getCenter().x - renderOffsetX, 0);
-        int right = (int) Math.min(player.getCenter().x + renderOffsetX, terrainWidth);
-        int down = (int) Math.max(player.getCenter().y - renderOffsetY, 0);
-        int up = (int) Math.min(player.getCenter().y + renderOffsetY, terrainHeight);
+        int left = (int) Math.max(camera.position.x - renderOffsetX, 0);
+        int right = (int) Math.min(camera.position.x + renderOffsetX, terrainWidth);
+        int down = (int) Math.max(camera.position.y - renderOffsetY, 0);
+        int up = (int) Math.min(camera.position.y + renderOffsetY, terrainHeight);
 
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 Tile t = worldTerrain[i][j];
-                if(t.getTypeFront() == TileType.AIR) continue;
-
+                if(t.getTypeFront() == TileType.AIR) {
+                    continue;
+                }
                 if(GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT) {
                     player.getTilePlacer().render(t, i, j);
                     continue;
@@ -131,38 +130,28 @@ public class GameWorld {
             }
         }
 
-        batch.end();
-
-        /*lightsFrameBuffer.begin();
-
-        Gdx.gl.glClearColor(0f,0f,0f,0f); // ambient color
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-        Gdx.gl.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
-
-        batch.begin();
-        for(LightSource l : activeLights) {
-            LightType type = l.getType();
-            float width = type.width;
-            float height = type.height;
-            batch.draw(type.texture, l.getLoc().x - width/2, l.getLoc().y - height/2, width, height);
+        for(int i =  left; i < right; i++) {
+            for(int j = down; j < up; j++) {
+                Tile t = worldTerrain[i][j];
+                float light = t.getLocalLight();
+                float serverTime = GameScreen.get().getServerTime();
+                if(serverTime >= 0 && serverTime < 50) {
+                    light = Math.max(light, t.getSkyLight() / 50f * serverTime);
+                    System.out.println("--"+t.getSkyLight()+" "+serverTime);
+                }else if(serverTime >= 50 && serverTime < 600) {
+                    light = Math.max(light, t.getSkyLight());
+                }else if(serverTime >= 600 && serverTime < 700) {
+                    light = Math.max(light, t.getSkyLight() / 100f * serverTime);
+                }else {
+                    light = Math.max(light, t.getSkyLight() / 100f * 10);
+                }
+                batch.setColor(0, 0, 0, 1f / Consts.MAX_LIGHT_LEVEL * (Consts.MAX_LIGHT_LEVEL - light));
+                System.out.println(1f / Consts.MAX_LIGHT_LEVEL * (Consts.MAX_LIGHT_LEVEL - light));
+                batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
+                //System.out.println(GameScreen.get().getServerTime());
+            }
         }
-        batch.end();
-        lightsFrameBuffer.end();
-
-        Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);*/
-
-        batch.setProjectionMatrix(screenMatrix);
-
-        /*float sw = Gdx.graphics.getWidth();
-        float sh = Gdx.graphics.getHeight();
-        int fw = lightsFrameBuffer.getWidth();
-        int fh = lightsFrameBuffer.getHeight();*/
-
-        batch.begin();
-        //batch.draw(lightsFrameBuffer.getColorBufferTexture(), 0, 0, sw, sh,  0, 0, fw, fh, false, true);
+        batch.setColor(Color.WHITE);
 
     }
 
@@ -181,6 +170,10 @@ public class GameWorld {
                 t.setStability(stability);
             }
         }
+
+        if(yOff + partHeight == terrainHeight) {
+            lightCalculator.recalcSkyLights();
+        }
     }
 
     public void onTileChange(PacketInputStream in) {
@@ -192,6 +185,9 @@ public class GameWorld {
         Tile t = worldTerrain[x][y];
 
         t.setTypeFront(type);
+
+        lightCalculator.onTileChange(x);
+
     }
 
     public void onStabilityChange(PacketInputStream in) {
@@ -222,8 +218,11 @@ public class GameWorld {
 
     private void cameraCenter() {
         Vector3 position = camera.position;
-        position.x = camera.position.x  + (player.getLocation().x - camera.position.x) * .1f;
-        position.y = camera.position.y  + (player.getLocation().y - camera.position.y) * .1f;
+        Vector2 pCenter = player.getCenter();
+        position.x = Math.max(camera.position.x  + (pCenter.x - camera.position.x) * .1f, camera.viewportWidth / 2);
+        position.y = Math.max(camera.position.y  + (pCenter.y - camera.position.y) * .1f, camera.viewportHeight / 2);
+        position.x = Math.min(position.x, terrainWidth - camera.viewportWidth / 2);
+        position.y = Math.min(position.y, terrainHeight - camera.viewportHeight / 2);
         camera.position.set(position);
         camera.update();
     }

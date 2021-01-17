@@ -105,7 +105,7 @@ public class HostCreatorRoot extends Table {
                     }
                 }
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
-                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 2000, 256, 0);
+                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 50, 30, 0);
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref);
                 ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());

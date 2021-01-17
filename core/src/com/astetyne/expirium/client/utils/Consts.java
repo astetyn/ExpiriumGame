@@ -27,6 +27,8 @@ public class Consts {
 
     public static final float ITEM_DESPAWN_TIME = 10; // in seconds
 
+    public static final byte MAX_LIGHT_LEVEL = 2;
+
     // player
     public static final int PLAYER_INV_COLUMNS = 5;
     public static final int PLAYER_INV_ROWS = 5;
