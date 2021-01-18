@@ -7,6 +7,7 @@ import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.widget.HotBarSlot;
 import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
@@ -28,8 +29,8 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
     private final Table hotSlotsTable, debugInfoTable, playerStatsTable;
 
-    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, warnLabel, healthStat, foodStat, tempStat;
-    private final Image healthImage, foodImage, tempImage;
+    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, versionLabel, healthStat, foodStat, tempStat;
+    private final Image healthImage, foodImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
     public final ThumbStick moveTS, breakTS;
@@ -51,10 +52,10 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
         switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_UP, false);
         switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_DOWN, true);
-        inventoryButton = new Image(Res.INVENTORY);
-        consumeButton = new Image(Res.TEMP_ICON);
-        buildViewButton = new Image(Res.TEMP_ICON);
-        settingsButton = new Image(Res.TEMP_ICON);
+        inventoryButton = new Image(GuiRes.INV.getDrawable());
+        consumeButton = new Image(GuiRes.DEBUG.getDrawable());
+        buildViewButton = new Image(GuiRes.DEBUG.getDrawable());
+        settingsButton = new Image(GuiRes.DEBUG.getDrawable());
 
         settingsButton.addListener(new ClickListener() {
             @Override
@@ -97,12 +98,11 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         entityLabel = new Label("", Res.LABEL_STYLE);
         callsLabel = new Label("", Res.LABEL_STYLE);
         buffersLabel = new Label("", Res.LABEL_STYLE);
-        warnLabel = new Label("pre-alpha", Res.LABEL_STYLE);
-        warnLabel.setColor(1,0.1f,0.1f,1);
+        versionLabel = new Label("pre-alpha", Res.LABEL_STYLE);
+        versionLabel.setColor(1,0.1f,0.1f,1);
 
-        healthImage = new Image(Res.HEALTH_ICON);
-        foodImage = new Image(Res.FOOD_ICON);
-        tempImage = new Image(Res.TEMP_ICON);
+        healthImage = new Image(GuiRes.HEALTH_ICON.getDrawable());
+        foodImage = new Image(GuiRes.FOOD_ICON.getDrawable());
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
         foodStat = new Label("0%", Res.LABEL_STYLE);
@@ -128,7 +128,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
             debugInfoTable.add(buffersLabel).left().height(50);
             debugInfoTable.row();
         }
-        debugInfoTable.add(warnLabel).left();
+        debugInfoTable.add(versionLabel).left();
 
         float iconSize = 60;
         playerStatsTable.add(healthStat).padTop(10).height(50);

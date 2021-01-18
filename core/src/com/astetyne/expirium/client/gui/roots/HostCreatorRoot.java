@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.gui.roots;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.LauncherScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
@@ -16,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import java.net.Inet4Address;
@@ -37,7 +37,7 @@ public class HostCreatorRoot extends Table {
         Label savedWorldsTitle = new Label("Saved worlds", Res.LABEL_STYLE);
         savedWorldsTitle.setAlignment(Align.center);
         launchButton = new TextButton("Launch!", Res.TEXT_BUTTON_STYLE);
-        Image deleteWorldButton = new Image(Res.FOOD_ICON);
+        Image deleteWorldButton = new Image(GuiRes.DEBUG.getDrawable());
 
         savedWorlds = new Table();
         rebuildSavedWorldsTable();
@@ -72,7 +72,7 @@ public class HostCreatorRoot extends Table {
         leftTable.row();
         leftTable.add(launchButton).width(400).height(100).align(Align.bottom).padBottom(50);
         leftTable.add(deleteWorldButton).width(100).height(Utils.percFromW(100)).align(Align.right).padLeft(30);
-        leftTable.background(new TextureRegionDrawable(Res.INV_CHOOSE_BACK));
+        leftTable.background(GuiRes.FRAME_SQUARE.getDrawable());
 
         // world creator table
         Label worldCreatorTitle = new Label("Create new world", Res.LABEL_STYLE);
@@ -94,9 +94,13 @@ public class HostCreatorRoot extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String worldName = tf.getText().trim();
-                if(worldName.isEmpty()) return;
+                if(worldName.isEmpty()) {
+                    LauncherScreen.get().addWarning("Add a name please.", 1000, Color.ORANGE);
+                    return;
+                }
                 for(FileHandle fh : Gdx.files.local("worlds").list()) {
                     if(fh.name().equals(worldName)) {
+                        LauncherScreen.get().addWarning("This world name already exists.", 1000, Color.RED);
                         return;
                     }
                 }
@@ -114,7 +118,7 @@ public class HostCreatorRoot extends Table {
         rightTable.add(tf).width(600).height(100).expandY().colspan(2);
         rightTable.row();
         rightTable.add(createNewButton).width(400).height(100).align(Align.bottom).padBottom(50).colspan(2);
-        rightTable.background(new TextureRegionDrawable(Res.INV_CHOOSE_BACK));
+        rightTable.background(GuiRes.FRAME_SQUARE.getDrawable());
 
         add(leftTable).width(1000).growY();
         add(rightTable).width(1000).growY();
@@ -129,7 +133,7 @@ public class HostCreatorRoot extends Table {
             worldLabel.setAlignment(Align.center);
             worldLabel.setColor(Color.LIGHT_GRAY);
             world.add(worldLabel).grow();
-            world.setBackground(Res.RECIPE_BACK);
+            world.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
             world.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {

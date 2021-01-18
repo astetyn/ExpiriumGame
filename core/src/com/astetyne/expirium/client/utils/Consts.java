@@ -20,14 +20,14 @@ public class Consts {
 
     public static final int DAY_TIME_SEC = 1200;
 
-    public static final float CAMPFIRE_TIME = 30;
+    public static final float CAMPFIRE_TIME = 120;
 
     public static final float ITEM_COOLDOWN_BREAK = 1;
     public static final float ITEM_COOLDOWN_DROP = 6;
 
-    public static final float ITEM_DESPAWN_TIME = 10; // in seconds
+    public static final float ITEM_DESPAWN_TIME = 60; // in seconds
 
-    public static final byte MAX_LIGHT_LEVEL = 15;
+    public static final byte MAX_LIGHT_LEVEL = 10;
 
     // player
     public static final int PLAYER_INV_COLUMNS = 5;
@@ -36,7 +36,7 @@ public class Consts {
     public static final int JUMP_DELAY = 200;
 
     // gui
-    public static final int INV_TILE_MLT = 60;
+    public static final int INV_TILE_MLT = 120;
 
 
 }

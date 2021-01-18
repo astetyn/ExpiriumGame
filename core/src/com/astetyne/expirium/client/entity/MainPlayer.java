@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.world.input.TilePlacer;
 import com.astetyne.expirium.server.net.PacketInputStream;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class MainPlayer extends Entity {
@@ -18,7 +19,7 @@ public class MainPlayer extends Entity {
         animator = new PlayerEntityAnimator(ExpiGame.get().getBatch(), this);
     }
 
-    public void draw() {
+    public void draw(SpriteBatch batch) {
         animator.draw();
     }
 

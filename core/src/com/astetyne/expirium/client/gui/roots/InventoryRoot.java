@@ -1,8 +1,8 @@
 package com.astetyne.expirium.client.gui.roots;
 
 import com.astetyne.expirium.client.ExpiGame;
+import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
-import com.astetyne.expirium.client.gui.widget.RecipeList;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
@@ -13,25 +13,38 @@ import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class InventoryRoot extends Table implements ExpiRoot {
+public class InventoryRoot extends WidgetGroup implements ExpiRoot {
+
+    private final Table table;
 
     private final StorageGrid storage;
     private final Cell<StorageGrid> storageCell;
 
-    private final RecipeList recipeList;
+    private final ScrollPane recipeList;
     private final RecipeDetailTable recipeDetail;
+    private final Image returnButton;
 
     public InventoryRoot() {
 
         if(Consts.DEBUG) setDebug(true);
 
-        recipeDetail = new RecipeDetailTable();
+        table = new Table();
 
-        recipeList = new RecipeList(new RecipeListTable(recipeDetail));
+        recipeDetail = new RecipeDetailTable();
+        recipeList = new ScrollPane(new RecipeListTable(recipeDetail));
+        recipeList.setScrollingDisabled(true, false);
+
+        returnButton = new Image(Res.CROSS_ICON);
+        returnButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                GameScreen.get().setRoot(new GameRoot());
+            }
+        });
 
         storage = new StorageGrid(GameScreen.get().getPlayerData().getMainData(), true);
 
@@ -39,6 +52,7 @@ public class InventoryRoot extends Table implements ExpiRoot {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("fkjdnaiofdofdsiafdasfds");
                 GridItemStack is = storage.getItemAt(x, y);
                 if(is != null) {
                     storage.getGrid().setSelectedItem(is);
@@ -62,11 +76,15 @@ public class InventoryRoot extends Table implements ExpiRoot {
 
         });
 
-        storageCell = add(storage).width(800).height(Utils.percFromW(800));
-        add(recipeList).growY().width(400).pad(20,0,20,0);
-        add(recipeDetail).growY().width(400).pad(20, 20, 20, 20).align(Align.top);
+        storageCell = table.add(storage).width(800).height(Utils.percFromW(800));
+        table.add(recipeList).growY().width(400).pad(20,0,20,0);
+        table.add(recipeDetail).growY().width(400).pad(20, 20, 20, 20).align(Align.top);
+        table.add(returnButton).width(Utils.percFromH(100)).height(100).pad(20, 50, 0, 0).align(Align.topRight);
 
         storage.setZIndex(100);
+
+        table.setBounds(0, 0, 2000, 1000);
+        addActor(table);
     }
 
     @Override

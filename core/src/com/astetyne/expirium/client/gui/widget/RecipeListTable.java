@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.gui.widget;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,6 +15,8 @@ import com.badlogic.gdx.utils.Align;
 
 public class RecipeListTable extends Table {
 
+    private Table lastSelected;
+
     public RecipeListTable(RecipeChangeListener listener) {
 
         for(ItemRecipe recipe : ItemRecipe.values()) {
@@ -24,16 +27,20 @@ public class RecipeListTable extends Table {
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
             t.add(icon).width(100).height(Utils.percFromW(100)).align(Align.left).pad(10, 5, 10, 5);
             t.add(label).grow();
-            t.setBackground(Res.RECIPE_BACK);
+            t.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
             t.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    if(lastSelected != null) lastSelected.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
+                    t.setBackground(GuiRes.FRAME_SQUARE.getDrawable());
                     listener.onRecipeChange(recipe);
+                    lastSelected = t;
                 }
             });
             add(t).width(400);
             row();
         }
+        setBackground(GuiRes.FRAME_SQUARE.getDrawable());
     }
 
     public interface RecipeChangeListener {

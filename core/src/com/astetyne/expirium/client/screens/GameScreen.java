@@ -5,8 +5,10 @@ import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.roots.GameRoot;
+import com.astetyne.expirium.client.resources.BGRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.WarnMsgLabel;
 import com.astetyne.expirium.client.world.GameWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
@@ -25,6 +27,7 @@ public class GameScreen implements Screen {
     private final SpriteBatch batch;
     private final InputMultiplexer multiplexer;
     private final Stage stage;
+    private final WarnMsgLabel warnMsgLabel;
     private final GameWorld gameWorld;
     private float dayTime;
     private final int serverTPS;
@@ -47,6 +50,10 @@ public class GameScreen implements Screen {
         playerDataHandler = new PlayerDataHandler();
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
+
+        warnMsgLabel = new WarnMsgLabel(Res.LABEL_STYLE);
+        warnMsgLabel.setBounds(0, 700, 2000, 200);
+
         setRoot(new GameRoot());
         //setRoot(new TestRoot());
 
@@ -95,12 +102,12 @@ public class GameScreen implements Screen {
 
         // parallax - needs projection matrix from gui (2000*1000)
         batch.setColor(getBGColor());
-        batch.draw(Res.BG_1, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
-        batch.draw(Res.BG_1, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
-        batch.draw(Res.BG_2, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
-        batch.draw(Res.BG_2, parallaxWidth2-xShift2, -yShift2, parallaxWidth2, parallaxHeight);
-        batch.draw(Res.BG_3, -xShift3, -yShift3, parallaxWidth3, parallaxHeight);
-        batch.draw(Res.BG_3, parallaxWidth3-xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        BGRes.BACKGROUND_1.getDrawable().draw(batch, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        BGRes.BACKGROUND_1.getDrawable().draw(batch, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        BGRes.BACKGROUND_2.getDrawable().draw(batch, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        BGRes.BACKGROUND_2.getDrawable().draw(batch, parallaxWidth2-xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        BGRes.BACKGROUND_3.getDrawable().draw(batch, -xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        BGRes.BACKGROUND_3.getDrawable().draw(batch, parallaxWidth3-xShift3, -yShift3, parallaxWidth3, parallaxHeight);
         batch.setColor(Color.WHITE);
 
         gameWorld.render();
@@ -154,22 +161,42 @@ public class GameScreen implements Screen {
         root.getActor().setBounds(0, 0, 2000, 1000);
         stage.clear();
         stage.addActor(root.getActor());
+        stage.addActor(warnMsgLabel);
         activeRoot = root;
     }
 
     private Color getSkyColor() {
-        //todo
-        return new Color(0.4f,0.6f,1,1);
+
+        float moonLight = 0f;
+
+        if(dayTime >= 0 && dayTime < 25) { // sunrise
+            float b = Math.max(1f / 25 * dayTime, moonLight);
+            return new Color(b, b, b, 1);
+        }else if(dayTime >= 25 && dayTime < 600) { // day
+            return new Color(1, 1, 1, 1);
+        }else if(dayTime >= 600 && dayTime < 625) { // dawn
+            float b = Math.max(1f / 25 * (625 - dayTime), moonLight);
+            return new Color(b, b, b, 1);
+        }else { // night
+            return new Color(moonLight, moonLight, moonLight, 1);
+        }
     }
 
     private Color getBGColor() {
-        //todo
-        return new Color(1, 1, 1, 1);
-    }
 
-    public Color getNightColor() {
-        //todo
-        return new Color();
+        float moonLight = 0.15f;
+
+        if(dayTime >= 0 && dayTime < 25) { // sunrise
+            float b = Math.max(1f / 25 * dayTime, moonLight);
+            return new Color(b, b, b, 1);
+        }else if(dayTime >= 25 && dayTime < 600) { // day
+            return new Color(1, 1, 1, 1);
+        }else if(dayTime >= 600 && dayTime < 625) { // dawn
+            float b = Math.max(1f / 25 * (625 - dayTime), moonLight);
+            return new Color(b, b, b, 1);
+        }else { // night
+            return new Color(moonLight, moonLight, moonLight, 1);
+        }
     }
 
     public GameWorld getWorld() {
@@ -210,5 +237,9 @@ public class GameScreen implements Screen {
 
     public void toggleBuildViewActive() {
         buildViewActive = !buildViewActive;
+    }
+
+    public void addWarning(String msg, long duration, Color color) {
+        warnMsgLabel.addWarning(msg, duration, color);
     }
 }

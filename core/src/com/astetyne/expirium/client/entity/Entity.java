@@ -1,8 +1,10 @@
 package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.screens.GameScreen;
+import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entity implements MetaReadable {
@@ -40,7 +42,7 @@ public abstract class Entity implements MetaReadable {
 
     }
 
-    public abstract void draw();
+    public abstract void draw(SpriteBatch batch);
 
     public void move() {
 
@@ -94,5 +96,10 @@ public abstract class Entity implements MetaReadable {
 
     public Vector2 getVelocity() {
         return velocity;
+    }
+
+    public Tile getCenterTile() {
+        Vector2 center = getCenter();
+        return GameScreen.get().getWorld().getTileAt(center.x, center.y);
     }
 }

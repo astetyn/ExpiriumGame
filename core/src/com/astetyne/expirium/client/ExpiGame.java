@@ -3,6 +3,8 @@ package com.astetyne.expirium.client;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
+import com.astetyne.expirium.client.resources.BGRes;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
@@ -44,6 +46,8 @@ public class ExpiGame extends Game {
 
 	@Override
 	public void create () {
+		GuiRes.loadTextures();
+		BGRes.loadTextures();
 		Res.loadTextures();
 		TileTex.loadTextures();
 		TileTexAnim.loadTextures();

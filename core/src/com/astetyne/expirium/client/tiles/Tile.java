@@ -1,5 +1,7 @@
 package com.astetyne.expirium.client.tiles;
 
+import com.astetyne.expirium.client.screens.GameScreen;
+
 public class Tile {
 
     private TileType typeFront, typeBack;
@@ -52,5 +54,23 @@ public class Tile {
 
     public void setLocalLight(byte localLight) {
         this.localLight = localLight;
+    }
+
+    public byte getTimeCompensatedSkyLight() {
+        float dayTime = GameScreen.get().getDayTime();
+        byte moonLight = 2;
+        if(dayTime >= 0 && dayTime < 25) return (byte) Math.max(skyLight / 25f * dayTime, moonLight);
+        else if(dayTime >= 25 && dayTime < 600) return skyLight;
+        else if(dayTime >= 600 && dayTime < 625) return (byte) Math.max(skyLight / 25f * (625 - dayTime), moonLight);
+        else return moonLight;
+    }
+
+    /**
+     * This method calculates with time compensated sky light and local lights.
+     *
+     * @return Real light level, which can be displayed on screen.
+     */
+    public byte getLight() {
+        return (byte) Math.max(getTimeCompensatedSkyLight(), localLight);
     }
 }

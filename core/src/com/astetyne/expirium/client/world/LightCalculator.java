@@ -5,21 +5,22 @@ import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 public class LightCalculator {
 
     private final Tile[][] terrain;
     private final int w, h;
-    private final HashSet<Tile> lightSources;
+    private final HashMap<Tile, LightSource> lightSources;
+    private final HashSet<LightSource> invalidedSources;
 
     public LightCalculator(Tile[][] terrain) {
         this.terrain = terrain;
         w = terrain.length;
         h = terrain[0].length;
-        lightSources = new HashSet<>();
+        lightSources = new HashMap<>();
+        invalidedSources = new HashSet<>();
     }
 
     public void recalcSkyLights() {
@@ -103,54 +104,6 @@ public class LightCalculator {
         }
     }
 
-    private void destroyLight(int x, int y, List<IntVector2> legitLights, List<IntVector2> filler) {
-
-        Tile t = terrain[x][y];
-
-        if(lightSources.contains(t) || t.getLocalLight() == 0) return;
-
-        if(isLegit(x, y)) {
-            legitLights.add(new IntVector2(x, y));
-            return;
-        }
-
-        t.setLocalLight((byte)0);
-
-        if(x != 0) { //left
-            filler.add(new IntVector2(x-1, y));
-        }
-        if(x != w-1) { //right
-            filler.add(new IntVector2(x+1, y));
-        }
-        if(y != h-1) { //top
-            filler.add(new IntVector2(x, y+1));
-        }
-        if(y != 0) { //bottom
-            filler.add(new IntVector2(x, y-1));
-        }
-
-    }
-
-    private boolean isLegit(int x, int y) {
-
-        int l = terrain[x][y].getLocalLight();
-
-        if(x != 0 && terrain[x-1][y].getLocalLight() > l) { //left
-            return true;
-        }
-        if(x != w-1 && terrain[x+1][y].getLocalLight() > l) { //right
-            return true;
-        }
-        if(y != h-1 && terrain[x][y+1].getLocalLight() > l) { //top
-            return true;
-        }
-        if(y != 0 && terrain[x][y-1].getLocalLight() > l) { //bottom
-            return true;
-        }
-        return false;
-
-    }
-
     public void onTileChange(TileType from, TileType to, int x, int y) {
 
         Tile t = terrain[x][y];
@@ -162,38 +115,56 @@ public class LightCalculator {
             if(!t2.getTypeFront().getSolidity().isSoft()) break;
         }
 
-        if(lightSources.contains(t)) {
+        if(lightSources.containsKey(t)) {
+            invalidedSources.add(lightSources.get(t));
             lightSources.remove(t);
-            List<IntVector2> legitLights = new ArrayList<>();
-
-            List<IntVector2> queue = new ArrayList<>();
-            List<IntVector2> queueTemp = new ArrayList<>();
-
-            destroyLight(x, y, legitLights, queue);
-
-            while(queue.size() > 0) {
-                for(IntVector2 loc : queue) {
-                    destroyLight(loc.x, loc.y, legitLights, queueTemp);
-                }
-                queue.clear();
-                queue.addAll(queueTemp);
-                queueTemp.clear();
-            }
-
-            //todo: skontrolovat obsah legitLights
-            for(IntVector2 loc : legitLights) {
-                calcTileLocalLights(loc.x, loc.y);
-            }
         }
 
         if(to == TileType.CAMPFIRE_BIG) {
-            t.setLocalLight((byte)10);
-            calcTileLocalLights(x, y);
-            lightSources.add(t);
+            lightSources.put(t, new LightSource((byte)10, new IntVector2(x, y)));
         }else if(to == TileType.CAMPFIRE_SMALL) {
-            t.setLocalLight((byte)5);
-            calcTileLocalLights(x, y);
-            lightSources.add(t);
+            lightSources.put(t, new LightSource((byte)5, new IntVector2(x, y)));
         }
+
+        recalcAllLights();
+    }
+
+    private void recalcAllLights() {
+
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                terrain[x][y].setLocalLight((byte)0);
+            }
+        }
+
+        for(LightSource source : invalidedSources) {
+
+            int x = source.getLoc().x;
+            int y = source.getLoc().y;
+            int radius = source.getRadius();
+
+            int left = Math.max(x-radius, 0);
+            int right = Math.min(x+radius, w);
+            int top = Math.min(y+radius, h);
+            int bottom = Math.max(y-radius, 0);
+
+            for(int i = left; i < right; i++) {
+                for(int j = bottom; j < top; j++) {
+                    terrain[i][j].setLocalLight((byte)0);
+                }
+            }
+        }
+
+        invalidedSources.clear();
+
+        for(LightSource source : lightSources.values()) {
+            int x = source.getLoc().x;
+            int y = source.getLoc().y;
+            byte radius = source.getRadius();
+
+            terrain[x][y].setLocalLight(radius);
+            calcTileLocalLights(x, y);
+        }
+
     }
 }

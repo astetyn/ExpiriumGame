@@ -103,6 +103,7 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
             }
 
         });
+
     }
 
     @Override

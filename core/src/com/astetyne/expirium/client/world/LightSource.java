@@ -1,22 +1,22 @@
 package com.astetyne.expirium.client.world;
 
-import com.badlogic.gdx.math.Vector2;
+import com.astetyne.expirium.client.utils.IntVector2;
 
 public class LightSource {
 
-    private final LightType type;
-    private final Vector2 loc;
+    private final byte radius;
+    private final IntVector2 loc;
 
-    public LightSource(LightType type, Vector2 loc) {
-        this.type = type;
+    public LightSource(byte radius, IntVector2 loc) {
+        this.radius = radius;
         this.loc = loc;
     }
 
-    public LightType getType() {
-        return type;
+    public byte getRadius() {
+        return radius;
     }
 
-    public Vector2 getLoc() {
+    public IntVector2 getLoc() {
         return loc;
     }
 }

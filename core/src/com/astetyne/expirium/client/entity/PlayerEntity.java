@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.server.net.PacketInputStream;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerEntity extends Entity {
@@ -16,7 +17,7 @@ public class PlayerEntity extends Entity {
     }
 
     @Override
-    public void draw() {
+    public void draw(SpriteBatch batch) {
         animator.draw();
     }
 

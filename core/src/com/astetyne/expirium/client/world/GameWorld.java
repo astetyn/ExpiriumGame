@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
-import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.BreakingTile;
@@ -98,16 +97,21 @@ public class GameWorld {
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 Tile t = worldTerrain[i][j];
-                if(t.getTypeFront() == TileType.AIR) {
-                    continue;
-                }
+                if(t.getTypeFront() == TileType.AIR)  continue;
+
                 if(GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT) {
                     player.getTilePlacer().render(t, i, j);
                     continue;
                 }
+
+                float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
+                batch.setColor(b,b,b,1);
+
                 batch.draw(t.getTypeFront().getTex(), i, j, 1, 1);
             }
         }
+
+        batch.setColor(Color.WHITE);
 
         // breaking anim
         for(BreakingTile bt : BreakingTile.getBreakingTiles().values()) {
@@ -118,40 +122,20 @@ public class GameWorld {
         for(Entity e : entities) {
             // this is for entities from entities.atlas
             if(e.getType() != EntityType.DROPPED_ITEM) {
-                e.draw();
+                float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
+                batch.setColor(b,b,b,1);
+                e.draw(batch);
             }
         }
-        player.draw();
 
         for(Entity e : entities) {
             // this is for dropped items from gui.atlas
             if(e.getType() == EntityType.DROPPED_ITEM) {
-                e.draw();
+                float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
+                batch.setColor(b,b,b,1);
+                e.draw(batch);
             }
         }
-
-        // lightning
-        // background must be also darkened during night, because light mask will light it
-        for(int i =  left; i < right; i++) {
-            for(int j = down; j < up; j++) {
-                Tile t = worldTerrain[i][j];
-                float light = t.getLocalLight();
-                //float dayTime = GameScreen.get().getDayTime();
-                float dayTime = 0;
-                if(dayTime >= 0 && dayTime < 25) {
-                    light = Math.max(light, t.getSkyLight() / 25f * dayTime + 2);
-                }else if(dayTime >= 25 && dayTime < 600) {
-                    light = Math.max(light, t.getSkyLight());
-                }else if(dayTime >= 600 && dayTime < 625) {
-                    light = Math.max(light, t.getSkyLight() / 25f * (625 - dayTime));
-                }else {
-                    light = Math.max(light, t.getSkyLight() * 0.1f); // moon sky lightning
-                }
-                batch.setColor(0, 0, 0, 1f / Consts.MAX_LIGHT_LEVEL * (Consts.MAX_LIGHT_LEVEL - light));
-                batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
-            }
-        }
-        batch.setColor(Color.WHITE);
 
     }
 
@@ -251,5 +235,9 @@ public class GameWorld {
 
     public int getTerrainHeight() {
         return terrainHeight;
+    }
+
+    public Tile getTileAt(float x, float y) {
+        return worldTerrain[(int)x][(int)y];
     }
 }

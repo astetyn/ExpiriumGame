@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 
 public class SettingsRoot extends WidgetGroup implements ExpiRoot {
 
+
     public SettingsRoot() {
 
         Image returnButton = new Image(Res.CROSS_ICON);
@@ -60,9 +61,7 @@ public class SettingsRoot extends WidgetGroup implements ExpiRoot {
     }
 
     @Override
-    public void refresh() {
-
-    }
+    public void refresh() {}
 
     @Override
     public boolean canInteractWithWorld() {
