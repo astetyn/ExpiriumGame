@@ -72,13 +72,14 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         requiredItems.clear();
 
         for(ItemStack is : selectedRecipe.getRequiredItems()) {
+            //todo: pridat k itemu obrazok toho itemu
             requiredItems.add(new Label(is.getAmount() +" "+is.getItem().getLabel(), Res.LABEL_STYLE));
             requiredItems.row();
         }
         add(scrollRequiredItems).expandX().height(200);
         row();
         add(desc).grow().width(360).pad(50, 20, 10, 20);
-        setBackground(GuiRes.FRAME_SQUARE.getDrawable());
+        setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
 
     }
 }

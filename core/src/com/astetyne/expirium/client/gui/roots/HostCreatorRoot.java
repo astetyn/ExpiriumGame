@@ -37,7 +37,7 @@ public class HostCreatorRoot extends Table {
         Label savedWorldsTitle = new Label("Saved worlds", Res.LABEL_STYLE);
         savedWorldsTitle.setAlignment(Align.center);
         launchButton = new TextButton("Launch!", Res.TEXT_BUTTON_STYLE);
-        Image deleteWorldButton = new Image(GuiRes.DEBUG.getDrawable());
+        Image deleteWorldButton = new Image(GuiRes.TRASH_ICON.getDrawable());
 
         savedWorlds = new Table();
         rebuildSavedWorldsTable();

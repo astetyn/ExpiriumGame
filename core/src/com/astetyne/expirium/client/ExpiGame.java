@@ -22,6 +22,8 @@ import java.net.UnknownHostException;
 
 public class ExpiGame extends Game {
 
+	public static final String version = "alpha 1.0";
+
 	private static ExpiGame expiGame;
 
 	private ClientGateway clientGateway;

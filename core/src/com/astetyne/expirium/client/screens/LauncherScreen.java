@@ -29,7 +29,7 @@ public class LauncherScreen implements Screen {
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
 
-        warnMsgLabel = new WarnMsgLabel(Res.LABEL_STYLE);
+        warnMsgLabel = new WarnMsgLabel(Res.TITLE_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
         stage.addActor(warnMsgLabel);
 

@@ -28,7 +28,7 @@ public class LauncherRoot extends Table {
         if(Consts.DEBUG) setDebug(true);
         if(Consts.DEBUG) ExpiGame.get().setPlayerName("palko");
 
-        Label versionLabel = new Label("pre-alpha", Res.LABEL_STYLE);
+        Label versionLabel = new Label(ExpiGame.version, Res.LABEL_STYLE);
         versionLabel.setColor(Color.RED);
 
         nameTF = new TextField(ExpiGame.get().getPlayerName(), Res.TEXT_FIELD_STYLE);

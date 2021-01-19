@@ -38,6 +38,7 @@ public class WarnMsgLabel extends Label {
         if(actualMsg == null) {
             actualMsg = queue.poll();
             lastMsgStart = System.currentTimeMillis();
+            setColor(actualMsg.color);
             setText(actualMsg.msg);
         }
 

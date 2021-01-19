@@ -4,10 +4,10 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -15,14 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class HotBarSlot extends Widget {
 
     private ItemStack itemStack;
-    private final HotBarSlotStyle style;
     private boolean focused;
     private final String emptyLabel;
     private final ChosenSlot slotType;
 
-    public HotBarSlot(HotBarSlotStyle style, String emptyLabel, ChosenSlot slotType) {
+    public HotBarSlot(String emptyLabel, ChosenSlot slotType) {
         itemStack = new ItemStack(Item.EMPTY);
-        this.style = style;
         this.emptyLabel = emptyLabel;
         this.slotType = slotType;
         focused = false;
@@ -41,7 +39,7 @@ public class HotBarSlot extends Widget {
             batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
         }
 
-        batch.draw(style.frame, getX(), getY(), getWidth(), getHeight());
+        GuiRes.FRAME_GRAY.getDrawable().draw(batch, getX(), getY(), getWidth(), getHeight());
         if(itemStack == null || itemStack.getItem() == Item.EMPTY) {
             Res.MAIN_FONT.setColor(0.2f, 0.2f, 0.2f, 1);
             float xOff = getWidth()/2 - Utils.getTextWidth(emptyLabel, Res.MAIN_FONT)/2;
@@ -76,15 +74,6 @@ public class HotBarSlot extends Widget {
 
     public ChosenSlot getSlotType() {
         return slotType;
-    }
-
-    public static class HotBarSlotStyle {
-
-        final TextureRegion frame;
-
-        public HotBarSlotStyle(TextureRegion frame) {
-            this.frame = frame;
-        }
     }
 
 }

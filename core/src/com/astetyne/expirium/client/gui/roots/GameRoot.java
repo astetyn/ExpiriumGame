@@ -29,7 +29,7 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
     private final Table hotSlotsTable, debugInfoTable, playerStatsTable;
 
-    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, versionLabel, healthStat, foodStat, tempStat;
+    private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, versionLabel, healthStat, foodStat;
     private final Image healthImage, foodImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
@@ -42,9 +42,9 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
         if(Consts.DEBUG) setDebug(true);
 
-        toolSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, "Tools", ChosenSlot.TOOL_SLOT);
-        materialSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, "Mats", ChosenSlot.MATERIAL_SLOT);
-        consumableSlot = new HotBarSlot(Res.HOT_BAR_SLOT_STYLE, "Misc", ChosenSlot.CONSUMABLE_SLOT);
+        toolSlot = new HotBarSlot("Tools", ChosenSlot.TOOL_SLOT);
+        materialSlot = new HotBarSlot("Mats", ChosenSlot.MATERIAL_SLOT);
+        consumableSlot = new HotBarSlot("Misc", ChosenSlot.CONSUMABLE_SLOT);
 
         toolSlot.setFocus(true);
         lastFocused = toolSlot;
@@ -53,9 +53,9 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_UP, false);
         switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_DOWN, true);
         inventoryButton = new Image(GuiRes.INV.getDrawable());
-        consumeButton = new Image(GuiRes.DEBUG.getDrawable());
-        buildViewButton = new Image(GuiRes.DEBUG.getDrawable());
-        settingsButton = new Image(GuiRes.DEBUG.getDrawable());
+        consumeButton = new Image(GuiRes.USE_ICON.getDrawable());
+        buildViewButton = new Image(GuiRes.WARNING_ICON.getDrawable());
+        settingsButton = new Image(GuiRes.SETTINGS_ICON.getDrawable());
 
         settingsButton.addListener(new ClickListener() {
             @Override
@@ -98,15 +98,15 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         entityLabel = new Label("", Res.LABEL_STYLE);
         callsLabel = new Label("", Res.LABEL_STYLE);
         buffersLabel = new Label("", Res.LABEL_STYLE);
-        versionLabel = new Label("pre-alpha", Res.LABEL_STYLE);
+        versionLabel = new Label(ExpiGame.version, Res.LABEL_STYLE);
         versionLabel.setColor(1,0.1f,0.1f,1);
+        versionLabel.setAlignment(Align.topLeft);
 
         healthImage = new Image(GuiRes.HEALTH_ICON.getDrawable());
         foodImage = new Image(GuiRes.FOOD_ICON.getDrawable());
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
         foodStat = new Label("0%", Res.LABEL_STYLE);
-        tempStat = new Label("0%", Res.LABEL_STYLE);
 
         hotSlotsTable.add(switchArrowUp).padBottom(10).colspan(3);
         hotSlotsTable.row();
@@ -128,7 +128,6 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
             debugInfoTable.add(buffersLabel).left().height(50);
             debugInfoTable.row();
         }
-        debugInfoTable.add(versionLabel).left();
 
         float iconSize = 60;
         playerStatsTable.add(healthStat).padTop(10).height(50);
@@ -141,14 +140,16 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
         settingsButton.setBounds(10, 890, 100, 100);
         addActor(settingsButton);
-        debugInfoTable.setBounds(0, 500, 500, 400);
+        versionLabel.setBounds(140, 890, 200, 100);
+        addActor(versionLabel);
+        debugInfoTable.setBounds(0, 300, 500, 400);
         if(Consts.DEBUG) debugInfoTable.setDebug(true);
         debugInfoTable.align(Align.topLeft);
         addActor(debugInfoTable);
-        playerStatsTable.setBounds(1500, 750, 500, 250);
+        playerStatsTable.setBounds(1800, 850, 200, 150);
         playerStatsTable.align(Align.topRight);
         addActor(playerStatsTable);
-        inventoryButton.setBounds(1890, 650, 100, 100);
+        inventoryButton.setBounds(1870, 750, 100, 100);
         addActor(inventoryButton);
         moveTS.setBounds(50, 50, 200, 200);
         addActor(moveTS);
@@ -242,7 +243,6 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
 
         healthStat.setText((int)Math.ceil(playerData.getHealth())+" %");
         foodStat.setText((int)Math.ceil(playerData.getFood())+" %");
-        tempStat.setText((int)Math.ceil(playerData.getTemperature())+" °C");
     }
 
     @Override

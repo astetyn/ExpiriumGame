@@ -58,11 +58,11 @@ public class Tile {
 
     public byte getTimeCompensatedSkyLight() {
         float dayTime = GameScreen.get().getDayTime();
-        byte moonLight = 2;
-        if(dayTime >= 0 && dayTime < 25) return (byte) Math.max(skyLight / 25f * dayTime, moonLight);
+        float moonLightFactor = 0.2f;
+        if(dayTime >= 0 && dayTime < 25) return (byte) Math.max(skyLight / 25f * dayTime, skyLight * moonLightFactor);
         else if(dayTime >= 25 && dayTime < 600) return skyLight;
-        else if(dayTime >= 600 && dayTime < 625) return (byte) Math.max(skyLight / 25f * (625 - dayTime), moonLight);
-        else return moonLight;
+        else if(dayTime >= 600 && dayTime < 625) return (byte) Math.max(skyLight / 25f * (625 - dayTime), skyLight * moonLightFactor);
+        else return (byte) (skyLight * moonLightFactor);
     }
 
     /**

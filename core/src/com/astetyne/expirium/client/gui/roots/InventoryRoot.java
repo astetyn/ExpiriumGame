@@ -13,13 +13,14 @@ import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class InventoryRoot extends WidgetGroup implements ExpiRoot {
-
-    private final Table table;
+public class InventoryRoot extends Table implements ExpiRoot {
 
     private final StorageGrid storage;
     private final Cell<StorageGrid> storageCell;
@@ -31,8 +32,6 @@ public class InventoryRoot extends WidgetGroup implements ExpiRoot {
     public InventoryRoot() {
 
         if(Consts.DEBUG) setDebug(true);
-
-        table = new Table();
 
         recipeDetail = new RecipeDetailTable();
         recipeList = new ScrollPane(new RecipeListTable(recipeDetail));
@@ -76,15 +75,12 @@ public class InventoryRoot extends WidgetGroup implements ExpiRoot {
 
         });
 
-        storageCell = table.add(storage).width(800).height(Utils.percFromW(800));
-        table.add(recipeList).growY().width(400).pad(20,0,20,0);
-        table.add(recipeDetail).growY().width(400).pad(20, 20, 20, 20).align(Align.top);
-        table.add(returnButton).width(Utils.percFromH(100)).height(100).pad(20, 50, 0, 0).align(Align.topRight);
+        storageCell = add(storage).width(800).height(Utils.percFromW(800));
+        add(recipeList).growY().width(450).pad(20,0,20,0);
+        add(recipeDetail).growY().width(450).pad(20, 20, 20, 20).align(Align.top);
+        add(returnButton).width(Utils.percFromH(100)).height(100).pad(20, 50, 0, 0).align(Align.topRight);
 
         storage.setZIndex(100);
-
-        table.setBounds(0, 0, 2000, 1000);
-        addActor(table);
     }
 
     @Override

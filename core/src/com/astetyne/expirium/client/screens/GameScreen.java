@@ -45,7 +45,6 @@ public class GameScreen implements Screen {
 
         batch = ExpiGame.get().getBatch();
         multiplexer = new InputMultiplexer();
-        gameWorld = new GameWorld();
 
         playerDataHandler = new PlayerDataHandler();
 
@@ -55,9 +54,10 @@ public class GameScreen implements Screen {
         warnMsgLabel.setBounds(0, 700, 2000, 200);
 
         setRoot(new GameRoot());
-        //setRoot(new TestRoot());
 
         multiplexer.addProcessor(stage);
+
+        gameWorld = new GameWorld();
 
         // load init data from server
         gameWorld.loadData(in);

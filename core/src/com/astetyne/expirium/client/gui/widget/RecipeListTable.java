@@ -27,12 +27,14 @@ public class RecipeListTable extends Table {
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
             t.add(icon).width(100).height(Utils.percFromW(100)).align(Align.left).pad(10, 5, 10, 5);
             t.add(label).grow();
-            t.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
+            t.setBackground(GuiRes.FRAME_GRAY.getDrawable());
             t.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if(lastSelected != null) lastSelected.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
-                    t.setBackground(GuiRes.FRAME_SQUARE.getDrawable());
+                    if(lastSelected != null) {
+                        lastSelected.setBackground(GuiRes.FRAME_GRAY.getDrawable());
+                    }
+                    t.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
                     listener.onRecipeChange(recipe);
                     lastSelected = t;
                 }
@@ -40,7 +42,7 @@ public class RecipeListTable extends Table {
             add(t).width(400);
             row();
         }
-        setBackground(GuiRes.FRAME_SQUARE.getDrawable());
+        setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
     }
 
     public interface RecipeChangeListener {

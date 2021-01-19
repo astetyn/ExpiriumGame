@@ -12,11 +12,16 @@ public enum GuiRes {
     FRAME_GREEN("frame_green", true),
     FRAME_YELLOW("frame_yellow", true),
     FRAME_SQUARE("frame_square", true),
+    FRAME_GRAY_TRANSP("frame_gray_trans", true),
     INV("inventory", false),
     INV_WEIGHT("weight_icon", false),
     HEALTH_ICON("health_icon", false),
     FOOD_ICON("food_icon", false),
-    TEMP_ICON("temp_icon", false);
+    TEMP_ICON("temp_icon", false),
+    TRASH_ICON("trash_icon", false),
+    SETTINGS_ICON("settings_icon", false),
+    USE_ICON("use_icon", false),
+    WARNING_ICON("warning_icon", false);
 
     private final String name;
     private final boolean ninepatch;

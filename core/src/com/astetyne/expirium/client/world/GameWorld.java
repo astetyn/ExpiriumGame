@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
+import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.BreakingTile;
@@ -11,6 +12,7 @@ import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
+import com.astetyne.expirium.client.world.input.WorldInputListener;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
@@ -36,13 +38,19 @@ public class GameWorld {
     private final OrthographicCamera camera;
     private int terrainWidth, terrainHeight;
     private LightCalculator lightCalculator;
+    private final WorldInputListener worldInputListener;
+
+    Color[] stabColors = new Color[] {new Color(0.9f, 0f, 0f, 1), new Color(0.9f, 0.3f, 0f, 1), new Color(0.9f, 0.6f, 0f, 1), new Color(0.9f, 0.9f, 0f, 1)};
 
     public GameWorld() {
 
-        this.batch = ExpiGame.get().getBatch();
+        batch = ExpiGame.get().getBatch();
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
+
+        worldInputListener = new WorldInputListener(this);
+        GameScreen.get().getMultiplexer().addProcessor(worldInputListener);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
@@ -97,17 +105,18 @@ public class GameWorld {
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 Tile t = worldTerrain[i][j];
-                if(t.getTypeFront() == TileType.AIR)  continue;
-
-                if(GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT) {
-                    player.getTilePlacer().render(t, i, j);
-                    continue;
-                }
+                if(t.getTypeFront() == TileType.AIR) continue;
 
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
                 batch.setColor(b,b,b,1);
 
-                batch.draw(t.getTypeFront().getTex(), i, j, 1, 1);
+                ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
+                if(slot == ChosenSlot.MATERIAL_SLOT && GameScreen.get().isBuildViewActive()) {
+                    batch.setColor(stabColors[t.getStability()-1]);
+                    batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
+                }else {
+                    batch.draw(t.getTypeFront().getTex(), i, j, 1, 1);
+                }
             }
         }
 
@@ -240,4 +249,5 @@ public class GameWorld {
     public Tile getTileAt(float x, float y) {
         return worldTerrain[(int)x][(int)y];
     }
+
 }
