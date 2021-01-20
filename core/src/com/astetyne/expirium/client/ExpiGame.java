@@ -1,5 +1,7 @@
 package com.astetyne.expirium.client;
 
+import com.astetyne.expirium.client.gui.roots.LauncherRoot;
+import com.astetyne.expirium.client.gui.roots.LoadingRoot;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
@@ -117,18 +119,24 @@ public class ExpiGame extends Game {
 		clientGateway.getManager().processIncomingPackets();
 	}
 
-	public void startServer(ServerPreferences preferences) {
+	public boolean startServer(ServerPreferences preferences) {
 		hostingServer = true;
+		LauncherScreen.get().setRoot(new LoadingRoot("Loading world..."));
 		try {
 			gameCode = Utils.getCodeFromAddress((Inet4Address) Inet4Address.getLocalHost());
 			server = new GameServer(preferences);
 			//todo: port free check
-		}catch(UnknownHostException | WorldLoadingException e) {
-			e.printStackTrace();
+		}catch(WorldLoadingException e) {
+			LauncherScreen.get().setRoot(new LauncherRoot(e.getMessage()));
+			return false;
+		}catch(UnknownHostException e) {
+			LauncherScreen.get().setRoot(new LauncherRoot("Connection problem during server start."));
+			return false;
 		}
 		Thread t = new Thread(server);
 		t.setName("Game Server");
 		t.start();
+		return true;
 	}
 
 	public void stopServer() {

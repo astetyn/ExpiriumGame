@@ -17,7 +17,7 @@ public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
     private final ExpiGame game;
-    private Inet4Address ipAddress;
+    private final Inet4Address ipAddress;
     private PacketInputStream in;
     private PacketOutputStream out;
     private ClientPacketManager packetManager;

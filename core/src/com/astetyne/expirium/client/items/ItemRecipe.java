@@ -1,21 +1,26 @@
 package com.astetyne.expirium.client.items;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public enum ItemRecipe {
 
-    PICKAXE(new ItemStack(Item.RHYOLITE_PICKAXE), Arrays.asList(new ItemStack(Item.RAW_WOOD, 10), new ItemStack(Item.STONE, 3)), "Palko je naj."),
-    WOODEN_WALL(new ItemStack(Item.WOODEN_WALL, 3), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Nepriestrelna stena."),
-    CAMPFIRE(new ItemStack(Item.CAMPFIRE), Arrays.asList(new ItemStack(Item.RAW_WOOD, 1)), "Ohnicek, ktory aj zahreje.");
+    RHYOLITE_PICKAXE(Item.RHYOLITE_PICKAXE, new ItemStack[]{new ItemStack(Item.RHYOLITE, 5), new ItemStack(Item.RAW_WOOD, 20)}, "Palko je naj."),
+    WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Nepriestrelna stena, naozaj."),
+    CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Ohnicek, ktory aj zahreje."),
+    BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska?");
 
     ItemStack product;
-    List<ItemStack> requiredItems;
+    ItemStack[] requiredItems;
     String description;
 
-    ItemRecipe(ItemStack product, List<ItemStack> reqItems, String desc) {
-        this.product = product;
+    ItemRecipe(Item product, ItemStack[] reqItems, String desc) {
+        this.product = new ItemStack(product);
+        this.requiredItems = reqItems;
+        this.description = desc;
+    }
+
+    ItemRecipe(Item product, int amount, ItemStack[] reqItems, String desc) {
+        this.product = new ItemStack(product, amount);
         this.requiredItems = reqItems;
         this.description = desc;
     }
@@ -28,7 +33,7 @@ public enum ItemRecipe {
         return product;
     }
 
-    public List<ItemStack> getRequiredItems() {
+    public ItemStack[] getRequiredItems() {
         return requiredItems;
     }
 

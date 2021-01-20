@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
 import com.badlogic.gdx.Gdx;
@@ -20,18 +21,21 @@ public class WorldFileManager {
         this.worldName = worldName;
     }
 
-    public DataInputStream getWorldDataStream() throws WorldLoadingException {
+    /**
+     * Do not forget to close the stream when you are finished with loading.
+     */
+    public DataInputStream loadGameServer() throws WorldLoadingException {
         FileHandle file = Gdx.files.local(worldsPath+worldName+worldDataPath);
         if(!file.exists()) throw new WorldLoadingException("World does not exists.");
         return new DataInputStream(new BufferedInputStream(file.read()));
     }
 
-    public void saveWorld(ExpiWorld world) throws IOException {
+    public void saveGameServer(Saveable saveable) throws IOException {
 
         FileHandle file = Gdx.files.local(worldsPath+worldName+worldDataPath);
 
         DataOutputStream out = new DataOutputStream(new BufferedOutputStream(file.write(false)));
-        world.writeData(out);
+        saveable.writeData(out);
         out.close();
 
         for(ExpiPlayer p : GameServer.get().getPlayers()) {

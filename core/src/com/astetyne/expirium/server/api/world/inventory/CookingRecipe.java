@@ -5,7 +5,8 @@ import com.astetyne.expirium.client.items.ItemStack;
 
 public enum CookingRecipe {
 
-    COOKED_APPLE(10, new ItemStack[]{new ItemStack(Item.APPLE)}, new ItemStack(Item.COOKED_APPLE));
+    COOKED_APPLE(10, new ItemStack[]{new ItemStack(Item.APPLE)}, new ItemStack(Item.COOKED_APPLE)),
+    FRUIT_JAM(20, new ItemStack[]{new ItemStack(Item.RASPBERRY), new ItemStack(Item.APPLE), new ItemStack(Item.WOODEN_BOWL)}, new ItemStack(Item.FRUIT_JAM));
 
     float time;
     ItemStack[] requiredItems;

@@ -4,6 +4,7 @@ public enum Source {
 
     PLAYER,
     STABILITY,
-    SERVER;
+    NATURAL,
+    OTHER;
 
 }

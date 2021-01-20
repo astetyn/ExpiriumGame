@@ -10,13 +10,11 @@ import java.util.List;
 public class TickLooper extends TerminableLooper {
 
     private final Object tickLock;
-    private final List<ExpiPlayer> players;
     private final int tps;
 
     public TickLooper(int tps) {
         this.tps = tps;
         tickLock = new Object();
-        players = GameServer.get().getPlayers();
     }
 
     @Override
@@ -28,7 +26,7 @@ public class TickLooper extends TerminableLooper {
 
                 GameServer.get().getServerGateway().resolveJoiningAndLeavingPlayers();
 
-                for(ExpiPlayer ep : players) {
+                for(ExpiPlayer ep : GameServer.get().getPlayers()) {
                     ep.getNetManager().processIncomingPackets();
                 }
 

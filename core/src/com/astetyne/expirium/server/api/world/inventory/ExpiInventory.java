@@ -75,7 +75,7 @@ public class ExpiInventory implements Saveable {
             for(ItemStack is : items) {
                 if(is.getItem() == gridIS.getItem()) {
                     is.increaseAmount(gridIS.getAmount());
-                    totalWeight += gridIS.getItem().getWeight() * gridIS.getAmount();
+                    increaseWeight(gridIS.getItem().getWeight() * gridIS.getAmount());
                     return true;
                 }
             }
@@ -89,8 +89,7 @@ public class ExpiInventory implements Saveable {
                 gridIS.getGridPos().set(c, r);
                 insertToGrid(gridIS);
                 items.add(gridIS);
-                totalWeight += gridIS.getItem().getWeight() * gridIS.getAmount();
-                System.out.println("adding: "+gridIS+" to "+gridIS.getGridPos());
+                increaseWeight(gridIS.getItem().getWeight() * gridIS.getAmount());
                 return true;
             }
         }
@@ -116,10 +115,9 @@ public class ExpiInventory implements Saveable {
      * @param remIS
      */
     public void removeGridItem(GridItemStack remIS) {
-        System.out.println("removing: "+remIS+" from "+remIS.getGridPos());
         items.remove(remIS);
         cleanGridFrom(remIS);
-        totalWeight -= remIS.getItem().getWeight() * remIS.getAmount();
+        decreaseWeight(remIS.getItem().getWeight() * remIS.getAmount());
     }
 
     public void removeItem(Item item) {
@@ -146,13 +144,13 @@ public class ExpiInventory implements Saveable {
                     cleanGridFrom(is);
                 }
                 if(removedAmount == remIS.getAmount()) {
-                    totalWeight -= remIS.getItem().getWeight() * removedAmount;
+                    decreaseWeight(remIS.getItem().getWeight() * removedAmount);
                     return;
                 }
             }
         }
         // remove was not completely successful
-        totalWeight -= remIS.getItem().getWeight() * removedAmount;
+        decreaseWeight(remIS.getItem().getWeight() * removedAmount);
     }
 
     public void clear() {
@@ -250,10 +248,12 @@ public class ExpiInventory implements Saveable {
 
     public void increaseWeight(float f) {
         totalWeight += f;
+        totalWeight = Math.round(totalWeight * 100) / 100f;
     }
 
     public void decreaseWeight(float f) {
         totalWeight -= f;
+        totalWeight = Math.round(totalWeight * 100) / 100f;
     }
 
     public boolean isInvalid() {

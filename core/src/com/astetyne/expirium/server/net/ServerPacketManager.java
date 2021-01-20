@@ -202,4 +202,9 @@ public class ServerPacketManager {
         out.putFloat(owner.getFoodLevel());
         out.putFloat(owner.getTemperatureLevel());
     }
+
+    public void putSimpleServerPacket(SimpleServerPacket p) {
+        out.startPacket(17);
+        out.putInt(p.getID());
+    }
 }

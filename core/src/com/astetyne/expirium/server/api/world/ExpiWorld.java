@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemCategory;
 import com.astetyne.expirium.client.items.ItemStack;
@@ -15,9 +14,6 @@ import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.*;
 import com.astetyne.expirium.server.api.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.api.world.generator.WorldGenerator;
-import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
-import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
-import com.astetyne.expirium.server.api.world.listeners.TreeListener;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -60,65 +56,36 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         dayTime = 50; // 7:00
         weatherType = WeatherType.SUNNY;
 
-        try {
-            GameServer.get().getFileManager().saveWorld(this);
-        }catch(IOException e) {
-            e.printStackTrace();
+        initAfterCreation();
+
+    }
+
+    public ExpiWorld(DataInputStream in) throws IOException {
+
+        width = in.readInt();
+        height = in.readInt();
+        seed = in.readLong();
+
+        worldTerrain = new ExpiTile[height][width];
+
+        for(int h = 0; h < height; h++) {
+            for(int w = 0; w < width; w++) {
+                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.getType(in.readByte()), w, h);
+            }
         }
+
+        dayTime = in.readFloat();
+
+        //todo: len docasne zatial
+        weatherType = WeatherType.SUNNY;
 
         initAfterCreation();
 
     }
 
-    public ExpiWorld(DataInputStream in) throws WorldLoadingException {
-        try {
-
-            width = in.readInt();
-            height = in.readInt();
-            seed = in.readLong();
-
-            worldTerrain = new ExpiTile[height][width];
-
-            for(int h = 0; h < height; h++) {
-                for(int w = 0; w < width; w++) {
-                    worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.getType(in.readByte()), w, h);
-                }
-            }
-
-            dayTime = in.readFloat();
-
-            //todo: len docasne zatial
-            weatherType = WeatherType.SUNNY;
-
-            initAfterCreation();
-
-        }catch(IOException ignored) {
-            throw new WorldLoadingException("IO Exception during world loading.");
-        }
-    }
-
-    /**
-     * This method is useful for world objects which require getWorld() from server in their constructor.
-     */
-    public void loadWorldStuff(DataInputStream in) throws WorldLoadingException {
-        try {
-
-            int entitiesSize = in.readInt();
-            for(int i = 0; i < entitiesSize; i++) {
-                EntityType.getType(in.readInt()).initEntity(in);
-            }
-
-        }catch(IOException ignored) {
-            throw new WorldLoadingException("IO Exception during world stuff loading.");
-        }
-    }
-
     private void initAfterCreation() {
 
         stepsTimeAccumulator = 0;
-
-        new CampfireListener();
-        new TreeListener();
 
         partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
 
@@ -347,19 +314,6 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
 
         out.writeFloat(dayTime);
-
-        // world stuff from here
-        int entitiesSize = 0;
-        for(ExpiEntity e : GameServer.get().getEntities()) {
-            if(e instanceof ExpiPlayer) continue;
-            entitiesSize++;
-        }
-        out.writeInt(entitiesSize);
-        for(ExpiEntity e : GameServer.get().getEntities()) {
-            if(e instanceof ExpiPlayer) continue;
-            out.writeInt(e.getType().getID());
-            e.writeData(out);
-        }
 
     }
 }

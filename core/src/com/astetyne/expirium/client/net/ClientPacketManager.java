@@ -15,6 +15,7 @@ import com.astetyne.expirium.server.api.world.WeatherType;
 import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
+import com.astetyne.expirium.server.net.SimpleServerPacket;
 
 public class ClientPacketManager {
 
@@ -59,6 +60,9 @@ public class ClientPacketManager {
                     world.onBreakingTile(in);
                     break;
 
+                case 17: //SimpleServerPacket
+                    GameScreen.get().onSimplePacket(SimpleServerPacket.getType(in.getInt()));
+                    break;
                 case 18: //StabilityPacket
                     world.onStabilityChange(in);
                     break;

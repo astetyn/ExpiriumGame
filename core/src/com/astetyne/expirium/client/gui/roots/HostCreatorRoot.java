@@ -51,9 +51,9 @@ public class HostCreatorRoot extends Table {
             public void changed(ChangeEvent event, Actor actor) {
                 LoadWorldPreferences worldPref = new LoadWorldPreferences(selectedWorld.name());
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
-                ExpiGame.get().startServer(pref);
-                LauncherScreen.get().setRoot(new LoadingRoot("Loading world..."));
-                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                if(ExpiGame.get().startServer(pref)) {
+                    ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                }
             }
         });
 
@@ -107,8 +107,9 @@ public class HostCreatorRoot extends Table {
                 LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
                 CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 1000, 256, 0);
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
-                ExpiGame.get().startServer(pref);
-                ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                if(ExpiGame.get().startServer(pref)) {
+                    ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                }
             }
         });
 

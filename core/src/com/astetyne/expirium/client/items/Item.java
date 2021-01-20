@@ -11,19 +11,19 @@ public enum Item {
     EMPTY(ItemCategory.EMPTY, -1, -1, 0, null, "error"),
     STONE(ItemCategory.MATERIAL, "STONE", 1, 1, 0.5f, "stone_item", "Stone"),
     RHYOLITE(ItemCategory.MATERIAL, "RHYOLITE", 1, 1, 0.2f, "rhyolite_item", "Rhyolite"),
-    GRASS(ItemCategory.MATERIAL, "GRASS", 1, 1, 0.5f, "grass_item", "Grass"),
-    DIRT(ItemCategory.MATERIAL, "DIRT", 1, 1, 0.5f, "dirt_item", "Dirt"),
-    RAW_WOOD(ItemCategory.MISC, 1, 1, 0.5f, "raw_wood_item", "Raw wood"),
+    GRASS(ItemCategory.MATERIAL, "GRASS", 1, 1, 0.1f, "grass_item", "Grass"),
+    DIRT(ItemCategory.MATERIAL, "DIRT", 1, 1, 0.1f, "dirt_item", "Dirt"),
+    RAW_WOOD(ItemCategory.MISC, 1, 1, 0.05f, "raw_wood_item", "Raw wood"),
     RHYOLITE_PICKAXE(ItemCategory.TOOL, 1, 2, 1, "rhyolite_pickaxe_item", "pickaxe_item_grid", "Pickaxe"),
-    CAMPFIRE(ItemCategory.MATERIAL, "CAMPFIRE_BIG", 2, 2, 2, "campfire_item", "Campfire"),
-    WOODEN_WALL(ItemCategory.MATERIAL, "WOODEN_WALL", 1, 1, 0.5f, "wooden_wall_item", "Wooden wall"),
-    APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "apple_item", "Apple"),
-    COOKED_APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "cooked_apple_item", "Cooked Apple"),
-    RASPBERRY_BUSH(ItemCategory.MATERIAL, "RASPBERRY_BUSH_1", 1, 1, 0.5f, "raspberry_bush_item", "Raspberry bush"),
-    RASPBERRY(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "raspberry_item", "Raspberries"),
-    WOODEN_BOWL(ItemCategory.MISC, 1, 1, 0.1f, "wooden_bowl_item", "Wooden bowl"),
-    FRUIT_JAM(ItemCategory.CONSUMABLE, 1, 1, 0.2f, "fruit_jam_item", "Fruit jam"),
-    COAL(ItemCategory.MISC, 1, 1, 0.2f, "coal_item", "Coal");
+    CAMPFIRE(ItemCategory.MATERIAL, "CAMPFIRE_BIG", 2, 2, 0.5f, "campfire_item", "Campfire"),
+    WOODEN_WALL(ItemCategory.MATERIAL, "WOODEN_WALL", 1, 1, 0.05f, "wooden_wall_item", "Wooden wall"),
+    APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "apple_item", "Apple"),
+    COOKED_APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "cooked_apple_item", "Cooked Apple"),
+    RASPBERRY_BUSH(ItemCategory.MATERIAL, "RASPBERRY_BUSH_1", 1, 1, 0.1f, "raspberry_bush_item", "Raspberry bush"),
+    RASPBERRY(ItemCategory.CONSUMABLE, 1, 1, 0.01f, "raspberry_item", "Raspberries"),
+    WOODEN_BOWL(ItemCategory.MISC, 1, 1, 0.05f, "wooden_bowl_item", "Wooden bowl"),
+    FRUIT_JAM(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "fruit_jam_item", "Fruit jam"),
+    COAL(ItemCategory.MISC, 1, 1, 0.1f, "coal_item", "Coal");
 
     ItemCategory category;
     String buildTile;

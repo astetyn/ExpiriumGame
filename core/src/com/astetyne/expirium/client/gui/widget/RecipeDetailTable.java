@@ -6,7 +6,7 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Utils;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -21,16 +21,11 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
     public RecipeDetailTable() {
 
         requiredItems = new Table();
-        scrollRequiredItems = new ScrollPane(requiredItems);
+        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(GuiRes.FRAME_GRAY.getDrawable(), null, null, null, GuiRes.FRAME_SQUARE.getDrawable());
+        scrollRequiredItems = new ScrollPane(requiredItems, style);
         scrollRequiredItems.setScrollingDisabled(true, false);
 
         rebuild();
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        //batch.draw(Res.INV_DETAIL_BACK, getX(), getY(), getWidth(), getHeight());
-        super.draw(batch, parentAlpha);
     }
 
     @Override
@@ -70,16 +65,20 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         row();
 
         requiredItems.clear();
-
         for(ItemStack is : selectedRecipe.getRequiredItems()) {
-            //todo: pridat k itemu obrazok toho itemu
-            requiredItems.add(new Label(is.getAmount() +" "+is.getItem().getLabel(), Res.LABEL_STYLE));
+            Image i = new Image(is.getItem().getTexture());
+            Label l = new Label(is.getAmount() +" "+is.getItem().getLabel(), Res.LABEL_STYLE);
+            l.setColor(Color.ORANGE);
+            l.setWrap(true);
+            requiredItems.add(i).width(50).height(Utils.percFromW(50)).padRight(20).padLeft(30);
+            requiredItems.add(l).width(310);
             requiredItems.row();
         }
-        add(scrollRequiredItems).expandX().height(200);
+        add(scrollRequiredItems).expandX().height(210);
         row();
-        add(desc).grow().width(360).pad(50, 20, 10, 20);
+        add(desc).grow().width(360).pad(10, 20, 10, 20);
         setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
+        scrollRequiredItems.setScrollbarsVisible(true);
 
     }
 }

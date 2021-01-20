@@ -4,6 +4,9 @@ import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+
 public class CookingInventory extends ExpiInventory {
 
     private static final float updateInterval = 1;
@@ -13,6 +16,11 @@ public class CookingInventory extends ExpiInventory {
 
     public CookingInventory(int rows, int columns, float maxWeight) {
         super(rows, columns, maxWeight, false);
+        cookingTime = updater = 0;
+    }
+
+    public CookingInventory(int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
+        super(rows, columns, maxWeight, false, in);
         cookingTime = updater = 0;
     }
 

@@ -12,10 +12,7 @@ import com.astetyne.expirium.server.GameServer;
 import com.astetyne.expirium.server.api.event.TickListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
-import com.astetyne.expirium.server.net.PacketInputStream;
-import com.astetyne.expirium.server.net.PacketOutputStream;
-import com.astetyne.expirium.server.net.ServerPacketManager;
-import com.astetyne.expirium.server.net.ServerPlayerGateway;
+import com.astetyne.expirium.server.net.*;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;
@@ -92,11 +89,10 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
         if(row1 == row2 && column1 == column2) return;
 
-        System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
+        //System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
 
         if(fromMain) {
             GridItemStack is = mainInv.getGrid()[row1][column1];
-            System.out.println("choosen item: "+is);
             if(is == null) return;
 
             if(column2 == -1) {
@@ -218,6 +214,14 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
         getNetManager().putLivingStatsPacket();
 
+        if(foodLevel <= 5) {
+            healthLevel -= (1f / Consts.SERVER_DEFAULT_TPS);
+        }
+
+        if(healthLevel <= 0) {
+            getNetManager().putSimpleServerPacket(SimpleServerPacket.DEATH_EVENT);
+        }
+
         if(mainInv.isInvalid() || secondInv.isInvalid()) {
             getNetManager().putInvFeedPacket();
             mainInv.setInvalid(false);
@@ -229,6 +233,12 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
     public void wantsToMakeItem(ItemRecipe recipe) {
         System.out.println("Wants to make item");
+        if(Consts.DEBUG) {
+            System.out.println("Overriding item check (debug mode)");
+            mainInv.addItem(recipe.getProduct(), true);
+            getNetManager().putInvFeedPacket();
+            return;
+        }
         for(ItemStack is : recipe.getRequiredItems()) {
             if(!mainInv.contains(is)) return;
         }
