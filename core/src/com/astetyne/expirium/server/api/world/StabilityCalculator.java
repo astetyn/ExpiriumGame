@@ -61,14 +61,11 @@ public class StabilityCalculator {
 
         HashSet<ExpiTile> affectedTiles = new HashSet<>();
 
-        //System.out.println("NS: "+newStability+" OS: "+t.getStability());
-
         if(newStability > t.getStability()) {
 
             t.setStability(newStability);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
             if(t.getY()-1 != h)recalculateStabilityForNearbyTiles(worldTerrain[t.getY()+1][t.getX()], affectedTiles);
-            //System.out.println("AS:"+t.getStability());
 
         }else if(newStability < t.getStability()) {
 
@@ -161,8 +158,13 @@ public class StabilityCalculator {
                 int s1 = t1.getStability();
                 int s2 = t2.getStability();
                 int s3 = t3.getStability();
+                TileType type1 = t1.getTypeFront();
+                TileType type2 = t2.getTypeFront();
+                TileType type3 = t3.getTypeFront();
                 if(s1 == s2 && s2 == s3 && s1 != 0) {
                     maxAvailStab = Math.max(maxAvailStab, s1 + 1);
+                }else if(type1 != TileType.AIR && type1 == type2 && type2 == type3) {
+                    maxAvailStab = Math.max(maxAvailStab, Math.min(s1, Math.min(s2, s3))+1);
                 }
             }
         }

@@ -25,7 +25,9 @@ public class RecipeListTable extends Table {
             Item item = recipe.getProduct().getItem();
             Image icon = new Image(item.getTexture());
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
-            t.add(icon).width(100).height(Utils.percFromW(100)).align(Align.left).pad(10, 5, 10, 5);
+            label.setWrap(true);
+
+            t.add(icon).width(80).height(Utils.percFromW(80)).align(Align.left).pad(10, 5, 10, 15);
             t.add(label).grow();
             t.setBackground(GuiRes.FRAME_GRAY.getDrawable());
             t.addListener(new ClickListener() {
@@ -39,7 +41,7 @@ public class RecipeListTable extends Table {
                     lastSelected = t;
                 }
             });
-            add(t).width(400);
+            add(t).width(450);
             row();
         }
         setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());

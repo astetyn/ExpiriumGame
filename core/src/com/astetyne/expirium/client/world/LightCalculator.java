@@ -25,45 +25,71 @@ public class LightCalculator {
 
     public void recalcSkyLights() {
         for(int x = 0; x < w; x++) {
-            for(int y = h-1; y >= 0; y--) {
-                Tile t = terrain[x][y];
-                t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
-                calcTileSkyLights(t, x, y);
-                if(!t.getTypeFront().getSolidity().isSoft()) break;
-            }
+            recalcSkyLightHardColumn(x);
+        }
+        for(int x = 0; x < w; x++) {
+            recalcSkyLightSoftColumn(x);
         }
     }
 
-    private void calcTileSkyLights(Tile t, int x, int y) {
+    private void recalcSkyLightHardColumn(int c) {
 
-        int newLight = t.getSkyLight()-3;
+        // direct sun
+        int firstNotDirect = -1;
+        for(int i = h - 1; i >= 0; i--) {
+            Tile t = terrain[c][i];
+            t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
+            if(!t.getTypeFront().getSolidity().isSoft()) {
+                firstNotDirect = i-1;
+                break;
+            }
+        }
+
+        // tiles under
+        for(int i = firstNotDirect; i >= 0; i--) {
+            Tile t = terrain[c][i];
+            t.setSkyLight((byte) (Math.max(Consts.MAX_LIGHT_LEVEL - (firstNotDirect - i + 1) * Consts.SKY_LIGHT_DECREASE, 0)));
+        }
+    }
+
+    private void recalcSkyLightSoftColumn(int c) {
+        for(int i = h - 1; i >= 0; i--) {
+            Tile t = terrain[c][i];
+            if(t.getSkyLight() == 0) continue;
+            spreadSkyLightFrom(t, c, i);
+        }
+    }
+
+    private void spreadSkyLightFrom(Tile t, int x, int y) {
+
+        int newLight = t.getSkyLight()-Consts.SKY_LIGHT_DECREASE;
 
         if(x != 0) { // left
             Tile t2 = terrain[x-1][y];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
-                calcTileSkyLights(t2, x-1, y);
+                spreadSkyLightFrom(t2, x-1, y);
             }
         }
         if(x != w-1) { // right
             Tile t2 = terrain[x+1][y];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
-                calcTileSkyLights(t2, x+1, y);
+                spreadSkyLightFrom(t2, x+1, y);
             }
         }
         if(y != h-1) { // top
             Tile t2 = terrain[x][y+1];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
-                calcTileSkyLights(t2, x, y+1);
+                spreadSkyLightFrom(t2, x, y+1);
             }
         }
         if(y != 0) { // bottom
             Tile t2 = terrain[x][y-1];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
-                calcTileSkyLights(t2, x, y-1);
+                spreadSkyLightFrom(t2, x, y-1);
             }
         }
     }
@@ -108,11 +134,14 @@ public class LightCalculator {
 
         Tile t = terrain[x][y];
 
-        for(int i = h-1; i >= 0; i--) {
-            Tile t2 = terrain[x][i];
-            t2.setSkyLight(Consts.MAX_LIGHT_LEVEL);
-            calcTileSkyLights(t2, x, i);
-            if(!t2.getTypeFront().getSolidity().isSoft()) break;
+        int left = Math.max(x - Consts.MAX_LIGHT_LEVEL * 2 / Consts.SKY_LIGHT_DECREASE, 0);
+        int right = Math.min(x + Consts.MAX_LIGHT_LEVEL * 2 / Consts.SKY_LIGHT_DECREASE, w-1);
+
+        for(int c = left; c < right; c++) {
+            recalcSkyLightHardColumn(c);
+        }
+        for(int c = left; c < right; c++) {
+            recalcSkyLightSoftColumn(c);
         }
 
         if(lightSources.containsKey(t)) {

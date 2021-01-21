@@ -69,7 +69,7 @@ public class ExpiTileBreaker {
         }
         if(targetTile != null) {
             float speedCoef = 1;
-            if(owner.getInv().getItemInHand().getItem() == Item.RHYOLITE_PICKAXE) {
+            if(owner.getInv().getItemInHand().getItem() == Item.RHYOLITE_MATTOCK) {
                 speedCoef = 4;
             }
             if(Consts.DEBUG) speedCoef = 50;

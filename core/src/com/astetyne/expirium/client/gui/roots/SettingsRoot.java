@@ -20,8 +20,8 @@ public class SettingsRoot extends WidgetGroup implements ExpiRoot {
     public SettingsRoot() {
 
         Image returnButton = new Image(Res.CROSS_ICON);
-        TextButton leaveButton = new TextButton("Leave server", Res.TEXT_BUTTON_STYLE);
-        Label codeLabel = new Label("Game code: "+ExpiGame.get().getGameCode(), Res.LABEL_STYLE);
+        TextButton leaveButton = new TextButton("Leave game", Res.TEXT_BUTTON_STYLE);
+        Label codeLabel = new Label("Game code: "+ExpiGame.get().getGameCode(), Res.TITLE_LABEL_STYLE);
         codeLabel.setAlignment(Align.center);
 
         returnButton.addListener(new ClickListener() {

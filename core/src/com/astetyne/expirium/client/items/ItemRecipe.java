@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 public enum ItemRecipe {
 
-    RHYOLITE_PICKAXE(Item.RHYOLITE_PICKAXE, new ItemStack[]{new ItemStack(Item.RHYOLITE, 5), new ItemStack(Item.RAW_WOOD, 20)}, "Palko je naj."),
-    WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Nepriestrelna stena, naozaj."),
-    CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Ohnicek, ktory aj zahreje."),
-    BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska?");
+    WOODEN_MATTOCK(Item.WOODEN_MATTOCK, new ItemStack[]{new ItemStack(Item.STONE, 2), new ItemStack(Item.RAW_WOOD, 30)}, "Better than nothing."),
+    RHYOLITE_MATTOCK(Item.RHYOLITE_MATTOCK, new ItemStack[]{new ItemStack(Item.RHYOLITE, 10), new ItemStack(Item.RAW_WOOD, 20)}, "Quite strong for soft materials."),
+    WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Good for basic house walls. High stability included."),
+    CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Make it if you are cold. It will warm your small house."),
+    BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska? hahaha");
 
     ItemStack product;
     ItemStack[] requiredItems;

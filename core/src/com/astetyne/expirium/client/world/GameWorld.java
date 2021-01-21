@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.world;
 
-import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
@@ -30,7 +29,6 @@ public class GameWorld {
 
     public static float PPM = 32;
 
-    private final SpriteBatch batch;
     private Tile[][] worldTerrain;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
@@ -40,11 +38,15 @@ public class GameWorld {
     private LightCalculator lightCalculator;
     private final WorldInputListener worldInputListener;
 
-    Color[] stabColors = new Color[] {new Color(0.9f, 0f, 0f, 1), new Color(0.9f, 0.3f, 0f, 1), new Color(0.9f, 0.6f, 0f, 1), new Color(0.9f, 0.9f, 0f, 1)};
+    Color[] stabColors = new Color[] {
+            new Color(0.9f, 0f, 0f, 1),
+            new Color(0.9f, 0.3f, 0f, 1),
+            new Color(0.9f, 0.6f, 0f, 1),
+            new Color(0.9f, 0.9f, 0f, 1),
+            new Color(0.9f, 1f, 0.2f, 1),
+            new Color(0.8f, 1f, 0.2f, 1)};
 
     public GameWorld() {
-
-        batch = ExpiGame.get().getBatch();
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
@@ -90,7 +92,7 @@ public class GameWorld {
         cameraCenter();
     }
 
-    public void render() {
+    public void draw(SpriteBatch batch) {
 
         batch.setProjectionMatrix(camera.combined);
 

@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
 public class HostCreatorRoot extends Table {
 
@@ -52,7 +53,11 @@ public class HostCreatorRoot extends Table {
                 LoadWorldPreferences worldPref = new LoadWorldPreferences(selectedWorld.name());
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 if(ExpiGame.get().startServer(pref)) {
-                    ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                    try {
+                        ExpiGame.get().startClient((Inet4Address) Inet4Address.getByName("127.0.0.1"));
+                    }catch(UnknownHostException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -108,7 +113,11 @@ public class HostCreatorRoot extends Table {
                 CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 1000, 256, 0);
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 if(ExpiGame.get().startServer(pref)) {
-                    ExpiGame.get().startClient((Inet4Address) Inet4Address.getLoopbackAddress());
+                    try {
+                        ExpiGame.get().startClient((Inet4Address) Inet4Address.getByName("127.0.0.1"));
+                    }catch(UnknownHostException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

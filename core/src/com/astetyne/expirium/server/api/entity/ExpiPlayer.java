@@ -176,10 +176,10 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     }
 
     private void throwAwayItem(ItemStack is) {
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
-            for(int i = 0; i < is.getAmount(); i++) {
-                //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
-                ExpiDroppedItem edi = new ExpiDroppedItem(getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
+        for(int i = 0; i < is.getAmount(); i++) {
+            //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
+            ExpiDroppedItem edi = new ExpiDroppedItem(getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
+            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(edi);
             }
         }

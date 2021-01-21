@@ -7,15 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PlayerEntityAnimator {
 
-    private final SpriteBatch batch;
     private final Entity player;
 
     private float timer;
     private int lastState;
 
-    public PlayerEntityAnimator(SpriteBatch batch, Entity player) {
+    public PlayerEntityAnimator(Entity player) {
 
-        this.batch = batch;
         this.player = player;
 
         timer = 0;
@@ -23,7 +21,7 @@ public class PlayerEntityAnimator {
 
     }
 
-    public void draw() {
+    public void draw(SpriteBatch batch) {
 
         timer += Gdx.graphics.getDeltaTime();
 

@@ -148,6 +148,7 @@ public class GameServer implements Runnable, Disposable, Saveable {
             wl.update();
             if(wl.isCompleted()) it.remove();
         }
+
     }
 
     public List<ExpiEntity> getEntities() {

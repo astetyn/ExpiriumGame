@@ -2,7 +2,7 @@ package com.astetyne.expirium.client.utils;
 
 public class Consts {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // networking
     public static final int SERVER_PORT = 1414;
@@ -20,7 +20,7 @@ public class Consts {
 
     public static final int DAY_TIME_SEC = 1200;
 
-    public static final float CAMPFIRE_TIME = 120;
+    public static final float CAMPFIRE_TIME = 180;
 
     public static final float ITEM_COOLDOWN_BREAK = 1;
     public static final float ITEM_COOLDOWN_DROP = 6;
@@ -28,6 +28,11 @@ public class Consts {
     public static final float ITEM_DESPAWN_TIME = 60; // in seconds
 
     public static final byte MAX_LIGHT_LEVEL = 10;
+    public static final int SKY_LIGHT_DECREASE = 3;
+    public static final int SUNRISE_START = 0;
+    public static final int SUNRISE_END = 50;
+    public static final int SUNSET_START = 600;
+    public static final int SUNSET_END = 650;
 
     // player
     public static final int PLAYER_INV_COLUMNS = 5;

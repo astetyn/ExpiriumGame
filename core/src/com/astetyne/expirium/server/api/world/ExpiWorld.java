@@ -118,7 +118,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     public void onTick() {
 
-        dayTime += 100f / Consts.SERVER_DEFAULT_TPS;
+        dayTime += 1f / Consts.SERVER_DEFAULT_TPS;
         if(dayTime >= Consts.DAY_TIME_SEC) {
             dayTime = 0;
         }

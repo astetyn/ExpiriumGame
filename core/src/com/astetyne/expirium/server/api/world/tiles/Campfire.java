@@ -78,7 +78,7 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
                 }
                 break;
             }
-        }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 10) {
+        }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 60) {
             GameServer.get().getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.NATURAL);
         }
         inventory.onTick();

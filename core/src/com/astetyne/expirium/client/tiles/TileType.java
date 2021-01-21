@@ -12,7 +12,7 @@ import java.util.HashMap;
 public enum TileType implements Textureable {
 
     AIR(Solidity.LABILE_SOFT, null, 0, Item.EMPTY, 0),
-    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 3),
+    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 5),
     RHYOLITE(Solidity.SOLID, TileTex.RHYOLITE, 5f, Item.RHYOLITE, 3),
     GRASS(Solidity.SOLID, TileTex.GRASS, 4f, Item.GRASS, 2),
     GRASS_SLOPE_R(Solidity.LABILE, TileTex.GRASS_SLOPE_R, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_R),
@@ -29,7 +29,7 @@ public enum TileType implements Textureable {
     WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 5),
     RASPBERRY_BUSH_1(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1),
     RASPBERRY_BUSH_2(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1),
-    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 1);
+    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3);
 
     Solidity solidity;
     Textureable textureable;
