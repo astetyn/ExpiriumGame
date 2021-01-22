@@ -69,8 +69,10 @@ public class ExpiTileBreaker {
         }
         if(targetTile != null) {
             float speedCoef = 1;
-            if(owner.getInv().getItemInHand().getItem() == Item.RHYOLITE_MATTOCK) {
-                speedCoef = 4;
+            if(owner.getInv().getItemInHand().getItem() == Item.WOODEN_MATTOCK) {
+                speedCoef = 2;
+            }else if(owner.getInv().getItemInHand().getItem() == Item.RHYOLITE_MATTOCK) {
+                speedCoef = 3;
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;

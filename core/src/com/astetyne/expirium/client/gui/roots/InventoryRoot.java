@@ -6,6 +6,7 @@ import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -34,7 +35,8 @@ public class InventoryRoot extends Table implements ExpiRoot {
         if(Consts.DEBUG) setDebug(true);
 
         recipeDetail = new RecipeDetailTable();
-        recipeList = new ScrollPane(new RecipeListTable(recipeDetail));
+        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(GuiRes.FRAME_GRAY_TRANSP.getDrawable(), null, null, null, null);
+        recipeList = new ScrollPane(new RecipeListTable(recipeDetail), style);
         recipeList.setScrollingDisabled(true, false);
 
         returnButton = new Image(Res.CROSS_ICON);
@@ -51,7 +53,6 @@ public class InventoryRoot extends Table implements ExpiRoot {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("fkjdnaiofdofdsiafdasfds");
                 GridItemStack is = storage.getItemAt(x, y);
                 if(is != null) {
                     storage.getGrid().setSelectedItem(is);
@@ -76,7 +77,7 @@ public class InventoryRoot extends Table implements ExpiRoot {
         });
 
         storageCell = add(storage).width(800).height(Utils.percFromW(800));
-        add(recipeList).growY().width(450).pad(20,0,20,0);
+        add(recipeList).growY().width(500).pad(20,0,20,0);
         add(recipeDetail).growY().width(450).pad(20, 20, 20, 20).align(Align.top);
         add(returnButton).width(Utils.percFromH(100)).height(100).pad(20, 50, 0, 0).align(Align.topRight);
 

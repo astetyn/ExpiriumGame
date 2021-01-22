@@ -12,7 +12,7 @@ import java.util.HashMap;
 public enum TileType implements Textureable {
 
     AIR(Solidity.LABILE_SOFT, null, 0, Item.EMPTY, 0),
-    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 5),
+    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 4),
     RHYOLITE(Solidity.SOLID, TileTex.RHYOLITE, 5f, Item.RHYOLITE, 3),
     GRASS(Solidity.SOLID, TileTex.GRASS, 4f, Item.GRASS, 2),
     GRASS_SLOPE_R(Solidity.LABILE, TileTex.GRASS_SLOPE_R, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_R),
@@ -26,7 +26,9 @@ public enum TileType implements Textureable {
     TREE6(Solidity.LABILE_SOFT, TileTex.TREE6, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1),
     CAMPFIRE_SMALL(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_SMALL, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
     CAMPFIRE_BIG(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_BIG, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
-    WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 5),
+    WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 6),
+    SOFT_WOODEN_WALL(Solidity.SOLID_SOFT, TileTex.SOFT_WOODEN_WALL, 2f, Item.SOFT_WOODEN_WALL, 6),
+    WOODEN_SUPPORT(Solidity.SOLID_SOFT, TileTex.WOODEN_SUPPORT, 1f, Item.EMPTY, 6),
     RASPBERRY_BUSH_1(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1),
     RASPBERRY_BUSH_2(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1),
     COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3);

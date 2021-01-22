@@ -18,6 +18,8 @@ public enum TileTex implements Textureable {
     TREE5("tree5"),
     TREE6("tree6"),
     WOODEN_WALL("wooden_wall"),
+    SOFT_WOODEN_WALL("soft_wooden_wall"),
+    WOODEN_SUPPORT("wooden_support"),
     WHITE_TILE("white_tile"),
     COAL_ORE("coal_ore_tile"),
     RASPBERRY_BUSH_1("raspberry_bush_tile"),

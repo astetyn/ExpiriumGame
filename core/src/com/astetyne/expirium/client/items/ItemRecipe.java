@@ -7,6 +7,8 @@ public enum ItemRecipe {
     WOODEN_MATTOCK(Item.WOODEN_MATTOCK, new ItemStack[]{new ItemStack(Item.STONE, 2), new ItemStack(Item.RAW_WOOD, 30)}, "Better than nothing."),
     RHYOLITE_MATTOCK(Item.RHYOLITE_MATTOCK, new ItemStack[]{new ItemStack(Item.RHYOLITE, 10), new ItemStack(Item.RAW_WOOD, 20)}, "Quite strong for soft materials."),
     WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Good for basic house walls. High stability included."),
+    SOFT_WOODEN_WALL(Item.SOFT_WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Same as wooden wall but softer to your body."),
+    WOODEN_SUPPORT(Item.WOODEN_SUPPORT, 6, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 6)}, "Cheap and useful for maintaining high stability."),
     CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Make it if you are cold. It will warm your small house."),
     BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska? hahaha");
 

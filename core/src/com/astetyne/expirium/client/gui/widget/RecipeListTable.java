@@ -44,7 +44,6 @@ public class RecipeListTable extends Table {
             add(t).width(450);
             row();
         }
-        setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
     }
 
     public interface RecipeChangeListener {

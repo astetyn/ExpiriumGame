@@ -134,13 +134,13 @@ public class LightCalculator {
 
         Tile t = terrain[x][y];
 
-        int left = Math.max(x - Consts.MAX_LIGHT_LEVEL * 2 / Consts.SKY_LIGHT_DECREASE, 0);
-        int right = Math.min(x + Consts.MAX_LIGHT_LEVEL * 2 / Consts.SKY_LIGHT_DECREASE, w-1);
+        int left = Math.max(x - Consts.MAX_LIGHT_LEVEL / Consts.SKY_LIGHT_DECREASE, 0);
+        int right = Math.min(x + Consts.MAX_LIGHT_LEVEL / Consts.SKY_LIGHT_DECREASE, w-1);
 
         for(int c = left; c < right; c++) {
             recalcSkyLightHardColumn(c);
         }
-        for(int c = left; c < right; c++) {
+        for(int c = Math.max(left-1,0); c < Math.min(right+1, w-1); c++) {
             recalcSkyLightSoftColumn(c);
         }
 

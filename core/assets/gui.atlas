@@ -34,7 +34,7 @@ cooked_apple_item
   index: -1
 cross_icon
   rotate: false
-  xy: 340, 20
+  xy: 358, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -116,14 +116,14 @@ fruit_jam_item
   index: -1
 grass_item
   rotate: false
-  xy: 286, 20
+  xy: 806, 229
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 health_icon
   rotate: false
-  xy: 806, 229
+  xy: 304, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -165,7 +165,7 @@ raspberry_bush_item
   index: -1
 raspberry_item
   rotate: false
-  xy: 788, 229
+  xy: 286, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -179,14 +179,14 @@ raw_wood_item
   index: -1
 rhyolite_item
   rotate: false
-  xy: 304, 20
+  xy: 824, 229
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item
   rotate: false
-  xy: 322, 20
+  xy: 842, 229
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -207,6 +207,13 @@ selection
   index: -1
 settings_icon
   rotate: false
+  xy: 878, 229
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+soft_wooden_wall_item
+  rotate: false
   xy: 860, 229
   size: 16, 16
   orig: 16, 16
@@ -214,7 +221,7 @@ settings_icon
   index: -1
 stone_item
   rotate: false
-  xy: 842, 229
+  xy: 340, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -235,7 +242,7 @@ switch_arrow_up_pressed
   index: -1
 temperature_icon
   rotate: false
-  xy: 358, 20
+  xy: 376, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -291,7 +298,7 @@ wooden_bowl_item
   index: -1
 wooden_mattock_item
   rotate: false
-  xy: 824, 229
+  xy: 322, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -301,6 +308,13 @@ wooden_mattock_item_grid
   xy: 468, 38
   size: 16, 32
   orig: 16, 32
+  offset: 0, 0
+  index: -1
+wooden_support_item
+  rotate: false
+  xy: 788, 229
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall_item

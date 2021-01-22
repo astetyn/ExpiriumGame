@@ -18,6 +18,8 @@ public enum Item {
     RHYOLITE_MATTOCK(ItemCategory.TOOL, 1, 2, 1, "rhyolite_mattock_item", "rhyolite_mattock_item_grid", "Rhyolite Mattock"),
     CAMPFIRE(ItemCategory.MATERIAL, "CAMPFIRE_BIG", 2, 2, 0.5f, "campfire_item", "Campfire"),
     WOODEN_WALL(ItemCategory.MATERIAL, "WOODEN_WALL", 1, 1, 0.05f, "wooden_wall_item", "Wooden wall"),
+    SOFT_WOODEN_WALL(ItemCategory.MATERIAL, "SOFT_WOODEN_WALL", 1, 1, 0.04f, "soft_wooden_wall_item", "Soft wooden wall"),
+    WOODEN_SUPPORT(ItemCategory.MATERIAL, "WOODEN_SUPPORT", 1, 1, 0.02f, "wooden_support_item", "Wooden support"),
     APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "apple_item", "Apple"),
     COOKED_APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "cooked_apple_item", "Cooked Apple"),
     RASPBERRY_BUSH(ItemCategory.MATERIAL, "RASPBERRY_BUSH_1", 1, 1, 0.1f, "raspberry_bush_item", "Raspberry bush"),
