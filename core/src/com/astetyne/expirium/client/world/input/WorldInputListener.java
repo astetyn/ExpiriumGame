@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.world.GameWorld;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -13,16 +14,19 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     private final GestureDetector detector;
     private final GameWorld world;
     private boolean pressed;
+    private float savedZoom;
 
     public WorldInputListener(GameWorld world) {
         this.world = world;
         pressed = false;
         detector = new GestureDetector(this);
+        savedZoom = 1;
     }
 
     // from input adapter
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        savedZoom = GameScreen.get().getWorld().getCamera().zoom;
         detector.touchDown(screenX, screenY, pointer, button);
 
         if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
@@ -42,6 +46,10 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
         if(!pressed) return true;
         pressed = false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
+        vec.x = Math.max(vec.x, 0);
+        vec.y = Math.max(vec.y, 0);
+        vec.x = Math.min(vec.x, world.getTerrainWidth() - 0.0001f);
+        vec.y = Math.min(vec.y, world.getTerrainHeight() - 0.0001f);
         ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.RELEASE);
         return true;
     }
@@ -67,7 +75,6 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        System.out.println("tap");
         return false;
     }
 
@@ -93,7 +100,12 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean zoom(float initialDistance, float distance) {
-        System.out.println("zoom "+initialDistance + " "+distance);
+        OrthographicCamera cam = GameScreen.get().getWorld().getCamera();
+        if(savedZoom * (initialDistance / distance) * cam.viewportWidth >= world.getTerrainWidth() || savedZoom * (initialDistance / distance) * cam.viewportHeight >= world.getTerrainHeight()) {
+            return false;
+        }
+        cam.zoom = savedZoom * (initialDistance / distance);
+        cam.update();
         return false;
     }
 
@@ -103,7 +115,5 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     }
 
     @Override
-    public void pinchStop() {
-
-    }
+    public void pinchStop() {}
 }

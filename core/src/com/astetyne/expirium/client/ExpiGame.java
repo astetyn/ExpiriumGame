@@ -19,8 +19,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 
 public class ExpiGame extends Game {
 
@@ -123,14 +123,29 @@ public class ExpiGame extends Game {
 		hostingServer = true;
 		LauncherScreen.get().setRoot(new LoadingRoot("Loading world..."));
 		try {
-			gameCode = Utils.getCodeFromAddress((Inet4Address) Inet4Address.getLocalHost());
+			try {
+				for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
+						.hasMoreElements();) {
+					NetworkInterface intf = en.nextElement();
+					if (intf.getName().contains("wlan")) {
+						for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
+								.hasMoreElements();) {
+							InetAddress inetAddress = enumIpAddr.nextElement();
+							if (!inetAddress.isLoopbackAddress()
+									&& (inetAddress.getAddress().length == 4)) {
+								System.out.println(inetAddress.getHostAddress());
+								gameCode = Utils.getCodeFromAddress((Inet4Address) inetAddress);
+							}
+						}
+					}
+				}
+			} catch (SocketException ex) {
+				ex.printStackTrace();
+			}
 			server = new GameServer(preferences);
 			//todo: port free check
 		}catch(WorldLoadingException e) {
 			LauncherScreen.get().setRoot(new LauncherRoot(e.getMessage()));
-			return false;
-		}catch(UnknownHostException e) {
-			LauncherScreen.get().setRoot(new LauncherRoot("Connection problem during server start."));
 			return false;
 		}
 		Thread t = new Thread(server);
@@ -145,9 +160,9 @@ public class ExpiGame extends Game {
 		server = null;
 	}
 
-	public void startClient(Inet4Address address) {
+	public void startClient(Inet4Address address) throws UnknownHostException {
 		clientGateway = new ClientGateway(address);
-		if(!hostingServer) gameCode = Utils.getCodeFromAddress(address);
+		if(!hostingServer) gameCode = Utils.getCodeFromAddress((Inet4Address)InetAddress.getLocalHost());
 		Thread t = new Thread(clientGateway);
 		t.setName("Client gateway");
 		t.start();

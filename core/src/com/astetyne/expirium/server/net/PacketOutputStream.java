@@ -30,6 +30,7 @@ public class PacketOutputStream {
         activePacketCounter = 0;
         lastPacketCounter = 0;
         writeBuffer.putInt(0);
+        writeBuffer.putInt(0);
         writeBuffer.putLong(0);
     }
 
@@ -88,8 +89,9 @@ public class PacketOutputStream {
     }
 
     public void flush() throws IOException {
-        readBuffer.putInt(0, lastPacketCounter);
-        readBuffer.putLong(4, System.currentTimeMillis());
+        readBuffer.putInt(0, readBuffer.position());
+        readBuffer.putInt(4, lastPacketCounter);
+        readBuffer.putLong(8, System.currentTimeMillis());
         //System.out.println("packets: "+lastPacketCounter+" pos: "+readBuffer.position()+" packet counter: "+lastPacketCounter);
         //System.out.println("Flushing: "+readBuffer.position());
         out.write(readBuffer.array(), 0, readBuffer.position());
@@ -104,8 +106,10 @@ public class PacketOutputStream {
         activePacketCounter = 0;
         lastPacketCounter = 0;
         writeBuffer.putInt(0);
-        readBuffer.putInt(0);
+        writeBuffer.putInt(0);
         writeBuffer.putLong(0);
+        readBuffer.putInt(0);
+        readBuffer.putInt(0);
         readBuffer.putLong(0);
     }
 
@@ -121,6 +125,7 @@ public class PacketOutputStream {
             readBuffer = buffer1;
             writeBuffer = buffer2;
         }
+        writeBuffer.putInt(0);
         writeBuffer.putInt(0);
         writeBuffer.putLong(0);
         lastPacketCounter = activePacketCounter;

@@ -97,8 +97,8 @@ public class GameWorld {
         batch.setProjectionMatrix(camera.combined);
 
         // tiles
-        int renderOffsetX = (int) (Gdx.graphics.getWidth() / (PPM * 2)) + 2;
-        int renderOffsetY = (int) (Gdx.graphics.getHeight() / (PPM * 2)) + 2;
+        int renderOffsetX = (int) (Gdx.graphics.getWidth() / (PPM / camera.zoom * 2)) + 2;
+        int renderOffsetY = (int) (Gdx.graphics.getHeight() / (PPM / camera.zoom * 2)) + 2;
         int left = (int) Math.max(camera.position.x - renderOffsetX, 0);
         int right = (int) Math.min(camera.position.x + renderOffsetX, terrainWidth);
         int down = (int) Math.max(camera.position.y - renderOffsetY, 0);
@@ -216,10 +216,10 @@ public class GameWorld {
     private void cameraCenter() {
         Vector3 position = camera.position;
         Vector2 pCenter = player.getCenter();
-        position.x = Math.max(camera.position.x  + (pCenter.x - camera.position.x) * .1f, camera.viewportWidth / 2);
-        position.y = Math.max(camera.position.y  + (pCenter.y - camera.position.y) * .1f, camera.viewportHeight / 2);
-        position.x = Math.min(position.x, terrainWidth - camera.viewportWidth / 2);
-        position.y = Math.min(position.y, terrainHeight - camera.viewportHeight / 2);
+        position.x = Math.max(camera.position.x  + (pCenter.x - camera.position.x) * 0.1f, camera.viewportWidth * camera.zoom / 2);
+        position.y = Math.max(camera.position.y  + (pCenter.y - camera.position.y) * 0.1f, camera.viewportHeight * camera.zoom / 2);
+        position.x = Math.min(position.x, terrainWidth - camera.viewportWidth * camera.zoom / 2);
+        position.y = Math.min(position.y, terrainHeight - camera.viewportHeight * camera.zoom / 2);
         camera.position.set(position);
         camera.update();
     }

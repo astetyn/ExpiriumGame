@@ -36,6 +36,8 @@ public class ClientPacketManager {
 
         int availPackets = in.getAvailablePackets();
 
+        //System.out.println("Coming avail packets: "+availPackets);
+
         for(int i = 0; i < availPackets; i++) {
 
             int packetID = in.getInt();

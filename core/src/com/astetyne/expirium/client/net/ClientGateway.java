@@ -64,13 +64,12 @@ public class ClientGateway extends TerminableLooper {
             out.swap();
             out.flush();
             out.reset();
-            //System.out.println("Client flushing.");
 
             while(isRunning()) {
 
                 socket.setSoTimeout(5000);
-                int readBytes = in.fillBuffer();//System.out.println("Client reading: "+readBytes);
-                out.flush(); //System.out.println("Client flushing.");
+                int readBytes = in.fillBuffer();
+                out.flush();
 
                 traffic += readBytes;
                 if(time + 5000 < System.currentTimeMillis()) {

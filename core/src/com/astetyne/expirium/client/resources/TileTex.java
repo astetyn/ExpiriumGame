@@ -37,6 +37,7 @@ public enum TileTex implements Textureable {
         TextureAtlas world = new TextureAtlas("world.atlas");
         for(TileTex tileTex : values()) {
             tileTex.textureRegion = world.findRegion(tileTex.regionName);
+            //tileTex.textureRegion.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         }
     }
 

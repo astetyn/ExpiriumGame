@@ -151,13 +151,13 @@ public class GameRoot extends WidgetGroup implements ExpiRoot {
         addActor(playerStatsTable);
         inventoryButton.setBounds(1870, 750, 100, 100);
         addActor(inventoryButton);
-        moveTS.setBounds(80, 80, 300, Utils.percFromW(300));
+        moveTS.setBounds(140, 100, 320, Utils.percFromW(320));
         addActor(moveTS);
         hotSlotsTable.setBounds(700, 50, 600, 500);
         hotSlotsTable.align(Align.bottom);
         addActor(hotSlotsTable);
 
-        breakTS.setBounds(1620, 80, 300, Utils.percFromW(300));
+        breakTS.setBounds(1540, 100, 320, Utils.percFromW(320));
         addActor(breakTS);
         activeLeftActor = breakTS;
 

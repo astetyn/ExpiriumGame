@@ -62,11 +62,18 @@ public class PacketInputStream {
     }
 
     public int fillBuffer() throws IOException {
-        int readBytes =  in.read(writeBuffer.array(), 0, writeBuffer.capacity());
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        in.read(bb.array(), 0, 4);
+        int reqBytes = bb.getInt() - 4;
+        int incomingBytes = reqBytes;
+        while(reqBytes != 0) {
+            int read = in.read(writeBuffer.array(), incomingBytes - reqBytes, reqBytes);
+            if(read == -1) return -1;
+            reqBytes -= read;
+        }
         availablePackets = writeBuffer.getInt();
         ping = (int) (System.currentTimeMillis() - writeBuffer.getLong());
-        //System.out.println("Reading: "+readBytes);
-        return readBytes;
+        return incomingBytes;
     }
 
     public void reset() {

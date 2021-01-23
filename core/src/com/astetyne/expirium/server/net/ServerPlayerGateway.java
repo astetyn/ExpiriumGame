@@ -40,8 +40,6 @@ public class ServerPlayerGateway extends TerminableLooper {
             int readBytes = in.fillBuffer();
             if(readBytes == -1) end();
 
-            //System.out.println("Server reading init: "+readBytes);
-
             GameServer.get().getServerGateway().playerPreJoinAsync(this);
 
             synchronized(joinLock) {
@@ -52,12 +50,11 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             while(isRunning()) {
                 out.flush();
-                //System.out.println("Server flushing.");
                 client.setSoTimeout(5000);
                 readBytes = in.fillBuffer();
                 if(readBytes == -1) {
                     GameServer.get().getServerGateway().playerPreLeaveAsync(owner);
-                    return;//System.out.println("Server reading: "+readBytes+"\n"+in);
+                    return;
                 }
 
                 traffic += readBytes;
