@@ -2,12 +2,15 @@ package com.astetyne.expirium.client.utils;
 
 public class Consts {
 
+    public static final int VERSION = 1;
+
     public static final boolean DEBUG = false;
 
     // networking
     public static final int SERVER_PORT = 1414;
     public static final int BUFFER_SIZE = 32768; //262144, 2097152, 32768
-    public static final int SERVER_DEFAULT_TPS = 3;
+    public static final int SERVER_DEFAULT_TPS = 30;
+    public static final String MULTICAST_ADDRESS = "234.14.14.14";
 
     // world
     public static final int BREAKING_PRECISION = 6;

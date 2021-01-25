@@ -2,7 +2,7 @@ package com.astetyne.expirium.client.screens;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
-import com.astetyne.expirium.client.gui.roots.LauncherRoot;
+import com.astetyne.expirium.client.gui.roots.menu.MainMenuRoot;
 import com.astetyne.expirium.client.utils.WarnMsgLabel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -12,20 +12,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class LauncherScreen implements Screen {
-
-    private static LauncherScreen launcherScreen;
+public class MenuScreen implements Screen {
 
     private final Stage stage;
     private final WarnMsgLabel warnMsgLabel;
 
-    public LauncherScreen() {
+    public MenuScreen() {
         this("");
     }
 
-    public LauncherScreen(String info) {
-
-        launcherScreen = this;
+    public MenuScreen(String info) {
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
 
@@ -33,12 +29,13 @@ public class LauncherScreen implements Screen {
         warnMsgLabel.setBounds(0, 700, 2000, 200);
         stage.addActor(warnMsgLabel);
 
-        setRoot(new LauncherRoot(info));
+        setRoot(new MainMenuRoot(info, this));
     }
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        System.out.println("Showing launcher screen.");
     }
 
     @Override
@@ -63,18 +60,14 @@ public class LauncherScreen implements Screen {
 
     @Override
     public void hide() {
+        System.out.println("Hiding launcher screen.");
         Gdx.input.setInputProcessor(null);
         dispose();
-        launcherScreen = null;
     }
 
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-    public static LauncherScreen get() {
-        return launcherScreen;
     }
 
     public void setRoot(Actor root) {

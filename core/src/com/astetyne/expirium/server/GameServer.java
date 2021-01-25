@@ -14,8 +14,8 @@ import com.astetyne.expirium.server.api.world.listeners.CampfireListener;
 import com.astetyne.expirium.server.api.world.listeners.RaspberryListener;
 import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.backend.WorldLoader;
+import com.astetyne.expirium.server.net.MulticastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
-import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class GameServer implements Runnable, Disposable, Saveable {
+public class GameServer implements Saveable {
 
     private static final int version = 1;
 
-    private final ExpiWorld expiWorld;
+    private ExpiWorld expiWorld;
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
@@ -44,15 +44,20 @@ public class GameServer implements Runnable, Disposable, Saveable {
 
     private final List<Saveable> saveableModules;
 
+    private final ServerFailListener failListener;
+    private final MulticastSender multicastSender;
+
     /** Object representing whole game server.
      * Note that you can create only one instance of this object and because server can be stopped in any
      * moment and garbage collected, there MUST NOT be any static references to this server or its sub-parts.
      *
      * You should create this object on dedicated thread, it will create endless loop.
      */
-    public GameServer(ServerPreferences serverPreferences) throws WorldLoadingException {
+    public GameServer(ServerPreferences serverPreferences, ServerFailListener listener) {
 
         ExpiGame.get().server = this;
+
+        this.failListener = listener;
 
         System.out.println("Booting server...");
 
@@ -65,6 +70,7 @@ public class GameServer implements Runnable, Disposable, Saveable {
 
         tickLooper = new TickLooper(serverPreferences.tps);
         serverGateway = new ServerGateway(serverPreferences.port);
+        multicastSender = new MulticastSender();
 
         fileManager = new WorldFileManager(serverPreferences.worldPreferences.worldName);
 
@@ -78,13 +84,12 @@ public class GameServer implements Runnable, Disposable, Saveable {
             saveableModules.add(new CampfireListener());
         }else {
 
-            // this is executed when user wants to load his world from file
-            DataInputStream in = fileManager.loadGameServer();
-
             try {
+                // this is executed when user wants to load his world from file
+                DataInputStream in = fileManager.loadGameServer();
 
                 int savedVersion = in.readInt();
-                if(savedVersion != version) throw new WorldLoadingException("World has incompatible version." +
+                if(savedVersion != version) failListener.onServerFail("World has incompatible version." +
                         " ("+savedVersion+") Your is: "+" ("+version+")");
 
                 expiWorld = new ExpiWorld(in);
@@ -100,20 +105,32 @@ public class GameServer implements Runnable, Disposable, Saveable {
 
                 in.close();
             } catch(IOException e) {
-                throw new WorldLoadingException("Exception during loading server.");
+                failListener.onServerFail("IOException during loading server.");
+                return;
+            }catch(WorldLoadingException e) {
+                failListener.onServerFail("World is corrupted.");
+                return;
             }
         }
-    }
 
-    @Override
-    public void run() {
         Thread t = new Thread(serverGateway);
         t.setName("Server gateway");
         t.start();
+
+        Thread t2 = new Thread(multicastSender);
+        t2.setName("Multicast sender loop");
+        t2.start();
+
         tickLooper.run();
+        // do not add any code here ticklooper is infinite loop
     }
 
-    public void stop() {
+    /**
+     * This will close the server, save world and release all resources. Server is unusable after being closed. You must
+     * create new instance in order to use server again. You can call this method from any thread.
+     */
+    public void close() {
+        multicastSender.end();
         tickLooper.end();
         serverGateway.end();
         for(ExpiPlayer p : players) {
@@ -130,7 +147,7 @@ public class GameServer implements Runnable, Disposable, Saveable {
         dispose();
     }
 
-    public void dispose() {
+    private void dispose() {
         expiWorld.dispose();
     }
 

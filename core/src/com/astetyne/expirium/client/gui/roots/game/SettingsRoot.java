@@ -1,9 +1,10 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.screens.GameScreen;
-import com.astetyne.expirium.client.screens.LauncherScreen;
+import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -34,11 +35,11 @@ public class SettingsRoot extends WidgetGroup implements ExpiRoot {
         leaveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ExpiGame.get().getClientGateway().end();
+                ExpiGame.get().getClientGateway().close();
                 if(ExpiGame.get().isHostingServer()) {
                     ExpiGame.get().stopServer();
                 }
-                ExpiGame.get().setScreen(new LauncherScreen());
+                ExpiGame.get().setScreen(new MenuScreen());
             }
         });
         returnButton.setBounds(1880, 890, 100, Utils.percFromW(100));

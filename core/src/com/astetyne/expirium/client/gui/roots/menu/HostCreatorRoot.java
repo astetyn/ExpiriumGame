@@ -1,9 +1,9 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.resources.GuiRes;
-import com.astetyne.expirium.client.screens.LauncherScreen;
+import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.ServerPreferences;
@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class HostCreatorRoot extends Table {
@@ -29,7 +30,7 @@ public class HostCreatorRoot extends Table {
     private Label lastWorld;
     private final TextButton launchButton;
 
-    public HostCreatorRoot() {
+    public HostCreatorRoot(MenuScreen menu) {
 
         Table leftTable = new Table();
         Table rightTable = new Table();
@@ -52,12 +53,11 @@ public class HostCreatorRoot extends Table {
             public void changed(ChangeEvent event, Actor actor) {
                 LoadWorldPreferences worldPref = new LoadWorldPreferences(selectedWorld.name());
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
-                if(ExpiGame.get().startServer(pref)) {
-                    try {
-                        ExpiGame.get().startClient((Inet4Address) Inet4Address.getByName("127.0.0.1"));
-                    }catch(UnknownHostException e) {
-                        e.printStackTrace();
-                    }
+                ExpiGame.get().startServer(pref, menu);
+                try {
+                    ExpiGame.get().startClient(InetAddress.getLocalHost());
+                }catch(UnknownHostException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -86,7 +86,7 @@ public class HostCreatorRoot extends Table {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                LauncherScreen.get().setRoot(new LauncherRoot(""));
+                menu.setRoot(new MainMenuRoot("", menu));
             }
         });
         TextField tf = new TextField("", Res.TEXT_FIELD_STYLE);
@@ -100,24 +100,23 @@ public class HostCreatorRoot extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 String worldName = tf.getText().trim();
                 if(worldName.isEmpty()) {
-                    LauncherScreen.get().addWarning("Add a name please.", 1000, Color.ORANGE);
+                    menu.addWarning("Add a name please.", 1000, Color.ORANGE);
                     return;
                 }
                 for(FileHandle fh : Gdx.files.local("worlds").list()) {
                     if(fh.name().equals(worldName)) {
-                        LauncherScreen.get().addWarning("This world name already exists.", 1000, Color.RED);
+                        menu.addWarning("This world name already exists.", 1000, Color.RED);
                         return;
                     }
                 }
-                LauncherScreen.get().setRoot(new LoadingRoot("Creating world..."));
+                menu.setRoot(new LoadingRoot("Creating world..."));
                 CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 1000, 256, 0);
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
-                if(ExpiGame.get().startServer(pref)) {
-                    try {
-                        ExpiGame.get().startClient((Inet4Address) Inet4Address.getByName("127.0.0.1"));
-                    }catch(UnknownHostException e) {
-                        e.printStackTrace();
-                    }
+                ExpiGame.get().startServer(pref, menu);
+                try {
+                    ExpiGame.get().startClient(Inet4Address.getLocalHost());
+                }catch(UnknownHostException e) {
+                    e.printStackTrace();
                 }
             }
         });

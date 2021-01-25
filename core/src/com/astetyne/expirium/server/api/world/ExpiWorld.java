@@ -114,6 +114,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     public void dispose() {
         b2dWorld.dispose();
+        fixtureCalc.dispose();
     }
 
     public void onTick() {

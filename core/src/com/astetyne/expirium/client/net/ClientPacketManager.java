@@ -5,7 +5,7 @@ import com.astetyne.expirium.client.GameInfo;
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.client.gui.roots.DoubleInventoryRoot;
+import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.IntVector2;

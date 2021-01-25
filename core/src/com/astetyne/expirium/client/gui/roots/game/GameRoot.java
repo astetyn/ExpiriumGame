@@ -1,9 +1,10 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.HotSlotsData;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
+import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.widget.HotBarSlot;
 import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;

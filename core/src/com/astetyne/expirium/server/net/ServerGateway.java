@@ -45,7 +45,7 @@ public class ServerGateway extends TerminableLooper {
 
         }catch(IOException | IllegalArgumentException e) {
             if(isRunning()) {
-                GameServer.get().stop();
+                GameServer.get().close();
                 System.out.println("Server gateway fatal fail.");
             }
             end();

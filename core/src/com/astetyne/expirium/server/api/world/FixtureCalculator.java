@@ -4,8 +4,9 @@ import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Disposable;
 
-public class FixtureCalculator {
+public class FixtureCalculator implements Disposable {
 
     private final ExpiTile[][] worldTerrain;
     private final int w, h;
@@ -135,5 +136,10 @@ public class FixtureCalculator {
     private void createFixture(FixtureDef fixDef, ExpiTile t) {
         Fixture f = terrainBody.createFixture(fixDef);
         t.getFixtures().add(f);
+    }
+
+    @Override
+    public void dispose() {
+        shape.dispose();
     }
 }

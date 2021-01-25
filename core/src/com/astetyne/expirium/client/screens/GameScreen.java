@@ -3,9 +3,9 @@ package com.astetyne.expirium.client.screens;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
-import com.astetyne.expirium.client.gui.roots.DoubleInventoryRoot;
 import com.astetyne.expirium.client.gui.roots.ExpiRoot;
-import com.astetyne.expirium.client.gui.roots.GameRoot;
+import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
+import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.WarnMsgLabel;
@@ -76,6 +76,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        System.out.println("Showing game screen.");
         Gdx.input.setInputProcessor(multiplexer);
     }
 
@@ -120,6 +121,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        System.out.println("Hiding launcher screen.");
         dispose();
         gameScreen = null;
     }

@@ -39,6 +39,8 @@ public class EntityBodyFactory {
 
         Body body = GameServer.get().getWorld().getB2dWorld().createBody(bodyDef);
 
+        body.setFixedRotation(true);
+
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
 
@@ -46,8 +48,6 @@ public class EntityBodyFactory {
         fixtureDef.restitution = 0f;
         fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
         fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
-
-        body.setFixedRotation(true);
 
         // upper poly
         polyShape.setAsBox(0.45f, 0.55f, new Vector2(0.45f, 0.7f), 0);
@@ -85,7 +85,13 @@ public class EntityBodyFactory {
         fixtureDef.density = 0f;
         fixtureDef.shape = polyShape;
         fixtureDef.isSensor = true;
-        return body.createFixture(fixtureDef);
+        fixtureDef.friction = 0;
+
+        Fixture fix = body.createFixture(fixtureDef);
+
+        polyShape.dispose();
+
+        return fix;
 
     }
 

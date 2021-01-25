@@ -1,10 +1,12 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
-import com.astetyne.expirium.client.screens.LauncherScreen;
+import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -17,13 +19,13 @@ import com.badlogic.gdx.utils.Align;
 
 import java.net.UnknownHostException;
 
-public class LauncherRoot extends Table {
+public class MainMenuRoot extends Table {
 
     private final TextField nameTF, codeTF;
     private final TextButton joinButton, hostServerButton;
     private final Label title, infoLabel, creditsLabel;
 
-    public LauncherRoot(String info) {
+    public MainMenuRoot(String info, MenuScreen menu) {
 
         if(Consts.DEBUG) setDebug(true);
         if(Consts.DEBUG) ExpiGame.get().setPlayerName("palko");
@@ -49,6 +51,23 @@ public class LauncherRoot extends Table {
         codeTF.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z]"));
         codeTF.setMaxLength(6);
 
+        codeTF.setOnscreenKeyboard(visible -> {
+            codeTF.setDisabled(true);
+            Gdx.input.setOnscreenKeyboardVisible(true);
+            Gdx.input.getTextInput(new Input.TextInputListener() {
+                @Override
+                public void input(String text) {
+                    codeTF.setText(text);
+                    codeTF.setDisabled(false);
+                }
+
+                @Override
+                public void canceled() {
+                    System.out.println("Cancelled.");
+                }
+            }, "Enter game code", "", "game code");
+        });
+
         joinButton = new TextButton("Join!", Res.TEXT_BUTTON_STYLE);
         hostServerButton = new TextButton("Host a game.", Res.TEXT_BUTTON_STYLE);
 
@@ -70,7 +89,7 @@ public class LauncherRoot extends Table {
                     setInfo("You must enter your nickname.", Color.RED);
                     return;
                 }
-                LauncherScreen.get().setRoot(new LoadingRoot("Connecting to: "+codeTF.getText()+" ..."));
+                menu.setRoot(new LoadingRoot("Connecting to: "+codeTF.getText()+" ..."));
                 try {
                     ExpiGame.get().startClient(Utils.getAddressFromCode(codeTF.getText()));
                 }catch(UnknownHostException e) {
@@ -86,7 +105,7 @@ public class LauncherRoot extends Table {
                     setInfo("You must enter your nickname.", Color.RED);
                     return;
                 }
-                LauncherScreen.get().setRoot(new HostCreatorRoot());
+                menu.setRoot(new HostCreatorRoot(menu));
             }
         });
 

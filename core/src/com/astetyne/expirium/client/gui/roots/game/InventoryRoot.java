@@ -1,7 +1,8 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;

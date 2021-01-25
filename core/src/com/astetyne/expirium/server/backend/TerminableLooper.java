@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.backend;
 public abstract class TerminableLooper implements Runnable {
 
     private final Object runningLock;
-    private boolean running;
+    protected boolean running;
 
     public TerminableLooper() {
         runningLock = new Object();

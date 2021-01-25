@@ -9,9 +9,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,6 +116,28 @@ public class Utils {
             buf.append(symbols.charAt(v.mod(radix).intValue()));
         }
         return buf.reverse().toString();
+    }
+
+    public static String getGameCode() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
+                    .hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                if (intf.getName().contains("wlan")) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
+                            .hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()
+                                && (inetAddress.getAddress().length == 4)) {
+                            return getCodeFromAddress((Inet4Address) inetAddress);
+                        }
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return "error";
     }
 
 }

@@ -1,59 +1,57 @@
 package com.astetyne.expirium.client.net;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.gui.roots.LauncherRoot;
-import com.astetyne.expirium.client.screens.LauncherScreen;
+import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.backend.TerminableLooper;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 
 import java.io.IOException;
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class ClientGateway extends TerminableLooper {
+public class ClientGateway implements Runnable {
 
     private Socket socket;
-    private final ExpiGame game;
-    private final Inet4Address ipAddress;
+    private InetAddress address;
     private PacketInputStream in;
     private PacketOutputStream out;
     private ClientPacketManager packetManager;
-    private final Object nextReadLock;
+    private final Object nextPacketsLock;
     private int traffic;
     private long time;
-    private boolean connectionBroken;
+    private boolean nextPacketsAvailable;
+    private final ClientFailListener failListener;
+    private String errorMsg;
 
-    public ClientGateway(Inet4Address address) {
-        this.ipAddress = address;
-        game = ExpiGame.get();
-        nextReadLock = new Object();
+    public ClientGateway(ClientFailListener listener) {
+        nextPacketsLock = new Object();
         traffic = 0;
         time = 0;
-        connectionBroken = false;
+        nextPacketsAvailable = false;
+        failListener = listener;
+        errorMsg = "";
     }
 
     @Override
     public void run() {
 
+        errorMsg = "";
+
         System.out.println("Client connecting...");
 
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(ipAddress, Consts.SERVER_PORT), 10000);
+            socket.connect(new InetSocketAddress(address, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
-            System.out.println("Exception during connecting to server.");
-            LauncherScreen.get().setRoot(new LauncherRoot("Can't connect to server.\n Are you on the same network?"));
+            errorMsg = "Can't connect to server.\n Are you on the same network?";
             return;
         }
 
         try {
 
             socket.setTcpNoDelay(true);
-
-            System.out.println("Connection established.");
 
             in = new PacketInputStream(socket.getInputStream());
             out = new PacketOutputStream(socket.getOutputStream());
@@ -65,9 +63,8 @@ public class ClientGateway extends TerminableLooper {
             out.flush();
             out.reset();
 
-            while(isRunning()) {
+            while(!socket.isClosed()) {
 
-                socket.setSoTimeout(5000);
                 int readBytes = in.fillBuffer();
                 out.flush();
 
@@ -78,44 +75,84 @@ public class ClientGateway extends TerminableLooper {
                     traffic = 0;
                 }
 
-                synchronized(nextReadLock) {
-                    game.notifyServerUpdate();
-                    nextReadLock.wait();
+                synchronized(nextPacketsLock) {
+                    nextPacketsAvailable = true;
+                    nextPacketsLock.wait();
                 }
             }
-        }catch(IOException e) {
-            System.out.println("Exception during messaging with server.");
+        }catch(IOException | InterruptedException e) {
             try {
-                if(socket != null) socket.close();
+                socket.close();
             }catch(IOException ignored) {}
-            if(isRunning()) {
-                synchronized(this) {
-                    connectionBroken = true;
-                }
-            }
-        }catch(InterruptedException e) {
-            e.printStackTrace();
+            errorMsg = "You were disconnected due to connection issue.";
         }
     }
 
-    @Override
-    public void end() {
-        super.end();
+    /**
+     * Call this from main thread every frame. If new packet is available, out buffer will be flushed
+     * and incoming packets will be resolved.
+     */
+    public void update() {
+
+        if(!errorMsg.isEmpty()) {
+            failListener.onClientFail(errorMsg);
+            errorMsg = "";
+            return;
+        }
+
+        synchronized(nextPacketsLock) {
+            if(!nextPacketsAvailable) return;
+            nextPacketsAvailable = false;
+        }
+
+        if(GameScreen.get() != null) {
+            packetManager.putTSPacket();
+        }
+
+        out.swap();
+        in.swap();
+
+        synchronized(nextPacketsLock) {
+            nextPacketsLock.notify();
+        }
+
+        packetManager.processIncomingPackets();
+    }
+
+    /**
+     * Gateway will attempt to connect to server at given address. This will create new thread.
+     * @param address Server address.
+     */
+    public void connectToServer(InetAddress address) {
+
+        this.address = address;
+
+        if(socket != null && !socket.isClosed()) {
+            close();
+        }
+
+        Thread t = new Thread(this);
+        t.setName("Client gateway");
+        t.start();
+    }
+
+    /**
+     * Call this when client should disconnect from server and release resources. Can be reopened with
+     * connectToServer().
+     */
+    public void close() {
+
         try {
             if(socket != null) socket.close();
         }catch(IOException ignored) {}
+
+        synchronized(nextPacketsLock) {
+            nextPacketsLock.notify();
+        }
+        // after this I should be confident that client thread will be stopped
         in.reset();
         out.reset();
-        System.out.println("Client successfully closed socket.");
-    }
-
-    // call this only once per server tick as active buffer will be switched and overwritten.
-    public void swapBuffers() {
-        out.swap();
-        in.swap();
-        synchronized(nextReadLock) {
-            nextReadLock.notify();
-        }
+        System.out.println("Client closed.");
     }
 
     public ClientPacketManager getManager() {
@@ -130,9 +167,4 @@ public class ClientGateway extends TerminableLooper {
         return out;
     }
 
-    public boolean isConnectionBroken() {
-        synchronized(this) {
-            return connectionBroken;
-        }
-    }
 }
