@@ -1,8 +1,8 @@
-package com.astetyne.expirium.client.gui.roots;
+package com.astetyne.expirium.client.gui.roots.game;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public interface ExpiRoot {
+public interface GameRootable {
 
     Actor getActor();
 

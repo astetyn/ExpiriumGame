@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
 import com.astetyne.expirium.client.tiles.TileType;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.event.TileChangeEvent;
@@ -20,7 +20,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
 
     public CampfireListener() {
         campfires = new HashMap<>();
-        GameServer.get().getEventManager().getTileChangeListeners().add(this);
+        ExpiServer.get().getEventManager().getTileChangeListeners().add(this);
     }
 
     public CampfireListener(DataInputStream in) throws IOException {
@@ -32,7 +32,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
             campfires.put(cf.getTile(), cf);
         }
 
-        GameServer.get().getEventManager().getTileChangeListeners().add(this);
+        ExpiServer.get().getEventManager().getTileChangeListeners().add(this);
     }
 
     @Override

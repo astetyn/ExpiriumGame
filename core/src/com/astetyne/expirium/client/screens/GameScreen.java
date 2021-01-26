@@ -3,9 +3,8 @@ package com.astetyne.expirium.client.screens;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
-import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
-import com.astetyne.expirium.client.gui.roots.game.GameRoot;
+import com.astetyne.expirium.client.gui.roots.game.GameRootable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.WarnMsgLabel;
@@ -34,7 +33,7 @@ public class GameScreen implements Screen {
     private float dayTime;
     private final int serverTPS;
     private final PlayerDataHandler playerDataHandler;
-    private ExpiRoot activeRoot;
+    private GameRootable activeRoot;
     private boolean buildViewActive;
 
     public GameScreen(PacketInputStream in) {
@@ -55,7 +54,7 @@ public class GameScreen implements Screen {
         warnMsgLabel = new WarnMsgLabel(Res.LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
 
-        setRoot(new GameRoot());
+        setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
 
         multiplexer.addProcessor(stage);
 
@@ -131,7 +130,7 @@ public class GameScreen implements Screen {
         stage.dispose();
     }
 
-    public void setRoot(ExpiRoot root) {
+    public void setRoot(GameRootable root) {
         root.getActor().setBounds(0, 0, 2000, 1000);
         stage.clear();
         stage.addActor(root.getActor());
@@ -142,7 +141,7 @@ public class GameScreen implements Screen {
     public void onSimplePacket(SimpleServerPacket ssp) {
         if(ssp == SimpleServerPacket.CLOSE_DOUBLE_INV) {
             if(getActiveRoot() instanceof DoubleInventoryRoot) {
-                setRoot(new GameRoot());
+                setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
             }
         }else if(ssp == SimpleServerPacket.DEATH_EVENT) {
             addWarning("You died", 2, Color.RED);
@@ -177,7 +176,7 @@ public class GameScreen implements Screen {
         return playerDataHandler;
     }
 
-    public ExpiRoot getActiveRoot() {
+    public GameRootable getActiveRoot() {
         return activeRoot;
     }
 

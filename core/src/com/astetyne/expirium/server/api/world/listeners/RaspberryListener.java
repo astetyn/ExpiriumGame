@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.api.world.listeners;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
@@ -25,16 +25,16 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
     private final List<RaspberryBush> growingBushes;
     private final HashMap<ExpiTile, RaspberryBush> lookUp;
 
-    public RaspberryListener(GameServer gameServer) {
+    public RaspberryListener(ExpiServer expiServer) {
         growingBushes = new ArrayList<>();
         lookUp = new HashMap<>();
-        gameServer.getEventManager().getPlayerInteractListeners().add(this);
-        gameServer.getEventManager().getTileChangeListeners().add(this);
-        gameServer.getEventManager().getTickListeners().add(this);
+        expiServer.getEventManager().getPlayerInteractListeners().add(this);
+        expiServer.getEventManager().getTileChangeListeners().add(this);
+        expiServer.getEventManager().getTickListeners().add(this);
 
-        ExpiTile[][] terrain = GameServer.get().getWorld().getTerrain();
-        int w = gameServer.getWorld().getTerrainWidth();
-        int h = gameServer.getWorld().getTerrainHeight();
+        ExpiTile[][] terrain = ExpiServer.get().getWorld().getTerrain();
+        int w = expiServer.getWorld().getTerrainWidth();
+        int h = expiServer.getWorld().getTerrainHeight();
 
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
@@ -49,20 +49,20 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
     }
 
-    public RaspberryListener(DataInputStream in, GameServer gameServer) throws IOException {
+    public RaspberryListener(DataInputStream in, ExpiServer expiServer) throws IOException {
 
         growingBushes = new ArrayList<>();
         lookUp = new HashMap<>();
-        gameServer.getEventManager().getPlayerInteractListeners().add(this);
-        gameServer.getEventManager().getTileChangeListeners().add(this);
-        gameServer.getEventManager().getTickListeners().add(this);
+        expiServer.getEventManager().getPlayerInteractListeners().add(this);
+        expiServer.getEventManager().getTileChangeListeners().add(this);
+        expiServer.getEventManager().getTickListeners().add(this);
 
         int bushesNumber = in.readInt();
         for(int i = 0; i < bushesNumber; i++) {
             int x = in.readInt();
             int y = in.readInt();
             float growTime = in.readFloat();
-            ExpiTile t = gameServer.getWorld().getTerrain()[y][x];
+            ExpiTile t = expiServer.getWorld().getTerrain()[y][x];
             RaspberryBush bush = new RaspberryBush(t, growTime);
             growingBushes.add(bush);
             lookUp.put(t, bush);
@@ -74,7 +74,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
         if(event.getTile().getTypeFront() != TileType.RASPBERRY_BUSH_2) return;
 
-        GameServer.get().getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, event.getPlayer(), Source.PLAYER);
+        ExpiServer.get().getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, event.getPlayer(), Source.PLAYER);
 
         int raspNumber = (int)(Math.random() * 2) + 1; // 1-2
 
@@ -83,7 +83,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
         for(int i = 0; i < raspNumber; i++) {
             ExpiDroppedItem edi = new ExpiDroppedItem(dropLoc, Item.RASPBERRY, 0.2f);
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(edi);
             }
         }
@@ -117,7 +117,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
             if(bush.getGrowTime() <= 0) {
                 it.remove();
                 lookUp.remove(bush.getTile());
-                GameServer.get().getWorld().changeTile(bush.getTile(), TileType.RASPBERRY_BUSH_2, false, null, Source.NATURAL);
+                ExpiServer.get().getWorld().changeTile(bush.getTile(), TileType.RASPBERRY_BUSH_2, false, null, Source.NATURAL);
             }
         }
     }

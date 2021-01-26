@@ -106,8 +106,9 @@ public class FixtureCalculator implements Disposable {
             float lastX = vertices[0];
             float lastY = vertices[1];
             for(int i = 2; i < vertices.length; i+=2) {
-                shape.set(lastX + x, lastY + y, vertices[i] + x, vertices[i+1] + y);
-                createFixture(fixDef, t);
+                EdgeShape es = new EdgeShape();
+                es.set(lastX + x, lastY + y, vertices[i] + x, vertices[i+1] + y);
+                createFixture(fixDef, t, es);
                 lastX = vertices[i];
                 lastY = vertices[i+1];
             }
@@ -116,25 +117,38 @@ public class FixtureCalculator implements Disposable {
         if(t.getTypeFront().getSolidity() != Solidity.SOLID) return;
 
         if(y != 0 && worldTerrain[y-1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
-            shape.set(x, y, x+1,y);
-            createFixture(fixDef, t);
+            EdgeShape es = new EdgeShape();
+            es.set(x, y, x+1,y);
+            createFixture(fixDef, t, es);
         }
         if(y != h-1 && worldTerrain[y+1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x, y+1, x+1,y+1);
-            createFixture(fixDef, t);
+            EdgeShape es = new EdgeShape();
+            es.set(x, y+1, x+1,y+1);
+            createFixture(fixDef, t, es);
         }
         if(x != 0 && worldTerrain[y][x-1].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x, y, x,y+1);
-            createFixture(fixDef, t);
+            EdgeShape es = new EdgeShape();
+            es.set(x, y, x+1,y);
+            createFixture(fixDef, t, es);
         }
         if(x != w-1 && worldTerrain[y][x+1].getTypeFront().getSolidity() != Solidity.SOLID) {
             shape.set(x+1, y, x+1,y+1);
-            createFixture(fixDef, t);
+            EdgeShape es = new EdgeShape();
+            es.set(x, y, x+1,y);
+            createFixture(fixDef, t, es);
         }
     }
 
-    private void createFixture(FixtureDef fixDef, ExpiTile t) {
-        Fixture f = terrainBody.createFixture(fixDef);
+    private void createFixture(FixtureDef fixDef, ExpiTile t, EdgeShape testShape) {
+
+        FixtureDef def = new FixtureDef();
+        def.shape = testShape;
+        def.friction = 0.2f;
+        def.filter.categoryBits = Consts.DEFAULT_BIT;
+
+        Fixture f = terrainBody.createFixture(def);
         t.getFixtures().add(f);
     }
 

@@ -5,7 +5,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.event.TickListener;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
@@ -28,7 +28,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
         livingTime = 0;
         despawnTime = Consts.ITEM_DESPAWN_TIME;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);
-        GameServer.get().getEventManager().getTickListeners().add(this);
+        ExpiServer.get().getEventManager().getTickListeners().add(this);
     }
 
     public ExpiDroppedItem(DataInputStream in) throws IOException {
@@ -38,7 +38,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
         pickCooldown = 5;
         livingTime = 0;
         despawnTime = Consts.ITEM_DESPAWN_TIME;
-        GameServer.get().getEventManager().getTickListeners().add(this);
+        ExpiServer.get().getEventManager().getTickListeners().add(this);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
         livingTime += 1f / Consts.SERVER_DEFAULT_TPS;
 
         if(livingTime >= despawnTime) {
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                 pp.getNetManager().putEntityDespawnPacket(this);
             }
             destroy();
@@ -56,12 +56,12 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
         if(livingTime < pickCooldown) {
             return;
         }
-        for(ExpiPlayer p : GameServer.get().getPlayers()) {
+        for(ExpiPlayer p : ExpiServer.get().getPlayers()) {
             Vector2 dif = p.getCenter().sub(getCenter());
             if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(item, 1)) {
                 p.getInv().addItem(new ItemStack(item), true);
                 p.getNetManager().putInvFeedPacket();
-                for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                     pp.getNetManager().putEntityDespawnPacket(this);
                 }
                 destroy();
@@ -74,7 +74,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
     }
 
     public void destroy() {
-        GameServer.get().getEventManager().getTickListeners().remove(this);
+        ExpiServer.get().getEventManager().getTickListeners().remove(this);
         super.destroy();
     }
 

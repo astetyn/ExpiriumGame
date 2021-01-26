@@ -16,7 +16,7 @@ public abstract class TerminableLooper implements Runnable {
         }
     }
 
-    public void end() {
+    public void stop() {
         synchronized(runningLock) {
             running = false;
         }

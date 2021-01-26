@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class GameServer implements Saveable {
+public class ExpiServer implements Saveable {
 
     private static final int version = 1;
 
@@ -53,7 +53,7 @@ public class GameServer implements Saveable {
      *
      * You should create this object on dedicated thread, it will create endless loop.
      */
-    public GameServer(ServerPreferences serverPreferences, ServerFailListener listener) {
+    public ExpiServer(ServerPreferences serverPreferences, ServerFailListener listener) {
 
         ExpiGame.get().server = this;
 
@@ -122,7 +122,7 @@ public class GameServer implements Saveable {
         t2.start();
 
         tickLooper.run();
-        // do not add any code here ticklooper is infinite loop
+        // do not add any code here - ticklooper is infinite loop
     }
 
     /**
@@ -130,14 +130,15 @@ public class GameServer implements Saveable {
      * create new instance in order to use server again. You can call this method from any thread.
      */
     public void close() {
-        multicastSender.end();
-        tickLooper.end();
-        serverGateway.end();
+        System.out.println("performing normal close");
+        multicastSender.stop();
+        tickLooper.stop();
+        serverGateway.stop();
         for(ExpiPlayer p : players) {
-            p.getGateway().end();
+            p.getGateway().stop();
         }
-        synchronized(GameServer.get().getTickLooper().getTickLock()) {
-            GameServer.get().getTickLooper().getTickLock().notifyAll();
+        synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
+            ExpiServer.get().getTickLooper().getTickLock().notifyAll();
         }
         try {
             fileManager.saveGameServer(this);
@@ -147,6 +148,31 @@ public class GameServer implements Saveable {
         dispose();
     }
 
+    /**
+     * This is only for fault-case when server unexpectedly fail.
+     */
+    public void faultClose() {
+        System.out.println("performing fault close");
+        multicastSender.stop();
+        tickLooper.stop();
+        serverGateway.stop();
+        for(ExpiPlayer p : players) {
+            p.getGateway().stop();
+        }
+        synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
+            ExpiServer.get().getTickLooper().getTickLock().notifyAll();
+        }
+        try {
+            fileManager.saveGameServer(this);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        dispose();
+    }
+
+    /**
+     * Call this only ONCE during object lifetime.
+     */
     private void dispose() {
         expiWorld.dispose();
     }
@@ -184,7 +210,7 @@ public class GameServer implements Saveable {
         return tickLooper;
     }
 
-    public static GameServer get() {
+    public static ExpiServer get() {
         return ExpiGame.get().server;
     }
 
@@ -216,12 +242,12 @@ public class GameServer implements Saveable {
         expiWorld.writeData(out);
 
         int entitiesSize = 0;
-        for(ExpiEntity e : GameServer.get().getEntities()) {
+        for(ExpiEntity e : entities) {
             if(e instanceof ExpiPlayer) continue;
             entitiesSize++;
         }
         out.writeInt(entitiesSize);
-        for(ExpiEntity e : GameServer.get().getEntities()) {
+        for(ExpiEntity e : entities) {
             if(e instanceof ExpiPlayer) continue;
             out.writeInt(e.getType().getID());
             e.writeData(out);

@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.net;
 
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.backend.TerminableLooper;
 
@@ -38,9 +38,9 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             client.setSoTimeout(5000);
             int readBytes = in.fillBuffer();
-            if(readBytes == -1) end();
+            if(readBytes == -1) stop();
 
-            GameServer.get().getServerGateway().playerPreJoinAsync(this);
+            ExpiServer.get().getServerGateway().playerPreJoinAsync(this);
 
             synchronized(joinLock) {
                 joinLock.wait(); // wait until main looper recognize new player and populate init actions
@@ -53,7 +53,7 @@ public class ServerPlayerGateway extends TerminableLooper {
                 client.setSoTimeout(5000);
                 readBytes = in.fillBuffer();
                 if(readBytes == -1) {
-                    GameServer.get().getServerGateway().playerPreLeaveAsync(owner);
+                    ExpiServer.get().getServerGateway().playerPreLeaveAsync(owner);
                     return;
                 }
 
@@ -64,22 +64,22 @@ public class ServerPlayerGateway extends TerminableLooper {
                     traffic = 0;
                 }
 
-                synchronized(GameServer.get().getTickLooper().getTickLock()) {
-                    GameServer.get().getTickLooper().getTickLock().wait();
+                synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
+                    ExpiServer.get().getTickLooper().getTickLock().wait();
                     in.swap();
                     out.swap();
                 }
             }
 
         }catch(IOException | InterruptedException e) {
-            GameServer.get().getServerGateway().playerPreLeaveAsync(owner);
+            ExpiServer.get().getServerGateway().playerPreLeaveAsync(owner);
         }
         System.out.println("Channel with client \""+owner.getName()+"\" closed.");
     }
 
     @Override
-    public void end() {
-        super.end();
+    public void stop() {
+        super.stop();
         try {
             client.close();
         }catch(IOException ignored) {}

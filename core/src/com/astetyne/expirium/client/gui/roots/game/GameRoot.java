@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.HotSlotsData;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
-import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.widget.HotBarSlot;
 import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
@@ -26,7 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class GameRoot extends WidgetGroup implements ExpiRoot {
+public class GameRoot extends WidgetGroup implements GameRootable {
 
     private final Table hotSlotsTable, debugInfoTable, playerStatsTable;
 

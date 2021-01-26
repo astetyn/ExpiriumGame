@@ -11,17 +11,14 @@ import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.MenuScreen;
-import com.astetyne.expirium.client.utils.Utils;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
 import com.astetyne.expirium.server.ServerPreferences;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -36,8 +33,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	private float timeSinceStart;
 	private SpriteBatch batch;
 	private boolean hostingServer;
-	private String gameCode;
-	public GameServer server;
+	public ExpiServer server;
 	private final Queue<Runnable> tasks;
 	private final MulticastListener multicastListener;
 
@@ -47,7 +43,6 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		timeSinceStart = 0;
 		playerName = "";
 		hostingServer = false;
-		gameCode = "";
 		tasks = new LinkedList<>();
 
 		multicastListener = new MulticastListener();
@@ -86,7 +81,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	@Override
 	public void dispose () {
 		super.dispose();
-		multicastListener.end();
+		multicastListener.stop();
 		getScreen().dispose();
 		if(server != null) {
 			server.close();
@@ -109,9 +104,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	public void startServer(ServerPreferences preferences, MenuScreen menu) {
 		hostingServer = true;
 		menu.setRoot(new LoadingRoot("Loading world..."));
-		gameCode = Utils.getGameCode();
 		//todo: port free check
-		Thread t = new Thread(() -> server = new GameServer(preferences, this));
+		Thread t = new Thread(() -> server = new ExpiServer(preferences, this));
 		t.setName("Game Server");
 		t.start();
 	}
@@ -122,9 +116,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		server = null;
 	}
 
-	public void startClient(InetAddress address) throws UnknownHostException {
+	public void startClient(InetAddress address) {
 		clientGateway.connectToServer(address);
-		if(!hostingServer) gameCode = Utils.getCodeFromAddress((Inet4Address)InetAddress.getLocalHost());
 	}
 
 	public String getPlayerName() {
@@ -147,8 +140,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		return hostingServer;
 	}
 
-	public String getGameCode() {
-		return gameCode;
+	public MulticastListener getMulticastListener() {
+		return multicastListener;
 	}
 
 	public void runOnMainThread(Runnable r) {
@@ -169,6 +162,9 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void onServerFail(String msg) {
-
+		runOnMainThread(() -> {
+			clientGateway.close();
+			setScreen(new MenuScreen(msg));
+		});
 	}
 }

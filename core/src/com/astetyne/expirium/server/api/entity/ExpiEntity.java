@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.api.entity;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.Metaable;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -28,9 +28,9 @@ public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
         int randomID;
         do {
             randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(GameServer.get().getEntitiesID().containsKey(randomID));
-        GameServer.get().getEntitiesID().put(randomID, this);
-        GameServer.get().getEntities().add(this);
+        } while(ExpiServer.get().getEntitiesID().containsKey(randomID));
+        ExpiServer.get().getEntitiesID().put(randomID, this);
+        ExpiServer.get().getEntities().add(this);
 
         this.ID = randomID;
         this.width = width;
@@ -81,9 +81,9 @@ public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
     }
 
     public void destroy() {
-        GameServer.get().getEntitiesID().remove(ID);
-        GameServer.get().getEntities().remove(this);
-        GameServer.get().getWorld().getB2dWorld().destroyBody(body);
+        ExpiServer.get().getEntitiesID().remove(ID);
+        ExpiServer.get().getEntities().remove(this);
+        ExpiServer.get().getWorld().getB2dWorld().destroyBody(body);
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
@@ -47,9 +47,9 @@ public class ServerPacketManager {
                     float x = in.getFloat();
                     float y = in.getFloat();
                     InteractType type = InteractType.getType(in.getInt());
-                    ExpiTile tile = GameServer.get().getWorld().getTileAt(x, y);
+                    ExpiTile tile = ExpiServer.get().getWorld().getTileAt(x, y);
                     PlayerInteractEvent e = new PlayerInteractEvent(owner, x, y, tile, type);
-                    List<PlayerInteractListener> list = GameServer.get().getEventManager().getPlayerInteractListeners();
+                    List<PlayerInteractListener> list = ExpiServer.get().getEventManager().getPlayerInteractListeners();
                     for(int j = list.size() - 1; j >= 0; j--) {
                         list.get(j).onInteract(e);
                     }
@@ -185,8 +185,8 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putFloat(GameServer.get().getWorld().getDayTime());
-        out.putInt(GameServer.get().getWorld().getWeather().getID());
+        out.putFloat(ExpiServer.get().getWorld().getDayTime());
+        out.putInt(ExpiServer.get().getWorld().getWeather().getID());
     }
 
     public void putBreakingTilePacket(ExpiTile t, float state) {

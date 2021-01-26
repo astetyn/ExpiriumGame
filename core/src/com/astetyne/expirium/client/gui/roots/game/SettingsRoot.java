@@ -2,7 +2,6 @@ package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
-import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Utils;
@@ -15,20 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class SettingsRoot extends WidgetGroup implements ExpiRoot {
+public class SettingsRoot extends WidgetGroup implements GameRootable {
 
 
     public SettingsRoot() {
 
         Image returnButton = new Image(Res.CROSS_ICON);
         TextButton leaveButton = new TextButton("Leave game", Res.TEXT_BUTTON_STYLE);
-        Label codeLabel = new Label("Game code: "+ExpiGame.get().getGameCode(), Res.TITLE_LABEL_STYLE);
+        Label codeLabel = new Label("under construction", Res.TITLE_LABEL_STYLE);
         codeLabel.setAlignment(Align.center);
 
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new GameRoot());
+                GameScreen.get().setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
             }
         });
 

@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -13,7 +13,7 @@ public class EntityBodyFactory {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        Body body = GameServer.get().getWorld().getB2dWorld().createBody(bodyDef);
+        Body body = ExpiServer.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
@@ -37,7 +37,7 @@ public class EntityBodyFactory {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(loc);
 
-        Body body = GameServer.get().getWorld().getB2dWorld().createBody(bodyDef);
+        Body body = ExpiServer.get().getWorld().getB2dWorld().createBody(bodyDef);
 
         body.setFixedRotation(true);
 

@@ -6,7 +6,7 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.ItemDropper;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
@@ -108,7 +108,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
 
-        GameServer.get().getEventManager().getPlayerInteractListeners().add(this);
+        ExpiServer.get().getEventManager().getPlayerInteractListeners().add(this);
 
     }
 
@@ -124,7 +124,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             dayTime = 0;
         }
 
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+        for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
             pp.applyPhysics();
         }
 
@@ -135,8 +135,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
         //b2dWorld.step(1f/Consts.SERVER_DEFAULT_TPS, 6, 2);
 
-        for(ExpiEntity ee : GameServer.get().getEntities()) {
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+        for(ExpiEntity ee : ExpiServer.get().getEntities()) {
+            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
         }
@@ -196,7 +196,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         affectedTiles.add(t);
 
-        for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+        for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
             for(ExpiTile t2 : changedTiles) {
                 pp.getNetManager().putTileChangePacket(t2);
             }
@@ -204,7 +204,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
 
         TileChangeEvent e = new TileChangeEvent(t, from, p, source);
-        List<TileChangeListener> list = GameServer.get().getEventManager().getTileChangeListeners();
+        List<TileChangeListener> list = ExpiServer.get().getEventManager().getTileChangeListeners();
         for(int i = list.size() - 1; i >= 0; i--) {
             list.get(i).onTileChange(e);
         }
@@ -220,7 +220,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         for(Item item : ItemDropper.chooseItems(t.getTypeFront().getItemDropper())) {
             if(item == Item.EMPTY) return;
             ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, item, Consts.ITEM_COOLDOWN_BREAK);
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(droppedItem);
             }
         }
@@ -233,7 +233,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         if(toPlace.getBuildTile().getSolidity().isSoft()) return true;
 
-        for(ExpiEntity p : GameServer.get().getEntities()) {
+        for(ExpiEntity p : ExpiServer.get().getEntities()) {
 
             float px = p.getLocation().x;
             float py = p.getLocation().y;

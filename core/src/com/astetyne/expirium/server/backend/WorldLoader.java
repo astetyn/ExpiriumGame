@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 
@@ -13,7 +13,7 @@ public class WorldLoader {
     public WorldLoader(ExpiPlayer owner) {
         this.owner = owner;
         partNumber = 0;
-        world = GameServer.get().getWorld();
+        world = ExpiServer.get().getWorld();
     }
 
     public void update() {

@@ -8,7 +8,7 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.event.TickListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
@@ -32,7 +32,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
         super(EntityType.PLAYER, 0.9f, 1.25f);
         body = EntityBodyFactory.createPlayerBody(location);
-        GameServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
+        ExpiServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
@@ -42,14 +42,14 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
-        GameServer.get().getPlayers().add(this);
-        GameServer.get().getEventManager().getTickListeners().add(this);
+        ExpiServer.get().getPlayers().add(this);
+        ExpiServer.get().getEventManager().getTickListeners().add(this);
     }
 
     public ExpiPlayer(DataInputStream in, ServerPlayerGateway gateway) throws IOException {
         super(EntityType.PLAYER, 0.9f, 1.25f, in);
         body = EntityBodyFactory.createPlayerBody(new Vector2(in.readFloat(), in.readFloat()));
-        GameServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
+        ExpiServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
         int nameLength = in.readInt();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < nameLength; i++) {
@@ -64,8 +64,8 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
-        GameServer.get().getPlayers().add(this);
-        GameServer.get().getEventManager().getTickListeners().add(this);
+        ExpiServer.get().getPlayers().add(this);
+        ExpiServer.get().getEventManager().getTickListeners().add(this);
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -179,7 +179,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         for(int i = 0; i < is.getAmount(); i++) {
             //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
             ExpiDroppedItem edi = new ExpiDroppedItem(getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
-            for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(edi);
             }
         }
@@ -274,12 +274,12 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     @Override
     public void destroy() {
         destroySafe();
-        GameServer.get().getPlayers().remove(this);
+        ExpiServer.get().getPlayers().remove(this);
     }
 
     public void destroySafe() {
         super.destroy();
-        GameServer.get().getEventManager().getTickListeners().remove(this);
+        ExpiServer.get().getEventManager().getTickListeners().remove(this);
     }
 
     @Override

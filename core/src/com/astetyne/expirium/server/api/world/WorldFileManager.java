@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.generator.WorldLoadingException;
@@ -38,7 +38,7 @@ public class WorldFileManager {
         saveable.writeData(out);
         out.close();
 
-        for(ExpiPlayer p : GameServer.get().getPlayers()) {
+        for(ExpiPlayer p : ExpiServer.get().getPlayers()) {
             savePlayer(p);
         }
 

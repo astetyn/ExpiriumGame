@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.backend.TerminableLooper;
 
@@ -18,7 +19,13 @@ public class MulticastSender extends TerminableLooper {
 
             InetAddress group = InetAddress.getByName("234.14.14.14");
             DatagramSocket socket = new DatagramSocket();
-            ByteBuffer bb = ByteBuffer.allocate(4);
+
+            String playersName = ExpiGame.get().getPlayerName();
+            ByteBuffer bb = ByteBuffer.allocate(8 + playersName.length()*2); // 4-version, 4-string len, string...
+            bb.putInt(playersName.length());
+            for(char c : playersName.toCharArray()) {
+                bb.putChar(c);
+            }
             bb.putInt(Consts.VERSION);
 
             while(isRunning()) {

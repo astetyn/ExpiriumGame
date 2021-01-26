@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.TickListener;
 
@@ -24,15 +24,15 @@ public class TickLooper extends TerminableLooper {
 
             while(isRunning()) {
 
-                GameServer.get().getServerGateway().resolveJoiningAndLeavingPlayers();
+                ExpiServer.get().getServerGateway().resolveJoiningAndLeavingPlayers();
 
-                for(ExpiPlayer ep : GameServer.get().getPlayers()) {
+                for(ExpiPlayer ep : ExpiServer.get().getPlayers()) {
                     ep.getNetManager().processIncomingPackets();
                 }
 
-                GameServer.get().onTick();
+                ExpiServer.get().onTick();
 
-                List<TickListener> list = GameServer.get().getEventManager().getTickListeners();
+                List<TickListener> list = ExpiServer.get().getEventManager().getTickListeners();
                 for(int i = list.size() - 1; i >= 0; i--) {
                     list.get(i).onTick();
                 }
@@ -54,11 +54,6 @@ public class TickLooper extends TerminableLooper {
 
     public Object getTickLock() {
         return tickLock;
-    }
-
-    @Override
-    public void end() {
-        super.end();
     }
 
     public int getTps() {

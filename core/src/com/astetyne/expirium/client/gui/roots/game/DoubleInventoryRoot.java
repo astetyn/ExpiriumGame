@@ -3,7 +3,6 @@ package com.astetyne.expirium.client.gui.roots.game;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.StorageGridData;
-import com.astetyne.expirium.client.gui.roots.ExpiRoot;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.screens.GameScreen;
@@ -20,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class DoubleInventoryRoot extends Table implements ExpiRoot {
+public class DoubleInventoryRoot extends Table implements GameRootable {
 
     private final StorageGrid storage1, storage2;
     private final Cell<StorageGrid> storageCell1, storageCell2;
@@ -40,7 +39,7 @@ public class DoubleInventoryRoot extends Table implements ExpiRoot {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new GameRoot());
+                GameScreen.get().setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
             }
         });
 

@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.event.Source;
 import com.astetyne.expirium.server.api.world.ExpiWorld;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
@@ -24,7 +24,7 @@ public class ExpiTileBreaker {
         timeAccumulator = 0;
         tempVec = new Vector2();
         tempVec2 = new Vector2();
-        world = GameServer.get().getWorld();
+        world = ExpiServer.get().getWorld();
     }
 
     public void onTick(ThumbStickData data) {
@@ -50,7 +50,7 @@ public class ExpiTileBreaker {
                 targetTile = null;
                 break;
             }
-            ExpiTile newTarget = GameServer.get().getWorld().getTileAt(tempVec);
+            ExpiTile newTarget = ExpiServer.get().getWorld().getTileAt(tempVec);
             if(newTarget == null) {
                 timeAccumulator = 0;
                 if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
@@ -77,7 +77,7 @@ public class ExpiTileBreaker {
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
             if(timeAccumulator >= targetTile.getTypeFront().getBreakTime()) {
-                GameServer.get().getWorld().changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
+                ExpiServer.get().getWorld().changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
                 owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;

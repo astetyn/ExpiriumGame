@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.net;
 
-import com.astetyne.expirium.server.GameServer;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.backend.TerminableLooper;
@@ -45,17 +45,15 @@ public class ServerGateway extends TerminableLooper {
 
         }catch(IOException | IllegalArgumentException e) {
             if(isRunning()) {
-                GameServer.get().close();
+                ExpiServer.get().faultClose();
                 System.out.println("Server gateway fatal fail.");
             }
-            end();
         }
-        System.out.println("Server GW closed.");
     }
 
     @Override
-    public void end() {
-        super.end();
+    public void stop() {
+        super.stop();
         try {
             if(server != null) server.close();
         }catch(IOException ignored) {}
@@ -77,14 +75,14 @@ public class ServerGateway extends TerminableLooper {
 
         synchronized(leavingPlayers) {
             for(ExpiPlayer p : leavingPlayers) {
-                GameServer.get().getPlayers().remove(p);
-                for(ExpiPlayer pp : GameServer.get().getPlayers()) {
+                ExpiServer.get().getPlayers().remove(p);
+                for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
                     pp.getNetManager().putEntityDespawnPacket(p);
                 }
                 p.destroySafe();
-                p.getGateway().end();
+                p.getGateway().stop();
                 try {
-                    GameServer.get().getFileManager().savePlayer(p);
+                    ExpiServer.get().getFileManager().savePlayer(p);
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
@@ -107,10 +105,10 @@ public class ServerGateway extends TerminableLooper {
                     continue;
                 }
                 String name = in.getString();
-                DataInputStream dataIn = GameServer.get().getFileManager().getPlayerDataStream(name);
+                DataInputStream dataIn = ExpiServer.get().getFileManager().getPlayerDataStream(name);
                 ExpiPlayer ep = null;
                 if(dataIn == null) {
-                    ep = new ExpiPlayer(GameServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
+                    ep = new ExpiPlayer(ExpiServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
                 }else {
                     try {
                         ep = new ExpiPlayer(dataIn, gateway);
@@ -119,7 +117,7 @@ public class ServerGateway extends TerminableLooper {
                     }
                 }
                 joiningPlayers.add(ep);
-                GameServer.get().getWorldLoaders().add(new WorldLoader(ep));
+                ExpiServer.get().getWorldLoaders().add(new WorldLoader(ep));
             }
             joiningClients.clear();
         }
@@ -128,13 +126,13 @@ public class ServerGateway extends TerminableLooper {
 
             // create list of entities (for new players)
             List<ExpiEntity> alreadyExistingEntities = new ArrayList<>();
-            for(ExpiEntity e : GameServer.get().getEntities()) {
+            for(ExpiEntity e : ExpiServer.get().getEntities()) {
                 if(e == newPlayer) continue;
                 alreadyExistingEntities.add(e);
             }
 
             // initial packet for new player
-            newPlayer.getNetManager().putInitDataPacket(GameServer.get().getWorld().getTerrain(), alreadyExistingEntities);
+            newPlayer.getNetManager().putInitDataPacket(ExpiServer.get().getWorld().getTerrain(), alreadyExistingEntities);
             newPlayer.getGateway().getOut().swap();
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
@@ -142,7 +140,7 @@ public class ServerGateway extends TerminableLooper {
             }
 
             // notify all players about new players
-            for(ExpiPlayer p : GameServer.get().getPlayers()) {
+            for(ExpiPlayer p : ExpiServer.get().getPlayers()) {
                 if(p == newPlayer) continue;
                 p.getNetManager().putEntitySpawnPacket(newPlayer);
             }

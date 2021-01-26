@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.net;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.backend.TerminableLooper;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 
@@ -11,7 +12,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class ClientGateway implements Runnable {
+public class ClientGateway extends TerminableLooper {
 
     private Socket socket;
     private InetAddress address;
@@ -23,7 +24,6 @@ public class ClientGateway implements Runnable {
     private long time;
     private boolean nextPacketsAvailable;
     private final ClientFailListener failListener;
-    private String errorMsg;
 
     public ClientGateway(ClientFailListener listener) {
         nextPacketsLock = new Object();
@@ -31,13 +31,10 @@ public class ClientGateway implements Runnable {
         time = 0;
         nextPacketsAvailable = false;
         failListener = listener;
-        errorMsg = "";
     }
 
     @Override
     public void run() {
-
-        errorMsg = "";
 
         System.out.println("Client connecting...");
 
@@ -45,7 +42,7 @@ public class ClientGateway implements Runnable {
             socket = new Socket();
             socket.connect(new InetSocketAddress(address, Consts.SERVER_PORT), 10000);
         } catch(IOException e) {
-            errorMsg = "Can't connect to server.\n Are you on the same network?";
+            failListener.onClientFail("Can't connect to server.\n Are you on the same network?");
             return;
         }
 
@@ -63,7 +60,7 @@ public class ClientGateway implements Runnable {
             out.flush();
             out.reset();
 
-            while(!socket.isClosed()) {
+            while(isRunning()) {
 
                 int readBytes = in.fillBuffer();
                 out.flush();
@@ -81,10 +78,11 @@ public class ClientGateway implements Runnable {
                 }
             }
         }catch(IOException | InterruptedException e) {
+            if(!isRunning()) return;
             try {
                 socket.close();
             }catch(IOException ignored) {}
-            errorMsg = "You were disconnected due to connection issue.";
+            failListener.onClientFail("You were disconnected due to connection issue.");
         }
     }
 
@@ -93,12 +91,6 @@ public class ClientGateway implements Runnable {
      * and incoming packets will be resolved.
      */
     public void update() {
-
-        if(!errorMsg.isEmpty()) {
-            failListener.onClientFail(errorMsg);
-            errorMsg = "";
-            return;
-        }
 
         synchronized(nextPacketsLock) {
             if(!nextPacketsAvailable) return;
@@ -125,6 +117,7 @@ public class ClientGateway implements Runnable {
      */
     public void connectToServer(InetAddress address) {
 
+        running = true;
         this.address = address;
 
         if(socket != null && !socket.isClosed()) {
@@ -143,6 +136,7 @@ public class ClientGateway implements Runnable {
     public void close() {
 
         try {
+            stop();
             if(socket != null) socket.close();
         }catch(IOException ignored) {}
 
