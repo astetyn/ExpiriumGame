@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.gui.widget.TextInputRoot;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Consts;
@@ -23,7 +24,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class HostCreatorRoot extends Table {
+public class HostCreatorRoot extends Table implements MenuRootable {
 
     private final Table savedWorlds;
     private FileHandle selectedWorld;
@@ -93,6 +94,16 @@ public class HostCreatorRoot extends Table {
         tf.setMessageText("Enter world name");
         tf.setAlignment(Align.center);
         tf.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z ]"));
+
+        HostCreatorRoot ref = this;
+
+        tf.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                menu.setRoot(new TextInputRoot(() -> menu.setRoot(ref), tf));
+            }
+        });
+
         if(Consts.DEBUG) tf.setText("test"+Gdx.files.local("worlds").list().length);
         TextButton createNewButton = new TextButton("Create new!", Res.TEXT_BUTTON_STYLE);
         createNewButton.addListener(new ClickListener() {
@@ -158,5 +169,15 @@ public class HostCreatorRoot extends Table {
             savedWorlds.add(world).growX().height(100);
             savedWorlds.row();
         }
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
+    }
+
+    @Override
+    public void onEnd() {
+
     }
 }

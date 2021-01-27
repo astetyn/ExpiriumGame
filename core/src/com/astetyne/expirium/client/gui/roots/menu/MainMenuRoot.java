@@ -2,12 +2,15 @@ package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.gui.widget.TextInputRoot;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -15,14 +18,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-public class MainMenuRoot extends WidgetGroup {
+import java.io.*;
+
+public class MainMenuRoot extends WidgetGroup implements MenuRootable {
+
+    private static final String path = "userdata";
 
     private final Label infoLabel;
 
     public MainMenuRoot(String info, MenuScreen menu) {
 
         if(Consts.DEBUG) setDebug(true);
-        if(Consts.DEBUG) ExpiGame.get().setPlayerName("palko");
+
+        MainMenuRoot ref = this;
+
+        loadData();
 
         // title
         Label title = new Label("Expirium", Res.TITLE_LABEL_STYLE);
@@ -37,12 +47,11 @@ public class MainMenuRoot extends WidgetGroup {
         nameTF.setMessageText("Your nickname");
         nameTF.setAlignment(Align.center);
         nameTF.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z_+\\- ]"));
-        nameTF.setMaxLength(16);
-        nameTF.addListener(new InputListener() {
+
+        nameTF.addListener(new ClickListener() {
             @Override
-            public boolean keyTyped (InputEvent event, char character) {
-                ExpiGame.get().setPlayerName(nameTF.getText().trim());
-                return false;
+            public void clicked(InputEvent event, float x, float y) {
+                menu.setRoot(new TextInputRoot(() -> menu.setRoot(ref), nameTF));
             }
         });
 
@@ -111,4 +120,49 @@ public class MainMenuRoot extends WidgetGroup {
         infoLabel.setText(info);
     }
 
+    @Override
+    public Actor getActor() {
+        return this;
+    }
+
+    @Override
+    public void onEnd() {
+        saveData();
+    }
+
+    private void loadData() {
+
+        FileHandle file = Gdx.files.local(path);
+        if(!file.exists()) return;
+        try {
+            DataInputStream in = new DataInputStream(new BufferedInputStream(file.read()));
+
+            StringBuilder sb = new StringBuilder();
+
+            int len = in.readInt();
+            for(int i = 0; i < len; i++) {
+                sb.append(in.readChar());
+            }
+
+            ExpiGame.get().setPlayerName(sb.toString());
+
+            in.close();
+        }catch(IOException ignored) { }
+    }
+
+    private void saveData() {
+
+        FileHandle file = Gdx.files.local(path);
+        try {
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(file.write(false)));
+
+            out.writeInt(ExpiGame.get().getPlayerName().length());
+            for(char c : ExpiGame.get().getPlayerName().toCharArray()) {
+                out.writeChar(c);
+            }
+
+            out.close();
+        }catch(IOException ignored) {}
+
+    }
 }

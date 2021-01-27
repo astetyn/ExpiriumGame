@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server.api.world;
 
-import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.resources.TileFix;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -20,6 +20,7 @@ public class FixtureCalculator implements Disposable {
         this.w = world.getTerrainWidth();
         this.terrainBody = terrainBody;
 
+        // default setup for tile fixtures
         shape = new EdgeShape();
         fixDef = new FixtureDef();
         fixDef.shape = shape;
@@ -29,12 +30,14 @@ public class FixtureCalculator implements Disposable {
 
     public void generateWorldFixtures() {
 
+        // tiles
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
-                recalcTileFixtures(i, j, shape, fixDef);
+                updateTileFixtures(i, j);
             }
         }
 
+        // borders
         ChainShape chainShape = new ChainShape();
 
         float[] verts = new float[10];
@@ -56,39 +59,21 @@ public class FixtureCalculator implements Disposable {
     }
 
     /** This method will check all nearby tiles and create his own fixtures + impact nearby tiles*/
-    public void recalcTileFixturesPlus(ExpiTile t) {
+    public void updateTileFixturesAndNearbyTiles(ExpiTile t) {
 
         int x = t.getX();
         int y = t.getY();
 
-        recalcTileFixtures(y, x, shape, fixDef);
-        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef);
-        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef);
-        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef);
-        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef);
+        updateTileFixtures(y, x);
+        if(y != 0) updateTileFixtures(y-1, x);
+        if(y != h-1) updateTileFixtures(y+1, x);
+        if(x != 0) updateTileFixtures(y, x-1);
+        if(x != w-1) updateTileFixtures(y, x+1);
 
-    }
-
-    /** This method will remove all fixtures from given tile and also updates nearby tiles fixtures*/
-    public void clearTileFixtures(ExpiTile t) {
-
-        for(Fixture f : t.getFixtures()) {
-            terrainBody.destroyFixture(f);
-        }
-        t.getFixtures().clear();
-
-        int y = t.getY();
-        int x = t.getX();
-
-        // updates nearby tiles fixtures
-        if(y != 0) recalcTileFixtures(y-1, x, shape, fixDef);
-        if(y != h-1) recalcTileFixtures(y+1, x, shape, fixDef);
-        if(x != 0) recalcTileFixtures(y, x-1, shape, fixDef);
-        if(x != w-1) recalcTileFixtures(y, x+1, shape, fixDef);
     }
 
     /** This method will check all nearby tiles and create his own fixtures (does not impact nearby tiles)*/
-    private void recalcTileFixtures(int y, int x, EdgeShape shape, FixtureDef fixDef) {
+    private void updateTileFixtures(int y, int x) {
 
         ExpiTile t = worldTerrain[y][x];
 
@@ -97,7 +82,8 @@ public class FixtureCalculator implements Disposable {
         }
         t.getFixtures().clear();
 
-        if(t.getTypeFront().getTileFix() != null) {
+        if(t.getTypeFront().getTileFix() != TileFix.FULL && t.getTypeFront().getTileFix() != TileFix.SOFT) {
+            // case when tile has own custom fixtures
             float[] vertices = t.getTypeFront().getTileFix().getVertices();
             if(vertices.length < 4)  {
                 System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getTypeFront().getTileFix());
@@ -106,49 +92,36 @@ public class FixtureCalculator implements Disposable {
             float lastX = vertices[0];
             float lastY = vertices[1];
             for(int i = 2; i < vertices.length; i+=2) {
-                EdgeShape es = new EdgeShape();
-                es.set(lastX + x, lastY + y, vertices[i] + x, vertices[i+1] + y);
-                createFixture(fixDef, t, es);
+                shape.set(lastX + x, lastY + y, vertices[i] + x, vertices[i+1] + y);
+                createFixture(t);
                 lastX = vertices[i];
                 lastY = vertices[i+1];
             }
+            return;
         }
 
-        if(t.getTypeFront().getSolidity() != Solidity.SOLID) return;
+        if(t.getTypeFront().getTileFix() != TileFix.FULL) return;
 
-        if(y != 0 && worldTerrain[y-1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
-            EdgeShape es = new EdgeShape();
-            es.set(x, y, x+1,y);
-            createFixture(fixDef, t, es);
+        if(y != 0 && worldTerrain[y-1][x].getTypeFront().getTileFix() != TileFix.FULL) {
+            shape.set(x, y, x+1,y);
+            createFixture(t);
         }
-        if(y != h-1 && worldTerrain[y+1][x].getTypeFront().getSolidity() != Solidity.SOLID) {
+        if(y != h-1 && worldTerrain[y+1][x].getTypeFront().getTileFix() != TileFix.FULL) {
             shape.set(x, y+1, x+1,y+1);
-            EdgeShape es = new EdgeShape();
-            es.set(x, y+1, x+1,y+1);
-            createFixture(fixDef, t, es);
+            createFixture(t);
         }
-        if(x != 0 && worldTerrain[y][x-1].getTypeFront().getSolidity() != Solidity.SOLID) {
+        if(x != 0 && worldTerrain[y][x-1].getTypeFront().getTileFix() != TileFix.FULL) {
             shape.set(x, y, x,y+1);
-            EdgeShape es = new EdgeShape();
-            es.set(x, y, x+1,y);
-            createFixture(fixDef, t, es);
+            createFixture(t);
         }
-        if(x != w-1 && worldTerrain[y][x+1].getTypeFront().getSolidity() != Solidity.SOLID) {
+        if(x != w-1 && worldTerrain[y][x+1].getTypeFront().getTileFix() != TileFix.FULL) {
             shape.set(x+1, y, x+1,y+1);
-            EdgeShape es = new EdgeShape();
-            es.set(x, y, x+1,y);
-            createFixture(fixDef, t, es);
+            createFixture(t);
         }
     }
 
-    private void createFixture(FixtureDef fixDef, ExpiTile t, EdgeShape testShape) {
-
-        FixtureDef def = new FixtureDef();
-        def.shape = testShape;
-        def.friction = 0.2f;
-        def.filter.categoryBits = Consts.DEFAULT_BIT;
-
-        Fixture f = terrainBody.createFixture(def);
+    private void createFixture(ExpiTile t) {
+        Fixture f = terrainBody.createFixture(fixDef);
         t.getFixtures().add(f);
     }
 

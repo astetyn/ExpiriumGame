@@ -15,6 +15,7 @@ import com.astetyne.expirium.server.api.event.*;
 import com.astetyne.expirium.server.api.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.api.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.resources.TileFix;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -174,7 +175,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
 
         t.setTypeFront(to);
-        fixtureCalc.recalcTileFixturesPlus(t);
+        fixtureCalc.updateTileFixturesAndNearbyTiles(t);
 
         List<ExpiTile> changedTiles = new ArrayList<>();
         changedTiles.add(t);
@@ -189,7 +190,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
                 createDroppedItem(t2);
             }
             t2.setTypeFront(TileType.AIR);
-            fixtureCalc.clearTileFixtures(t2);
+            fixtureCalc.updateTileFixturesAndNearbyTiles(t2);
             changedTiles.add(t2);
             it.remove();
         }
@@ -231,7 +232,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         int x = t.getX();
         int y = t.getY();
 
-        if(toPlace.getBuildTile().getSolidity().isSoft()) return true;
+        if(toPlace.getBuildTile().getTileFix() == TileFix.SOFT) return true;
 
         for(ExpiEntity p : ExpiServer.get().getEntities()) {
 

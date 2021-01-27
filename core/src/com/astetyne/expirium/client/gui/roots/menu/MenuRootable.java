@@ -1,7 +1,11 @@
 package com.astetyne.expirium.client.gui.roots.menu;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+
 public interface MenuRootable {
 
-    //todo just in case i will need something
+    Actor getActor();
+
+    void onEnd();
 
 }

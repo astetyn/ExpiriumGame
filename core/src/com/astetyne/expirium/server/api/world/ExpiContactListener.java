@@ -1,43 +1,33 @@
 package com.astetyne.expirium.server.api.world;
 
 import com.astetyne.expirium.server.api.entity.Collidable;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExpiContactListener implements ContactListener {
 
-    private final HashMap<Fixture, Collidable> listeners;
-    private final HashMap<Collidable, Fixture> convenientMap;
+    private final List<Collidable> listeners;
 
     public ExpiContactListener() {
-        listeners = new HashMap<>();
-        convenientMap = new HashMap<>();
+        listeners = new ArrayList<>();
     }
 
     @Override
     public void beginContact(Contact contact) {
-        Fixture fixA = contact.getFixtureA();
-        Fixture fixB = contact.getFixtureB();
-
-        if(listeners.containsKey(fixA)) {
-            listeners.get(fixA).onCollisionBegin(fixB);
-        }
-        if(listeners.containsKey(fixB)) {
-            listeners.get(fixB).onCollisionBegin(fixA);
+        for(Collidable listener : listeners) {
+            listener.onCollisionBegin(contact);
         }
     }
 
     @Override
     public void endContact(Contact contact) {
-        Fixture fixA = contact.getFixtureA();
-        Fixture fixB = contact.getFixtureB();
-
-        if(listeners.containsKey(fixA)) {
-            listeners.get(fixA).onCollisionEnd(fixB);
-        }
-        if(listeners.containsKey(fixB)) {
-            listeners.get(fixB).onCollisionEnd(fixA);
+        for(Collidable listener : listeners) {
+            listener.onCollisionEnd(contact);
         }
     }
 
@@ -51,14 +41,11 @@ public class ExpiContactListener implements ContactListener {
 
     }
 
-    public void registerListener(Fixture fix, Collidable collidable) {
-        listeners.put(fix, collidable);
-        convenientMap.put(collidable, fix);
+    public void registerListener(Collidable collidable) {
+        listeners.add(collidable);
     }
 
     public void unregisterListener(Collidable collidable) {
-        Fixture key = convenientMap.get(collidable);
-        listeners.remove(key);
-        convenientMap.remove(collidable);
+        listeners.remove(collidable);
     }
 }

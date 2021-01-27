@@ -11,27 +11,27 @@ import java.util.HashMap;
 
 public enum TileType implements Textureable {
 
-    AIR(Solidity.LABILE_SOFT, null, 0, Item.EMPTY, 0),
-    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 4),
-    RHYOLITE(Solidity.SOLID, TileTex.RHYOLITE, 5f, Item.RHYOLITE, 3),
-    GRASS(Solidity.SOLID, TileTex.GRASS, 4f, Item.GRASS, 2),
+    AIR(Solidity.LABILE, null, 0, Item.EMPTY, 0, TileFix.SOFT),
+    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 4, TileFix.FULL),
+    RHYOLITE(Solidity.SOLID, TileTex.RHYOLITE, 5f, Item.RHYOLITE, 3, TileFix.FULL),
+    GRASS(Solidity.SOLID, TileTex.GRASS, 4f, Item.GRASS, 2, TileFix.FULL),
     GRASS_SLOPE_R(Solidity.LABILE, TileTex.GRASS_SLOPE_R, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_R),
     GRASS_SLOPE_L(Solidity.LABILE, TileTex.GRASS_SLOPE_L, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_L),
-    DIRT(Solidity.SOLID, TileTex.DIRT, 4f, Item.DIRT, 2),
-    TREE1(Solidity.SOLID_SOFT_VERT, TileTex.TREE1, 3f, Item.RAW_WOOD, 1),
-    TREE2(Solidity.SOLID_SOFT_VERT, TileTex.TREE2, 3f, Item.RAW_WOOD, 1),
-    TREE3(Solidity.SOLID_SOFT_VERT, TileTex.TREE3, 3f, Item.RAW_WOOD, 1),
-    TREE4(Solidity.LABILE_SOFT, TileTex.TREE4, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1),
-    TREE5(Solidity.LABILE_SOFT, TileTex.TREE5, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1),
-    TREE6(Solidity.LABILE_SOFT, TileTex.TREE6, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1),
+    DIRT(Solidity.SOLID, TileTex.DIRT, 4f, Item.DIRT, 2, TileFix.FULL),
+    TREE1(Solidity.SOLID_VERT, TileTex.TREE1, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
+    TREE2(Solidity.SOLID_VERT, TileTex.TREE2, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
+    TREE3(Solidity.SOLID_VERT, TileTex.TREE3, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
+    TREE4(Solidity.LABILE, TileTex.TREE4, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
+    TREE5(Solidity.LABILE, TileTex.TREE5, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
+    TREE6(Solidity.LABILE, TileTex.TREE6, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
     CAMPFIRE_SMALL(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_SMALL, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
     CAMPFIRE_BIG(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_BIG, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
-    WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 6),
-    SOFT_WOODEN_WALL(Solidity.SOLID_SOFT, TileTex.SOFT_WOODEN_WALL, 2f, Item.SOFT_WOODEN_WALL, 6),
-    WOODEN_SUPPORT(Solidity.SOLID_SOFT, TileTex.WOODEN_SUPPORT, 1f, Item.EMPTY, 6),
-    RASPBERRY_BUSH_1(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1),
-    RASPBERRY_BUSH_2(Solidity.LABILE_SOFT_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1),
-    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3);
+    WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 6, TileFix.FULL),
+    SOFT_WOODEN_WALL(Solidity.SOLID, TileTex.SOFT_WOODEN_WALL, 2f, Item.SOFT_WOODEN_WALL, 6, TileFix.SOFT),
+    WOODEN_SUPPORT(Solidity.SOLID_VERT, TileTex.WOODEN_SUPPORT, 1f, Item.EMPTY, 6, TileFix.SOFT),
+    RASPBERRY_BUSH_1(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
+    RASPBERRY_BUSH_2(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
+    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3, TileFix.FULL);
 
     Solidity solidity;
     Textureable textureable;
@@ -39,14 +39,6 @@ public enum TileType implements Textureable {
     ItemDropper itemDropper;
     int maxStability; // set to 1 if LABILE is used
     TileFix tileFix;
-
-    TileType(Solidity ss, Textureable textureable, float time, Item item, int s) {
-        this(ss, textureable, time, new ItemDropper(new Item[]{item}, 1), s, null);
-    }
-
-    TileType(Solidity ss, Textureable textureable, float time, ItemDropper itemDropper, int s) {
-        this(ss, textureable, time, itemDropper, s, null);
-    }
 
     TileType(Solidity ss, Textureable textureable, float time, Item item, int s, TileFix fd) {
         this(ss, textureable, time, new ItemDropper(new Item[]{item}, 1), s, fd);

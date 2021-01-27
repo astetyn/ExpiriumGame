@@ -6,23 +6,19 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
 
-public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
+public abstract class ExpiEntity implements Metaable, Saveable {
 
     private final int ID;
     private final float width, height;
     private float angle;
     protected EntityType type;
     protected Body body;
-    protected boolean onGround;
-    private int collisions;
     private final Vector2 centerLoc;
 
     public ExpiEntity(EntityType type, float width, float height) {
 
         this.type = type;
-
         centerLoc = new Vector2();
 
         int randomID;
@@ -36,8 +32,6 @@ public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
         this.width = width;
         this.height = height;
         this.angle = 0;
-        onGround = false;
-        collisions = 0;
     }
 
     public int getID() {
@@ -84,18 +78,6 @@ public abstract class ExpiEntity implements Metaable, Collidable, Saveable {
         ExpiServer.get().getEntitiesID().remove(ID);
         ExpiServer.get().getEntities().remove(this);
         ExpiServer.get().getWorld().getB2dWorld().destroyBody(body);
-    }
-
-    @Override
-    public void onCollisionBegin(Fixture fix) {
-        collisions++;
-        onGround = true;
-    }
-
-    @Override
-    public void onCollisionEnd(Fixture fix) {
-        collisions--;
-        if(collisions == 0) onGround = false;
     }
 
 }

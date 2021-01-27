@@ -32,7 +32,8 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
         super(EntityType.PLAYER, 0.9f, 1.25f);
         body = EntityBodyFactory.createPlayerBody(location);
-        ExpiServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
+        groundSensor = EntityBodyFactory.createSensor(body);
+        ExpiServer.get().getWorld().getCL().registerListener(this);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
@@ -49,7 +50,8 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     public ExpiPlayer(DataInputStream in, ServerPlayerGateway gateway) throws IOException {
         super(EntityType.PLAYER, 0.9f, 1.25f, in);
         body = EntityBodyFactory.createPlayerBody(new Vector2(in.readFloat(), in.readFloat()));
-        ExpiServer.get().getWorld().getCL().registerListener(EntityBodyFactory.createSensor(body), this);
+        groundSensor = EntityBodyFactory.createSensor(body);
+        ExpiServer.get().getWorld().getCL().registerListener(this);
         int nameLength = in.readInt();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < nameLength; i++) {

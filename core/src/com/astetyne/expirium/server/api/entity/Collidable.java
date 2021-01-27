@@ -1,11 +1,11 @@
 package com.astetyne.expirium.server.api.entity;
 
-import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Contact;
 
 public interface Collidable {
 
-    void onCollisionBegin(Fixture fix);
+    void onCollisionBegin(Contact contact);
 
-    void onCollisionEnd(Fixture fix);
+    void onCollisionEnd(Contact contact);
 
 }

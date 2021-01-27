@@ -1,4 +1,4 @@
-package com.astetyne.expirium.client.utils;
+package com.astetyne.expirium.client.gui.widget;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Touchable;

@@ -3,12 +3,12 @@ package com.astetyne.expirium.client.screens;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.roots.menu.MainMenuRoot;
-import com.astetyne.expirium.client.utils.WarnMsgLabel;
+import com.astetyne.expirium.client.gui.roots.menu.MenuRootable;
+import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
@@ -16,6 +16,7 @@ public class MenuScreen implements Screen {
 
     private final Stage stage;
     private final WarnMsgLabel warnMsgLabel;
+    private MenuRootable activeRoot;
 
     public MenuScreen() {
         this("");
@@ -60,6 +61,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void hide() {
+        if(activeRoot != null) activeRoot.onEnd();
         System.out.println("Hiding launcher screen.");
         Gdx.input.setInputProcessor(null);
         dispose();
@@ -70,11 +72,13 @@ public class MenuScreen implements Screen {
         stage.dispose();
     }
 
-    public void setRoot(Actor root) {
-        root.setBounds(0, 0, 2000, 1000);
+    public void setRoot(MenuRootable root) {
+        if(activeRoot != null) activeRoot.onEnd();
+        root.getActor().setBounds(0, 0, 2000, 1000);
         stage.clear();
-        stage.addActor(root);
+        stage.addActor(root.getActor());
         stage.addActor(warnMsgLabel);
+        activeRoot = root;
     }
 
     public void addWarning(String msg, long duration, Color color) {

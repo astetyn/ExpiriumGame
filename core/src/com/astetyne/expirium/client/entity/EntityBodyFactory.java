@@ -92,7 +92,6 @@ public class EntityBodyFactory {
         polyShape.dispose();
 
         return fix;
-
     }
 
 }

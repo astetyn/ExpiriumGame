@@ -112,4 +112,13 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
 
     }
 
+    @Override
+    public Actor getActor() {
+        return this;
+    }
+
+    @Override
+    public void onEnd() {
+
+    }
 }
