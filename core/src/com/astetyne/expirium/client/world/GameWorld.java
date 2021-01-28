@@ -27,7 +27,7 @@ import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 32;
+    public static float PPM = 64; // pixel per meter when zoom == 1
 
     private Tile[][] worldTerrain;
     private final HashMap<Integer, Entity> entitiesID;

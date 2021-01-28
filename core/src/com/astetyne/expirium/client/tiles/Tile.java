@@ -1,6 +1,7 @@
 package com.astetyne.expirium.client.tiles;
 
 import com.astetyne.expirium.client.screens.GameScreen;
+import com.astetyne.expirium.client.utils.Consts;
 
 public class Tile {
 
@@ -59,9 +60,25 @@ public class Tile {
     public byte getTimeCompensatedSkyLight() {
         float dayTime = GameScreen.get().getDayTime();
         float moonLightFactor = 0.2f;
-        if(dayTime >= 0 && dayTime < 25) return (byte) Math.max(skyLight / 25f * dayTime, skyLight * moonLightFactor);
-        else if(dayTime >= 25 && dayTime < 600) return skyLight;
-        else if(dayTime >= 600 && dayTime < 625) return (byte) Math.max(skyLight / 25f * (625 - dayTime), skyLight * moonLightFactor);
+
+        int srs = Consts.SUNRISE_START;
+        float srd = Consts.SUNRISE_END - Consts.SUNRISE_START;
+        int sre = Consts.SUNRISE_END;
+
+        int sss = Consts.SUNSET_START;
+        float ssd = Consts.SUNSET_END - Consts.SUNSET_START;
+        int sse = Consts.SUNSET_END;
+
+        // sunrise
+        if(dayTime >= srs && dayTime < sre) return (byte) Math.max(skyLight / srd * (dayTime - srs), skyLight * moonLightFactor);
+
+        //daylight
+        else if(dayTime >= sre && dayTime < sss) return skyLight;
+
+        //sunset
+        else if(dayTime >= sss && dayTime < sse) return (byte) Math.max(skyLight / ssd * (sse - dayTime), skyLight * moonLightFactor);
+
+        //night
         else return (byte) (skyLight * moonLightFactor);
     }
 
