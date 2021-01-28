@@ -6,36 +6,43 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public abstract class ExpiEntity implements Metaable, Saveable {
 
-    private final int ID;
-    private final float width, height;
-    private float angle;
-    protected EntityType type;
-    protected Body body;
+    protected final ExpiServer server;
+    private final int id;
+    protected final EntityType type;
     private final Vector2 centerLoc;
+    protected Body body;
 
-    public ExpiEntity(EntityType type, float width, float height) {
-
+    public ExpiEntity(ExpiServer server, EntityType type, Vector2 loc) {
+        this.server = server;
+        id = server.getRandomEntityID();
         this.type = type;
         centerLoc = new Vector2();
 
-        int randomID;
-        do {
-            randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(ExpiServer.get().getEntitiesID().containsKey(randomID));
-        ExpiServer.get().getEntitiesID().put(randomID, this);
-        ExpiServer.get().getEntities().add(this);
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(loc);
+        body = server.getWorld().getB2dWorld().createBody(bodyDef);
 
-        this.ID = randomID;
-        this.width = width;
-        this.height = height;
-        this.angle = 0;
+        server.getEntitiesID().put(id, this);
+        server.getEntities().add(this);
     }
 
-    public int getID() {
-        return ID;
+    public ExpiEntity(ExpiServer server, EntityType type,  DataInputStream in) throws IOException {
+        this(server, type, new Vector2(in.readFloat(), in.readFloat()));
+    }
+
+    public abstract void createBodyFixtures();
+
+    public int getId() {
+        return id;
     }
 
     public Vector2 getLocation() {
@@ -43,7 +50,7 @@ public abstract class ExpiEntity implements Metaable, Saveable {
     }
 
     public Vector2 getCenter() {
-        return centerLoc.set(body.getPosition().x + width/2, body.getPosition().y + height/2);
+        return centerLoc.set(body.getPosition().x + type.getWidth()/2, body.getPosition().y + type.getHeight()/2);
     }
 
     public Vector2 getVelocity() {
@@ -51,19 +58,11 @@ public abstract class ExpiEntity implements Metaable, Saveable {
     }
 
     public float getWidth() {
-        return width;
+        return type.getWidth();
     }
 
     public float getHeight() {
-        return height;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
-
-    public float getAngle() {
-        return angle;
+        return type.getHeight();
     }
 
     public EntityType getType() {
@@ -75,9 +74,14 @@ public abstract class ExpiEntity implements Metaable, Saveable {
     }
 
     public void destroy() {
-        ExpiServer.get().getEntitiesID().remove(ID);
-        ExpiServer.get().getEntities().remove(this);
-        ExpiServer.get().getWorld().getB2dWorld().destroyBody(body);
+        server.getEntitiesID().remove(id);
+        server.getEntities().remove(this);
+        server.getWorld().getB2dWorld().destroyBody(body);
+    }
+
+    public void writeData(DataOutputStream out) throws IOException {
+        out.writeFloat(body.getPosition().x);
+        out.writeFloat(body.getPosition().y);
     }
 
 }

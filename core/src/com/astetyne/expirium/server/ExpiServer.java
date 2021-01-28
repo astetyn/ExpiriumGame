@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
@@ -47,17 +46,16 @@ public class ExpiServer implements Saveable {
     private final ServerFailListener failListener;
     private final MulticastSender multicastSender;
 
+    private boolean fullyRunning;
+    private boolean closeRequest;
+
     /** Object representing whole game server.
-     * Note that you can create only one instance of this object and because server can be stopped in any
-     * moment and garbage collected, there MUST NOT be any static references to this server or its sub-parts.
-     *
-     * You should create this object on dedicated thread, it will create endless loop.
+     * Only constructor will run on main thread, whole server will then run on dedicated thread.
      */
     public ExpiServer(ServerPreferences serverPreferences, ServerFailListener listener) {
 
-        ExpiGame.get().server = this;
-
         this.failListener = listener;
+        closeRequest = false;
 
         System.out.println("Booting server...");
 
@@ -68,8 +66,8 @@ public class ExpiServer implements Saveable {
 
         eventManager = new EventManager();
 
-        tickLooper = new TickLooper(serverPreferences.tps);
-        serverGateway = new ServerGateway(serverPreferences.port);
+        tickLooper = new TickLooper(serverPreferences.tps, this);
+        serverGateway = new ServerGateway(serverPreferences.port, this);
         multicastSender = new MulticastSender();
 
         fileManager = new WorldFileManager(serverPreferences.worldPreferences.worldName);
@@ -79,9 +77,9 @@ public class ExpiServer implements Saveable {
         if(serverPreferences.worldPreferences instanceof CreateWorldPreferences) {
 
             // this is executed when user is creating new world and no data is saved
-            expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences);
+            expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences, this);
             saveableModules.add(new RaspberryListener(this));
-            saveableModules.add(new CampfireListener());
+            saveableModules.add(new CampfireListener(this));
         }else {
 
             try {
@@ -92,16 +90,16 @@ public class ExpiServer implements Saveable {
                 if(savedVersion != version) failListener.onServerFail("World has incompatible version." +
                         " ("+savedVersion+") Your is: "+" ("+version+")");
 
-                expiWorld = new ExpiWorld(in);
+                expiWorld = new ExpiWorld(in, this);
 
                 // this must be loaded here, because it requires fully loaded ExpiWorld
                 int entitiesSize = in.readInt();
                 for(int i = 0; i < entitiesSize; i++) {
-                    EntityType.getType(in.readInt()).initEntity(in);
+                    EntityType.getType(in.readInt()).initEntity(this, in);
                 }
 
-                saveableModules.add(new RaspberryListener(in, this));
-                saveableModules.add(new CampfireListener(in));
+                saveableModules.add(new RaspberryListener(this, in));
+                saveableModules.add(new CampfireListener(this, in));
 
                 in.close();
             } catch(IOException e) {
@@ -121,8 +119,10 @@ public class ExpiServer implements Saveable {
         t2.setName("Multicast sender loop");
         t2.start();
 
-        tickLooper.run();
-        // do not add any code here - ticklooper is infinite loop
+        Thread t3 = new Thread(tickLooper);
+        t3.setName("Tick Looper");
+        t3.start();
+
     }
 
     /**
@@ -130,22 +130,7 @@ public class ExpiServer implements Saveable {
      * create new instance in order to use server again. You can call this method from any thread.
      */
     public void close() {
-        System.out.println("performing normal close");
-        multicastSender.stop();
-        tickLooper.stop();
-        serverGateway.stop();
-        for(ExpiPlayer p : players) {
-            p.getGateway().stop();
-        }
-        synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
-            ExpiServer.get().getTickLooper().getTickLock().notifyAll();
-        }
-        try {
-            fileManager.saveGameServer(this);
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
-        dispose();
+        closeRequest = true;
     }
 
     /**
@@ -159,11 +144,30 @@ public class ExpiServer implements Saveable {
         for(ExpiPlayer p : players) {
             p.getGateway().stop();
         }
-        synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
-            ExpiServer.get().getTickLooper().getTickLock().notifyAll();
+        synchronized(tickLooper.getTickLock()) {
+            tickLooper.getTickLock().notifyAll();
         }
         try {
-            fileManager.saveGameServer(this);
+            fileManager.saveGameServer(this, this);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        dispose();
+    }
+
+    private void performClose() {
+        System.out.println("performing normal close");
+        multicastSender.stop();
+        tickLooper.stop();
+        serverGateway.stop();
+        for(ExpiPlayer p : players) {
+            p.getGateway().stop();
+        }
+        synchronized(tickLooper.getTickLock()) {
+            tickLooper.getTickLock().notifyAll();
+        }
+        try {
+            fileManager.saveGameServer(this, this);
         }catch(IOException e) {
             e.printStackTrace();
         }
@@ -179,7 +183,14 @@ public class ExpiServer implements Saveable {
 
     public void onTick() {
 
-        expiWorld.onTick();
+        if(!fullyRunning && serverGateway.isFullyRunning()) {
+            fullyRunning = true;
+        }
+
+        if(closeRequest && fullyRunning) {
+            performClose();
+            return;
+        }
 
         for(ExpiPlayer pp : players) {
             pp.getNetManager().putEnviroPacket();
@@ -208,10 +219,6 @@ public class ExpiServer implements Saveable {
 
     public TickLooper getTickLooper() {
         return tickLooper;
-    }
-
-    public static ExpiServer get() {
-        return ExpiGame.get().server;
     }
 
     public ServerGateway getServerGateway() {
@@ -256,5 +263,13 @@ public class ExpiServer implements Saveable {
         for(Saveable saveable : saveableModules) {
             saveable.writeData(out);
         }
+    }
+
+    public int getRandomEntityID() {
+        int randomID;
+        do {
+            randomID = (int)(Math.random()*Integer.MAX_VALUE);
+        } while(entitiesID.containsKey(randomID));
+        return randomID;
     }
 }

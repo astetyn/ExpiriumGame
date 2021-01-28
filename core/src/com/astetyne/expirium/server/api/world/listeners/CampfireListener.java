@@ -16,14 +16,17 @@ import java.util.HashMap;
 
 public class CampfireListener implements TileChangeListener, Saveable {
 
+    private final ExpiServer server;
     private final HashMap<ExpiTile, Campfire> campfires;
 
-    public CampfireListener() {
+    public CampfireListener(ExpiServer server) {
+        this.server = server;
         campfires = new HashMap<>();
-        ExpiServer.get().getEventManager().getTileChangeListeners().add(this);
+        server.getEventManager().getTileChangeListeners().add(this);
     }
 
-    public CampfireListener(DataInputStream in) throws IOException {
+    public CampfireListener(ExpiServer server, DataInputStream in) throws IOException {
+        this.server = server;
         campfires = new HashMap<>();
 
         int number = in.readInt();
@@ -32,7 +35,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
             campfires.put(cf.getTile(), cf);
         }
 
-        ExpiServer.get().getEventManager().getTileChangeListeners().add(this);
+        server.getEventManager().getTileChangeListeners().add(this);
     }
 
     @Override
@@ -50,7 +53,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
         }
 
         if(toType == TileType.CAMPFIRE_BIG || toType == TileType.CAMPFIRE_SMALL) {
-            Campfire cf = new Campfire(event.getTile());
+            Campfire cf = new Campfire(server, event.getTile());
             campfires.put(cf.getTile(), cf);
         }
 

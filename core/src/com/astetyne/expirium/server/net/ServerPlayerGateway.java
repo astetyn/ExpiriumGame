@@ -17,9 +17,11 @@ public class ServerPlayerGateway extends TerminableLooper {
     private int traffic;
     private long time;
     private ExpiPlayer owner;
+    private final ExpiServer server;
 
-    public ServerPlayerGateway(Socket client) {
+    public ServerPlayerGateway(Socket client, ExpiServer server) {
         this.client = client;
+        this.server = server;
         joinLock = new Object();
         traffic = 0;
         time = 0;
@@ -40,7 +42,7 @@ public class ServerPlayerGateway extends TerminableLooper {
             int readBytes = in.fillBuffer();
             if(readBytes == -1) stop();
 
-            ExpiServer.get().getServerGateway().playerPreJoinAsync(this);
+            server.getServerGateway().playerPreJoinAsync(this);
 
             synchronized(joinLock) {
                 joinLock.wait(); // wait until main looper recognize new player and populate init actions
@@ -53,7 +55,7 @@ public class ServerPlayerGateway extends TerminableLooper {
                 client.setSoTimeout(5000);
                 readBytes = in.fillBuffer();
                 if(readBytes == -1) {
-                    ExpiServer.get().getServerGateway().playerPreLeaveAsync(owner);
+                    server.getServerGateway().playerPreLeaveAsync(owner);
                     return;
                 }
 
@@ -64,15 +66,15 @@ public class ServerPlayerGateway extends TerminableLooper {
                     traffic = 0;
                 }
 
-                synchronized(ExpiServer.get().getTickLooper().getTickLock()) {
-                    ExpiServer.get().getTickLooper().getTickLock().wait();
+                synchronized(server.getTickLooper().getTickLock()) {
+                    server.getTickLooper().getTickLock().wait();
                     in.swap();
                     out.swap();
                 }
             }
 
         }catch(IOException | InterruptedException e) {
-            ExpiServer.get().getServerGateway().playerPreLeaveAsync(owner);
+            server.getServerGateway().playerPreLeaveAsync(owner);
         }
         System.out.println("Channel with client \""+owner.getName()+"\" closed.");
     }
@@ -87,7 +89,7 @@ public class ServerPlayerGateway extends TerminableLooper {
 
     public void setOwner(ExpiPlayer owner) {
         this.owner = owner;
-        packetManager = new ServerPacketManager(owner);
+        packetManager = new ServerPacketManager(server, owner);
     }
 
     public ServerPacketManager getManager() {

@@ -32,6 +32,7 @@ import java.util.List;
 
 public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
+    private final ExpiServer server;
     private final ExpiTile[][] worldTerrain;
     private int partHeight;
     private World b2dWorld;
@@ -45,7 +46,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private final int width, height;
     private final long seed;
 
-    public ExpiWorld(CreateWorldPreferences preferences) {
+    public ExpiWorld(CreateWorldPreferences preferences, ExpiServer server) {
+
+        this.server = server;
 
         width = preferences.width;
         height = preferences.height;
@@ -61,7 +64,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     }
 
-    public ExpiWorld(DataInputStream in) throws IOException {
+    public ExpiWorld(DataInputStream in, ExpiServer server) throws IOException {
+
+        this.server = server;
 
         width = in.readInt();
         height = in.readInt();
@@ -109,7 +114,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
 
-        ExpiServer.get().getEventManager().getPlayerInteractListeners().add(this);
+        server.getEventManager().getPlayerInteractListeners().add(this);
 
     }
 
@@ -125,7 +130,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             dayTime = 0;
         }
 
-        for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+        for(ExpiPlayer pp : server.getPlayers()) {
             pp.applyPhysics();
         }
 
@@ -136,8 +141,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
         //b2dWorld.step(1f/Consts.SERVER_DEFAULT_TPS, 6, 2);
 
-        for(ExpiEntity ee : ExpiServer.get().getEntities()) {
-            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+        for(ExpiEntity ee : server.getEntities()) {
+            for(ExpiPlayer pp : server.getPlayers()) {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
         }
@@ -197,7 +202,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         affectedTiles.add(t);
 
-        for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+        for(ExpiPlayer pp : server.getPlayers()) {
             for(ExpiTile t2 : changedTiles) {
                 pp.getNetManager().putTileChangePacket(t2);
             }
@@ -205,7 +210,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
 
         TileChangeEvent e = new TileChangeEvent(t, from, p, source);
-        List<TileChangeListener> list = ExpiServer.get().getEventManager().getTileChangeListeners();
+        List<TileChangeListener> list = server.getEventManager().getTileChangeListeners();
         for(int i = list.size() - 1; i >= 0; i--) {
             list.get(i).onTileChange(e);
         }
@@ -220,8 +225,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         Vector2 loc = new Vector2(t.getX() + off, t.getY() + off);
         for(Item item : ItemDropper.chooseItems(t.getTypeFront().getItemDropper())) {
             if(item == Item.EMPTY) return;
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(loc, item, Consts.ITEM_COOLDOWN_BREAK);
-            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+            ExpiDroppedItem droppedItem = new ExpiDroppedItem(server, loc, item, Consts.ITEM_COOLDOWN_BREAK);
+            for(ExpiPlayer pp : server.getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(droppedItem);
             }
         }
@@ -234,7 +239,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         if(toPlace.getBuildTile().getTileFix() == TileFix.SOFT) return true;
 
-        for(ExpiEntity p : ExpiServer.get().getEntities()) {
+        for(ExpiEntity p : server.getEntities()) {
 
             float px = p.getLocation().x;
             float py = p.getLocation().y;

@@ -20,7 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -56,7 +55,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref, menu);
                 try {
-                    ExpiGame.get().startClient(InetAddress.getLocalHost());
+                    ExpiGame.get().connectToServer(InetAddress.getLocalHost());
                 }catch(UnknownHostException e) {
                     e.printStackTrace();
                 }
@@ -94,13 +93,16 @@ public class HostCreatorRoot extends Table implements MenuRootable {
         tf.setMessageText("Enter world name");
         tf.setAlignment(Align.center);
         tf.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z ]"));
+        tf.setMaxLength(10);
 
         HostCreatorRoot ref = this;
 
         tf.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                menu.setRoot(new TextInputRoot(() -> menu.setRoot(ref), tf));
+                TextInputRoot tir = new TextInputRoot(() -> menu.setRoot(ref), tf);
+                menu.setRoot(tir);
+                tir.setFocus(menu.getStage());
             }
         });
 
@@ -125,7 +127,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref, menu);
                 try {
-                    ExpiGame.get().startClient(Inet4Address.getLocalHost());
+                    ExpiGame.get().connectToServer(InetAddress.getLocalHost());
                 }catch(UnknownHostException e) {
                     e.printStackTrace();
                 }

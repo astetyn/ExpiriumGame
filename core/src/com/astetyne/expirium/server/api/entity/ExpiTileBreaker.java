@@ -12,19 +12,20 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ExpiTileBreaker {
 
+    private ExpiServer server;
     private ExpiTile targetTile;
     private float timeAccumulator;
     private final Vector2 tempVec, tempVec2;
     private final ExpiWorld world;
     private final ExpiPlayer owner;
 
-    public ExpiTileBreaker(ExpiPlayer owner) {
+    public ExpiTileBreaker(ExpiServer server, ExpiPlayer owner) {
         this.owner = owner;
         targetTile = null;
         timeAccumulator = 0;
         tempVec = new Vector2();
         tempVec2 = new Vector2();
-        world = ExpiServer.get().getWorld();
+        world = server.getWorld();
     }
 
     public void onTick(ThumbStickData data) {
@@ -50,7 +51,7 @@ public class ExpiTileBreaker {
                 targetTile = null;
                 break;
             }
-            ExpiTile newTarget = ExpiServer.get().getWorld().getTileAt(tempVec);
+            ExpiTile newTarget = world.getTileAt(tempVec);
             if(newTarget == null) {
                 timeAccumulator = 0;
                 if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
@@ -77,7 +78,7 @@ public class ExpiTileBreaker {
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
             if(timeAccumulator >= targetTile.getTypeFront().getBreakTime()) {
-                ExpiServer.get().getWorld().changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
+                world.changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
                 owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;

@@ -10,10 +10,10 @@ public class WorldLoader {
     private int partNumber;
     private final ExpiWorld world;
 
-    public WorldLoader(ExpiPlayer owner) {
+    public WorldLoader(ExpiServer server, ExpiPlayer owner) {
         this.owner = owner;
         partNumber = 0;
-        world = ExpiServer.get().getWorld();
+        world = server.getWorld();
     }
 
     public void update() {

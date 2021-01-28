@@ -30,7 +30,9 @@ public class WorldFileManager {
         return new DataInputStream(new BufferedInputStream(file.read()));
     }
 
-    public void saveGameServer(Saveable saveable) throws IOException {
+    public void saveGameServer(ExpiServer server, Saveable saveable) throws IOException {
+
+        System.out.println("Saving server...");
 
         FileHandle file = Gdx.files.local(worldsPath+worldName+worldDataPath);
 
@@ -38,9 +40,11 @@ public class WorldFileManager {
         saveable.writeData(out);
         out.close();
 
-        for(ExpiPlayer p : ExpiServer.get().getPlayers()) {
+        for(ExpiPlayer p : server.getPlayers()) {
             savePlayer(p);
         }
+
+        System.out.println("Saving done.");
 
     }
 

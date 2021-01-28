@@ -1,7 +1,6 @@
 package com.astetyne.expirium.server.api.entity;
 
 import com.astetyne.expirium.client.data.ThumbStickData;
-import com.astetyne.expirium.client.entity.EntityBodyFactory;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemRecipe;
@@ -14,6 +13,8 @@ import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.net.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -28,46 +29,90 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     private final ExpiTileBreaker tileBreaker;
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
+    private float resurrectionTime; // -1 player is alive, 0 player has option to resurrect
 
-    public ExpiPlayer(Vector2 location, ServerPlayerGateway gateway, String name) {
-        super(EntityType.PLAYER, 0.9f, 1.25f);
-        body = EntityBodyFactory.createPlayerBody(location);
-        groundSensor = EntityBodyFactory.createSensor(body);
-        ExpiServer.get().getWorld().getCL().registerListener(this);
+    public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
+        super(server, EntityType.PLAYER, location);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
+        resurrectionTime = -1;
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new ExpiInventory(1, 1, 1, false);
-        tileBreaker = new ExpiTileBreaker(this);
+        tileBreaker = new ExpiTileBreaker(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
-        ExpiServer.get().getPlayers().add(this);
-        ExpiServer.get().getEventManager().getTickListeners().add(this);
+        createBodyFixtures();
+        server.getPlayers().add(this);
+        server.getEventManager().getTickListeners().add(this);
     }
 
-    public ExpiPlayer(DataInputStream in, ServerPlayerGateway gateway) throws IOException {
-        super(EntityType.PLAYER, 0.9f, 1.25f, in);
-        body = EntityBodyFactory.createPlayerBody(new Vector2(in.readFloat(), in.readFloat()));
-        groundSensor = EntityBodyFactory.createSensor(body);
-        ExpiServer.get().getWorld().getCL().registerListener(this);
+    public ExpiPlayer(ExpiServer server, DataInputStream in, ServerPlayerGateway gateway) throws IOException {
+        super(server, EntityType.PLAYER, in);
+        server.getWorld().getCL().registerListener(this);
         int nameLength = in.readInt();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < nameLength; i++) {
             sb.append(in.readChar());
         }
+        resurrectionTime = in.readFloat();
         this.gateway = gateway;
         gateway.setOwner(this);
         name = sb.toString();
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new ExpiInventory(1, 1, 1, false);
-        tileBreaker = new ExpiTileBreaker(this);
+        tileBreaker = new ExpiTileBreaker(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
-        ExpiServer.get().getPlayers().add(this);
-        ExpiServer.get().getEventManager().getTickListeners().add(this);
+        createBodyFixtures();
+        server.getPlayers().add(this);
+        server.getEventManager().getTickListeners().add(this);
+    }
+
+    public void createBodyFixtures() {
+
+        body.setFixedRotation(true);
+
+        PolygonShape polyShape = new PolygonShape();
+        FixtureDef fixtureDef = new FixtureDef();
+
+        fixtureDef.density = 30f;
+        fixtureDef.restitution = 0f;
+        fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
+        fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
+
+        // upper poly
+        polyShape.setAsBox(0.45f, 0.55f, new Vector2(0.45f, 0.7f), 0);
+        fixtureDef.shape = polyShape;
+        fixtureDef.friction = 0;
+        body.createFixture(fixtureDef);
+
+        // bottom poly
+        float[] verts = new float[8];
+        verts[0] = 0.05f;
+        verts[1] = 0.15f;
+        verts[2] = 0.2f;
+        verts[3] = 0;
+        verts[4] = 0.7f;
+        verts[5] = 0;
+        verts[6] = 0.85f;
+        verts[7] = 0.15f;
+
+        // ground sensor
+        polyShape.set(verts);
+        fixtureDef.friction = 1;
+        body.createFixture(fixtureDef);
+
+        polyShape.setAsBox(0.4f, 0.3f, new Vector2(0.45f, 0.2f), 0);
+        fixtureDef.density = 0f;
+        fixtureDef.isSensor = true;
+        fixtureDef.friction = 0;
+
+        groundSensor = body.createFixture(fixtureDef);
+
+        polyShape.dispose();
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -180,8 +225,8 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     private void throwAwayItem(ItemStack is) {
         for(int i = 0; i < is.getAmount(); i++) {
             //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
-            ExpiDroppedItem edi = new ExpiDroppedItem(getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
-            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+            ExpiDroppedItem edi = new ExpiDroppedItem(server, getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
+            for(ExpiPlayer pp : server.getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(edi);
             }
         }
@@ -276,12 +321,12 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     @Override
     public void destroy() {
         destroySafe();
-        ExpiServer.get().getPlayers().remove(this);
+        server.getPlayers().remove(this);
     }
 
     public void destroySafe() {
         super.destroy();
-        ExpiServer.get().getEventManager().getTickListeners().remove(this);
+        server.getEventManager().getTickListeners().remove(this);
     }
 
     @Override
@@ -304,10 +349,9 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         super.writeData(out);
-        out.writeFloat(getLocation().x);
-        out.writeFloat(getLocation().y);
         out.writeInt(name.length());
         out.writeChars(name);
         mainInv.writeData(out);
+        out.writeFloat(resurrectionTime);
     }
 }

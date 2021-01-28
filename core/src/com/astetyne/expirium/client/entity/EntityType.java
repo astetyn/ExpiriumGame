@@ -1,5 +1,7 @@
 package com.astetyne.expirium.client.entity;
 
+import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
@@ -12,15 +14,18 @@ import java.util.HashMap;
 
 public enum EntityType {
 
-    PLAYER(PlayerEntity.class, ExpiPlayer.class),
-    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class);
+    PLAYER(PlayerEntity.class, ExpiPlayer.class, 0.9f, 1.25f),
+    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, Consts.D_I_SIZE, Consts.D_I_SIZE);
 
     Class<? extends Entity> entityClazz;
     Class<? extends ExpiEntity> entityClazz2;
+    float width, height;
 
-    EntityType(Class<? extends Entity> entityClazz, Class<? extends ExpiEntity> entityClazz2) {
+    EntityType(Class<? extends Entity> entityClazz, Class<? extends ExpiEntity> entityClazz2, float width, float height) {
         this.entityClazz = entityClazz;
         this.entityClazz2 = entityClazz2;
+        this.width = width;
+        this.height = height;
     }
 
     public int getID() {
@@ -38,10 +43,10 @@ public enum EntityType {
         return null;
     }
 
-    public ExpiEntity initEntity(DataInputStream in) {
+    public ExpiEntity initEntity(ExpiServer server, DataInputStream in) {
         if(this == EntityType.PLAYER) return null;
         try {
-            return entityClazz2.getConstructor(DataInputStream.class).newInstance(in);
+            return entityClazz2.getConstructor(ExpiServer.class, DataInputStream.class).newInstance(server, in);
         }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -63,4 +68,11 @@ public enum EntityType {
         return map.get(id);
     }
 
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
 }

@@ -43,7 +43,7 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 menu.setRoot(new LoadingRoot("Connecting to server..."));
-                ExpiGame.get().startClient(chosenServer.address);
+                ExpiGame.get().connectToServer(chosenServer.address);
             }
         });
 

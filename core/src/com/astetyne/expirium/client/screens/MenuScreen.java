@@ -84,4 +84,8 @@ public class MenuScreen implements Screen {
     public void addWarning(String msg, long duration, Color color) {
         warnMsgLabel.addWarning(msg, duration, color);
     }
+
+    public Stage getStage() {
+        return stage;
+    }
 }

@@ -18,11 +18,13 @@ import java.util.List;
 
 public class ServerPacketManager {
 
+    private final ExpiServer server;
     private final PacketInputStream in;
     private final PacketOutputStream out;
     private final ExpiPlayer owner;
 
-    public ServerPacketManager(ExpiPlayer owner) {
+    public ServerPacketManager(ExpiServer server, ExpiPlayer owner) {
+        this.server = server;
         this.owner = owner;
         this.in = owner.getGateway().getIn();
         this.out = owner.getGateway().getOut();
@@ -47,9 +49,9 @@ public class ServerPacketManager {
                     float x = in.getFloat();
                     float y = in.getFloat();
                     InteractType type = InteractType.getType(in.getInt());
-                    ExpiTile tile = ExpiServer.get().getWorld().getTileAt(x, y);
+                    ExpiTile tile = server.getWorld().getTileAt(x, y);
                     PlayerInteractEvent e = new PlayerInteractEvent(owner, x, y, tile, type);
-                    List<PlayerInteractListener> list = ExpiServer.get().getEventManager().getPlayerInteractListeners();
+                    List<PlayerInteractListener> list = server.getEventManager().getPlayerInteractListeners();
                     for(int j = list.size() - 1; j >= 0; j--) {
                         list.get(j).onInteract(e);
                     }
@@ -81,7 +83,7 @@ public class ServerPacketManager {
         out.putInt(w);
         out.putInt(h);
 
-        out.putInt(owner.getID());
+        out.putInt(owner.getId());
         out.putVector(owner.getLocation());
         out.putInt(entities.size());
         for(ExpiEntity e : entities) {
@@ -107,7 +109,7 @@ public class ServerPacketManager {
 
     public void putEntityMovePacket(ExpiEntity e) {
         out.startPacket(19);
-        out.putInt(e.getID());
+        out.putInt(e.getId());
         out.putFloat(e.getLocation().x);
         out.putFloat(e.getLocation().y);
         out.putFloat(e.getVelocity().x);
@@ -122,7 +124,7 @@ public class ServerPacketManager {
 
     public void putEntityDespawnPacket(ExpiEntity e) {
         out.startPacket(21);
-        out.putInt(e.getID());
+        out.putInt(e.getId());
     }
 
     public void putInvFeedPacket() {
@@ -185,8 +187,8 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putFloat(ExpiServer.get().getWorld().getDayTime());
-        out.putInt(ExpiServer.get().getWorld().getWeather().getID());
+        out.putFloat(server.getWorld().getDayTime());
+        out.putInt(server.getWorld().getWeather().getID());
     }
 
     public void putBreakingTilePacket(ExpiTile t, float state) {

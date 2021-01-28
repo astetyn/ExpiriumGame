@@ -74,7 +74,7 @@ public class PacketOutputStream {
 
     public void putEntity(ExpiEntity e) {
         putInt(e.getType().getID());
-        putInt(e.getID());
+        putInt(e.getId());
         putFloat(e.getLocation().x);
         putFloat(e.getLocation().y);
         e.writeMeta(this);

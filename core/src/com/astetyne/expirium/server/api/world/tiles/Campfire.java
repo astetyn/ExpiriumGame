@@ -21,29 +21,31 @@ import java.io.IOException;
 
 public class Campfire implements PlayerInteractListener, TickListener, Saveable {
 
+    private ExpiServer server;
     private final ExpiTile tile;
     private float remainingTime;
     private final CookingInventory inventory;
     private final long placeTime;
 
-    public Campfire(ExpiTile tile) {
+    public Campfire(ExpiServer server, ExpiTile tile) {
+        this.server = server;
         this.tile = tile;
         this.remainingTime = Consts.CAMPFIRE_TIME;
         this.inventory = new CookingInventory(2, 2, 5);
         placeTime = System.currentTimeMillis();
-        ExpiServer.get().getEventManager().getPlayerInteractListeners().add(this);
-        ExpiServer.get().getEventManager().getTickListeners().add(this);
+        server.getEventManager().getPlayerInteractListeners().add(this);
+        server.getEventManager().getTickListeners().add(this);
     }
 
     public Campfire(DataInputStream in) throws IOException {
         int x = in.readInt();
         int y = in.readInt();
         remainingTime = in.readFloat();
-        tile = ExpiServer.get().getWorld().getTerrain()[y][x];
+        tile = server.getWorld().getTerrain()[y][x];
         inventory = new CookingInventory(2, 2, 5, in);
         placeTime = 0;
-        ExpiServer.get().getEventManager().getPlayerInteractListeners().add(this);
-        ExpiServer.get().getEventManager().getTickListeners().add(this);
+        server.getEventManager().getPlayerInteractListeners().add(this);
+        server.getEventManager().getTickListeners().add(this);
     }
 
     @Override
@@ -60,18 +62,18 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
     public void onTick() {
         remainingTime -= 1f / Consts.SERVER_DEFAULT_TPS;
         if(remainingTime <= 0) {
-            ExpiServer.get().getWorld().changeTile(tile, TileType.AIR, false, null, Source.NATURAL);
-            ExpiServer.get().getEventManager().getPlayerInteractListeners().remove(this);
-            ExpiServer.get().getEventManager().getTickListeners().remove(this);
-            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+            server.getWorld().changeTile(tile, TileType.AIR, false, null, Source.NATURAL);
+            server.getEventManager().getPlayerInteractListeners().remove(this);
+            server.getEventManager().getTickListeners().remove(this);
+            for(ExpiPlayer pp : server.getPlayers()) {
                 if(pp.getSecondInv() != inventory) continue;
                 pp.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
                 float off = (1 - Consts.D_I_SIZE)/2;
                 Vector2 dropLoc = new Vector2(tile.getX() + off, tile.getY() + off);
                 for(ItemStack is : inventory.getItems()) {
                     for(int i = 0; i < is.getAmount(); i++) {
-                        ExpiDroppedItem edi = new ExpiDroppedItem(dropLoc, is.getItem(), 0.5f);
-                        for(ExpiPlayer pp2 : ExpiServer.get().getPlayers()) {
+                        ExpiDroppedItem edi = new ExpiDroppedItem(server, dropLoc, is.getItem(), 0.5f);
+                        for(ExpiPlayer pp2 : server.getPlayers()) {
                             pp2.getNetManager().putEntitySpawnPacket(edi);
                         }
                     }
@@ -79,7 +81,7 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
                 break;
             }
         }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 60) {
-            ExpiServer.get().getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.NATURAL);
+            server.getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.NATURAL);
         }
         inventory.onTick();
     }

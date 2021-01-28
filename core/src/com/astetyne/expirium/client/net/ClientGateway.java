@@ -36,12 +36,21 @@ public class ClientGateway extends TerminableLooper {
     @Override
     public void run() {
 
-        System.out.println("Client connecting...");
+        System.out.println("Client connecting to: "+address+":"+Consts.SERVER_PORT);
 
-        try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(address, Consts.SERVER_PORT), 10000);
-        } catch(IOException e) {
+        long startT = System.currentTimeMillis();
+        while(startT + 10000 > System.currentTimeMillis()) {
+            System.out.println("Next connection attempt...");
+            try {
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(address, Consts.SERVER_PORT), 10000);
+                break;
+            } catch(IOException ignored) {}
+            try {
+                Thread.sleep(1000);
+            }catch(InterruptedException ignored) {}
+        }
+        if(!socket.isConnected()) {
             failListener.onClientFail("Can't connect to server.\n Are you on the same network?");
             return;
         }

@@ -15,13 +15,17 @@ import java.util.List;
 
 public class ServerGateway extends TerminableLooper {
 
-    private ServerSocket server;
+    private ServerSocket serverSocket;
     private final int port;
     private final List<ServerPlayerGateway> joiningClients;
     private final List<ExpiPlayer> leavingPlayers;
+    private boolean fullyRunning;
+    private final ExpiServer server;
 
-    public ServerGateway(int port) {
+    public ServerGateway(int port, ExpiServer server) {
         this.port = port;
+        this.server = server;
+        fullyRunning = false;
         joiningClients = new ArrayList<>();
         leavingPlayers = new ArrayList<>();
     }
@@ -31,13 +35,15 @@ public class ServerGateway extends TerminableLooper {
 
         try {
 
-            server = new ServerSocket(port);
+            serverSocket = new ServerSocket(port);
+
+            fullyRunning = true;
 
             while(isRunning()) {
 
                 System.out.println("Listening for incoming clients...");
-                Socket client = server.accept();
-                Thread t = new Thread(new ServerPlayerGateway(client));
+                Socket client = serverSocket.accept();
+                Thread t = new Thread(new ServerPlayerGateway(client, server));
                 t.setName("Server (client) gateway");
                 t.start();
 
@@ -45,7 +51,7 @@ public class ServerGateway extends TerminableLooper {
 
         }catch(IOException | IllegalArgumentException e) {
             if(isRunning()) {
-                ExpiServer.get().faultClose();
+                server.faultClose();
                 System.out.println("Server gateway fatal fail.");
             }
         }
@@ -55,8 +61,12 @@ public class ServerGateway extends TerminableLooper {
     public void stop() {
         super.stop();
         try {
-            if(server != null) server.close();
+            if(serverSocket != null) serverSocket.close();
         }catch(IOException ignored) {}
+    }
+
+    public boolean isFullyRunning() {
+        return fullyRunning;
     }
 
     public void playerPreJoinAsync(ServerPlayerGateway p) {
@@ -75,14 +85,14 @@ public class ServerGateway extends TerminableLooper {
 
         synchronized(leavingPlayers) {
             for(ExpiPlayer p : leavingPlayers) {
-                ExpiServer.get().getPlayers().remove(p);
-                for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+                server.getPlayers().remove(p);
+                for(ExpiPlayer pp : server.getPlayers()) {
                     pp.getNetManager().putEntityDespawnPacket(p);
                 }
                 p.destroySafe();
                 p.getGateway().stop();
                 try {
-                    ExpiServer.get().getFileManager().savePlayer(p);
+                    server.getFileManager().savePlayer(p);
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
@@ -105,19 +115,19 @@ public class ServerGateway extends TerminableLooper {
                     continue;
                 }
                 String name = in.getString();
-                DataInputStream dataIn = ExpiServer.get().getFileManager().getPlayerDataStream(name);
+                DataInputStream dataIn = server.getFileManager().getPlayerDataStream(name);
                 ExpiPlayer ep = null;
                 if(dataIn == null) {
-                    ep = new ExpiPlayer(ExpiServer.get().getWorld().getSaveLocationForSpawn(), gateway, name);
+                    ep = new ExpiPlayer(server, server.getWorld().getSaveLocationForSpawn(), gateway, name);
                 }else {
                     try {
-                        ep = new ExpiPlayer(dataIn, gateway);
+                        ep = new ExpiPlayer(server, dataIn, gateway);
                     }catch(IOException e) {
                         e.printStackTrace();
                     }
                 }
                 joiningPlayers.add(ep);
-                ExpiServer.get().getWorldLoaders().add(new WorldLoader(ep));
+                server.getWorldLoaders().add(new WorldLoader(server, ep));
             }
             joiningClients.clear();
         }
@@ -126,13 +136,13 @@ public class ServerGateway extends TerminableLooper {
 
             // create list of entities (for new players)
             List<ExpiEntity> alreadyExistingEntities = new ArrayList<>();
-            for(ExpiEntity e : ExpiServer.get().getEntities()) {
+            for(ExpiEntity e : server.getEntities()) {
                 if(e == newPlayer) continue;
                 alreadyExistingEntities.add(e);
             }
 
             // initial packet for new player
-            newPlayer.getNetManager().putInitDataPacket(ExpiServer.get().getWorld().getTerrain(), alreadyExistingEntities);
+            newPlayer.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), alreadyExistingEntities);
             newPlayer.getGateway().getOut().swap();
 
             synchronized(newPlayer.getGateway().getJoinLock()) {
@@ -140,7 +150,7 @@ public class ServerGateway extends TerminableLooper {
             }
 
             // notify all players about new players
-            for(ExpiPlayer p : ExpiServer.get().getPlayers()) {
+            for(ExpiPlayer p : server.getPlayers()) {
                 if(p == newPlayer) continue;
                 p.getNetManager().putEntitySpawnPacket(newPlayer);
             }

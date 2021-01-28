@@ -47,11 +47,17 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
         nameTF.setMessageText("Your nickname");
         nameTF.setAlignment(Align.center);
         nameTF.setTextFieldFilter((textField1, c) -> Character.toString(c).matches("^[0-9a-zA-Z_+\\- ]"));
+        nameTF.setMaxLength(16);
 
         nameTF.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                menu.setRoot(new TextInputRoot(() -> menu.setRoot(ref), nameTF));
+                TextInputRoot tir = new TextInputRoot(() -> {
+                    menu.setRoot(ref);
+                    ExpiGame.get().setPlayerName(nameTF.getText());
+                }, nameTF);
+                menu.setRoot(tir);
+                tir.setFocus(menu.getStage());
             }
         });
 
@@ -132,6 +138,8 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
 
     private void loadData() {
 
+        System.out.println("loading name");
+
         FileHandle file = Gdx.files.local(path);
         if(!file.exists()) return;
         try {
@@ -151,6 +159,8 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
     }
 
     private void saveData() {
+
+        System.out.println("saving name: "+ExpiGame.get().getPlayerName());
 
         FileHandle file = Gdx.files.local(path);
         try {

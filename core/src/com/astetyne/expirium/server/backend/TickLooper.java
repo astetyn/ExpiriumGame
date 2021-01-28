@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.backend;
 
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.TickListener;
@@ -11,8 +10,10 @@ public class TickLooper extends TerminableLooper {
 
     private final Object tickLock;
     private final int tps;
+    private final ExpiServer server;
 
-    public TickLooper(int tps) {
+    public TickLooper(int tps, ExpiServer server) {
+        this.server = server;
         this.tps = tps;
         tickLock = new Object();
     }
@@ -20,34 +21,35 @@ public class TickLooper extends TerminableLooper {
     @Override
     public void run() {
 
-        try {
+        while(isRunning()) {
 
-            while(isRunning()) {
+            server.getServerGateway().resolveJoiningAndLeavingPlayers();
 
-                ExpiServer.get().getServerGateway().resolveJoiningAndLeavingPlayers();
-
-                for(ExpiPlayer ep : ExpiServer.get().getPlayers()) {
-                    ep.getNetManager().processIncomingPackets();
-                }
-
-                ExpiServer.get().onTick();
-
-                List<TickListener> list = ExpiServer.get().getEventManager().getTickListeners();
-                for(int i = list.size() - 1; i >= 0; i--) {
-                    list.get(i).onTick();
-                }
-
-                // wakes up all clients threads and send new actions
-                synchronized(tickLock) {
-                    tickLock.notifyAll();
-                }
-
-                //noinspection BusyWait
-                Thread.sleep(1000 / Consts.SERVER_DEFAULT_TPS);
+            for(ExpiPlayer ep : server.getPlayers()) {
+                ep.getNetManager().processIncomingPackets();
             }
 
-        }catch(InterruptedException e) {
-            e.printStackTrace();
+            server.getWorld().onTick();
+
+            server.onTick();
+
+            List<TickListener> list = server.getEventManager().getTickListeners();
+            for(int i = list.size() - 1; i >= 0; i--) {
+                list.get(i).onTick();
+            }
+
+            // wakes up all clients threads and send new actions
+            synchronized(tickLock) {
+                tickLock.notifyAll();
+            }
+
+            try {
+                //noinspection BusyWait
+                Thread.sleep(1000 / tps);
+            }catch(InterruptedException ignored) {
+                server.faultClose();
+                break;
+            }
         }
         System.out.println("Tick looper ended.");
     }
@@ -56,7 +58,7 @@ public class TickLooper extends TerminableLooper {
         return tickLock;
     }
 
-    public int getTps() {
-        return tps;
+    public int getAverageTps() {
+        return 0; //todo not implemented yet
     }
 }

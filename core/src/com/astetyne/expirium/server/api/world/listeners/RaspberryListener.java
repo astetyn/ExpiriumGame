@@ -22,19 +22,21 @@ import java.util.List;
 
 public class RaspberryListener implements PlayerInteractListener, TileChangeListener, TickListener, Saveable {
 
+    private final ExpiServer server;
     private final List<RaspberryBush> growingBushes;
     private final HashMap<ExpiTile, RaspberryBush> lookUp;
 
-    public RaspberryListener(ExpiServer expiServer) {
+    public RaspberryListener(ExpiServer server) {
+        this.server = server;
         growingBushes = new ArrayList<>();
         lookUp = new HashMap<>();
-        expiServer.getEventManager().getPlayerInteractListeners().add(this);
-        expiServer.getEventManager().getTileChangeListeners().add(this);
-        expiServer.getEventManager().getTickListeners().add(this);
+        server.getEventManager().getPlayerInteractListeners().add(this);
+        server.getEventManager().getTileChangeListeners().add(this);
+        server.getEventManager().getTickListeners().add(this);
 
-        ExpiTile[][] terrain = ExpiServer.get().getWorld().getTerrain();
-        int w = expiServer.getWorld().getTerrainWidth();
-        int h = expiServer.getWorld().getTerrainHeight();
+        ExpiTile[][] terrain = server.getWorld().getTerrain();
+        int w = server.getWorld().getTerrainWidth();
+        int h = server.getWorld().getTerrainHeight();
 
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
@@ -49,20 +51,20 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
     }
 
-    public RaspberryListener(DataInputStream in, ExpiServer expiServer) throws IOException {
-
+    public RaspberryListener(ExpiServer server, DataInputStream in) throws IOException {
+        this.server = server;
         growingBushes = new ArrayList<>();
         lookUp = new HashMap<>();
-        expiServer.getEventManager().getPlayerInteractListeners().add(this);
-        expiServer.getEventManager().getTileChangeListeners().add(this);
-        expiServer.getEventManager().getTickListeners().add(this);
+        server.getEventManager().getPlayerInteractListeners().add(this);
+        server.getEventManager().getTileChangeListeners().add(this);
+        server.getEventManager().getTickListeners().add(this);
 
         int bushesNumber = in.readInt();
         for(int i = 0; i < bushesNumber; i++) {
             int x = in.readInt();
             int y = in.readInt();
             float growTime = in.readFloat();
-            ExpiTile t = expiServer.getWorld().getTerrain()[y][x];
+            ExpiTile t = server.getWorld().getTerrain()[y][x];
             RaspberryBush bush = new RaspberryBush(t, growTime);
             growingBushes.add(bush);
             lookUp.put(t, bush);
@@ -74,7 +76,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
         if(event.getTile().getTypeFront() != TileType.RASPBERRY_BUSH_2) return;
 
-        ExpiServer.get().getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, event.getPlayer(), Source.PLAYER);
+        server.getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, event.getPlayer(), Source.PLAYER);
 
         int raspNumber = (int)(Math.random() * 2) + 1; // 1-2
 
@@ -82,8 +84,8 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
         Vector2 dropLoc = new Vector2(event.getTile().getX() + off, event.getTile().getY() + off);
 
         for(int i = 0; i < raspNumber; i++) {
-            ExpiDroppedItem edi = new ExpiDroppedItem(dropLoc, Item.RASPBERRY, 0.2f);
-            for(ExpiPlayer pp : ExpiServer.get().getPlayers()) {
+            ExpiDroppedItem edi = new ExpiDroppedItem(server, dropLoc, Item.RASPBERRY, 0.2f);
+            for(ExpiPlayer pp : server.getPlayers()) {
                 pp.getNetManager().putEntitySpawnPacket(edi);
             }
         }
@@ -117,7 +119,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
             if(bush.getGrowTime() <= 0) {
                 it.remove();
                 lookUp.remove(bush.getTile());
-                ExpiServer.get().getWorld().changeTile(bush.getTile(), TileType.RASPBERRY_BUSH_2, false, null, Source.NATURAL);
+                server.getWorld().changeTile(bush.getTile(), TileType.RASPBERRY_BUSH_2, false, null, Source.NATURAL);
             }
         }
     }

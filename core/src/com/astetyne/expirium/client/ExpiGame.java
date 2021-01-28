@@ -33,7 +33,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	private float timeSinceStart;
 	private SpriteBatch batch;
 	private boolean hostingServer;
-	public ExpiServer server;
+	private ExpiServer server;
 	private final Queue<Runnable> tasks;
 	private final MulticastListener multicastListener;
 
@@ -105,18 +105,16 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		hostingServer = true;
 		menu.setRoot(new LoadingRoot("Loading world..."));
 		//todo: port free check
-		Thread t = new Thread(() -> server = new ExpiServer(preferences, this));
-		t.setName("Game Server");
-		t.start();
+		server = new ExpiServer(preferences, this);
 	}
 
 	public void stopServer() {
+		System.out.println("stopping server "+server);
 		if(server == null) return;
 		server.close();
-		server = null;
 	}
 
-	public void startClient(InetAddress address) {
+	public void connectToServer(InetAddress address) {
 		clientGateway.connectToServer(address);
 	}
 
@@ -152,6 +150,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void onClientFail(String msg) {
+		System.out.println("client fail");
 		runOnMainThread(() -> {
 			if(isHostingServer()) {
 				stopServer();
@@ -162,6 +161,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void onServerFail(String msg) {
+		System.out.println("server fail");
 		runOnMainThread(() -> {
 			clientGateway.close();
 			setScreen(new MenuScreen(msg));

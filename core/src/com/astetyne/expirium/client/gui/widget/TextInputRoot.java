@@ -2,8 +2,10 @@ package com.astetyne.expirium.client.gui.widget;
 
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.roots.menu.MenuRootable;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -12,9 +14,11 @@ import com.badlogic.gdx.utils.Align;
 
 public class TextInputRoot extends WidgetGroup implements MenuRootable {
 
+    private final TextField tf;
+
     public TextInputRoot(Runnable listener, TextField textField) {
 
-        TextField tf = new TextField("", Res.TEXT_FIELD_STYLE);
+        tf = new TextField("", Res.TEXT_FIELD_STYLE);
         tf.setAlignment(Align.center);
         tf.setText(textField.getText());
         tf.setTextFieldFilter(textField.getTextFieldFilter());
@@ -25,6 +29,7 @@ public class TextInputRoot extends WidgetGroup implements MenuRootable {
         doneButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                Gdx.input.setOnscreenKeyboardVisible(false);
                 textField.setText(tf.getText());
                 listener.run();
             }
@@ -38,6 +43,10 @@ public class TextInputRoot extends WidgetGroup implements MenuRootable {
 
     }
 
+    public void setFocus(Stage stage) {
+        stage.setKeyboardFocus(tf);
+    }
+
     @Override
     public Actor getActor() {
         return this;
@@ -46,5 +55,9 @@ public class TextInputRoot extends WidgetGroup implements MenuRootable {
     @Override
     public void onEnd() {
 
+    }
+
+    public String getInputText() {
+        return tf.getText();
     }
 }
