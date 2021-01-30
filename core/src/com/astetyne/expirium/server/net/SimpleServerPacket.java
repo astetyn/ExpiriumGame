@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 public enum SimpleServerPacket {
 
-    CLOSE_DOUBLE_INV,
-    DEATH_EVENT;
+    CLOSE_DOUBLE_INV;
 
     public static SimpleServerPacket getType(int id) {
         return map.get(id);

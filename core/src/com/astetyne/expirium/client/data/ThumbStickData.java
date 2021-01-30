@@ -8,4 +8,9 @@ public class ThumbStickData {
         this.vert = 0;
         this.horz = 0;
     }
+
+    public void reset() {
+        vert = 0;
+        horz = 0;
+    }
 }

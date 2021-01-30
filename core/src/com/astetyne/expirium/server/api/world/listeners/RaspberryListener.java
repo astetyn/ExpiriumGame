@@ -111,11 +111,11 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
     }
 
     @Override
-    public void onTick() {
+    public void onTick(float delta) {
         Iterator<RaspberryBush> it = growingBushes.iterator();
         while(it.hasNext()) {
             RaspberryBush bush = it.next();
-            bush.decreaseGrowTime(1f / Consts.SERVER_DEFAULT_TPS);
+            bush.decreaseGrowTime(delta);
             if(bush.getGrowTime() <= 0) {
                 it.remove();
                 lookUp.remove(bush.getTile());

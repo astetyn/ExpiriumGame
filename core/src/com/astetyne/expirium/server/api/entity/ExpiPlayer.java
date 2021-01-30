@@ -8,10 +8,12 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.api.event.TickListener;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.ExpiPlayerInventory;
-import com.astetyne.expirium.server.net.*;
+import com.astetyne.expirium.server.net.PacketInputStream;
+import com.astetyne.expirium.server.net.PacketOutputStream;
+import com.astetyne.expirium.server.net.ServerPacketManager;
+import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -20,7 +22,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ExpiPlayer extends LivingEntity implements TickListener {
+public class ExpiPlayer extends LivingEntity {
 
     private final ServerPlayerGateway gateway;
     private final String name;
@@ -29,20 +31,20 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     private final ExpiTileBreaker tileBreaker;
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
-    private float resurrectionTime; // -1 player is alive, 0 player has option to resurrect
+    private final Vector2 resurrectLoc;
 
     public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
-        resurrectionTime = -1;
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new ExpiInventory(1, 1, 1, false);
         tileBreaker = new ExpiTileBreaker(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
+        resurrectLoc = new Vector2(location);
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -50,13 +52,13 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
     public ExpiPlayer(ExpiServer server, DataInputStream in, ServerPlayerGateway gateway) throws IOException {
         super(server, EntityType.PLAYER, in);
+        // order is important - must be same as in writeData()
         server.getWorld().getCL().registerListener(this);
         int nameLength = in.readInt();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < nameLength; i++) {
             sb.append(in.readChar());
         }
-        resurrectionTime = in.readFloat();
         this.gateway = gateway;
         gateway.setOwner(this);
         name = sb.toString();
@@ -66,6 +68,7 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
+        resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -113,6 +116,19 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         groundSensor = body.createFixture(fixtureDef);
 
         polyShape.dispose();
+    }
+
+    @Override
+    public void die() {
+        invincible = true;
+        getNetManager().putDeathPacket(true, 10);
+        setFoodLevel(20);
+        setHealthLevel(20);
+        teleport(resurrectLoc.x, resurrectLoc.y);
+        tsData1.reset();
+        tsData2.reset();
+        body.setLinearVelocity(0, 0);
+        //todo: dropnut polovicu itemov
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -235,6 +251,10 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
 
     public void applyPhysics() {
 
+        if(invincible && tsData1.horz == 0 && tsData1.vert == 0 && tsData2.horz == 0 && tsData2.vert == 0) {
+            invincible = false;
+        }
+
         if(onGround) {
             Vector2 center = body.getWorldCenter();
             if(tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
@@ -255,19 +275,10 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
     }
 
     @Override
-    public void onTick() {
-
-        foodLevel -= (1f / Consts.SERVER_DEFAULT_TPS) / 10; // tenth of second = 1 for 10 seconds
+    public void onTick(float delta) {
+        super.onTick(delta);
 
         getNetManager().putLivingStatsPacket();
-
-        if(foodLevel <= 5) {
-            healthLevel -= (1f / Consts.SERVER_DEFAULT_TPS);
-        }
-
-        if(healthLevel <= 0) {
-            getNetManager().putSimpleServerPacket(SimpleServerPacket.DEATH_EVENT);
-        }
 
         if(mainInv.isInvalid() || secondInv.isInvalid()) {
             getNetManager().putInvFeedPacket();
@@ -346,12 +357,22 @@ public class ExpiPlayer extends LivingEntity implements TickListener {
         this.secondInv = secondInv;
     }
 
+    public Vector2 getResurrectLoc() {
+        return resurrectLoc;
+    }
+
+    public void setResurrectLoc(float x, float y) {
+        resurrectLoc.x = x;
+        resurrectLoc.y = y;
+    }
+
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         super.writeData(out);
         out.writeInt(name.length());
         out.writeChars(name);
         mainInv.writeData(out);
-        out.writeFloat(resurrectionTime);
+        out.writeFloat(resurrectLoc.x);
+        out.writeFloat(resurrectLoc.y);
     }
 }

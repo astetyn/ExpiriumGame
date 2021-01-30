@@ -209,4 +209,10 @@ public class ServerPacketManager {
         out.startPacket(17);
         out.putInt(p.getID());
     }
+
+    public void putDeathPacket(boolean firstDeath, int daysSurvived) {
+        out.startPacket(12);
+        out.putBoolean(firstDeath);
+        out.putInt(daysSurvived);
+    }
 }

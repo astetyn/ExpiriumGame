@@ -59,8 +59,8 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
     }
 
     @Override
-    public void onTick() {
-        remainingTime -= 1f / Consts.SERVER_DEFAULT_TPS;
+    public void onTick(float delta) {
+        remainingTime -= delta;
         if(remainingTime <= 0) {
             server.getWorld().changeTile(tile, TileType.AIR, false, null, Source.NATURAL);
             server.getEventManager().getPlayerInteractListeners().remove(this);

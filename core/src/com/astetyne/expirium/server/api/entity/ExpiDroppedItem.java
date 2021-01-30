@@ -60,9 +60,9 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
     }
 
     @Override
-    public void onTick() {
+    public void onTick(float delta) {
 
-        livingTime += 1f / Consts.SERVER_DEFAULT_TPS;
+        livingTime += delta;
 
         if(livingTime >= despawnTime) {
             for(ExpiPlayer pp : server.getPlayers()) {

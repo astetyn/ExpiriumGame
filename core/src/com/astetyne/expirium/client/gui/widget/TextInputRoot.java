@@ -24,6 +24,7 @@ public class TextInputRoot extends WidgetGroup implements MenuRootable {
         tf.setTextFieldFilter(textField.getTextFieldFilter());
         tf.setMaxLength(textField.getMaxLength());
         tf.setMessageText(textField.getMessageText());
+        tf.setCursorPosition(textField.getCursorPosition());
 
         TextButton doneButton = new TextButton("Done", Res.TEXT_BUTTON_STYLE);
         doneButton.addListener(new ClickListener() {

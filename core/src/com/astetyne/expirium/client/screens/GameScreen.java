@@ -3,7 +3,9 @@ package com.astetyne.expirium.client.screens;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
+import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
+import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRootable;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.TileTex;
@@ -13,6 +15,7 @@ import com.astetyne.expirium.client.world.GameWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -107,6 +110,10 @@ public class GameScreen implements Screen {
             e.printStackTrace();
         }
 
+        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+            setRoot(new DeathRoot(true, 10));
+        }
+
     }
 
     @Override
@@ -141,10 +148,8 @@ public class GameScreen implements Screen {
     public void onSimplePacket(SimpleServerPacket ssp) {
         if(ssp == SimpleServerPacket.CLOSE_DOUBLE_INV) {
             if(getActiveRoot() instanceof DoubleInventoryRoot) {
-                setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
+                setRoot(new GameRoot());
             }
-        }else if(ssp == SimpleServerPacket.DEATH_EVENT) {
-            addWarning("You died", 2, Color.RED);
         }
     }
 

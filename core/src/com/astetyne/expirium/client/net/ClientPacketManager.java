@@ -5,6 +5,7 @@ import com.astetyne.expirium.client.GameInfo;
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.screens.GameScreen;
@@ -50,8 +51,10 @@ public class ClientPacketManager {
                     ExpiGame.get().setScreen(new GameScreen(in));
                     world = GameScreen.get().getWorld();
                     break;
-                case 12: //
-
+                case 12: // DeathPacket
+                    boolean firstDeath = in.getBoolean();
+                    int daysSurvived = in.getInt();
+                    GameScreen.get().setRoot(new DeathRoot(firstDeath, daysSurvived));
                     break;
 
                 case 13: //WorldFeedPacket

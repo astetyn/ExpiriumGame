@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.backend;
 
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.TickListener;
@@ -33,9 +34,11 @@ public class TickLooper extends TerminableLooper {
 
             server.onTick();
 
+            float delta = 1f / Consts.SERVER_DEFAULT_TPS;
             List<TickListener> list = server.getEventManager().getTickListeners();
             for(int i = list.size() - 1; i >= 0; i--) {
-                list.get(i).onTick();
+                //todo: this is ideal, not real
+                list.get(i).onTick(delta);
             }
 
             // wakes up all clients threads and send new actions

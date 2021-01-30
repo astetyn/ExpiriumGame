@@ -49,6 +49,10 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         return body.getPosition();
     }
 
+    public void teleport(float x, float y) {
+        body.setTransform(x, y, 0);
+    }
+
     public Vector2 getCenter() {
         return centerLoc.set(body.getPosition().x + type.getWidth()/2, body.getPosition().y + type.getHeight()/2);
     }

@@ -3,8 +3,8 @@ package com.astetyne.expirium.server.api.entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
+import com.astetyne.expirium.server.api.event.TickListener;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
@@ -12,19 +12,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class LivingEntity extends ExpiEntity implements Saveable, Collidable {
+public abstract class LivingEntity extends ExpiEntity implements Saveable, Collidable, TickListener {
 
     private final static float MAX_HEALTH_LEVEL = 100;
     private final static float MAX_FOOD_LEVEL = 100;
 
-    protected float healthLevel, foodLevel, temperatureLevel;
+    private float healthLevel, foodLevel, temperatureLevel;
 
     protected boolean onGround;
     private int collisions;
     protected Fixture groundSensor;
 
     protected boolean alive;
-    private final Vector2 resurrectLoc;
+
+    protected boolean invincible;
 
     public LivingEntity(ExpiServer server, EntityType type, Vector2 loc) {
         super(server, type, loc);
@@ -34,7 +35,7 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         onGround = false;
         collisions = 0;
         alive = true;
-        resurrectLoc = new Vector2(loc);
+        invincible = false;
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -44,10 +45,10 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         foodLevel = in.readFloat();
         temperatureLevel = in.readFloat();
         alive = in.readBoolean();
-        resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
         onGround = false;
         collisions = 0;
         alive = true;
+        invincible = false;
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -58,19 +59,34 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         server.getWorld().getCL().unregisterListener(this);
     }
 
+    @Override
+    public void onTick(float delta) {
+
+        decreaseFoodLevel(delta);
+
+        if(foodLevel <= 5) {
+            injure(delta);
+        }
+
+    }
+
     public void die() {
         if(!alive) return;
         alive = false;
-        server.getWorld().getB2dWorld().destroyBody(body);
+        destroy();
     }
 
-    public void resurrect() {
-        if(alive) return;
-        alive = true;
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(resurrectLoc);
-        body = server.getWorld().getB2dWorld().createBody(bodyDef);
+    public void injure(float damage) {
+        if(invincible) return;
+        healthLevel -= damage;
+        if(healthLevel <= 0) {
+            die();
+        }
+    }
+
+    public void decreaseFoodLevel(float amount) {
+        if(invincible) return;
+        foodLevel = Math.max(foodLevel - amount, 0);
     }
 
     public float getHealthLevel() {
@@ -105,6 +121,14 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         foodLevel = Math.min(foodLevel + i, MAX_FOOD_LEVEL);
     }
 
+    public boolean isInvincible() {
+        return invincible;
+    }
+
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         super.writeData(out);
@@ -112,8 +136,6 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         out.writeFloat(foodLevel);
         out.writeFloat(temperatureLevel);
         out.writeBoolean(alive);
-        out.writeFloat(resurrectLoc.x);
-        out.writeFloat(resurrectLoc.y);
     }
 
     @Override

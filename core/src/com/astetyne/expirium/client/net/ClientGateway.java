@@ -40,6 +40,8 @@ public class ClientGateway extends TerminableLooper {
 
         long startT = System.currentTimeMillis();
         while(startT + 10000 > System.currentTimeMillis()) {
+            if(!isRunning()) return;
+
             System.out.println("Next connection attempt...");
             try {
                 socket = new Socket();
@@ -143,7 +145,6 @@ public class ClientGateway extends TerminableLooper {
      * connectToServer().
      */
     public void close() {
-
         try {
             stop();
             if(socket != null) socket.close();
@@ -153,8 +154,8 @@ public class ClientGateway extends TerminableLooper {
             nextPacketsLock.notify();
         }
         // after this I should be confident that client thread will be stopped
-        in.reset();
-        out.reset();
+        if(in != null) in.reset();
+        if(out != null) out.reset();
         System.out.println("Client closed.");
     }
 

@@ -161,7 +161,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void onServerFail(String msg) {
-		System.out.println("server fail");
+		System.out.println("server fail: "+msg);
 		runOnMainThread(() -> {
 			clientGateway.close();
 			setScreen(new MenuScreen(msg));
