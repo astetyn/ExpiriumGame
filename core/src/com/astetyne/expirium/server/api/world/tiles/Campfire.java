@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.world.tiles;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
@@ -68,7 +69,7 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
             for(ExpiPlayer pp : server.getPlayers()) {
                 if(pp.getSecondInv() != inventory) continue;
                 pp.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
-                float off = (1 - Consts.D_I_SIZE)/2;
+                float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
                 Vector2 dropLoc = new Vector2(tile.getX() + off, tile.getY() + off);
                 for(ItemStack is : inventory.getItems()) {
                     for(int i = 0; i < is.getAmount(); i++) {

@@ -1,5 +1,7 @@
 package com.astetyne.expirium.client.entity;
 
+import com.astetyne.expirium.client.entity.animator.EntityAnimation;
+import com.astetyne.expirium.client.entity.animator.EntityAnimator;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -7,7 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Entity implements MetaReadable {
+public abstract class Entity {
 
     protected EntityType type;
     protected int ID;
@@ -17,17 +19,19 @@ public abstract class Entity implements MetaReadable {
     private final Vector2 targetLocation;
     private float interpolationDelta;
     private float targetAngle;
-    protected final float width, height;
     private final Vector2 centerLoc;
     private Vector2 lastLoc;
     private float lastAngle;
+    private EntityAnimator animator;
 
-    public Entity(EntityType type, int id, Vector2 loc, float width, float height) {
+    public Entity(EntityType type, int id, Vector2 loc) {
 
         this.type = type;
         this.ID = id;
-        this.width = width;
-        this.height = height;
+        this.animator = new EntityAnimator(this) {
+            @Override
+            public void draw(SpriteBatch batch) {}
+        };
         interpolationDelta = 0;
         targetAngle = 0;
         location = loc;
@@ -42,7 +46,9 @@ public abstract class Entity implements MetaReadable {
 
     }
 
-    public abstract void draw(SpriteBatch batch);
+    public void draw(SpriteBatch batch) {
+        animator.draw(batch);
+    }
 
     public void move() {
 
@@ -78,7 +84,7 @@ public abstract class Entity implements MetaReadable {
     }
 
     public Vector2 getCenter() {
-        return centerLoc.set(getLocation()).add(width/2, height/2);
+        return centerLoc.set(getLocation()).add(type.width/2, type.height/2);
     }
 
     public int getID() {
@@ -101,5 +107,18 @@ public abstract class Entity implements MetaReadable {
     public Tile getCenterTile() {
         Vector2 center = getCenter();
         return GameScreen.get().getWorld().getTileAt(center.x, center.y);
+    }
+
+    public void setAnimator(EntityAnimator animator) {
+        this.animator = animator;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public void onEntityAnim(PacketInputStream in) {
+        EntityAnimation anim = EntityAnimation.getType(in.getInt());
+        animator.onEntityAnim(anim, in);
     }
 }

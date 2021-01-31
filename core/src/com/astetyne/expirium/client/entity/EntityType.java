@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.entity;
 
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiEntity;
@@ -14,8 +13,8 @@ import java.util.HashMap;
 
 public enum EntityType {
 
-    PLAYER(PlayerEntity.class, ExpiPlayer.class, 0.9f, 1.25f),
-    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, Consts.D_I_SIZE, Consts.D_I_SIZE);
+    PLAYER(PlayerEntity.class, ExpiPlayer.class, 0.9f, 1.5f),
+    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, 0.5f, 0.5f);
 
     Class<? extends Entity> entityClazz;
     Class<? extends ExpiEntity> entityClazz2;

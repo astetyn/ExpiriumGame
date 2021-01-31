@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.api.world;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemCategory;
 import com.astetyne.expirium.client.items.ItemStack;
@@ -221,7 +222,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
      */
     private void createDroppedItem(ExpiTile t) {
         if(t == null || t.getTypeFront() == TileType.AIR) return;
-        float off = (1 - Consts.D_I_SIZE)/2;
+        float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
         Vector2 loc = new Vector2(t.getX() + off, t.getY() + off);
         for(Item item : ItemDropper.chooseItems(t.getTypeFront().getItemDropper())) {
             if(item == Item.EMPTY) return;

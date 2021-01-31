@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server.api.world.listeners;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.TileType;
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
 import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
@@ -80,7 +80,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
 
         int raspNumber = (int)(Math.random() * 2) + 1; // 1-2
 
-        float off = (1 - Consts.D_I_SIZE)/2;
+        float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
         Vector2 dropLoc = new Vector2(event.getTile().getX() + off, event.getTile().getY() + off);
 
         for(int i = 0; i < raspNumber; i++) {

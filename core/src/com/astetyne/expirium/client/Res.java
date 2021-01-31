@@ -32,10 +32,9 @@ public class Res {
     public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
 
     // entities
-    public static Animation<TextureRegion> PLAYER_IDLE_ANIM_R;
-    public static Animation<TextureRegion> PLAYER_IDLE_ANIM_L;
-    public static Animation<TextureRegion> PLAYER_RUN_ANIM_R;
-    public static Animation<TextureRegion> PLAYER_RUN_ANIM_L;
+    public static Animation<TextureRegion> PLAYER_IDLE_ANIM;
+    public static Animation<TextureRegion> PLAYER_MOVE_ANIM;
+    public static Animation<TextureRegion> PLAYER_INTERACT_ANIM;
 
     public static void loadTextures() {
 
@@ -43,7 +42,6 @@ public class Res {
 
         TextureAtlas gui = new TextureAtlas("gui.atlas");
         TextureAtlas ent = new TextureAtlas("entities.atlas");
-        TextureAtlas bg = new TextureAtlas("background.atlas");
 
         /*FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("LadylikeBB.ttf"));
         //FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("Life is goofy.ttf"));
@@ -69,7 +67,6 @@ public class Res {
         Drawable cursor = new TextureRegionDrawable(gui.findRegion("cursor"));
         TextureRegion tsBack = gui.findRegion("thumb_stick_back");
         TextureRegion tsFore = gui.findRegion("thumb_stick_fore");
-        TextureRegion hbsFrame = gui.findRegion("hot_bar_slot_frame");
         TextureRegion switchArrowUp = gui.findRegion("switch_arrow_up");
         TextureRegion switchArrowUpPressed = gui.findRegion("switch_arrow_up_pressed");
         TextureRegion invTile = gui.findRegion("inv_tile");
@@ -88,10 +85,9 @@ public class Res {
         BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, invTileThrow, invTileSplit);
 
         // entities
-        PLAYER_IDLE_ANIM_R = new Animation<>(0.5f, ent.findRegions("player_right_idle"), loop_pong);
-        PLAYER_IDLE_ANIM_L = new Animation<>(0.5f, ent.findRegions("player_left_idle"), loop_pong);
-        PLAYER_RUN_ANIM_R = new Animation<>(0.1f, ent.findRegions("player_right_run"), loop_pong);
-        PLAYER_RUN_ANIM_L = new Animation<>(0.1f, ent.findRegions("player_left_run"), loop_pong);
+        PLAYER_IDLE_ANIM = new Animation<>(0.5f, ent.findRegions("player_idle"), loop_pong);
+        PLAYER_MOVE_ANIM = new Animation<>(0.05f, ent.findRegions("player_move"), loop_pong);
+        PLAYER_INTERACT_ANIM = new Animation<>(0.12f, ent.findRegions("player_interact"), Animation.PlayMode.LOOP);
 
     }
 

@@ -4,7 +4,7 @@ public class Consts {
 
     public static final int VERSION = 1;
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // networking
     public static final int SERVER_PORT = 1414;
@@ -18,7 +18,6 @@ public class Consts {
     public static final short DEFAULT_BIT = 1;
     public static final short PLAYER_BIT = 2;
 
-    public static final float D_I_SIZE = 0.5f;
     public static final float D_I_PICK_DIST = 1.3f;
 
     public static final int DAY_TIME_SEC = 1200;

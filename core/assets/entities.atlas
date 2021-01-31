@@ -4,72 +4,128 @@ size: 1024,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-player_left_idle
+player_idle
   rotate: false
-  xy: 2, 2
-  size: 64, 88
-  orig: 64, 88
+  xy: 19, 1
+  size: 16, 27
+  orig: 16, 27
   offset: 0, 0
   index: 1
-player_left_idle
+player_idle
   rotate: false
-  xy: 398, 2
-  size: 64, 88
-  orig: 64, 88
+  xy: 565, 91
+  size: 16, 27
+  orig: 16, 27
   offset: 0, 0
   index: 2
+player_interact
+  rotate: false
+  xy: 1, 1
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 2
+player_interact
+  rotate: false
+  xy: 529, 62
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 4
+player_interact
+  rotate: false
+  xy: 37, 1
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 1
+player_interact
+  rotate: false
+  xy: 547, 62
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 3
 player_left_run
   rotate: false
-  xy: 200, 2
+  xy: 133, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_left_run
   rotate: false
-  xy: 332, 2
+  xy: 265, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 3
 player_left_run
   rotate: false
-  xy: 596, 2
+  xy: 463, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
+player_move
+  rotate: false
+  xy: 529, 91
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 4
+player_move
+  rotate: false
+  xy: 547, 91
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 1
+player_move
+  rotate: false
+  xy: 529, 33
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 3
+player_move
+  rotate: false
+  xy: 55, 1
+  size: 16, 27
+  orig: 16, 27
+  offset: 0, 0
+  index: 2
 player_right_idle
   rotate: false
-  xy: 134, 2
+  xy: 67, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_right_idle
   rotate: false
-  xy: 530, 2
+  xy: 397, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 2
 player_right_run
   rotate: false
-  xy: 68, 2
+  xy: 1, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 1
 player_right_run
   rotate: false
-  xy: 266, 2
+  xy: 199, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
   index: 3
 player_right_run
   rotate: false
-  xy: 464, 2
+  xy: 331, 30
   size: 64, 88
   orig: 64, 88
   offset: 0, 0
