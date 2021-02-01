@@ -1,10 +1,12 @@
 package com.astetyne.expirium.client.entity.animator;
 
 import com.astetyne.expirium.client.entity.Entity;
-import com.astetyne.expirium.server.net.PacketInputStream;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class EntityAnimator {
+
+    protected static final float yOffset = 0.04f;
 
     protected final Entity entity;
     protected float timer;
@@ -21,14 +23,15 @@ public abstract class EntityAnimator {
         lastInjureValue = 0;
     }
 
+    public void update() {
+        timer += Gdx.graphics.getDeltaTime();
+    }
+
     public abstract void draw(SpriteBatch batch);
 
-    /** Subclasses should override this method if they listen to custom animations but always call this super method.*/
-    public void onEntityAnim(EntityAnimation anim, PacketInputStream in) {
-        if(anim == EntityAnimation.INJURE) {
-            lastInjureValue = in.getFloat();
-            lastInjureTime = System.currentTimeMillis();
-        }
+    public void injure(float damageValue) {
+        lastInjureValue = damageValue;
+        lastInjureTime = System.currentTimeMillis();
     }
 
 }

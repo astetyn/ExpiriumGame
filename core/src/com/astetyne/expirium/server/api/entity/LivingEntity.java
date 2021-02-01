@@ -81,6 +81,10 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         healthLevel -= damage;
         if(healthLevel <= 0) {
             die();
+        }else {
+            for(ExpiPlayer pp : server.getPlayers()) {
+                pp.getNetManager().putInjurePacket(getId(), damage);
+            }
         }
     }
 

@@ -5,8 +5,10 @@ import com.astetyne.expirium.client.GameInfo;
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.entity.Player;
 import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -33,6 +35,7 @@ public class ClientPacketManager {
         GameWorld world = null;
         if(GameScreen.get() != null) {
             world = GameScreen.get().getWorld();
+            world.onServerTick();
         }
 
         int availPackets = in.getAvailablePackets();
@@ -72,7 +75,7 @@ public class ClientPacketManager {
                     world.onStabilityChange(in);
                     break;
 
-                case 19: //EntityMovePacket
+                case 19: {//EntityMovePacket
                     int eID = in.getInt();
                     Entity e = world.getEntitiesID().get(eID);
                     if(e != null) {
@@ -81,7 +84,7 @@ public class ClientPacketManager {
                         in.skip(6 * 4);
                     }
                     break;
-
+                }
                 case 20: //EntitySpawnPacket
                     EntityType.getType(in.getInt()).initEntity(in);
                     break;
@@ -95,6 +98,11 @@ public class ClientPacketManager {
                     world.onTileChange(in);
                     break;
 
+                case 23: {//InjurePacket
+                    Entity e = world.getEntitiesID().get(in.getInt());
+                    e.injure(in.getFloat());
+                    break;
+                }
                 case 24: //InvFeedPacket
                     GameScreen.get().getPlayerData().feedInventory(in);
                     break;
@@ -115,6 +123,17 @@ public class ClientPacketManager {
                 case 31: //OpenDoubleInvPacket
                     GameScreen.get().setRoot(new DoubleInventoryRoot(in));
                     break;
+
+                case 32: {//HandPunchPacket
+                    Player p = (Player) world.getEntitiesID().get(in.getInt());
+                    p.onHandPunch();
+                    break;
+                }
+                case 33: { //HandItemPacket
+                    Player p = (Player) world.getEntitiesID().get(in.getInt());
+                    p.setItemInHand(Item.getType(in.getInt()));
+                    break;
+                }
             }
         }
     }

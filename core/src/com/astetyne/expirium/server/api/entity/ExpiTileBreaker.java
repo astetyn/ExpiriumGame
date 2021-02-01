@@ -12,20 +12,23 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ExpiTileBreaker {
 
-    private ExpiServer server;
+    private final ExpiServer server;
     private ExpiTile targetTile;
     private float timeAccumulator;
     private final Vector2 tempVec, tempVec2;
     private final ExpiWorld world;
     private final ExpiPlayer owner;
+    private long lastPunchTime;
 
     public ExpiTileBreaker(ExpiServer server, ExpiPlayer owner) {
+        this.server = server;
         this.owner = owner;
         targetTile = null;
         timeAccumulator = 0;
         tempVec = new Vector2();
         tempVec2 = new Vector2();
         world = server.getWorld();
+        lastPunchTime = 0;
     }
 
     public void onTick(ThumbStickData data) {
@@ -35,7 +38,6 @@ public class ExpiTileBreaker {
 
         // check if breaking
         if(horz == 0 && vert == 0) {
-            if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
             targetTile = null;
             timeAccumulator = 0;
             return;
@@ -47,21 +49,18 @@ public class ExpiTileBreaker {
         for(int i = 0; i < Consts.BREAKING_PRECISION; i++) {
             if(!isInWorld(tempVec)) {
                 timeAccumulator = 0;
-                if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
                 break;
             }
             ExpiTile newTarget = world.getTileAt(tempVec);
             if(newTarget == null) {
                 timeAccumulator = 0;
-                if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
                 break;
             }
             if(newTarget.getTypeFront() != TileType.AIR) {
                 if(newTarget != targetTile && newTarget.getY() != 0) {
                     timeAccumulator = 0;
-                    if(targetTile != null) owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                     targetTile = newTarget;
                 }
                 break;
@@ -80,10 +79,18 @@ public class ExpiTileBreaker {
             if(timeAccumulator >= targetTile.getTypeFront().getBreakTime()) {
                 world.changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
-                owner.getNetManager().putBreakingTilePacket(targetTile, -1);
                 targetTile = null;
             }else {
-                owner.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getTypeFront().getBreakTime());
+                // breaking in action
+                for(ExpiPlayer ep : server.getPlayers()) {
+                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getTypeFront().getBreakTime());
+                }
+                if(lastPunchTime + 200 < System.currentTimeMillis()) { // cca 450 is full animation (200 is half)
+                    lastPunchTime = System.currentTimeMillis();
+                    for(ExpiPlayer ep : server.getPlayers()) {
+                        ep.getNetManager().putHandPunchPacket(owner.getId());
+                    }
+                }
             }
         }
 

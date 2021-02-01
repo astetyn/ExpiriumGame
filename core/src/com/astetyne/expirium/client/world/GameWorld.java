@@ -10,7 +10,6 @@ import com.astetyne.expirium.client.tiles.BreakingTile;
 import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.WorldInputListener;
 import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -37,6 +36,7 @@ public class GameWorld {
     private int terrainWidth, terrainHeight;
     private LightCalculator lightCalculator;
     private final WorldInputListener worldInputListener;
+    private final List<BreakingTile> breakingTiles;
 
     Color[] stabColors = new Color[] {
             new Color(0.9f, 0f, 0f, 1),
@@ -57,6 +57,8 @@ public class GameWorld {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
         camera.update();
+
+        breakingTiles = new ArrayList<>();
     }
 
     public void loadData(PacketInputStream in) {
@@ -87,7 +89,7 @@ public class GameWorld {
 
     public void update() {
         for(Entity e : entities) {
-            e.move();
+            e.update();
         }
         cameraCenter();
     }
@@ -125,8 +127,8 @@ public class GameWorld {
         batch.setColor(Color.WHITE);
 
         // breaking anim
-        for(BreakingTile bt : BreakingTile.getBreakingTiles().values()) {
-            batch.draw(TileTexAnim.TILE_BREAK.getAnim().getKeyFrame(bt.getState()), bt.getLoc().x, bt.getLoc().y, 1, 1);
+        for(BreakingTile bt : breakingTiles) {
+            batch.draw(TileTexAnim.TILE_BREAK.getAnim().getKeyFrame(bt.state), bt.x, bt.y, 1, 1);
         }
 
         // entities + player
@@ -148,6 +150,10 @@ public class GameWorld {
             }
         }
 
+    }
+
+    public void onServerTick() {
+        breakingTiles.clear();
     }
 
     public void onFeedWorldEvent(PacketInputStream in) {
@@ -201,16 +207,7 @@ public class GameWorld {
         int x = in.getInt();
         int y = in.getInt();
         float state = in.getFloat();
-        Tile t = worldTerrain[x][y];
-        if(state == -1) {
-            BreakingTile.getBreakingTiles().remove(t);
-            return;
-        }
-        if(BreakingTile.getBreakingTiles().containsKey(t)) {
-            BreakingTile.getBreakingTiles().get(t).setState(state);
-        }else {
-            BreakingTile.getBreakingTiles().put(t, new BreakingTile(new IntVector2(x, y), state));
-        }
+        breakingTiles.add(new BreakingTile(x, y, state));
     }
 
     private void cameraCenter() {

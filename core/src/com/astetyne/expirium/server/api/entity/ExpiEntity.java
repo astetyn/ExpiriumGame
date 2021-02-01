@@ -77,6 +77,10 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         return body;
     }
 
+    public ExpiServer getServer() {
+        return server;
+    }
+
     public void destroy() {
         server.getEntitiesID().remove(id);
         server.getEntities().remove(this);

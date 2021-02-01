@@ -32,14 +32,14 @@ public class TickLooper extends TerminableLooper {
 
             server.getWorld().onTick();
 
-            server.onTick();
-
             float delta = 1f / Consts.SERVER_DEFAULT_TPS;
             List<TickListener> list = server.getEventManager().getTickListeners();
             for(int i = list.size() - 1; i >= 0; i--) {
                 //todo: this is ideal, not real
                 list.get(i).onTick(delta);
             }
+
+            server.onTick(); // this must be last since it can close the server (dispose world)
 
             // wakes up all clients threads and send new actions
             synchronized(tickLock) {

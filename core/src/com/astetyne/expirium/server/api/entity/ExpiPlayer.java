@@ -366,6 +366,8 @@ public class ExpiPlayer extends LivingEntity {
         resurrectLoc.y = y;
     }
 
+
+
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         super.writeData(out);

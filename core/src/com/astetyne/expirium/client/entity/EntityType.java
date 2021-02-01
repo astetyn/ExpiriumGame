@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public enum EntityType {
 
-    PLAYER(PlayerEntity.class, ExpiPlayer.class, 0.9f, 1.5f),
+    PLAYER(FriendPlayer.class, ExpiPlayer.class, 0.9f, 1.5f),
     DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, 0.5f, 0.5f);
 
     Class<? extends Entity> entityClazz;

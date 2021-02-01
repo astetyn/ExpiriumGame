@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.client.items.GridItemStack;
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.world.input.InteractType;
@@ -214,5 +215,22 @@ public class ServerPacketManager {
         out.startPacket(12);
         out.putBoolean(firstDeath);
         out.putInt(daysSurvived);
+    }
+
+    public void putInjurePacket(int id, float damageValue) {
+        out.startPacket(23);
+        out.putInt(id);
+        out.putFloat(damageValue);
+    }
+
+    public void putHandPunchPacket(int id) {
+        out.startPacket(32);
+        out.putInt(id);
+    }
+
+    public void putHandItemPacket(int id, Item item) {
+        out.startPacket(33);
+        out.putInt(id);
+        out.putInt(item.getId());
     }
 }

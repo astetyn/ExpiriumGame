@@ -178,6 +178,7 @@ public class ExpiServer implements Saveable {
      * Call this only ONCE during object lifetime.
      */
     private void dispose() {
+        System.out.println("Disposing server world.");
         expiWorld.dispose();
     }
 

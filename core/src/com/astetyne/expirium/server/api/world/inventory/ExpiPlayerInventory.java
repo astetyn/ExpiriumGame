@@ -163,6 +163,10 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
 
         owner.getNetManager().putHotSlotsFeedPacket((byte) chosenSlot.getId(), isTool, isMat, isCon);
 
+        for(ExpiPlayer ep : owner.getServer().getPlayers()) {
+            ep.getNetManager().putHandItemPacket(owner.getId(), itemInHand.getItem());
+        }
+
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.astetyne.expirium.client.screens;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
-import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRootable;
@@ -111,7 +110,7 @@ public class GameScreen implements Screen {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-            setRoot(new DeathRoot(true, 10));
+            gameWorld.getPlayer().onHandPunch();
         }
 
     }

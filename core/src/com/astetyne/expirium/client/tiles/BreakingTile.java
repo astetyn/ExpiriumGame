@@ -1,34 +1,13 @@
 package com.astetyne.expirium.client.tiles;
 
-import com.astetyne.expirium.client.utils.IntVector2;
-
-import java.util.HashMap;
-
 public class BreakingTile {
 
-    private final static HashMap<Tile, BreakingTile> breakingTiles = new HashMap<>();
+    public final int x, y;
+    public float state;
 
-    private final IntVector2 loc;
-    private float state;
-
-    public BreakingTile(IntVector2 loc, float state) {
-        this.loc = loc;
+    public BreakingTile(int x, int y, float state) {
+        this.x = x;
+        this.y = y;
         this.state = state;
-    }
-
-    public IntVector2 getLoc() {
-        return loc;
-    }
-
-    public float getState() {
-        return state;
-    }
-
-    public void setState(float state) {
-        this.state = state;
-    }
-
-    public static HashMap<Tile, BreakingTile> getBreakingTiles() {
-        return breakingTiles;
     }
 }

@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.entity;
 
-import com.astetyne.expirium.client.entity.animator.EntityAnimation;
 import com.astetyne.expirium.client.entity.animator.EntityAnimator;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.Tile;
@@ -46,11 +45,16 @@ public abstract class Entity {
 
     }
 
+    public void update() {
+        move();
+        animator.update();
+    }
+
     public void draw(SpriteBatch batch) {
         animator.draw(batch);
     }
 
-    public void move() {
+    private void move() {
 
         if(interpolationDelta == -1) return;
 
@@ -113,12 +117,15 @@ public abstract class Entity {
         this.animator = animator;
     }
 
+    public EntityAnimator getAnimator() {
+        return animator;
+    }
+
     public float getAngle() {
         return angle;
     }
 
-    public void onEntityAnim(PacketInputStream in) {
-        EntityAnimation anim = EntityAnimation.getType(in.getInt());
-        animator.onEntityAnim(anim, in);
+    public void injure(float damageValue) {
+        animator.injure(damageValue);
     }
 }
