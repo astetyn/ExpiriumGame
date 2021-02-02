@@ -30,14 +30,17 @@ public class TickLooper extends TerminableLooper {
                 ep.getNetManager().processIncomingPackets();
             }
 
-            server.getWorld().onTick();
-
             float delta = 1f / Consts.SERVER_DEFAULT_TPS;
+
+            server.getWorld().onTick(delta);
+
             List<TickListener> list = server.getEventManager().getTickListeners();
             for(int i = list.size() - 1; i >= 0; i--) {
-                //todo: this is ideal, not real
+                //todo: delta is ideal, not real
                 list.get(i).onTick(delta);
             }
+
+            server.getFileManager().onTick();
 
             server.onTick(); // this must be last since it can close the server (dispose world)
 

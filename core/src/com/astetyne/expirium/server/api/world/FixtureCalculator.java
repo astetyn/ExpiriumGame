@@ -82,11 +82,11 @@ public class FixtureCalculator implements Disposable {
         }
         t.getFixtures().clear();
 
-        if(t.getTypeFront().getTileFix() != TileFix.FULL && t.getTypeFront().getTileFix() != TileFix.SOFT) {
+        if(t.getType().getFix() != TileFix.FULL && t.getType().getFix() != TileFix.SOFT) {
             // case when tile has own custom fixtures
-            float[] vertices = t.getTypeFront().getTileFix().getVertices();
+            float[] vertices = t.getType().getFix().getVertices();
             if(vertices.length < 4)  {
-                System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getTypeFront().getTileFix());
+                System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getType().getFix());
                 return;
             }
             float lastX = vertices[0];
@@ -100,21 +100,21 @@ public class FixtureCalculator implements Disposable {
             return;
         }
 
-        if(t.getTypeFront().getTileFix() != TileFix.FULL) return;
+        if(t.getType().getFix() != TileFix.FULL) return;
 
-        if(y != 0 && worldTerrain[y-1][x].getTypeFront().getTileFix() != TileFix.FULL) {
+        if(y != 0 && worldTerrain[y-1][x].getType().getFix() != TileFix.FULL) {
             shape.set(x, y, x+1,y);
             createFixture(t);
         }
-        if(y != h-1 && worldTerrain[y+1][x].getTypeFront().getTileFix() != TileFix.FULL) {
+        if(y != h-1 && worldTerrain[y+1][x].getType().getFix() != TileFix.FULL) {
             shape.set(x, y+1, x+1,y+1);
             createFixture(t);
         }
-        if(x != 0 && worldTerrain[y][x-1].getTypeFront().getTileFix() != TileFix.FULL) {
+        if(x != 0 && worldTerrain[y][x-1].getType().getFix() != TileFix.FULL) {
             shape.set(x, y, x,y+1);
             createFixture(t);
         }
-        if(x != w-1 && worldTerrain[y][x+1].getTypeFront().getTileFix() != TileFix.FULL) {
+        if(x != w-1 && worldTerrain[y][x+1].getType().getFix() != TileFix.FULL) {
             shape.set(x+1, y, x+1,y+1);
             createFixture(t);
         }

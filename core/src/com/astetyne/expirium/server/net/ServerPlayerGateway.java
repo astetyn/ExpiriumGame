@@ -38,9 +38,18 @@ public class ServerPlayerGateway extends TerminableLooper {
             in = new PacketInputStream(client.getInputStream());
             out = new PacketOutputStream(client.getOutputStream());
 
-            client.setSoTimeout(5000);
+            client.setSoTimeout(10000);
             int readBytes = in.fillBuffer();
             if(readBytes == -1) stop();
+
+            in.swap();
+            // verification if connecting client is game or not
+            int packetID = in.getInt();
+            if(packetID != 10) {
+                System.out.println("Wrong join packet id, refusing.");
+                return;
+            }
+            System.out.println("Correct join packet, moving to registration.");
 
             server.getServerGateway().playerPreJoinAsync(this);
 
@@ -50,19 +59,29 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             in.reset();
 
+        }catch(Exception e) {
+            try {
+                client.close();
+            }catch(IOException ignored) {}
+            System.out.println("Player failed during connecting to server.");
+            return;
+        }
+
+        try {
+
             while(isRunning()) {
                 out.flush();
-                client.setSoTimeout(5000);
-                readBytes = in.fillBuffer();
+                client.setSoTimeout(30000);
+                int readBytes = in.fillBuffer();
                 if(readBytes == -1) {
                     server.getServerGateway().playerPreLeaveAsync(owner);
                     return;
                 }
 
                 traffic += readBytes;
-                if(time + 5000 < System.currentTimeMillis()) {
+                if(time + 10000 < System.currentTimeMillis()) {
                     time = System.currentTimeMillis();
-                    System.out.println("Server traffic (bytes): "+traffic+" ping (ms): "+in.getPing());
+                    System.out.println("Server traffic (Bp10s): "+traffic+" ping (ms): "+in.getPing());
                     traffic = 0;
                 }
 

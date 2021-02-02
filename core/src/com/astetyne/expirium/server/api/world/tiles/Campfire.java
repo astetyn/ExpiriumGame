@@ -6,7 +6,6 @@ import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
-import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
 import com.astetyne.expirium.server.api.event.PlayerInteractListener;
@@ -53,7 +52,7 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
     public void onInteract(PlayerInteractEvent event) {
         if(event.getTile() != tile || placeTime + 500 > System.currentTimeMillis()) return;
         ExpiPlayer p = event.getPlayer();
-        if(p.getCenter().dst(event.getX(), event.getY()) > 7) return;
+        if(!p.isInInteractRadius(event.getLoc())) return;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
         p.getNetManager().putInvFeedPacket();
@@ -73,15 +72,12 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
                 Vector2 dropLoc = new Vector2(tile.getX() + off, tile.getY() + off);
                 for(ItemStack is : inventory.getItems()) {
                     for(int i = 0; i < is.getAmount(); i++) {
-                        ExpiDroppedItem edi = new ExpiDroppedItem(server, dropLoc, is.getItem(), 0.5f);
-                        for(ExpiPlayer pp2 : server.getPlayers()) {
-                            pp2.getNetManager().putEntitySpawnPacket(edi);
-                        }
+                        server.getWorld().spawnDroppedItem(is.getItem(), dropLoc, Consts.ITEM_COOLDOWN_BREAK);
                     }
                 }
                 break;
             }
-        }else if(tile.getTypeFront() == TileType.CAMPFIRE_BIG && remainingTime < 60) {
+        }else if(tile.getType() == TileType.CAMPFIRE_BIG && remainingTime < 60) {
             server.getWorld().changeTile(tile, TileType.CAMPFIRE_SMALL, false, null, Source.NATURAL);
         }
         inventory.onTick();

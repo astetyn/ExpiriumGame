@@ -161,7 +161,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
             itemInHand = isCon;
         }
 
-        owner.getNetManager().putHotSlotsFeedPacket((byte) chosenSlot.getId(), isTool, isMat, isCon);
+        owner.getNetManager().putHotSlotsFeedPacket(chosenSlot, isTool, isMat, isCon);
 
         for(ExpiPlayer ep : owner.getServer().getPlayers()) {
             ep.getNetManager().putHandItemPacket(owner.getId(), itemInHand.getItem());
@@ -180,6 +180,13 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
     public void removeItem(ItemStack remIS) {
         super.removeItem(remIS);
         updateHotSlots();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        updateHotSlots();
+        owner.getNetManager().putInvFeedPacket();
     }
 
     public ItemStack getItemInHand() {

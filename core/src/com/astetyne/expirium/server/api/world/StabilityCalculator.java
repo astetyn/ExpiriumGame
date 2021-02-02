@@ -27,7 +27,7 @@ public class StabilityCalculator {
     public void generateStability() {
 
         for(int j = 0; j < w; j++) {
-            worldTerrain[0][j].setStability(worldTerrain[0][j].getTypeFront().getMaxStability());
+            worldTerrain[0][j].setStability(worldTerrain[0][j].getType().getMaxStability());
         }
 
         for(int i = 1; i < h; i++) {
@@ -86,7 +86,7 @@ public class StabilityCalculator {
      */
     public boolean canBeChanged(ExpiTile t, TileType checkType) {
 
-        TileType oldType = t.getTypeFront();
+        TileType oldType = t.getType();
 
         t.setTypeFront(checkType);
         int actualS = getActualStability(t);
@@ -119,7 +119,7 @@ public class StabilityCalculator {
     }
 
     private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
-        if(t.getTypeFront() == TileType.AIR) return;
+        if(t.getType() == TileType.AIR) return;
         if(t.getStability() > getActualStability(t) && t.getY() != 0) {
             findStrongConnections(t, pack);
         }else {
@@ -136,13 +136,13 @@ public class StabilityCalculator {
         int maxAvailStab = 0;
 
         // left tile
-        if(x != 0 && !worldTerrain[y][x-1].isLabile() && !t.getTypeFront().getSolidity().isVert())
+        if(x != 0 && !worldTerrain[y][x-1].isLabile() && !t.getType().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x-1].getStability()-1);
         // top tile
-        if(y != h-1 && !worldTerrain[y+1][x].isLabile() && !t.getTypeFront().getSolidity().isVert())
+        if(y != h-1 && !worldTerrain[y+1][x].isLabile() && !t.getType().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y+1][x].getStability()-2);
         // right tile
-        if(x != w-1 && !worldTerrain[y][x+1].isLabile() && !t.getTypeFront().getSolidity().isVert())
+        if(x != w-1 && !worldTerrain[y][x+1].isLabile() && !t.getType().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
         // bottom tile
         if(y != 0 && !worldTerrain[y-1][x].isLabile())
@@ -158,9 +158,9 @@ public class StabilityCalculator {
                 int s1 = t1.getStability();
                 int s2 = t2.getStability();
                 int s3 = t3.getStability();
-                TileType type1 = t1.getTypeFront();
-                TileType type2 = t2.getTypeFront();
-                TileType type3 = t3.getTypeFront();
+                TileType type1 = t1.getType();
+                TileType type2 = t2.getType();
+                TileType type3 = t3.getType();
                 if(s1 == s2 && s2 == s3 && s1 != 0) {
                     maxAvailStab = Math.max(maxAvailStab, s1 + 1);
                 }else if(type1 != TileType.AIR && type1 == type2 && type2 == type3) {
@@ -168,7 +168,7 @@ public class StabilityCalculator {
                 }
             }
         }
-        return Math.min(t.getTypeFront().getMaxStability(), maxAvailStab);
+        return Math.min(t.getType().getMaxStability(), maxAvailStab);
     }
 
     /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/
@@ -189,7 +189,7 @@ public class StabilityCalculator {
     }
 
     private void checkRealStability(ExpiTile t, HashSet<ExpiTile> changed) {
-        if(t.getTypeFront() == TileType.AIR) return;
+        if(t.getType() == TileType.AIR) return;
         int realStability = getActualStability(t);
         if(realStability > t.getStability()) {
             t.setStability(realStability);

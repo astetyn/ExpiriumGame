@@ -42,7 +42,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
     public void onTileChange(TileChangeEvent event) {
 
         TileType from = event.getFrom();
-        TileType toType = event.getTile().getTypeFront();
+        TileType toType = event.getTile().getType();
 
         if(event.getSource() == Source.NATURAL && from == TileType.CAMPFIRE_BIG && toType == TileType.CAMPFIRE_SMALL) {
             return;

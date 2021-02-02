@@ -20,6 +20,6 @@ public class FriendPlayer extends Player {
     @Override
     public void draw(SpriteBatch batch) {
         super.draw(batch);
-        Res.WORLD_FONT.draw(batch, name, getCenter().x - nameOffset, getLocation().y + 1.7f); // 1.7 comes from observing
+        Res.WORLD_FONT.draw(batch, name, getCenter().x - nameOffset, getLocation().y + 2f); // 2 comes from observing
     }
 }

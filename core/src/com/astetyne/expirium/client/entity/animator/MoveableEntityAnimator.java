@@ -51,13 +51,13 @@ public class MoveableEntityAnimator extends EntityAnimator {
         Vector2 loc = entity.getLocation();
 
         if(lastState == 0) {
-            batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, 0, 0, w, h, 1, 1, 1);
+            batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
         }else if(lastState == 1) {
-            batch.draw(idleAnim.getKeyFrame(timer), loc.x + w, loc.y - yOffset, 0, 0, w, h, -1, 1, 1);
+            batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
         }else if(lastState == 2) {
-            batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, 0, 0, w, h, 1, 1, 1);
+            batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
         }else if(lastState == 3) {
-            batch.draw(moveAnim.getKeyFrame(timer), loc.x + w, loc.y - yOffset, 0, 0, w, h, -1, 1, 1);
+            batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
         }
 
     }

@@ -62,10 +62,10 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
     @Override
     public void onTick(float delta) {
 
-        decreaseFoodLevel(delta);
+        decreaseFoodLevel(delta/10); // from 100 to 0 in 1000 seconds = 16.7 mins
 
         if(foodLevel <= 5) {
-            injure(delta);
+            injure(delta/2); // 1 health per 2 seconds
         }
 
     }

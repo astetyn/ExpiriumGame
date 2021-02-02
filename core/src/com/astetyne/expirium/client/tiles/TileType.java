@@ -81,7 +81,7 @@ public enum TileType implements Textureable {
         return maxStability;
     }
 
-    public TileFix getTileFix() {
+    public TileFix getFix() {
         return tileFix;
     }
 

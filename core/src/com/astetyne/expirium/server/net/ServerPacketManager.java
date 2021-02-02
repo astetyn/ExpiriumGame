@@ -10,6 +10,7 @@ import com.astetyne.expirium.server.api.entity.ExpiEntity;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
 import com.astetyne.expirium.server.api.event.PlayerInteractListener;
+import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
@@ -102,7 +103,7 @@ public class ServerPacketManager {
         for(int i = 0; i < terrain[0].length; i++) {
             for(int j = yOff; j < yOff + partHeight; j++) {
                 ExpiTile t = terrain[j][i];
-                out.putByte((byte) t.getTypeFront().getID());
+                out.putByte((byte) t.getType().getID());
                 out.putByte((byte) t.getStability());
             }
         }
@@ -158,9 +159,9 @@ public class ServerPacketManager {
         out.putInt(owner.getSecondInv().getGrid()[0].length);
     }
 
-    public void putHotSlotsFeedPacket(byte focus, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
+    public void putHotSlotsFeedPacket(ChosenSlot slot, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
         out.startPacket(30);
-        out.putByte(focus);
+        out.putByte((byte) slot.getId());
         out.putInt(toolIS.getItem().getId());
         out.putInt(toolIS.getAmount());
         out.putInt(materialIS.getItem().getId());
@@ -171,7 +172,7 @@ public class ServerPacketManager {
 
     public void putTileChangePacket(ExpiTile t) {
         out.startPacket(22);
-        out.putInt(t.getTypeFront().getID());
+        out.putInt(t.getType().getID());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }
@@ -188,7 +189,7 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putFloat(server.getWorld().getDayTime());
+        out.putFloat(server.getWorld().getTime());
         out.putInt(server.getWorld().getWeather().getID());
     }
 
@@ -223,9 +224,9 @@ public class ServerPacketManager {
         out.putFloat(damageValue);
     }
 
-    public void putHandPunchPacket(int id) {
+    public void putHandPunchPacket(ExpiPlayer puncher) {
         out.startPacket(32);
-        out.putInt(id);
+        out.putInt(puncher.getId());
     }
 
     public void putHandItemPacket(int id, Item item) {

@@ -26,7 +26,7 @@ public class ExpiTile {
         this.typeFront = type;
     }
 
-    public TileType getTypeFront() {
+    public TileType getType() {
         return typeFront;
     }
 

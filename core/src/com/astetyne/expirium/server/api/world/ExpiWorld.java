@@ -34,7 +34,7 @@ import java.util.List;
 public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     private final ExpiServer server;
-    private final ExpiTile[][] worldTerrain;
+    private final ExpiTile[][] terrain;
     private int partHeight;
     private World b2dWorld;
     private Body terrainBody;
@@ -43,7 +43,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private WeatherType weatherType;
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
-    private float dayTime;
+    private float dayTime; // in seconds from 6:00 local time
+    private int day; // completed days from server creation
     private final int width, height;
     private final long seed;
 
@@ -55,10 +56,11 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         height = preferences.height;
         seed = preferences.seed;
 
-        worldTerrain = new ExpiTile[preferences.height][preferences.width];
-        new WorldGenerator(worldTerrain).generateWorld();
+        terrain = new ExpiTile[preferences.height][preferences.width];
+        new WorldGenerator(terrain).generateWorld();
 
         dayTime = 50; // 7:00
+        day = 0;
         weatherType = WeatherType.SUNNY;
 
         initAfterCreation();
@@ -73,15 +75,16 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         height = in.readInt();
         seed = in.readLong();
 
-        worldTerrain = new ExpiTile[height][width];
+        terrain = new ExpiTile[height][width];
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                worldTerrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.getType(in.readByte()), w, h);
+                terrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), TileType.getType(in.readByte()), w, h);
             }
         }
 
         dayTime = in.readFloat();
+        day = in.readInt();
 
         //todo: len docasne zatial
         weatherType = WeatherType.SUNNY;
@@ -96,7 +99,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
 
-        b2dWorld = new World(new Vector2(0, -9.81f), false);
+        b2dWorld = new World(new Vector2(0, -12f), false);
 
         contactListener = new ExpiContactListener();
         b2dWorld.setContactListener(contactListener);
@@ -106,7 +109,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         terrainDef.position.set(0, 0);
         terrainBody = b2dWorld.createBody(terrainDef);
 
-        stabilityCalc = new StabilityCalculator(worldTerrain);
+        stabilityCalc = new StabilityCalculator(terrain);
         fixtureCalc = new FixtureCalculator(this, terrainBody);
 
         System.out.println("Creating fixtures...");
@@ -124,40 +127,44 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         fixtureCalc.dispose();
     }
 
-    public void onTick() {
+    public void onTick(float delta) {
 
-        dayTime += 1f / Consts.SERVER_DEFAULT_TPS;
+        dayTime += delta;
         if(dayTime >= Consts.DAY_TIME_SEC) {
             dayTime = 0;
+            day++;
         }
 
         for(ExpiPlayer pp : server.getPlayers()) {
             pp.applyPhysics();
         }
 
-        stepsTimeAccumulator += 1f / Consts.SERVER_DEFAULT_TPS;
+        stepsTimeAccumulator += delta;
         while(stepsTimeAccumulator >= 1/60f) {
             b2dWorld.step(1/60f, 6, 2);
             stepsTimeAccumulator -= 1/60f;
         }
         //b2dWorld.step(1f/Consts.SERVER_DEFAULT_TPS, 6, 2);
 
-        for(ExpiEntity ee : server.getEntities()) {
-            for(ExpiPlayer pp : server.getPlayers()) {
+        for(ExpiPlayer pp : server.getPlayers()) {
+            for(ExpiEntity ee : server.getEntities()) {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
+            pp.getNetManager().putEnviroPacket();
         }
     }
 
     public void onInteract(PlayerInteractEvent event) {
 
-        // this is only for tile breaking
+        // this is only for tile placing
 
         ExpiPlayer p = event.getPlayer();
+        if(!p.isInInteractRadius(event.getLoc())) return;
+
         Item item = p.getInv().getItemInHand().getItem();
         ExpiTile t = event.getTile();
 
-        if(item.getCategory() != ItemCategory.MATERIAL || event.getTile().getTypeFront() != TileType.AIR) return;
+        if(item.getCategory() != ItemCategory.MATERIAL || event.getTile().getType() != TileType.AIR) return;
 
         if(item.getBuildTile() == null) return;
 
@@ -169,12 +176,16 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         p.getInv().removeItem(new ItemStack(item, 1));
         p.getNetManager().putInvFeedPacket();
 
+        for(ExpiPlayer ep : server.getPlayers()) {
+            ep.getNetManager().putHandPunchPacket(p);
+        }
+
         changeTile(t, item.getBuildTile(), true, p, Source.PLAYER);
     }
 
     public void changeTile(ExpiTile t, TileType to, boolean withDrops, ExpiPlayer p, Source source) {
 
-        TileType from = t.getTypeFront();
+        TileType from = t.getType();
 
         if(to == TileType.AIR && withDrops) {
             createDroppedItem(t);
@@ -192,7 +203,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         while(it.hasNext()) {
             ExpiTile t2 = it.next();
             if(t2.getStability() != 0) continue;
-            if(Math.random() < 2.0 / size && withDrops && t2.getTypeFront() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
+            if(Math.random() < 2.0 / size && withDrops && t2.getType() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
                 createDroppedItem(t2);
             }
             t2.setTypeFront(TileType.AIR);
@@ -221,15 +232,12 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
      * Call right before tile is changed.
      */
     private void createDroppedItem(ExpiTile t) {
-        if(t == null || t.getTypeFront() == TileType.AIR) return;
+        if(t == null || t.getType() == TileType.AIR) return;
         float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
         Vector2 loc = new Vector2(t.getX() + off, t.getY() + off);
-        for(Item item : ItemDropper.chooseItems(t.getTypeFront().getItemDropper())) {
+        for(Item item : ItemDropper.chooseItems(t.getType().getItemDropper())) {
             if(item == Item.EMPTY) return;
-            ExpiDroppedItem droppedItem = new ExpiDroppedItem(server, loc, item, Consts.ITEM_COOLDOWN_BREAK);
-            for(ExpiPlayer pp : server.getPlayers()) {
-                pp.getNetManager().putEntitySpawnPacket(droppedItem);
-            }
+            spawnDroppedItem(item, loc, Consts.ITEM_COOLDOWN_BREAK);
         }
     }
 
@@ -238,7 +246,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         int x = t.getX();
         int y = t.getY();
 
-        if(toPlace.getBuildTile().getTileFix() == TileFix.SOFT) return true;
+        if(toPlace.getBuildTile().getFix() == TileFix.SOFT) return true;
 
         for(ExpiEntity p : server.getEntities()) {
 
@@ -255,20 +263,77 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return true;
     }
 
-    public Vector2 getSaveLocationForSpawn() {
-        int i = 0;
-        while(i != height && worldTerrain[i][10].getTypeFront() != TileType.AIR) {
-            i++;
+    public Vector2 getSpawnLocation() {
+        int x = (int) (width/2 -10 + Math.random()*11);
+        int y = height-2;
+        while(terrain[y][x].getType().getFix() == TileFix.SOFT) {
+            if(y == 0) {
+                x = (int) (Math.random() * width);
+                y = height-2;
+            }else {
+                y--;
+            }
         }
-        return new Vector2(10, i+2);
+        return new Vector2(x, y+2);
+    }
+
+    public void teleport(ExpiEntity e, float x, float y) {
+
+        float precision = 0.5f;
+
+        float rightX = x;
+        float leftX = x;
+
+        System.out.println("teleport req to: "+x+" "+y);
+
+        while(true) {
+            if(isPlaceSafe(e, rightX, y)) {
+                e.teleport(rightX, y);
+                System.out.println("succes right: "+rightX+" "+y);
+                break;
+            }
+            if(isPlaceSafe(e, leftX, y)) {
+                e.teleport(leftX, y);
+                System.out.println("succes left: "+leftX+" "+y);
+                break;
+            }
+            rightX += precision;
+            leftX -= precision;
+            if(leftX <= 0 || rightX + e.getType().getWidth() >= width) {
+                leftX = x;
+                rightX = x;
+                y++;
+            }
+            if(y + e.getType().getHeight() >= height) {
+                System.out.println("Can not find safe teleport loc for: "+e+". Teleport canceled.");
+                break;
+            }
+            System.out.println("not success");
+        }
+
+    }
+
+    private boolean isPlaceSafe(ExpiEntity e, float x, float y) {
+
+        float ew = e.getType().getWidth();
+        float eh = e.getType().getHeight();
+
+        if(x <= 0 || x + ew >= width || y <= 0 || y + eh >= height) return false;
+
+        if(getTileAt(x, y).getType().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x + ew, y).getType().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x + ew, y + eh).getType().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x, y + eh).getType().getFix() != TileFix.SOFT) return false;
+
+        return true;
     }
 
     public ExpiTile getTileAt(float x, float y) {
-        return worldTerrain[(int)y][(int)x];
+        return terrain[(int)y][(int)x];
     }
 
     public ExpiTile getTileAt(Vector2 vec) {
-        return worldTerrain[(int)vec.y][(int)vec.x];
+        return terrain[(int)vec.y][(int)vec.x];
     }
 
     public Body getTerrainBody() {
@@ -287,12 +352,12 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return contactListener;
     }
 
-    public float getDayTime() {
+    public float getTime() {
         return dayTime;
     }
 
     public ExpiTile[][] getTerrain() {
-        return worldTerrain;
+        return terrain;
     }
 
     public int getTerrainWidth() {
@@ -307,6 +372,17 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return partHeight;
     }
 
+    public int getDay() {
+        return day;
+    }
+
+    public void spawnDroppedItem(Item item, Vector2 loc, float cooldown) {
+        ExpiDroppedItem edi = new ExpiDroppedItem(server, loc, item, cooldown);
+        for(ExpiPlayer pp : server.getPlayers()) {
+            pp.getNetManager().putEntitySpawnPacket(edi);
+        }
+    }
+
     @Override
     public void writeData(DataOutputStream out) throws IOException {
 
@@ -316,12 +392,13 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                out.writeByte(worldTerrain[h][w].getTypeFront().getID());
-                out.writeByte(worldTerrain[h][w].getTypeBack().getID());
+                out.writeByte(terrain[h][w].getType().getID());
+                out.writeByte(terrain[h][w].getTypeBack().getID());
             }
         }
 
         out.writeFloat(dayTime);
+        out.writeInt(day);
 
     }
 }

@@ -86,7 +86,7 @@ public class WorldGenerator {
 
             int y = terrainLevel[x] + 1;
 
-            if(worldTerrain[y-1][x].getTypeFront() != TileType.GRASS) continue;
+            if(worldTerrain[y-1][x].getType() != TileType.GRASS) continue;
 
             if(Math.random() < 0.8f || lastTree + 2 > x) continue;
 
@@ -126,7 +126,7 @@ public class WorldGenerator {
 
             int y = terrainLevel[x] + 1;
 
-            if(worldTerrain[y - 1][x].getTypeFront() != TileType.GRASS || worldTerrain[y][x].getTypeFront() != TileType.AIR) continue;
+            if(worldTerrain[y - 1][x].getType() != TileType.GRASS || worldTerrain[y][x].getType() != TileType.AIR) continue;
 
             if(Math.random() < 0.8f || lastRasp + 2 > x) continue;
 

@@ -3,19 +3,19 @@ package com.astetyne.expirium.server.api.event;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
+import com.badlogic.gdx.math.Vector2;
 
 public class PlayerInteractEvent implements Cancellable {
 
     private final ExpiPlayer player;
-    private final float x, y;
+    private final Vector2 loc;
     private final ExpiTile tile;
     private final InteractType type;
     private boolean cancelled;
 
     public PlayerInteractEvent(ExpiPlayer player, float x, float y, ExpiTile tile, InteractType type) {
         this.player = player;
-        this.x = x;
-        this.y = y;
+        loc = new Vector2(x, y);
         this.tile = tile;
         this.type = type;
         cancelled = false;
@@ -25,12 +25,8 @@ public class PlayerInteractEvent implements Cancellable {
         return player;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
+    public Vector2 getLoc() {
+        return loc;
     }
 
     public ExpiTile getTile() {

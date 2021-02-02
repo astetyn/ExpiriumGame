@@ -14,6 +14,8 @@ import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -32,6 +34,8 @@ public class ExpiPlayer extends LivingEntity {
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
     private final Vector2 resurrectLoc;
+    private boolean wasAlreadyDead;
+    private int lastDeathDay;
 
     public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location);
@@ -45,6 +49,8 @@ public class ExpiPlayer extends LivingEntity {
         tsData2 = new ThumbStickData();
         lastJump = 0;
         resurrectLoc = new Vector2(location);
+        wasAlreadyDead = false;
+        lastDeathDay = 0;
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -69,6 +75,8 @@ public class ExpiPlayer extends LivingEntity {
         tsData2 = new ThumbStickData();
         lastJump = 0;
         resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
+        wasAlreadyDead = in.readBoolean();
+        lastDeathDay = in.readInt();
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -87,7 +95,7 @@ public class ExpiPlayer extends LivingEntity {
         fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
 
         // upper poly
-        polyShape.setAsBox(0.45f, 0.55f, new Vector2(0.45f, 0.7f), 0);
+        polyShape.setAsBox(type.getWidth()/2, (type.getHeight()-0.15f)/2, new Vector2(type.getWidth()/2, (type.getHeight()-0.15f)/2+0.1f), 0);
         fixtureDef.shape = polyShape;
         fixtureDef.friction = 0;
         body.createFixture(fixtureDef);
@@ -103,11 +111,12 @@ public class ExpiPlayer extends LivingEntity {
         verts[6] = 0.85f;
         verts[7] = 0.15f;
 
-        // ground sensor
         polyShape.set(verts);
         fixtureDef.friction = 1;
         body.createFixture(fixtureDef);
 
+        // ground sensor
+        //todo: spravit vseobecny ground sensor pre living entity?
         polyShape.setAsBox(0.4f, 0.3f, new Vector2(0.45f, 0.2f), 0);
         fixtureDef.density = 0f;
         fixtureDef.isSensor = true;
@@ -121,14 +130,22 @@ public class ExpiPlayer extends LivingEntity {
     @Override
     public void die() {
         invincible = true;
-        getNetManager().putDeathPacket(true, 10);
+        getNetManager().putDeathPacket(!wasAlreadyDead, server.getWorld().getDay() - lastDeathDay);
         setFoodLevel(20);
         setHealthLevel(20);
-        teleport(resurrectLoc.x, resurrectLoc.y);
+        for(ItemStack is : mainInv.getItems()) {
+            int dropAmount = (int) (Math.random() * is.getAmount()) + 1;
+            for(int i = 0; i < dropAmount; i++) {
+                server.getWorld().spawnDroppedItem(is.getItem(), getCenter(), Consts.ITEM_COOLDOWN_DROP);
+            }
+        }
+        mainInv.clear();
+        server.getWorld().teleport(this, resurrectLoc.x, resurrectLoc.y);
         tsData1.reset();
         tsData2.reset();
         body.setLinearVelocity(0, 0);
-        //todo: dropnut polovicu itemov
+        wasAlreadyDead = true;
+        lastDeathDay = server.getWorld().getDay();
     }
 
     public void updateThumbSticks(PacketInputStream in) {
@@ -241,24 +258,21 @@ public class ExpiPlayer extends LivingEntity {
     private void throwAwayItem(ItemStack is) {
         for(int i = 0; i < is.getAmount(); i++) {
             //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
-            ExpiDroppedItem edi = new ExpiDroppedItem(server, getCenter(), is.getItem(), Consts.ITEM_COOLDOWN_DROP);
-            for(ExpiPlayer pp : server.getPlayers()) {
-                pp.getNetManager().putEntitySpawnPacket(edi);
-            }
+            server.getWorld().spawnDroppedItem(is.getItem(), getCenter(), Consts.ITEM_COOLDOWN_DROP);
         }
         getNetManager().putInvFeedPacket();
     }
 
     public void applyPhysics() {
 
-        if(invincible && tsData1.horz == 0 && tsData1.vert == 0 && tsData2.horz == 0 && tsData2.vert == 0) {
+        if(invincible && tsData1.horz != 0 || tsData1.vert != 0 || tsData2.horz != 0 || tsData2.vert != 0) {
             invincible = false;
         }
 
         if(onGround) {
             Vector2 center = body.getWorldCenter();
             if(tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
-                body.applyLinearImpulse(0, 200, center.x, center.y, true);
+                body.applyLinearImpulse(0, 270, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
             }
         }
@@ -270,7 +284,7 @@ public class ExpiPlayer extends LivingEntity {
             tsData1.horz = 0;
             //body.setLinearVelocity(-3, vY);
         }else {
-            body.applyForceToCenter((40000.0f/Consts.SERVER_DEFAULT_TPS) * tsData1.horz, 0, true);
+            body.applyForceToCenter((50000.0f/Consts.SERVER_DEFAULT_TPS) * tsData1.horz, 0, true);
         }
     }
 
@@ -287,6 +301,13 @@ public class ExpiPlayer extends LivingEntity {
         }
 
         tileBreaker.onTick(tsData2);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.H) && alive) {
+            die();
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.J)) {
+            setResurrectLoc(getLocation().x, getLocation().y);
+        }
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -366,7 +387,13 @@ public class ExpiPlayer extends LivingEntity {
         resurrectLoc.y = y;
     }
 
+    public boolean isInInteractRadius(Vector2 loc) {
+        return isInInteractRadius(loc.x, loc.y);
+    }
 
+    public boolean isInInteractRadius(float x, float y) {
+        return getCenter().dst(x, y) <= Consts.INTERACT_RADIUS;
+    }
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
@@ -376,5 +403,7 @@ public class ExpiPlayer extends LivingEntity {
         mainInv.writeData(out);
         out.writeFloat(resurrectLoc.x);
         out.writeFloat(resurrectLoc.y);
+        out.writeBoolean(wasAlreadyDead);
+        out.writeInt(lastDeathDay);
     }
 }

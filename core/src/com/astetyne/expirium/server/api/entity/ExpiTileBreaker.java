@@ -58,7 +58,7 @@ public class ExpiTileBreaker {
                 targetTile = null;
                 break;
             }
-            if(newTarget.getTypeFront() != TileType.AIR) {
+            if(newTarget.getType() != TileType.AIR) {
                 if(newTarget != targetTile && newTarget.getY() != 0) {
                     timeAccumulator = 0;
                     targetTile = newTarget;
@@ -76,19 +76,19 @@ public class ExpiTileBreaker {
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
-            if(timeAccumulator >= targetTile.getTypeFront().getBreakTime()) {
+            if(timeAccumulator >= targetTile.getType().getBreakTime()) {
                 world.changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;
                 targetTile = null;
             }else {
                 // breaking in action
                 for(ExpiPlayer ep : server.getPlayers()) {
-                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getTypeFront().getBreakTime());
+                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getType().getBreakTime());
                 }
                 if(lastPunchTime + 200 < System.currentTimeMillis()) { // cca 450 is full animation (200 is half)
                     lastPunchTime = System.currentTimeMillis();
                     for(ExpiPlayer ep : server.getPlayers()) {
-                        ep.getNetManager().putHandPunchPacket(owner.getId());
+                        ep.getNetManager().putHandPunchPacket(owner);
                     }
                 }
             }

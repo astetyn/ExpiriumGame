@@ -77,9 +77,9 @@ public class ClientGateway extends TerminableLooper {
                 out.flush();
 
                 traffic += readBytes;
-                if(time + 5000 < System.currentTimeMillis()) {
+                if(time + 10000 < System.currentTimeMillis()) {
                     time = System.currentTimeMillis();
-                    System.out.println("Client traffic (bytes): "+traffic+" ping (ms): "+in.getPing());
+                    System.out.println("Client traffic (Bp10s): "+traffic+" ping (ms): "+in.getPing());
                     traffic = 0;
                 }
 

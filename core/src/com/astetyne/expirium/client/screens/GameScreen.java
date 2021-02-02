@@ -112,6 +112,9 @@ public class GameScreen implements Screen {
         if(Gdx.input.isKeyPressed(Input.Keys.D)) {
             gameWorld.getPlayer().onHandPunch();
         }
+        if(Gdx.input.isKeyPressed(Input.Keys.G)) {
+            System.out.println(gameWorld.getPlayer().getLocation());
+        }
 
     }
 

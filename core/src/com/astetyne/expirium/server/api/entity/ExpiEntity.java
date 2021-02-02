@@ -49,6 +49,7 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         return body.getPosition();
     }
 
+    /** Note that this method is unsafe and teleport place must be checked in advance. */
     public void teleport(float x, float y) {
         body.setTransform(x, y, 0);
     }

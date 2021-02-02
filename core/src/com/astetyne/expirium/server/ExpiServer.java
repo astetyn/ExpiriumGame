@@ -70,7 +70,7 @@ public class ExpiServer implements Saveable {
         serverGateway = new ServerGateway(serverPreferences.port, this);
         multicastSender = new MulticastSender();
 
-        fileManager = new WorldFileManager(serverPreferences.worldPreferences.worldName);
+        fileManager = new WorldFileManager(this, serverPreferences.worldPreferences.worldName);
 
         saveableModules = new ArrayList<>();
 
@@ -147,11 +147,7 @@ public class ExpiServer implements Saveable {
         synchronized(tickLooper.getTickLock()) {
             tickLooper.getTickLock().notifyAll();
         }
-        try {
-            fileManager.saveGameServer(this, this);
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
+        fileManager.saveGameServer();
         dispose();
     }
 
@@ -166,11 +162,7 @@ public class ExpiServer implements Saveable {
         synchronized(tickLooper.getTickLock()) {
             tickLooper.getTickLock().notifyAll();
         }
-        try {
-            fileManager.saveGameServer(this, this);
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
+        fileManager.saveGameServer();
         dispose();
     }
 
@@ -191,10 +183,6 @@ public class ExpiServer implements Saveable {
         if(closeRequest && fullyRunning) {
             performClose();
             return;
-        }
-
-        for(ExpiPlayer pp : players) {
-            pp.getNetManager().putEnviroPacket();
         }
 
         Iterator<WorldLoader> it = worldLoaders.iterator();
@@ -249,6 +237,7 @@ public class ExpiServer implements Saveable {
 
         expiWorld.writeData(out);
 
+        // players are saved independently - during logout
         int entitiesSize = 0;
         for(ExpiEntity e : entities) {
             if(e instanceof ExpiPlayer) continue;

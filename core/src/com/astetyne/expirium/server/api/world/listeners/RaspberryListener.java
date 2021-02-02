@@ -3,9 +3,9 @@ package com.astetyne.expirium.server.api.world.listeners;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.api.Saveable;
-import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.api.entity.ExpiPlayer;
 import com.astetyne.expirium.server.api.event.*;
 import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
@@ -41,7 +41,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
                 ExpiTile t = terrain[i][j];
-                if(t.getTypeFront() == TileType.RASPBERRY_BUSH_1) {
+                if(t.getType() == TileType.RASPBERRY_BUSH_1) {
                     RaspberryBush bush = new RaspberryBush(t, (float) (Math.random() * 600));
                     growingBushes.add(bush);
                     lookUp.put(t, bush);
@@ -74,27 +74,31 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
     @Override
     public void onInteract(PlayerInteractEvent event) {
 
-        if(event.getTile().getTypeFront() != TileType.RASPBERRY_BUSH_2) return;
+        if(event.getTile().getType() != TileType.RASPBERRY_BUSH_2) return;
 
-        server.getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, event.getPlayer(), Source.PLAYER);
+        ExpiPlayer p = event.getPlayer();
+        if(!p.isInInteractRadius(event.getLoc())) return;
+
+        // confirmed
+        server.getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, p, Source.PLAYER);
+
+        for(ExpiPlayer ep : server.getPlayers()) {
+            ep.getNetManager().putHandPunchPacket(p);
+        }
 
         int raspNumber = (int)(Math.random() * 2) + 1; // 1-2
 
         float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
         Vector2 dropLoc = new Vector2(event.getTile().getX() + off, event.getTile().getY() + off);
-
         for(int i = 0; i < raspNumber; i++) {
-            ExpiDroppedItem edi = new ExpiDroppedItem(server, dropLoc, Item.RASPBERRY, 0.2f);
-            for(ExpiPlayer pp : server.getPlayers()) {
-                pp.getNetManager().putEntitySpawnPacket(edi);
-            }
+            server.getWorld().spawnDroppedItem(Item.RASPBERRY, dropLoc, Consts.ITEM_COOLDOWN_BREAK);
         }
     }
 
     @Override
     public void onTileChange(TileChangeEvent event) {
 
-        if(event.getTile().getTypeFront() == TileType.RASPBERRY_BUSH_1) {
+        if(event.getTile().getType() == TileType.RASPBERRY_BUSH_1) {
             RaspberryBush bush = new RaspberryBush(event.getTile(), (float) (Math.random() * 600));
             growingBushes.add(bush);
             lookUp.put(event.getTile(), bush);

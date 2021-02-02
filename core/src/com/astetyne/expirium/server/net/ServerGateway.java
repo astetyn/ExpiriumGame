@@ -107,18 +107,13 @@ public class ServerGateway extends TerminableLooper {
         synchronized(joiningClients) {
             // read init data from client
             for(ServerPlayerGateway gateway : joiningClients) {
+                // here we assume that joining client is verified and thus following reads will not fail
                 PacketInputStream in = gateway.getIn();
-                in.swap();
-                int packetID = in.getInt();
-                if(packetID != 10) {
-                    System.out.println("Wrong join packet id, refusing.");
-                    continue;
-                }
                 String name = in.getString();
                 DataInputStream dataIn = server.getFileManager().getPlayerDataStream(name);
                 ExpiPlayer ep = null;
                 if(dataIn == null) {
-                    ep = new ExpiPlayer(server, server.getWorld().getSaveLocationForSpawn(), gateway, name);
+                    ep = new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
                 }else {
                     try {
                         ep = new ExpiPlayer(server, dataIn, gateway);
