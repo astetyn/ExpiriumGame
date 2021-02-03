@@ -6,14 +6,14 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.api.entity.ExpiEntity;
-import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.event.PlayerInteractEvent;
-import com.astetyne.expirium.server.api.event.PlayerInteractListener;
-import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
-import com.astetyne.expirium.server.api.world.inventory.ExpiInventory;
-import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
-import com.astetyne.expirium.server.api.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.event.PlayerInteractEvent;
+import com.astetyne.expirium.server.core.event.PlayerInteractListener;
+import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
+import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
+import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
+import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
 
 import java.util.HashSet;
 import java.util.List;
@@ -233,5 +233,14 @@ public class ServerPacketManager {
         out.startPacket(33);
         out.putInt(id);
         out.putInt(item.getId());
+    }
+
+    public void putBackWallPacket(List<ExpiTile> backWallTiles) {
+        out.startPacket(34);
+        for(ExpiTile t : backWallTiles) {
+            out.putInt(t.getX());
+            out.putInt(t.getY());
+            out.putBoolean(t.hasBackWall());
+        }
     }
 }

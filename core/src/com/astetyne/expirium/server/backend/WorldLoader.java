@@ -1,8 +1,8 @@
 package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.world.ExpiWorld;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.world.ExpiWorld;
 
 public class WorldLoader {
 

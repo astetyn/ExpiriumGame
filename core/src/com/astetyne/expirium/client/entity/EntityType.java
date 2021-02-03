@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.api.entity.ExpiDroppedItem;
-import com.astetyne.expirium.server.api.entity.ExpiEntity;
-import com.astetyne.expirium.server.api.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
+import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 

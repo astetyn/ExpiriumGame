@@ -2,7 +2,7 @@ package com.astetyne.expirium.client.data;
 
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
+import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
 public class HotSlotsData {

@@ -2,8 +2,8 @@ package com.astetyne.expirium.server.backend;
 
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.api.entity.ExpiPlayer;
-import com.astetyne.expirium.server.api.event.TickListener;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.event.TickListener;
 
 import java.util.List;
 

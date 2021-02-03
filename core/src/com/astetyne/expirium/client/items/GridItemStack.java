@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.items;
 
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.api.Saveable;
+import com.astetyne.expirium.server.core.Saveable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.gui.widget;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.server.api.world.inventory.UIInteractType;
+import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

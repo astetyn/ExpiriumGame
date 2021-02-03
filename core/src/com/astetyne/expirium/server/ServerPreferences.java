@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server;
 
-import com.astetyne.expirium.server.api.world.generator.WorldPreferences;
+import com.astetyne.expirium.server.core.world.generator.WorldPreferences;
 
 public class ServerPreferences {
 

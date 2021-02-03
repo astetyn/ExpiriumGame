@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.resources.TileFix;
+import com.astetyne.expirium.server.core.world.tiles.TileFix;
 
 import java.util.HashMap;
 import java.util.HashSet;

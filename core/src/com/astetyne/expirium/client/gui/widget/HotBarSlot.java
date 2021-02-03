@@ -6,7 +6,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Utils;
-import com.astetyne.expirium.server.api.world.inventory.ChosenSlot;
+import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;

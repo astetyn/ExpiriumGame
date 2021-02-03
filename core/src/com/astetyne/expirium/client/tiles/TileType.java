@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.resources.Textureable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
-import com.astetyne.expirium.server.resources.TileFix;
+import com.astetyne.expirium.server.core.world.tiles.TileFix;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
@@ -83,6 +83,15 @@ public enum TileType implements Textureable {
 
     public TileFix getFix() {
         return tileFix;
+    }
+
+    public boolean isWall() {
+        switch(this) {
+            case WOODEN_WALL:
+            case SOFT_WOODEN_WALL:
+                return true;
+            default: return false;
+        }
     }
 
     int id;
