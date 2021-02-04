@@ -37,7 +37,8 @@ public class Campfire implements PlayerInteractListener, TickListener, Saveable 
         server.getEventManager().getTickListeners().add(this);
     }
 
-    public Campfire(DataInputStream in) throws IOException {
+    public Campfire(ExpiServer server, DataInputStream in) throws IOException {
+        this.server = server;
         int x = in.readInt();
         int y = in.readInt();
         remainingTime = in.readFloat();

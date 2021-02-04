@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.items.ItemCategory;
+import com.astetyne.expirium.client.items.ItemCat;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -56,20 +56,20 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
             case SLOT_MATERIALS: chosenSlot = ChosenSlot.MATERIAL_SLOT; break;
             case SLOT_CONSUMABLE: chosenSlot = ChosenSlot.CONSUMABLE_SLOT; break;
             case SWITCH_UP:
-                if(itemInHand.getItem().getCategory() == ItemCategory.TOOL) {
+                if(itemInHand.getItem().getCategory() == ItemCat.TOOL) {
                     indexTools++;
-                }else if(itemInHand.getItem().getCategory() == ItemCategory.MATERIAL){
+                }else if(itemInHand.getItem().getCategory() == ItemCat.MATERIAL){
                     indexMats++;
-                }else if(itemInHand.getItem().getCategory() == ItemCategory.CONSUMABLE){
+                }else if(itemInHand.getItem().getCategory() == ItemCat.CONSUMABLE){
                     indexCons++;
                 }
                 break;
             case SWITCH_DOWN:
-                if(itemInHand.getItem().getCategory() == ItemCategory.TOOL) {
+                if(itemInHand.getItem().getCategory() == ItemCat.TOOL) {
                     indexTools--;
-                }else if(itemInHand.getItem().getCategory() == ItemCategory.MATERIAL){
+                }else if(itemInHand.getItem().getCategory() == ItemCat.MATERIAL){
                     indexMats--;
-                }else if(itemInHand.getItem().getCategory() == ItemCategory.CONSUMABLE){
+                }else if(itemInHand.getItem().getCategory() == ItemCat.CONSUMABLE){
                     indexCons--;
                 }
                 break;
@@ -77,7 +77,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
                 owner.getNetManager().putInvFeedPacket(); //todo: toto je zbytocne?
                 break;
             case CONSUME_BUTTON:
-                if(itemInHand.getItem().getCategory() != ItemCategory.CONSUMABLE) break;
+                if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE) break;
 
                 switch(itemInHand.getItem()) {
                     case APPLE:
@@ -98,6 +98,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
                     case FRUIT_JAM:
                         owner.increaseFoodLevel(25);
                         removeItem(Item.FRUIT_JAM);
+                        addItem(new ItemStack(Item.WOODEN_BOWL), true);
                         break;
                 }
                 break;
@@ -112,11 +113,11 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
         List<ItemStack> is3 = new ArrayList<>();
 
         for(ItemStack is : items) {
-            if(is.getItem().getCategory() == ItemCategory.TOOL) {
+            if(is.getItem().getCategory() == ItemCat.TOOL) {
                 is1.add(is);
-            }else if(is.getItem().getCategory() == ItemCategory.MATERIAL) {
+            }else if(is.getItem().getCategory() == ItemCat.MATERIAL) {
                 is2.add(is);
-            }else if(is.getItem().getCategory() == ItemCategory.CONSUMABLE) {
+            }else if(is.getItem().getCategory() == ItemCat.CONSUMABLE) {
                 is3.add(is);
             }
         }

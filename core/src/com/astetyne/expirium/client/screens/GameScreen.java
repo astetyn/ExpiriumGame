@@ -14,7 +14,6 @@ import com.astetyne.expirium.client.world.GameWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -102,19 +101,11 @@ public class GameScreen implements Screen {
 
         stage.draw();
 
-        // lag simulator
-        try {
+        /*try { // lag simulator
             Thread.sleep(0);
         }catch(InterruptedException e) {
             e.printStackTrace();
-        }
-
-        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-            gameWorld.getPlayer().onHandPunch();
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.G)) {
-            System.out.println(gameWorld.getPlayer().getLocation());
-        }
+        }*/
 
     }
 

@@ -3,9 +3,9 @@ package com.astetyne.expirium.server.core.world.generator;
 public class CreateWorldPreferences extends WorldPreferences {
 
     public int width, height;
-    public int seed;
+    public long seed;
 
-    public CreateWorldPreferences(String worldName, int width, int height, int seed) {
+    public CreateWorldPreferences(String worldName, int width, int height, long seed) {
         super(worldName);
         this.width = width;
         this.height = height;

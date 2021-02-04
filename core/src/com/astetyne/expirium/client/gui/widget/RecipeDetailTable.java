@@ -43,6 +43,10 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         Label itemNameLabel = new Label(selectedRecipe.getProduct().getItem().getLabel(), Res.LABEL_STYLE);
         itemNameLabel.setAlignment(Align.center);
 
+        String amount = "";
+        if(selectedRecipe.getProduct().getAmount() != 1) amount = "x"+selectedRecipe.getProduct().getAmount();
+        Label productAmountLabel = new Label(amount, Res.LABEL_STYLE);
+        productAmountLabel.setAlignment(Align.left);
         Image imgDetail = new Image(selectedRecipe.getProduct().getItem().getTexture());
 
         TextButton makeButton = new TextButton("Make", Res.TEXT_BUTTON_STYLE);
@@ -59,7 +63,10 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
 
         add(itemNameLabel).height(Utils.percFromW(100));
         row();
-        add(imgDetail).width(Utils.percFromH(100)).height(100).pad(50,100,50,100);
+        Table t = new Table();
+        t.add(imgDetail).width(Utils.percFromH(100)).height(100).pad(50,30,50,30);
+        t.add(productAmountLabel).align(Align.left);
+        add(t);
         row();
         add(makeButton).width(240).height(80).padBottom(30);
         row();

@@ -134,6 +134,9 @@ public class ClientPacketManager {
                     p.setItemInHand(Item.getType(in.getInt()));
                     break;
                 }
+                case 34: // BackWallPacket
+                    world.onBackWallsChange(in);
+                    break;
             }
         }
     }

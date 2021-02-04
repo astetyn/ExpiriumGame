@@ -138,6 +138,7 @@ public class ExpiServer implements Saveable {
      */
     public void faultClose() {
         System.out.println("performing fault close");
+        fileManager.saveGameServer();
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
@@ -147,12 +148,12 @@ public class ExpiServer implements Saveable {
         synchronized(tickLooper.getTickLock()) {
             tickLooper.getTickLock().notifyAll();
         }
-        fileManager.saveGameServer();
         dispose();
     }
 
     private void performClose() {
         System.out.println("performing normal close");
+        fileManager.saveGameServer();
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
@@ -162,7 +163,6 @@ public class ExpiServer implements Saveable {
         synchronized(tickLooper.getTickLock()) {
             tickLooper.getTickLock().notifyAll();
         }
-        fileManager.saveGameServer();
         dispose();
     }
 

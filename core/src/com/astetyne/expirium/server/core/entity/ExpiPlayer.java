@@ -14,8 +14,6 @@ import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -301,13 +299,6 @@ public class ExpiPlayer extends LivingEntity {
         }
 
         tileBreaker.onTick(tsData2);
-
-        if(Gdx.input.isKeyPressed(Input.Keys.H) && alive) {
-            die();
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.J)) {
-            setResurrectLoc(getLocation().x, getLocation().y);
-        }
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {

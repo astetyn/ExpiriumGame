@@ -58,6 +58,7 @@ public class WorldFileManager {
             for(ExpiPlayer p : server.getPlayers()) {
                 savePlayer(p);
             }
+
         }catch(IOException e) {
             e.printStackTrace();
         }

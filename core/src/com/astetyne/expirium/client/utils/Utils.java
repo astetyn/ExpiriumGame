@@ -9,9 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,14 +45,14 @@ public class Utils {
         return -1;
     }
 
-    public static int getDirSize(FileHandle dir) {
+    public static int getFileSize(FileHandle fh) {
         int size = 0;
-        for(FileHandle fh : dir.list()) {
-            if(fh.isDirectory()) {
-                size += getDirSize(fh);
-            }else {
-                size += fh.length();
+        if(fh.isDirectory()) {
+            for(FileHandle fh2 : fh.list()) {
+                size += getFileSize(fh2);
             }
+        }else {
+            size += fh.length();
         }
         return size;
     }
@@ -93,7 +90,7 @@ public class Utils {
         return Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth() * val * 2;
     }
 
-    // main only for testing
+    /*// main only for testing
     public static void main(String[] args) throws UnknownHostException {
         System.out.println("-- running main for testing --");
         System.out.println(getCodeFromAddress((Inet4Address) Inet4Address.getByName("192.168.137.244")));
@@ -138,6 +135,6 @@ public class Utils {
             ex.printStackTrace();
         }
         return "error";
-    }
+    }*/
 
 }

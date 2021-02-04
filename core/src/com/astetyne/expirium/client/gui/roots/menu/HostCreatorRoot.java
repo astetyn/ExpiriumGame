@@ -123,7 +123,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
                     }
                 }
                 menu.setRoot(new LoadingRoot("Creating world..."));
-                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 1000, 256, 0);
+                CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 500, 256, (long) (Math.random() * Long.MAX_VALUE));
                 ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref, menu);
                 try {
@@ -149,7 +149,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
     private void rebuildSavedWorldsTable() {
         savedWorlds.clear();
         for(FileHandle fh : Gdx.files.local("worlds").list()) {
-            int size = Utils.getDirSize(fh);
+            int size = Utils.getFileSize(fh);
             Table world = new Table();
             Label worldLabel = new Label(fh.name() +" ("+Math.round(size * 10 / 1024f)/10f+"kB)", Res.LABEL_STYLE);
             worldLabel.setAlignment(Align.center);

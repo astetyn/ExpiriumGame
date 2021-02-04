@@ -12,17 +12,23 @@ public class TickLooper extends TerminableLooper {
     private final Object tickLock;
     private final int tps;
     private final ExpiServer server;
+    private long lastLagWarningTime;
 
     public TickLooper(int tps, ExpiServer server) {
         this.server = server;
         this.tps = tps;
         tickLock = new Object();
+        lastLagWarningTime = 0;
     }
 
     @Override
     public void run() {
 
+        long startT, diff;
+
         while(isRunning()) {
+
+            startT = System.currentTimeMillis();
 
             server.getServerGateway().resolveJoiningAndLeavingPlayers();
 
@@ -49,9 +55,18 @@ public class TickLooper extends TerminableLooper {
                 tickLock.notifyAll();
             }
 
+            diff = System.currentTimeMillis() - startT;
+
+            long waitMillis = (1000 / tps) - diff;
+
+            if(waitMillis < 0 && lastLagWarningTime + 5000 < System.currentTimeMillis()) {
+                System.out.println("TickLooper: Can't keep up! Server is overloaded.");
+                lastLagWarningTime = System.currentTimeMillis();
+            }
+
             try {
                 //noinspection BusyWait
-                Thread.sleep(1000 / tps);
+                Thread.sleep(waitMillis);
             }catch(InterruptedException ignored) {
                 server.faultClose();
                 break;

@@ -1,6 +1,11 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
 import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.event.Source;
+import com.astetyne.expirium.server.core.event.TileChangeEvent;
+import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
 
 import java.util.HashSet;
@@ -15,11 +20,13 @@ import java.util.HashSet;
  */
 public class StabilityCalculator {
 
+    private final ExpiServer server;
     private final ExpiTile[][] worldTerrain;
     private final int w, h;
 
-    public StabilityCalculator(ExpiTile[][] worldTerrain) {
-        this.worldTerrain = worldTerrain;
+    public StabilityCalculator(ExpiServer server, ExpiWorld world) {
+        this.server = server;
+        this.worldTerrain = world.getTerrain();
         this.h = worldTerrain.length;
         this.w = worldTerrain[0].length;
     }
@@ -50,6 +57,29 @@ public class StabilityCalculator {
         }
     }
 
+    public void onTileChange(TileChangeEvent e) {
+
+        if(e.getSource() == Source.STABILITY) return;
+
+        ExpiTile t = e.getTile();
+
+        HashSet<ExpiTile> affectedTiles = updateStability(t);
+
+        for(ExpiTile t2 : affectedTiles) {
+            if(t2.getStability() == 0) {
+                boolean withDrop = Math.random() < 2.0 / affectedTiles.size();
+                server.getWorld().changeTile(t2, TileType.AIR, withDrop, null, Source.STABILITY);
+            }
+        }
+
+        affectedTiles.add(t);
+
+        for(ExpiPlayer pp : server.getPlayers()) {
+            pp.getNetManager().putStabilityPacket(affectedTiles);
+        }
+
+    }
+
     /** This method will calculate all required stability and return tiles which were affected. Call
      *  this when TileType was changed. You should check if TileType can be changed with canBeAdjusted() first.
      * @param t changed tile from which stability should be recalculated
@@ -65,7 +95,7 @@ public class StabilityCalculator {
 
             t.setStability(newStability);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
-            if(t.getY()-1 != h)recalculateStabilityForNearbyTiles(worldTerrain[t.getY()+1][t.getX()], affectedTiles);
+            if(t.getY()-1 != h) recalculateStabilityForNearbyTiles(worldTerrain[t.getY()+1][t.getX()], affectedTiles);
 
         }else if(newStability < t.getStability()) {
 
@@ -177,18 +207,23 @@ public class StabilityCalculator {
         int x = t.getX();
         int y = t.getY();
 
-        // left tile
-        if(x != 0) checkRealStability(worldTerrain[y][x-1], changed);
-        // top tile
-        if(y != h-1) checkRealStability(worldTerrain[y+1][x], changed);
-        // right tile
-        if(x != w-1) checkRealStability(worldTerrain[y][x+1], changed);
-        // bottom tile
-        if(y != 0) checkRealStability(worldTerrain[y-1][x], changed);
+        floodHigherStability(x-1, y, changed);
+        floodHigherStability(x+1, y, changed);
+        floodHigherStability(x, y-1, changed);
+        floodHigherStability(x, y+1, changed);
+
+        // magic triangle
+        floodHigherStability(x+1, y+1, changed);
+        floodHigherStability(x-1, y+1, changed);
 
     }
 
-    private void checkRealStability(ExpiTile t, HashSet<ExpiTile> changed) {
+    private void floodHigherStability(int x, int y, HashSet<ExpiTile> changed) {
+
+        if(x < 0 || x == w || y < 0 || y == h) return;
+
+        ExpiTile t = worldTerrain[y][x];
+
         if(t.getType() == TileType.AIR) return;
         int realStability = getActualStability(t);
         if(realStability > t.getStability()) {

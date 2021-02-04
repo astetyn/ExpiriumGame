@@ -5,67 +5,79 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public enum Item {
 
-    EMPTY(ItemCategory.EMPTY, -1, -1, 0, null, "error"),
-    STONE(ItemCategory.MATERIAL, "STONE", 1, 1, 0.5f, "stone_item", "Stone"),
-    RHYOLITE(ItemCategory.MATERIAL, "RHYOLITE", 1, 1, 0.2f, "rhyolite_item", "Rhyolite"),
-    GRASS(ItemCategory.MATERIAL, "GRASS", 1, 1, 0.1f, "grass_item", "Grass"),
-    DIRT(ItemCategory.MATERIAL, "DIRT", 1, 1, 0.1f, "dirt_item", "Dirt"),
-    RAW_WOOD(ItemCategory.MISC, 1, 1, 0.05f, "raw_wood_item", "Raw wood"),
-    WOODEN_MATTOCK(ItemCategory.TOOL, 1, 2, 1, "wooden_mattock_item", "wooden_mattock_item_grid", "Wooden Mattock"),
-    RHYOLITE_MATTOCK(ItemCategory.TOOL, 1, 2, 1, "rhyolite_mattock_item", "rhyolite_mattock_item_grid", "Rhyolite Mattock"),
-    CAMPFIRE(ItemCategory.MATERIAL, "CAMPFIRE_BIG", 2, 2, 0.5f, "campfire_item", "Campfire"),
-    WOODEN_WALL(ItemCategory.MATERIAL, "WOODEN_WALL", 1, 1, 0.05f, "wooden_wall_item", "Wooden wall"),
-    SOFT_WOODEN_WALL(ItemCategory.MATERIAL, "SOFT_WOODEN_WALL", 1, 1, 0.04f, "soft_wooden_wall_item", "Soft wooden wall"),
-    WOODEN_SUPPORT(ItemCategory.MATERIAL, "WOODEN_SUPPORT", 1, 1, 0.02f, "wooden_support_item", "Wooden support"),
-    APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "apple_item", "Apple"),
-    COOKED_APPLE(ItemCategory.CONSUMABLE, 1, 1, 0.03f, "cooked_apple_item", "Cooked Apple"),
-    RASPBERRY_BUSH(ItemCategory.MATERIAL, "RASPBERRY_BUSH_1", 1, 1, 0.1f, "raspberry_bush_item", "Raspberry bush"),
-    RASPBERRY(ItemCategory.CONSUMABLE, 1, 1, 0.01f, "raspberry_item", "Raspberries"),
-    WOODEN_BOWL(ItemCategory.MISC, 1, 1, 0.05f, "wooden_bowl_item", "Wooden bowl"),
-    FRUIT_JAM(ItemCategory.CONSUMABLE, 1, 1, 0.1f, "fruit_jam_item", "Fruit jam"),
-    COAL(ItemCategory.MISC, 1, 1, 0.1f, "coal_item", "Coal");
+    // make sure texture with identical name+"_item" can be found in atlas
 
-    ItemCategory category;
-    String buildTile;
+    EMPTY(ItemCat.EMPTY, 0),
+    STONE(ItemCat.MATERIAL, 0.5f),
+    RHYOLITE(ItemCat.MATERIAL, 0.2f),
+    GRASS(ItemCat.MATERIAL, 0.1f),
+    DIRT(ItemCat.MATERIAL, 0.1f),
+    RAW_WOOD(ItemCat.MISC, 0.05f),
+    WOODEN_MATTOCK(ItemCat.TOOL, 1, 2, 1, true),
+    RHYOLITE_MATTOCK(ItemCat.TOOL, 1, 2, 1, true),
+    CAMPFIRE(ItemCat.MATERIAL, 2, 2, 0.5f),
+    WOODEN_WALL(ItemCat.MATERIAL, 0.05f),
+    SOFT_WOODEN_WALL(ItemCat.MATERIAL, 0.04f),
+    WOODEN_SUPPORT(ItemCat.MATERIAL, 0.02f),
+    APPLE(ItemCat.CONSUMABLE, 0.03f),
+    COOKED_APPLE(ItemCat.CONSUMABLE, 0.03f),
+    RASPBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
+    RASPBERRY(ItemCat.CONSUMABLE, 0.01f),
+    WOODEN_BOWL(ItemCat.MISC, 0.05f),
+    FRUIT_JAM(ItemCat.CONSUMABLE, 0.1f),
+    COAL(ItemCat.MISC, 0.1f),
+    SAND(ItemCat.MATERIAL, 0.08f),
+    GLASS(ItemCat.MATERIAL, 0.06f);
+
+    ItemCat category;
     int gridWidth;
     int gridHeight;
     float weight;
-    String regionName, gridRegionName;
+    boolean hasCustomGridTex;
     TextureRegion texture, gridTexture;
     String label;
 
-    Item(ItemCategory cat, int gw, int gh, float weight, String regionName, String label) {
-        this(cat, "", gw, gh, weight, regionName, label);
+    Item(ItemCat cat, float weight) {
+        this(cat, weight, false);
     }
 
-    Item(ItemCategory cat, String buildTile, int gw, int gh, float weight, String regionName, String label) {
-        this(cat, buildTile, gw, gh, weight, regionName, regionName, label);
+    Item(ItemCat cat, float weight, boolean hasCustomGrid) {
+        this(cat, 1, 1, weight, hasCustomGrid);
     }
 
-    Item(ItemCategory cat, int gw, int gh, float weight, String regionName, String gridRegionName, String label) {
-        this(cat, "", gw, gh, weight, regionName, gridRegionName, label);
+    Item(ItemCat cat, int gw, int gh, float weight) {
+        this(cat, gw, gh, weight, false);
     }
 
-    Item(ItemCategory cat, String buildTile, int gw, int gh, float weight, String regionName, String gridRegionName, String label) {
+    Item(ItemCat cat, int gw, int gh, float weight, boolean hasCustomGrid) {
         category = cat;
-        this.buildTile = buildTile;
         gridWidth = gw;
         gridHeight = gh;
         this.weight = weight;
-        this.regionName = regionName;
-        this.gridRegionName = gridRegionName;
-        this.label = label;
+        this.hasCustomGridTex = hasCustomGrid;
+
+        StringBuilder sb = new StringBuilder(name().toLowerCase(Locale.US).replaceAll("_", " "));
+        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+        label = sb.toString();
     }
 
     public static void loadTextures() {
         System.out.println("Loading textures for items.");
         TextureAtlas gui = new TextureAtlas("gui.atlas");
         for(Item item : values()) {
-            item.texture = gui.findRegion(item.regionName);
-            item.gridTexture = gui.findRegion(item.gridRegionName);
+            if(item == EMPTY) continue;
+
+            String texName = item.name().toLowerCase(Locale.US) + "_item";
+            String gridTexName = texName;
+            if(item.hasCustomGridTex) gridTexName += "_grid";
+
+            item.texture = gui.findRegion(texName);
+            item.gridTexture = gui.findRegion(gridTexName);
+
         }
     }
 
@@ -90,13 +102,25 @@ public enum Item {
         return id;
     }
 
-    public ItemCategory getCategory() {
+    public ItemCat getCategory() {
         return category;
     }
 
     public TileType getBuildTile() {
-        if(buildTile.equals("")) return null;
-        return TileType.valueOf(buildTile);
+        switch(this) {
+            case STONE: return TileType.STONE;
+            case RHYOLITE: return TileType.RHYOLITE;
+            case DIRT: return TileType.DIRT;
+            case GRASS: return TileType.GRASS;
+            case WOODEN_WALL: return TileType.WOODEN_WALL;
+            case SOFT_WOODEN_WALL: return TileType.SOFT_WOODEN_WALL;
+            case RASPBERRY_BUSH: return TileType.RASPBERRY_BUSH_1;
+            case WOODEN_SUPPORT: return TileType.WOODEN_SUPPORT;
+            case CAMPFIRE: return TileType.CAMPFIRE_BIG;
+            case SAND: return TileType.SAND;
+            case GLASS: return TileType.GLASS;
+            default: return null;
+        }
     }
 
     public int getGridWidth() {

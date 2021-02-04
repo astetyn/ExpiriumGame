@@ -105,6 +105,7 @@ public class ServerPacketManager {
                 ExpiTile t = terrain[j][i];
                 out.putByte((byte) t.getType().getID());
                 out.putByte((byte) t.getStability());
+                out.putBoolean(t.hasBackWall());
             }
         }
     }
@@ -237,6 +238,7 @@ public class ServerPacketManager {
 
     public void putBackWallPacket(List<ExpiTile> backWallTiles) {
         out.startPacket(34);
+        out.putInt(backWallTiles.size());
         for(ExpiTile t : backWallTiles) {
             out.putInt(t.getX());
             out.putInt(t.getY());

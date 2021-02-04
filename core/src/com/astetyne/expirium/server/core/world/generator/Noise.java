@@ -32,10 +32,10 @@ public class Noise {
 
     static Random perlinRandom;
 
-    public static float noise(float x, float y, float z) {
+    public static float noise(float x, float y, float z, long seed) {
         if (perlin == null) {
             if (perlinRandom == null) {
-                perlinRandom = new Random();
+                perlinRandom = new Random(seed);
             }
             perlin = new float[PERLIN_SIZE + 1];
             for (int i = 0; i < PERLIN_SIZE + 1; i++) {

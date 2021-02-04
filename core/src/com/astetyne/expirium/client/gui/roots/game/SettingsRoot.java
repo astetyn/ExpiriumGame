@@ -21,7 +21,7 @@ public class SettingsRoot extends WidgetGroup implements GameRootable {
 
         Image returnButton = new Image(Res.CROSS_ICON);
         TextButton leaveButton = new TextButton("Leave game", Res.TEXT_BUTTON_STYLE);
-        Label codeLabel = new Label("under construction", Res.TITLE_LABEL_STYLE);
+        Label codeLabel = new Label("Game not paused.", Res.TITLE_LABEL_STYLE);
         codeLabel.setAlignment(Align.center);
 
         returnButton.addListener(new ClickListener() {

@@ -31,7 +31,7 @@ public class CampfireListener implements TileChangeListener, Saveable {
 
         int number = in.readInt();
         for(int i = 0; i < number; i++) {
-            Campfire cf = new Campfire(in);
+            Campfire cf = new Campfire(server, in);
             campfires.put(cf.getTile(), cf);
         }
 

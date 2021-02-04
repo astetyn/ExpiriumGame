@@ -4,7 +4,7 @@ public class Consts {
 
     public static final int VERSION = 1;
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // server
     public static final long SAVE_INTERVAL = 10000; // in millis

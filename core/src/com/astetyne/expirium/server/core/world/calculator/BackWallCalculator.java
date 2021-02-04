@@ -1,9 +1,9 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.event.Source;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
@@ -11,7 +11,7 @@ import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InteriorWallCalculator {
+public class BackWallCalculator {
 
     private static final int radius = 50;
 
@@ -19,9 +19,9 @@ public class InteriorWallCalculator {
     private final ExpiTile[][] terrain;
     private final int w, h;
     private final boolean[][] visitMap;
-    private IntVector2 tempMiddle;
+    private final IntVector2 tempMiddle;
 
-    public InteriorWallCalculator(ExpiServer server, ExpiWorld world) {
+    public BackWallCalculator(ExpiServer server, ExpiWorld world) {
         this.server = server;
         this.terrain = world.getTerrain();
         w = world.getTerrainWidth();
@@ -38,6 +38,8 @@ public class InteriorWallCalculator {
         int y = t.getY();
 
         if(t.getType().isWall()) {
+
+            List<ExpiTile> affectedTiles = new ArrayList<>();
 
             tempMiddle.set(x, y);
 
@@ -61,79 +63,70 @@ public class InteriorWallCalculator {
                 b4 = isAreaClosed(terrain[y+1][x]);
             }
 
-            System.out.println("closed: "+b1+" "+b2+" "+b3+" "+b4);
+            if(Consts.DEBUG) System.out.println("closed: "+b1+" "+b2+" "+b3+" "+b4);
 
-            List<IntVector2> backWalls = new ArrayList<>();
-
-            // isAreaClosed are here just for filling map with true values
             if(b1) {
-                isAreaClosed(terrain[y][x-1]);
-                IntVector2 loc = transformToMap(x-1, y);
-                getBackWallsFrom(loc.x, loc.y, backWalls);
+                createBackWallsFlood(x-1, y, affectedTiles);
             }
             if(b2) {
-                isAreaClosed(terrain[y][x+1]);
-                IntVector2 loc = transformToMap(x+1, y);
-                getBackWallsFrom(loc.x, loc.y, backWalls);
+                createBackWallsFlood(x+1, y, affectedTiles);
             }
             if(b3) {
-                isAreaClosed(terrain[y-1][x]);
-                IntVector2 loc = transformToMap(x, y-1);
-                getBackWallsFrom(loc.x, loc.y, backWalls);
+                createBackWallsFlood(x, y-1, affectedTiles);
             }
             if(b4) {
-                isAreaClosed(terrain[y+1][x]);
-                IntVector2 loc = transformToMap(x, y+1);
-                getBackWallsFrom(loc.x, loc.y, backWalls);
+                createBackWallsFlood(x, y+1, affectedTiles);
             }
 
-            for(IntVector2 loc : backWalls) {
-                server.getWorld().changeTile(terrain[loc.y][loc.x], TileType.SOFT_WOODEN_WALL, false, null, Source.OTHER);
+            for(ExpiPlayer ep : server.getPlayers()) {
+                ep.getNetManager().putBackWallPacket(affectedTiles);
             }
 
-        }else if(e.getFrom().isWall()){
+        }else if(e.getFrom().isWall()) {
+
+            List<ExpiTile> affectedTiles = new ArrayList<>();
 
             if(t.getX() != 0 && terrain[y][x-1].hasBackWall()) {
                 clearMap();
                 if(isAreaClosed(terrain[y][x-1])) {
-                    //todo
+                    t.setBackWall(true);
+                    affectedTiles.add(t);
+                }else {
+                    clearBackWallsFlood(x-1, y, affectedTiles);
                 }
             }
             if(t.getX() != w-1 && !terrain[y][x+1].getType().isWall()) {
                 clearMap();
-                b2 = isAreaClosed(terrain[y][x+1]);
+                if(isAreaClosed(terrain[y][x+1])) {
+                    t.setBackWall(true);
+                    affectedTiles.add(t);
+                }else {
+                    clearBackWallsFlood(x+1, y, affectedTiles);
+                }
             }
             if(t.getY() != 0 && !terrain[y-1][x].getType().isWall()) {
                 clearMap();
-                b3 = isAreaClosed(terrain[y-1][x]);
+                if(isAreaClosed(terrain[y-1][x])) {
+                    t.setBackWall(true);
+                    affectedTiles.add(t);
+                }else {
+                    clearBackWallsFlood(x, y-1, affectedTiles);
+                }
             }
             if(t.getY() != h-1 && !terrain[y+1][x].getType().isWall()) {
                 clearMap();
-                b4 = isAreaClosed(terrain[y+1][x]);
+                if(isAreaClosed(terrain[y+1][x])) {
+                    t.setBackWall(true);
+                    affectedTiles.add(t);
+                }else {
+                    clearBackWallsFlood(x, y+1, affectedTiles);
+                }
             }
 
-        }
+            for(ExpiPlayer ep : server.getPlayers()) {
+                ep.getNetManager().putBackWallPacket(affectedTiles);
+            }
 
-    }
-
-    /** Flood clear backWall from all reached tiles. */
-    private void clearFlood(int x, int y) {
-
-        if(x != 0 && terrain[y][x-1].hasBackWall()) {
-            terrain[y][x-1].setBackWall(false);
-            clearFlood(x-1, y);
-        }
-        if(x != w-1 && !terrain[y][x+1].getType().isWall()) {
-            terrain[y][x+1].setBackWall(false);
-            clearFlood(x+1, y);
-        }
-        if(y != 0 && !terrain[y-1][x].getType().isWall()) {
-            terrain[y-1][x].setBackWall(false);
-            clearFlood(x, y-1);
-        }
-        if(y != h-1 && !terrain[y+1][x].getType().isWall()) {
-            terrain[y+1][x].setBackWall(false);
-            clearFlood(x, y+1);
         }
 
     }
@@ -146,20 +139,37 @@ public class InteriorWallCalculator {
         }
     }
 
-    // x and y are map coordinates
-    private void getBackWallsFrom(int x, int y, List<IntVector2> list) {
+    private void createBackWallsFlood(int x, int y, List<ExpiTile> list) {
 
-        // is this check required? area should be closed...
-        if(x < 0 || x >= visitMap.length || y < 0 || y >= visitMap[0].length) return;
+        if(x < 0 || x == w || y < 0 || y == h) return;
 
-        if(!visitMap[x][y]) return;
-        visitMap[x][y] = false;
+        ExpiTile t = terrain[y][x];
+        if(t.hasBackWall() || t.getType().isWall()) return;
 
-        list.add(transformFromMap(x, y));
-        getBackWallsFrom(x-1, y, list);
-        getBackWallsFrom(x+1, y, list);
-        getBackWallsFrom(x, y-1, list);
-        getBackWallsFrom(x, y+1, list);
+        t.setBackWall(true);
+
+        list.add(t);
+        createBackWallsFlood(x-1, y, list);
+        createBackWallsFlood(x+1, y, list);
+        createBackWallsFlood(x, y-1, list);
+        createBackWallsFlood(x, y+1, list);
+    }
+
+    private void clearBackWallsFlood(int x, int y, List<ExpiTile> list) {
+
+        if(x < 0 || x == w || y < 0 || y == h) return;
+
+        ExpiTile t = terrain[y][x];
+
+        if(!t.hasBackWall()) return;
+        t.setBackWall(false);
+
+        list.add(t);
+
+        clearBackWallsFlood(x-1, y, list);
+        clearBackWallsFlood(x+1, y, list);
+        clearBackWallsFlood(x, y-1, list);
+        clearBackWallsFlood(x, y+1, list);
 
     }
 

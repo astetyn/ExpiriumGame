@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.items;
 
-public enum ItemCategory {
+public enum ItemCat {
 
     EMPTY,
     TOOL,

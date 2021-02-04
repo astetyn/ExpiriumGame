@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.core.world.tiles.TileFix;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +39,7 @@ public class LightCalculator {
         for(int i = h - 1; i >= 0; i--) {
             Tile t = terrain[c][i];
             t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
-            if(t.getTypeFront().getFix() != TileFix.SOFT) {
+            if(!t.getType().isTransparent()) {
                 firstNotDirect = i-1;
                 break;
             }

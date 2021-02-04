@@ -31,7 +31,9 @@ public enum TileType implements Textureable {
     WOODEN_SUPPORT(Solidity.SOLID_VERT, TileTex.WOODEN_SUPPORT, 1f, Item.EMPTY, 6, TileFix.SOFT),
     RASPBERRY_BUSH_1(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
     RASPBERRY_BUSH_2(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
-    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3, TileFix.FULL);
+    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3, TileFix.FULL),
+    SAND(Solidity.SOLID_VERT, TileTex.SAND, 3, Item.SAND, 1, TileFix.FULL),
+    GLASS(Solidity.SOLID, TileTex.GLASS, 1, Item.GLASS, 2, TileFix.FULL);
 
     Solidity solidity;
     Textureable textureable;
@@ -85,10 +87,19 @@ public enum TileType implements Textureable {
         return tileFix;
     }
 
+    public boolean isTransparent() {
+        if(this.getFix() == TileFix.SOFT) return true;
+        switch(this) {
+            case GLASS: return true;
+            default: return false;
+        }
+    }
+
     public boolean isWall() {
         switch(this) {
             case WOODEN_WALL:
             case SOFT_WOODEN_WALL:
+            case GLASS:
                 return true;
             default: return false;
         }

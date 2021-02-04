@@ -28,7 +28,7 @@ public class GameWorld {
 
     public static float PPM = 32; // pixel per meter when zoom == 1
 
-    private Tile[][] worldTerrain;
+    private Tile[][] terrain;
     private final HashMap<Integer, Entity> entitiesID;
     private final List<Entity> entities;
     private MainPlayer player;
@@ -66,15 +66,15 @@ public class GameWorld {
         terrainWidth = in.getInt();
         terrainHeight = in.getInt();
 
-        worldTerrain = new Tile[terrainWidth][terrainHeight];
+        terrain = new Tile[terrainWidth][terrainHeight];
 
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = 0; j < terrainHeight; j++) {
-                worldTerrain[i][j] = new Tile(TileType.AIR, (byte)0);
+                terrain[i][j] = new Tile(TileType.AIR, (byte)0);
             }
         }
 
-        lightCalculator = new LightCalculator(worldTerrain);
+        lightCalculator = new LightCalculator(terrain);
 
         int pID = in.getInt();
         Vector2 loc = in.getVector();
@@ -108,8 +108,15 @@ public class GameWorld {
 
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
-                Tile t = worldTerrain[i][j];
-                if(t.getTypeFront() == TileType.AIR) continue;
+                Tile t = terrain[i][j];
+
+                if(t.hasBackWall()) {
+                    float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
+                    batch.setColor(b,b,b,1);
+                    batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
+                }
+
+                if(t.getType() == TileType.AIR) continue;
 
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
                 batch.setColor(b,b,b,1);
@@ -119,7 +126,7 @@ public class GameWorld {
                     batch.setColor(stabColors[t.getStability()-1]);
                     batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
                 }else {
-                    batch.draw(t.getTypeFront().getTex(), i, j, 1, 1);
+                    batch.draw(t.getType().getTex(), i, j, 1, 1);
                 }
             }
         }
@@ -164,11 +171,13 @@ public class GameWorld {
         int yOff = partNumber * partHeight;
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = yOff; j < yOff + partHeight; j++) {
-                Tile t = worldTerrain[i][j];
+                Tile t = terrain[i][j];
                 TileType type = TileType.getType(in.getByte());
                 byte stability = in.getByte();
-                t.setTypeFront(type);
+                boolean backWall = in.getBoolean();
+                t.setType(type);
                 t.setStability(stability);
+                t.setBackWall(backWall);
             }
         }
 
@@ -183,11 +192,11 @@ public class GameWorld {
         int x = in.getInt();
         int y = in.getInt();
 
-        Tile t = worldTerrain[x][y];
+        Tile t = terrain[x][y];
 
-        TileType oldType = t.getTypeFront();
+        TileType oldType = t.getType();
 
-        t.setTypeFront(type);
+        t.setType(type);
 
         lightCalculator.onTileChange(oldType, type, x, y);
 
@@ -199,7 +208,7 @@ public class GameWorld {
             int x = in.getInt();
             int y = in.getInt();
             byte stability = in.getByte();
-            worldTerrain[x][y].setStability(stability);
+            terrain[x][y].setStability(stability);
         }
     }
 
@@ -208,6 +217,18 @@ public class GameWorld {
         int y = in.getInt();
         float state = in.getFloat();
         breakingTiles.add(new BreakingTile(x, y, state));
+    }
+
+    public void onBackWallsChange(PacketInputStream in) {
+
+        int size = in.getInt();
+        for(int i = 0; i < size; i++) {
+            int x = in.getInt();
+            int y = in.getInt();
+            boolean has = in.getBoolean();
+            terrain[x][y].setBackWall(has);
+        }
+
     }
 
     private void cameraCenter() {
@@ -246,7 +267,7 @@ public class GameWorld {
     }
 
     public Tile getTileAt(float x, float y) {
-        return worldTerrain[(int)x][(int)y];
+        return terrain[(int)x][(int)y];
     }
 
 }

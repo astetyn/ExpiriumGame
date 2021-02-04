@@ -4,205 +4,226 @@ size: 128,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+back_wall
+  rotate: false
+  xy: 1, 7
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 campfire_big
   rotate: false
-  xy: 1, 91
+  xy: 1, 93
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_big
   rotate: false
-  xy: 35, 91
+  xy: 35, 93
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_big
   rotate: false
-  xy: 35, 57
+  xy: 35, 59
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 campfire_small
   rotate: false
-  xy: 1, 57
+  xy: 1, 59
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_small
   rotate: false
-  xy: 1, 23
+  xy: 1, 25
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_small
   rotate: false
-  xy: 69, 91
+  xy: 69, 93
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 coal_ore_tile
   rotate: false
-  xy: 87, 73
+  xy: 37, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dirt_tile
   rotate: false
-  xy: 55, 21
+  xy: 71, 57
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+glass
+  rotate: false
+  xy: 55, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 89, 55
+  xy: 91, 39
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_left
   rotate: false
-  xy: 91, 19
+  xy: 105, 91
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_right
   rotate: false
-  xy: 37, 21
+  xy: 37, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raspberry_bush_2_tile
   rotate: false
-  xy: 35, 39
+  xy: 35, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raspberry_bush_tile
   rotate: false
-  xy: 73, 37
+  xy: 91, 21
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_tile
   rotate: false
-  xy: 91, 1
+  xy: 109, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+sand
+  rotate: false
+  xy: 89, 57
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 soft_wooden_wall
   rotate: false
-  xy: 105, 89
+  xy: 109, 37
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 stone_tile
   rotate: false
-  xy: 107, 71
+  xy: 109, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tile_break
   rotate: false
-  xy: 1, 5
+  xy: 69, 75
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 2
 tile_break
   rotate: false
-  xy: 37, 3
+  xy: 55, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 4
 tile_break
   rotate: false
-  xy: 55, 3
+  xy: 73, 39
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 tile_break
   rotate: false
-  xy: 91, 37
+  xy: 91, 3
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 3
 tree1
   rotate: false
-  xy: 109, 53
+  xy: 109, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree2
   rotate: false
-  xy: 73, 19
+  xy: 73, 3
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree3
   rotate: false
-  xy: 53, 39
+  xy: 87, 75
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree4
   rotate: false
-  xy: 73, 1
+  xy: 107, 73
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree5
   rotate: false
-  xy: 71, 55
+  xy: 73, 21
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tree6
   rotate: false
-  xy: 69, 73
+  xy: 103, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 white_tile
   rotate: false
-  xy: 1, 2
+  xy: 1, 4
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 wooden_support
   rotate: false
-  xy: 19, 5
+  xy: 53, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall
   rotate: false
-  xy: 103, 107
+  xy: 19, 7
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

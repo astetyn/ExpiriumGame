@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.items.ItemCategory;
+import com.astetyne.expirium.client.items.ItemCat;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.ItemDropper;
 import com.astetyne.expirium.client.tiles.TileType;
@@ -13,8 +13,8 @@ import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.*;
+import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
-import com.astetyne.expirium.server.core.world.calculator.InteriorWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
 import com.astetyne.expirium.server.core.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
@@ -29,9 +29,6 @@ import com.badlogic.gdx.utils.Disposable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
@@ -43,7 +40,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private Body terrainBody;
     private StabilityCalculator stabilityCalc;
     private FixtureCalculator fixtureCalc;
-    private InteriorWallCalculator backWallCalculator;
+    private BackWallCalculator backWallCalculator;
     private WeatherType weatherType;
     private ExpiContactListener contactListener;
     private float stepsTimeAccumulator;
@@ -61,7 +58,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         seed = preferences.seed;
 
         terrain = new ExpiTile[preferences.height][preferences.width];
-        new WorldGenerator(terrain).generateWorld();
+        new WorldGenerator(terrain, seed).generateWorld();
 
         dayTime = 50; // 7:00
         day = 0;
@@ -83,7 +80,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                terrain[h][w] = new ExpiTile(TileType.getType(in.readByte()), w, h);
+                terrain[h][w] = new ExpiTile(in, w, h);
             }
         }
 
@@ -113,9 +110,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         terrainDef.position.set(0, 0);
         terrainBody = b2dWorld.createBody(terrainDef);
 
-        stabilityCalc = new StabilityCalculator(terrain);
+        stabilityCalc = new StabilityCalculator(server, this);
         fixtureCalc = new FixtureCalculator(this, terrainBody);
-        backWallCalculator = new InteriorWallCalculator(server, this);
+        backWallCalculator = new BackWallCalculator(server, this);
 
         System.out.println("Creating fixtures...");
         fixtureCalc.generateWorldFixtures();
@@ -169,7 +166,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         Item item = p.getInv().getItemInHand().getItem();
         ExpiTile t = event.getTile();
 
-        if(item.getCategory() != ItemCategory.MATERIAL || event.getTile().getType() != TileType.AIR) return;
+        if(item.getCategory() != ItemCat.MATERIAL || event.getTile().getType() != TileType.AIR) return;
 
         if(item.getBuildTile() == null) return;
 
@@ -192,41 +189,20 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         TileType from = t.getType();
 
-        if(to == TileType.AIR && withDrops) {
-            createDroppedItem(t);
-        }
+        if(to == TileType.AIR && withDrops) createDroppedItem(t);
 
         t.setType(to);
         fixtureCalc.updateTileFixturesAndNearbyTiles(t);
 
-        List<ExpiTile> changedTiles = new ArrayList<>();
-        changedTiles.add(t);
-
-        HashSet<ExpiTile> affectedTiles = stabilityCalc.updateStability(t);
-        int size = affectedTiles.size();
-        Iterator<ExpiTile> it = affectedTiles.iterator();
-        while(it.hasNext()) {
-            ExpiTile t2 = it.next();
-            if(t2.getStability() != 0) continue;
-            if(Math.random() < 2.0 / size && withDrops && t2.getType() != TileType.AIR) { //todo: ta posledna kontrola je zbytocna, ale funguje
-                createDroppedItem(t2);
-            }
-            t2.setType(TileType.AIR);
-            fixtureCalc.updateTileFixturesAndNearbyTiles(t2);
-            changedTiles.add(t2);
-            it.remove();
-        }
-
-        affectedTiles.add(t);
-
         for(ExpiPlayer pp : server.getPlayers()) {
-            for(ExpiTile t2 : changedTiles) {
-                pp.getNetManager().putTileChangePacket(t2);
-            }
-            pp.getNetManager().putStabilityPacket(affectedTiles);
+            pp.getNetManager().putTileChangePacket(t);
         }
 
         TileChangeEvent e = new TileChangeEvent(t, from, p, source);
+
+        stabilityCalc.onTileChange(e); // not sure if this should be before or after modules
+
+        // modules
         List<TileChangeListener> list = server.getEventManager().getTileChangeListeners();
         for(int i = list.size() - 1; i >= 0; i--) {
             list.get(i).onTileChange(e);
@@ -291,17 +267,13 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         float rightX = x;
         float leftX = x;
 
-        System.out.println("teleport req to: "+x+" "+y);
-
         while(true) {
             if(isPlaceSafe(e, rightX, y)) {
                 e.teleport(rightX, y);
-                System.out.println("succes right: "+rightX+" "+y);
                 break;
             }
             if(isPlaceSafe(e, leftX, y)) {
                 e.teleport(leftX, y);
-                System.out.println("succes left: "+leftX+" "+y);
                 break;
             }
             rightX += precision;
@@ -315,7 +287,6 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
                 System.out.println("Can not find safe teleport loc for: "+e+". Teleport canceled.");
                 break;
             }
-            System.out.println("not success");
         }
 
     }
@@ -399,7 +370,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                out.writeByte(terrain[h][w].getType().getID());
+                terrain[h][w].writeData(out);
             }
         }
 

@@ -34,6 +34,7 @@ public class ExpiTile implements Saveable {
         this.y = y;
         stability = 0;
         backWall = in.readBoolean();
+        if(backWall) System.out.println("jjdjdbasdlaj x: "+x+" y: "+y);
     }
 
     public void setType(TileType type) {

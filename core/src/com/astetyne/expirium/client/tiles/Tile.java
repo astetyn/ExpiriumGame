@@ -5,13 +5,13 @@ import com.astetyne.expirium.client.utils.Consts;
 
 public class Tile {
 
-    private TileType typeFront, typeBack;
+    private TileType type;
     private byte stability;
     private byte skyLight, localLight;
+    private boolean backWall;
 
     public Tile(TileType type, byte stability) {
-        this.typeFront = type;
-        this.typeBack = TileType.AIR;
+        this.type = type;
         this.stability = stability;
         skyLight = 0;
         localLight = 0;
@@ -25,20 +25,12 @@ public class Tile {
         this.stability = stability;
     }
 
-    public TileType getTypeFront() {
-        return typeFront;
+    public TileType getType() {
+        return type;
     }
 
-    public void setTypeFront(TileType type) {
-        this.typeFront = type;
-    }
-
-    public TileType getTypeBack() {
-        return typeBack;
-    }
-
-    public void setTypeBack(TileType typeBack) {
-        this.typeBack = typeBack;
+    public void setType(TileType type) {
+        this.type = type;
     }
 
     public byte getSkyLight() {
@@ -89,5 +81,13 @@ public class Tile {
      */
     public byte getLight() {
         return (byte) Math.max(getTimeCompensatedSkyLight(), localLight);
+    }
+
+    public boolean hasBackWall() {
+        return backWall;
+    }
+
+    public void setBackWall(boolean backWall) {
+        this.backWall = backWall;
     }
 }
