@@ -62,6 +62,7 @@ public class TickLooper extends TerminableLooper {
             if(waitMillis < 0 && lastLagWarningTime + 5000 < System.currentTimeMillis()) {
                 System.out.println("TickLooper: Can't keep up! Server is overloaded.");
                 lastLagWarningTime = System.currentTimeMillis();
+                continue; // no thread sleep, no wait
             }
 
             try {

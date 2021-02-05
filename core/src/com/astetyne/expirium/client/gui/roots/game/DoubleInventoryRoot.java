@@ -43,8 +43,10 @@ public class DoubleInventoryRoot extends Table implements GameRootable {
             }
         });
 
-        storageCell1 = add(storage1).padRight(200);
-        storageCell2 = add(storage2);
+        // width is here just for making sure, the inv label will not expand table when text is wider
+        storageCell1 = add(storage1).width(800).height(Utils.percFromW(800)).padRight(200);
+        storageCell2 = add(storage2).width(800).height(Utils.percFromW(800));
+
         add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
 
         setTouchable(Touchable.enabled);

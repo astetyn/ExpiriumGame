@@ -29,7 +29,7 @@ public class WorldGenerator {
 
             int terrainHeight = (int) (50 + Noise.noise((x) / 16.0f, 0, 0, seed) * 20);
 
-            if(!sandZone && Math.random() < 0.015) {
+            if(!sandZone && Math.random() < 0.01) {
                 sandZone = true;
                 sandZoneStart = x;
                 sandZoneLen = (int) (Math.random() * 20) + 10;

@@ -49,12 +49,14 @@ public class StorageGrid extends Table {
     public void rebuild() {
         int mlt = Consts.INV_TILE_MLT;
         clear();
-        gridCell = add(grid).width(data.columns * mlt).height(Utils.percFromW(data.rows * mlt)).colspan(2);
+        gridCell = add(grid).width(data.columns * mlt).height(Utils.percFromW(data.rows * mlt));
         row();
-        add(infoLabel).expandX().align(Align.center).padTop(10).colspan(2);
+        add(infoLabel).expandX().align(Align.center).padTop(10);
         row();
-        add(weightImage).width(60).height(Utils.percFromW(60)).align(Align.left).padTop(20);
-        add(weightLabel).expandX().align(Align.left).pad(20, 20, 0,0);
+        Table t = new Table();
+        t.add(weightImage).width(60).height(Utils.percFromW(60)).padTop(10);
+        t.add(weightLabel).pad(10, 20, 0,0);
+        add(t);
         setTouchable(Touchable.enabled);
         grid.setZIndex(100);
     }

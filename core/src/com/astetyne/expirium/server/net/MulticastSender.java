@@ -31,7 +31,9 @@ public class MulticastSender extends TerminableLooper {
             while(isRunning()) {
 
                 DatagramPacket packet = new DatagramPacket(bb.array(), bb.array().length, group, Consts.SERVER_PORT);
-                socket.send(packet);
+                try {
+                    socket.send(packet);
+                }catch(IOException ignored) {}
 
                 Thread.sleep(1000);
             }

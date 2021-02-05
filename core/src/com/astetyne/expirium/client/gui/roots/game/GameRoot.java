@@ -27,14 +27,14 @@ import com.badlogic.gdx.utils.Align;
 
 public class GameRoot extends WidgetGroup implements GameRootable {
 
-    private final Table hotSlotsTable, debugInfoTable, playerStatsTable;
+    private final Table debugInfoTable, playerStatsTable;
 
     private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, versionLabel, healthStat, foodStat;
     private final Image healthImage, foodImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
     public final ThumbStick moveTS, breakTS;
-    private final SwitchArrow switchArrowUp, switchArrowDown;
+    private final SwitchArrow switchArrowLeft, switchArrowRight;
     private final Image inventoryButton, consumeButton, buildViewButton, settingsButton;
     private Actor activeLeftActor;
 
@@ -50,8 +50,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         lastFocused = toolSlot;
         focusedSlot = toolSlot;
 
-        switchArrowUp = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_UP, false);
-        switchArrowDown = new SwitchArrow(Res.SWITCH_ARROW_STYLE, UIInteractType.SWITCH_DOWN, true);
+        switchArrowLeft = new SwitchArrow(Res.ARROW, UIInteractType.SWITCH_UP, false);
+        switchArrowRight = new SwitchArrow(Res.ARROW, UIInteractType.SWITCH_DOWN, true);
         inventoryButton = new Image(GuiRes.INV.getDrawable());
         consumeButton = new Image(GuiRes.USE_ICON.getDrawable());
         buildViewButton = new Image(GuiRes.WARNING_ICON.getDrawable());
@@ -89,7 +89,6 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         moveTS = new ThumbStick(GameScreen.get().getPlayerData().getThumbStickData1(), Res.THUMB_STICK_STYLE);
         breakTS = new ThumbStick(GameScreen.get().getPlayerData().getThumbStickData2(), Res.THUMB_STICK_STYLE);
 
-        hotSlotsTable = new Table();
         debugInfoTable = new Table();
         playerStatsTable = new Table();
 
@@ -107,14 +106,6 @@ public class GameRoot extends WidgetGroup implements GameRootable {
 
         healthStat = new Label("0%", Res.LABEL_STYLE);
         foodStat = new Label("0%", Res.LABEL_STYLE);
-
-        hotSlotsTable.add(switchArrowUp).padBottom(10).colspan(3);
-        hotSlotsTable.row();
-        hotSlotsTable.add(toolSlot).padRight(20).width(120).height(Utils.percFromW(120));
-        hotSlotsTable.add(materialSlot).padRight(20).width(120).height(Utils.percFromW(120));;
-        hotSlotsTable.add(consumableSlot).width(120).height(Utils.percFromW(120));;
-        hotSlotsTable.row();
-        hotSlotsTable.add(switchArrowDown).padTop(10).colspan(3);
 
         if(Consts.DEBUG) {
             debugInfoTable.add(fpsLabel).left().height(50).padTop(10);
@@ -143,7 +134,6 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         versionLabel.setBounds(140, 890, 200, 100);
         addActor(versionLabel);
         debugInfoTable.setBounds(0, 300, 500, 400);
-        if(Consts.DEBUG) debugInfoTable.setDebug(true);
         debugInfoTable.align(Align.topLeft);
         addActor(debugInfoTable);
         playerStatsTable.setBounds(1800, 850, 200, 150);
@@ -153,9 +143,27 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         addActor(inventoryButton);
         moveTS.setBounds(140, 100, 320, Utils.percFromW(320));
         addActor(moveTS);
-        hotSlotsTable.setBounds(700, 50, 600, 500);
-        hotSlotsTable.align(Align.bottom);
-        addActor(hotSlotsTable);
+
+        int slotW = 120;
+        int slotH = (int) Utils.percFromW(slotW);
+        int arrowW = 100;
+        int arrowH = (int) Utils.percFromW(arrowW);
+        int gapBars = 20;
+        int gapArrows = 40;
+        int totalW = 2*arrowW + 2*gapBars + 2*gapArrows + 3*slotW;
+        int leftB = 1000 - totalW/2;
+
+        switchArrowLeft.setBounds(leftB, 50, arrowW, arrowH);
+        toolSlot.setBounds(leftB + arrowW + gapArrows, 50, slotW, slotH);
+        materialSlot.setBounds(leftB + arrowW + gapArrows + gapBars + slotW, 50, slotW, slotH);
+        consumableSlot.setBounds(leftB + arrowW + gapArrows + 2*gapBars + 2*slotW, 50, slotW, slotH);
+        switchArrowRight.setBounds(leftB + arrowW + 2*gapArrows + 2*gapBars + 3*slotW, 50, arrowW, arrowH);
+
+        addActor(switchArrowLeft);
+        addActor(toolSlot);
+        addActor(materialSlot);
+        addActor(consumableSlot);
+        addActor(switchArrowRight);
 
         breakTS.setBounds(1540, 100, 320, Utils.percFromW(320));
         addActor(breakTS);

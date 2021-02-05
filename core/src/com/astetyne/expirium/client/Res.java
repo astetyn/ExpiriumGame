@@ -1,7 +1,6 @@
 package com.astetyne.expirium.client;
 
 import com.astetyne.expirium.client.gui.widget.BaseGrid;
-import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.badlogic.gdx.Gdx;
@@ -28,20 +27,17 @@ public class Res {
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
     public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
-    public static SwitchArrow.SwitchArrowStyle SWITCH_ARROW_STYLE;
     public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
+    public static TextureRegion ARROW;
 
     // entities
     public static Animation<TextureRegion> PLAYER_IDLE_ANIM;
     public static Animation<TextureRegion> PLAYER_MOVE_ANIM;
     public static Animation<TextureRegion> PLAYER_INTERACT_ANIM;
 
-    public static void loadTextures() {
+    public static void loadTextures(TextureAtlas gui, TextureAtlas ent) {
 
         Animation.PlayMode loop_pong = Animation.PlayMode.LOOP_PINGPONG;
-
-        TextureAtlas gui = new TextureAtlas("gui.atlas");
-        TextureAtlas ent = new TextureAtlas("entities.atlas");
 
         /*FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("LadylikeBB.ttf"));
         //FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("Life is goofy.ttf"));
@@ -67,8 +63,7 @@ public class Res {
         Drawable cursor = new TextureRegionDrawable(gui.findRegion("cursor"));
         TextureRegion tsBack = gui.findRegion("thumb_stick_back");
         TextureRegion tsFore = gui.findRegion("thumb_stick_fore");
-        TextureRegion switchArrowUp = gui.findRegion("switch_arrow_up");
-        TextureRegion switchArrowUpPressed = gui.findRegion("switch_arrow_up_pressed");
+        ARROW = gui.findRegion("switch_arrow");
         TextureRegion invTile = gui.findRegion("inv_tile");
         TextureRegion invTileSplit = gui.findRegion("inv_tile_split");
         TextureRegion invTileThrow = gui.findRegion("trash_icon");
@@ -81,7 +76,6 @@ public class Res {
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
-        SWITCH_ARROW_STYLE = new SwitchArrow.SwitchArrowStyle(switchArrowUp, switchArrowUpPressed);
         BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, invTileThrow, invTileSplit);
 
         // entities

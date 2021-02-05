@@ -7,7 +7,7 @@ public class Consts {
     public static final boolean DEBUG = false;
 
     // server
-    public static final long SAVE_INTERVAL = 10000; // in millis
+    public static final long SAVE_INTERVAL = 20000; // in millis
 
     // networking
     public static final int SERVER_PORT = 1414;
@@ -47,7 +47,7 @@ public class Consts {
     public static final int INTERACT_RADIUS = 6;
 
     // gui
-    public static final int INV_TILE_MLT = 120;
+    public static final int INV_TILE_MLT = 140;
 
 
 }

@@ -45,7 +45,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
         isCon = new ItemStack(Item.getType(in.readInt()));
         chosenSlot = ChosenSlot.getSlot(in.readInt());
         itemInHand = new ItemStack(Item.getType(in.readInt()));
-        label = "This is better than minecraft.";
+        label = "Note that game is still in alpha!";
     }
 
     public void onInteract(UIInteractType type) {

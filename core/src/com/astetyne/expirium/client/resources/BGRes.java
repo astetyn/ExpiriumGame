@@ -22,13 +22,12 @@ public enum BGRes {
         this.ninepatch = ninepatch;
     }
 
-    public static void loadTextures() {
-        TextureAtlas gui = new TextureAtlas("background.atlas");
+    public static void loadTextures(TextureAtlas bg) {
         for(BGRes val : values()) {
             if(val.ninepatch) {
-                val.drawable = new NinePatchDrawable(gui.createPatch(val.name));
+                val.drawable = new NinePatchDrawable(bg.createPatch(val.name));
             }else {
-                val.drawable = new TextureRegionDrawable(gui.findRegion(val.name));
+                val.drawable = new TextureRegionDrawable(bg.findRegion(val.name));
             }
         }
     }

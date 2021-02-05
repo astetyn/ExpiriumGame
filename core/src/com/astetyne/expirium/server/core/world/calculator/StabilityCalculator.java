@@ -67,7 +67,7 @@ public class StabilityCalculator {
 
         for(ExpiTile t2 : affectedTiles) {
             if(t2.getStability() == 0) {
-                boolean withDrop = Math.random() < 2.0 / affectedTiles.size();
+                boolean withDrop = Math.random() < 4.0 / affectedTiles.size();
                 server.getWorld().changeTile(t2, TileType.AIR, withDrop, null, Source.STABILITY);
             }
         }

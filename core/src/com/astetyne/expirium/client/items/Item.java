@@ -65,9 +65,8 @@ public enum Item {
         label = sb.toString();
     }
 
-    public static void loadTextures() {
+    public static void loadTextures(TextureAtlas gui) {
         System.out.println("Loading textures for items.");
-        TextureAtlas gui = new TextureAtlas("gui.atlas");
         for(Item item : values()) {
             if(item == EMPTY) continue;
 

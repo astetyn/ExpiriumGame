@@ -23,10 +23,9 @@ public enum TileTexAnim implements Textureable {
         this.playMode = playMode;
     }
 
-    public static void loadTextures() {
-        TextureAtlas world = new TextureAtlas("world.atlas");
+    public static void loadTextures(TextureAtlas worldAtlas) {
         for(TileTexAnim tta : values()) {
-            tta.anim = new Animation<>(tta.interval, world.findRegions(tta.regionName), tta.playMode);
+            tta.anim = new Animation<>(tta.interval, worldAtlas.findRegions(tta.regionName), tta.playMode);
         }
     }
 

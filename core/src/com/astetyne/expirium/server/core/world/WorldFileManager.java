@@ -46,12 +46,14 @@ public class WorldFileManager {
     public void saveGameServer() {
 
         System.out.println("Saving server...");
+        long start = System.nanoTime();
 
         try {
 
             FileHandle file = Gdx.files.local(worldsPath + worldName + worldDataPath);
 
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(file.write(false)));
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(file.write(false), 131072));
+
             server.writeData(out);
             out.close();
 
@@ -63,7 +65,8 @@ public class WorldFileManager {
             e.printStackTrace();
         }
 
-        System.out.println("Saving done.");
+        long end = System.nanoTime();
+        System.out.println("Saving done. Took: "+(end-start)/1000000f+" ms");
 
     }
 

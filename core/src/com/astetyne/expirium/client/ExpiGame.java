@@ -17,6 +17,7 @@ import com.astetyne.expirium.server.ServerPreferences;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
@@ -52,12 +53,16 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void create () {
-		GuiRes.loadTextures();
-		BGRes.loadTextures();
-		Res.loadTextures();
-		TileTex.loadTextures();
-		TileTexAnim.loadTextures();
-		Item.loadTextures();
+		TextureAtlas world = new TextureAtlas("world.atlas");
+		TextureAtlas gui = new TextureAtlas("gui.atlas");
+		TextureAtlas ent = new TextureAtlas("entities.atlas");
+		TextureAtlas bg = new TextureAtlas("background.atlas");
+		BGRes.loadTextures(bg);
+		GuiRes.loadTextures(gui);// must be called before Res
+		Res.loadTextures(gui, ent);
+		TileTex.loadTextures(world);
+		TileTexAnim.loadTextures(world);
+		Item.loadTextures(gui);
 		batch = new SpriteBatch();
 		setScreen(new MenuScreen());
 	}
