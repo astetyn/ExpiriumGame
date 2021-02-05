@@ -8,6 +8,7 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.backend.WorldLoader;
 import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.core.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -34,6 +35,7 @@ public class ExpiPlayer extends LivingEntity {
     private final Vector2 resurrectLoc;
     private boolean wasAlreadyDead;
     private int lastDeathDay;
+    private final WorldLoader worldLoader;
 
     public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location);
@@ -49,6 +51,7 @@ public class ExpiPlayer extends LivingEntity {
         resurrectLoc = new Vector2(location);
         wasAlreadyDead = false;
         lastDeathDay = 0;
+        worldLoader = new WorldLoader(server, this);
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -75,6 +78,7 @@ public class ExpiPlayer extends LivingEntity {
         resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
         wasAlreadyDead = in.readBoolean();
         lastDeathDay = in.readInt();
+        worldLoader = new WorldLoader(server, this);
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
@@ -289,6 +293,12 @@ public class ExpiPlayer extends LivingEntity {
     @Override
     public void onTick(float delta) {
         super.onTick(delta);
+
+        if(worldLoader.isCompleted()) {
+            mainInv.updateHotSlots();
+        }else {
+            worldLoader.update();
+        }
 
         getNetManager().putLivingStatsPacket();
 

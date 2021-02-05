@@ -2,7 +2,6 @@ package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.backend.TerminableLooper;
-import com.astetyne.expirium.server.backend.WorldLoader;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 
@@ -122,7 +121,6 @@ public class ServerGateway extends TerminableLooper {
                     }
                 }
                 joiningPlayers.add(ep);
-                server.getWorldLoaders().add(new WorldLoader(server, ep));
             }
             joiningClients.clear();
         }

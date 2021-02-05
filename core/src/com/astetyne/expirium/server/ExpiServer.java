@@ -2,7 +2,6 @@ package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.server.backend.TickLooper;
-import com.astetyne.expirium.server.backend.WorldLoader;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -21,7 +20,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class ExpiServer implements Saveable {
@@ -32,7 +30,6 @@ public class ExpiServer implements Saveable {
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
-    private final List<WorldLoader> worldLoaders;
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
 
@@ -59,7 +56,6 @@ public class ExpiServer implements Saveable {
 
         System.out.println("Booting server...");
 
-        worldLoaders = new ArrayList<>();
         entities = new ArrayList<>();
         players = new ArrayList<>();
         entitiesID = new HashMap<>();
@@ -185,13 +181,6 @@ public class ExpiServer implements Saveable {
             return;
         }
 
-        Iterator<WorldLoader> it = worldLoaders.iterator();
-        while(it.hasNext()) {
-            WorldLoader wl = it.next();
-            wl.update();
-            if(wl.isCompleted()) it.remove();
-        }
-
     }
 
     public List<ExpiEntity> getEntities() {
@@ -212,10 +201,6 @@ public class ExpiServer implements Saveable {
 
     public ServerGateway getServerGateway() {
         return serverGateway;
-    }
-
-    public List<WorldLoader> getWorldLoaders() {
-        return worldLoaders;
     }
 
     public EventManager getEventManager() {

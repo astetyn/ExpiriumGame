@@ -74,7 +74,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
                 }
                 break;
             case OPEN_INV:
-                owner.getNetManager().putInvFeedPacket(); //todo: toto je zbytocne?
+                owner.getNetManager().putInvFeedPacket(); // toto je zbytocne?
                 break;
             case CONSUME_BUTTON:
                 if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE) break;
@@ -106,7 +106,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
         updateHotSlots();
     }
 
-    private void updateHotSlots() {
+    public void updateHotSlots() {
 
         List<ItemStack> is1 = new ArrayList<>();
         List<ItemStack> is2 = new ArrayList<>();
