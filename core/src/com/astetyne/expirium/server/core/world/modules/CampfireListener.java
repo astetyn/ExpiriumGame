@@ -6,8 +6,8 @@ import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.event.TileChangeListener;
-import com.astetyne.expirium.server.core.world.tiles.Campfire;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Campfire;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -29,12 +29,12 @@ public class CookingInventory extends ExpiInventory {
             label = "No recipe match";
             return;
         }
-        updater += 1f / Consts.SERVER_DEFAULT_TPS;
+        updater += 1f / Consts.SERVER_TPS;
         if(updater >= updateInterval) {
             updater = 0;
             invalid = true;
         }
-        cookingTime += 1f / Consts.SERVER_DEFAULT_TPS;
+        cookingTime += 1f / Consts.SERVER_TPS;
         label = "Cooking: "+Math.min((int)(cookingTime * 100 / recipe.getTime()), 100)+"%";
         if(cookingTime >= recipe.time) {
             super.clear();

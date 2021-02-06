@@ -52,7 +52,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 LoadWorldPreferences worldPref = new LoadWorldPreferences(selectedWorld.name());
-                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref, menu);
                 try {
                     ExpiGame.get().connectToServer(InetAddress.getLocalHost());
@@ -124,7 +124,7 @@ public class HostCreatorRoot extends Table implements MenuRootable {
                 }
                 menu.setRoot(new LoadingRoot("Creating world..."));
                 CreateWorldPreferences worldPref = new CreateWorldPreferences(worldName, 500, 256, (long) (Math.random() * Long.MAX_VALUE));
-                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_DEFAULT_TPS, Consts.SERVER_PORT);
+                ServerPreferences pref = new ServerPreferences(worldPref, Consts.SERVER_PORT);
                 ExpiGame.get().startServer(pref, menu);
                 try {
                     ExpiGame.get().connectToServer(InetAddress.getLocalHost());

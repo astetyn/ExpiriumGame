@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.entity;
 import com.astetyne.expirium.client.entity.animator.EntityAnimator;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.Tile;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -58,19 +59,20 @@ public abstract class Entity {
 
         if(interpolationDelta == -1) return;
 
-        interpolationDelta += GameScreen.get().getServerTPS() / (float) Gdx.graphics.getFramesPerSecond();
-
-        float posX = lastLoc.x + (targetLocation.x - lastLoc.x) * interpolationDelta;
-        float posY = lastLoc.y + (targetLocation.y - lastLoc.y) * interpolationDelta;
-        float ang = lastAngle + (targetAngle-lastAngle) * interpolationDelta;
-
-        location.set(posX, posY);
-        angle = ang;
+        //interpolationDelta += Consts.SERVER_TPS / (float) Gdx.graphics.getFramesPerSecond();
+        interpolationDelta += Consts.SERVER_TPS * Gdx.graphics.getDeltaTime();
 
         if(interpolationDelta >= 1) {
             location.set(targetLocation);
             angle = targetAngle;
             interpolationDelta = -1;
+        }else {
+            float posX = lastLoc.x + (targetLocation.x - lastLoc.x) * interpolationDelta;
+            float posY = lastLoc.y + (targetLocation.y - lastLoc.y) * interpolationDelta;
+            float ang = lastAngle + (targetAngle-lastAngle) * interpolationDelta;
+
+            location.set(posX, posY);
+            angle = ang;
         }
     }
 

@@ -271,14 +271,14 @@ public class ExpiPlayer extends LivingEntity {
             invincible = false;
         }
 
-        if(onGround) {
-            Vector2 center = body.getWorldCenter();
-            if(tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
-                body.applyLinearImpulse(0, 270, center.x, center.y, true);
-                lastJump = System.currentTimeMillis();
-            }
-        }
         float vY = body.getLinearVelocity().y;
+
+        if(onGround && tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis() && vY >= -0.01f) {
+            Vector2 center = body.getWorldCenter();
+            body.applyLinearImpulse(0, 320, center.x, center.y, true);
+            lastJump = System.currentTimeMillis();
+        }
+
         if((body.getLinearVelocity().x >= 3 && tsData1.horz > 0)) {
             tsData1.horz = 0;
             //body.setLinearVelocity(3, vY);
@@ -286,7 +286,7 @@ public class ExpiPlayer extends LivingEntity {
             tsData1.horz = 0;
             //body.setLinearVelocity(-3, vY);
         }else {
-            body.applyForceToCenter((50000.0f/Consts.SERVER_DEFAULT_TPS) * tsData1.horz, 0, true);
+            body.applyForceToCenter((50000.0f/Consts.SERVER_TPS) * tsData1.horz, 0, true);
         }
     }
 

@@ -18,8 +18,8 @@ import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
 import com.astetyne.expirium.server.core.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
-import com.astetyne.expirium.server.core.world.tiles.TileFix;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.TileFix;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -43,8 +43,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private BackWallCalculator backWallCalculator;
     private WeatherType weatherType;
     private ExpiContactListener contactListener;
-    private float stepsTimeAccumulator;
-    private float dayTime; // in seconds from 6:00 local time
+    private int time; // from midnight = 0 ticks
     private int day; // completed days from server creation
     private final int width, height;
     private final long seed;
@@ -60,7 +59,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         terrain = new ExpiTile[preferences.height][preferences.width];
         new WorldGenerator(terrain, seed).generateWorld();
 
-        dayTime = 50; // 7:00
+        time = 11200; // 7:00
         day = 0;
         weatherType = WeatherType.SUNNY;
 
@@ -84,7 +83,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             }
         }
 
-        dayTime = in.readFloat();
+        time = in.readInt();
         day = in.readInt();
 
         //todo: len docasne zatial
@@ -96,11 +95,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     private void initAfterCreation() {
 
-        stepsTimeAccumulator = 0;
-
         partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
 
-        b2dWorld = new World(new Vector2(0, -12f), false);
+        b2dWorld = new World(new Vector2(0, -17f), false);
 
         contactListener = new ExpiContactListener();
         b2dWorld.setContactListener(contactListener);
@@ -129,11 +126,11 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         fixtureCalc.dispose();
     }
 
-    public void onTick(float delta) {
+    public void onTick() {
 
-        dayTime += delta;
-        if(dayTime >= Consts.DAY_TIME_SEC) {
-            dayTime = 0;
+        time += 100;
+        if(time == Consts.DAY_TICKS) { // midnight
+            time = 0;
             day++;
         }
 
@@ -141,12 +138,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             pp.applyPhysics();
         }
 
-        stepsTimeAccumulator += delta;
-        while(stepsTimeAccumulator >= 1/60f) {
-            b2dWorld.step(1/60f, 6, 2);
-            stepsTimeAccumulator -= 1/60f;
-        }
-        //b2dWorld.step(1f/Consts.SERVER_DEFAULT_TPS, 6, 2);
+        b2dWorld.step(1f/Consts.SERVER_TPS, 6, 2);
 
         for(ExpiPlayer pp : server.getPlayers()) {
             for(ExpiEntity ee : server.getEntities()) {
@@ -330,8 +322,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return contactListener;
     }
 
-    public float getTime() {
-        return dayTime;
+    public int getTime() {
+        return time;
     }
 
     public ExpiTile[][] getTerrain() {
@@ -374,7 +366,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             }
         }
 
-        out.writeFloat(dayTime);
+        out.writeInt(time);
         out.writeInt(day);
 
     }

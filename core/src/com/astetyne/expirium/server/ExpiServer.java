@@ -62,7 +62,7 @@ public class ExpiServer implements Saveable {
 
         eventManager = new EventManager();
 
-        tickLooper = new TickLooper(serverPreferences.tps, this);
+        tickLooper = new TickLooper(this);
         serverGateway = new ServerGateway(serverPreferences.port, this);
         multicastSender = new MulticastSender();
 

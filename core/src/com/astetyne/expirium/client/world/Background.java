@@ -29,7 +29,7 @@ public class Background {
         parallaxHeight = 1300;
     }
 
-    public void draw(SpriteBatch batch, float time) {
+    public void draw(SpriteBatch batch, int time) {
 
         // sky
         Color sky = getSkyColor(batch.getColor(), time);
@@ -55,21 +55,21 @@ public class Background {
 
     }
 
-    private Color getSkyColor(Color c, float time) {
+    private Color getSkyColor(Color c, int time) {
 
         int srs = Consts.SUNRISE_START;
-        int srh = (int) ((Consts.SUNRISE_END - Consts.SUNRISE_START)/2f);
+        int srh = (Consts.SUNRISE_END - Consts.SUNRISE_START)/2;
         int srm = srs + srh;
         int sre = Consts.SUNRISE_END;
 
         int sss = Consts.SUNSET_START;
-        int ssh = (int) ((Consts.SUNSET_END - Consts.SUNSET_START)/2f);
+        int ssh = (Consts.SUNSET_END - Consts.SUNSET_START)/2;
         int ssm = sss + ssh;
         int sse = Consts.SUNSET_END;
 
         if(time >= srs && time < srm) { // sunrise 1
             c.set(nightSkyC);
-            c.lerp(orangeSkyC, 1f / srh * time);
+            c.lerp(orangeSkyC, 1f / srh * (time-srs));
 
         }else if(time >= srm  && time < sre) { // sunrise 2
             c.set(orangeSkyC);
@@ -92,21 +92,21 @@ public class Background {
         return c;
     }
 
-    private Color getBGColor(Color c, float time) {
+    private Color getBGColor(Color c, int time) {
 
         int srs = Consts.SUNRISE_START;
-        int srh = (int) ((Consts.SUNRISE_END - Consts.SUNRISE_START)/2f);
+        int srh = (Consts.SUNRISE_END - Consts.SUNRISE_START)/2;
         int srm = srs + srh;
         int sre = Consts.SUNRISE_END;
 
         int sss = Consts.SUNSET_START;
-        int ssh = (int) ((Consts.SUNSET_END - Consts.SUNSET_START)/2f);
+        int ssh = (Consts.SUNSET_END - Consts.SUNSET_START)/2;
         int ssm = sss + ssh;
         int sse = Consts.SUNSET_END;
 
         if(time >= srs && time < srm) { // sunrise 1
             c.set(nightHillsC);
-            c.lerp(orangeSkyC, 1f / srh * time);
+            c.lerp(orangeSkyC, 1f / srh * (time-srs));
 
         }else if(time >= srm  && time < sre) { // sunrise 2
             c.set(orangeSkyC);

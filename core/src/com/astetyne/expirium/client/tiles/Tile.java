@@ -50,7 +50,7 @@ public class Tile {
     }
 
     public byte getTimeCompensatedSkyLight() {
-        float dayTime = GameScreen.get().getDayTime();
+        int time = GameScreen.get().getTime();
         float moonLightFactor = 0.2f;
 
         int srs = Consts.SUNRISE_START;
@@ -62,13 +62,13 @@ public class Tile {
         int sse = Consts.SUNSET_END;
 
         // sunrise
-        if(dayTime >= srs && dayTime < sre) return (byte) Math.max(skyLight / srd * (dayTime - srs), skyLight * moonLightFactor);
+        if(time >= srs && time < sre) return (byte) Math.max(skyLight / srd * (time - srs), skyLight * moonLightFactor);
 
         //daylight
-        else if(dayTime >= sre && dayTime < sss) return skyLight;
+        else if(time >= sre && time < sss) return skyLight;
 
         //sunset
-        else if(dayTime >= sss && dayTime < sse) return (byte) Math.max(skyLight / ssd * (sse - dayTime), skyLight * moonLightFactor);
+        else if(time >= sss && time < sse) return (byte) Math.max(skyLight / ssd * (sse - time), skyLight * moonLightFactor);
 
         //night
         else return (byte) (skyLight * moonLightFactor);

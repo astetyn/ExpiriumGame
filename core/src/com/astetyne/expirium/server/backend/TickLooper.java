@@ -10,13 +10,11 @@ import java.util.List;
 public class TickLooper extends TerminableLooper {
 
     private final Object tickLock;
-    private final int tps;
     private final ExpiServer server;
     private long lastLagWarningTime;
 
-    public TickLooper(int tps, ExpiServer server) {
+    public TickLooper(ExpiServer server) {
         this.server = server;
-        this.tps = tps;
         tickLock = new Object();
         lastLagWarningTime = 0;
     }
@@ -36,9 +34,9 @@ public class TickLooper extends TerminableLooper {
                 ep.getNetManager().processIncomingPackets();
             }
 
-            float delta = 1f / Consts.SERVER_DEFAULT_TPS;
+            float delta = 1f / Consts.SERVER_TPS;
 
-            server.getWorld().onTick(delta);
+            server.getWorld().onTick();
 
             List<TickListener> list = server.getEventManager().getTickListeners();
             for(int i = list.size() - 1; i >= 0; i--) {
@@ -57,7 +55,7 @@ public class TickLooper extends TerminableLooper {
 
             diff = System.currentTimeMillis() - startT;
 
-            long waitMillis = (1000 / tps) - diff;
+            long waitMillis = (1000 / Consts.SERVER_TPS) - diff;
 
             if(waitMillis < 0) {
                 if(lastLagWarningTime + 5000 < System.currentTimeMillis()) {

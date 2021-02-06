@@ -1,58 +1,46 @@
 package com.astetyne.expirium.client.tiles;
 
-import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.resources.Textureable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
-import com.astetyne.expirium.server.core.world.tiles.TileFix;
+import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.meta.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
 
 public enum TileType implements Textureable {
 
-    AIR(Solidity.LABILE, null, 0, Item.EMPTY, 0, TileFix.SOFT),
-    STONE(Solidity.SOLID, TileTex.STONE, 10f, Item.STONE, 4, TileFix.FULL),
-    RHYOLITE(Solidity.SOLID, TileTex.RHYOLITE, 5f, Item.RHYOLITE, 3, TileFix.FULL),
-    GRASS(Solidity.SOLID, TileTex.GRASS, 4f, Item.GRASS, 2, TileFix.FULL),
-    GRASS_SLOPE_R(Solidity.LABILE, TileTex.GRASS_SLOPE_R, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_R),
-    GRASS_SLOPE_L(Solidity.LABILE, TileTex.GRASS_SLOPE_L, 3f, Item.GRASS, 1, TileFix.GRASS_SLOPE_L),
-    DIRT(Solidity.SOLID, TileTex.DIRT, 4f, Item.DIRT, 2, TileFix.FULL),
-    TREE1(Solidity.SOLID_VERT, TileTex.TREE1, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
-    TREE2(Solidity.SOLID_VERT, TileTex.TREE2, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
-    TREE3(Solidity.SOLID_VERT, TileTex.TREE3, 3f, Item.RAW_WOOD, 1, TileFix.SOFT),
-    TREE4(Solidity.LABILE, TileTex.TREE4, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
-    TREE5(Solidity.LABILE, TileTex.TREE5, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
-    TREE6(Solidity.LABILE, TileTex.TREE6, 1f, new ItemDropper(new Item[]{Item.APPLE}, 0.5f), 1, TileFix.SOFT),
-    CAMPFIRE_SMALL(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_SMALL, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
-    CAMPFIRE_BIG(Solidity.LABILE_VERT, TileTexAnim.CAMPFIRE_BIG, 0.5f, Item.EMPTY, 1, TileFix.CAMPFIRE),
-    WOODEN_WALL(Solidity.SOLID, TileTex.WOODEN_WALL, 2f, Item.WOODEN_WALL, 6, TileFix.FULL),
-    SOFT_WOODEN_WALL(Solidity.SOLID, TileTex.SOFT_WOODEN_WALL, 2f, Item.SOFT_WOODEN_WALL, 6, TileFix.SOFT),
-    WOODEN_SUPPORT(Solidity.SOLID_VERT, TileTex.WOODEN_SUPPORT, 1f, Item.EMPTY, 6, TileFix.SOFT),
-    RASPBERRY_BUSH_1(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_1, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
-    RASPBERRY_BUSH_2(Solidity.LABILE_VERT, TileTex.RASPBERRY_BUSH_2, 1f, Item.RASPBERRY_BUSH, 1, TileFix.SOFT),
-    COAL_ORE(Solidity.SOLID, TileTex.COAL_ORE, 10f, Item.COAL, 3, TileFix.FULL),
-    SAND(Solidity.SOLID_VERT, TileTex.SAND, 3, Item.SAND, 1, TileFix.FULL),
-    GLASS(Solidity.SOLID, TileTex.GLASS, 1, Item.GLASS, 2, TileFix.FULL);
+    AIR(null, MetaTileAir.class),
+    STONE(TileTex.STONE, MetaTileStone.class),
+    RHYOLITE(TileTex.RHYOLITE, MetaTileRhyolite.class),
+    GRASS(TileTex.GRASS, MetaTileGrass.class),
+    GRASS_SLOPE_R(TileTex.GRASS_SLOPE_R, MetaTileGrassSlopeR.class),
+    GRASS_SLOPE_L(TileTex.GRASS_SLOPE_L, MetaTileGrassSlopeL.class),
+    DIRT(TileTex.DIRT, MetaTileDirt.class),
+    LOG1(TileTex.TREE1, MetaTileLog.class),
+    LOG2(TileTex.TREE2, MetaTileLog.class),
+    LOG3(TileTex.TREE3, MetaTileLog.class),
+    LEAVES1(TileTex.TREE4, MetaTileLeaves.class),
+    LEAVES2(TileTex.TREE5, MetaTileLeaves.class),
+    LEAVES3(TileTex.TREE6, MetaTileLeaves.class),
+    CAMPFIRE_SMALL(TileTexAnim.CAMPFIRE_SMALL, MetaTileCampfire.class),
+    CAMPFIRE_BIG(TileTexAnim.CAMPFIRE_BIG, MetaTileCampfire.class),
+    WOODEN_WALL(TileTex.WOODEN_WALL, MetaTileWoodenWall.class),
+    SOFT_WOODEN_WALL(TileTex.SOFT_WOODEN_WALL, MetaTileSoftWoodenWall.class),
+    WOODEN_SUPPORT(TileTex.WOODEN_SUPPORT, MetaTileWoodenSupport.class),
+    RASPBERRY_BUSH_1(TileTex.RASPBERRY_BUSH_1, MetaTileRaspberryBush.class),
+    RASPBERRY_BUSH_2(TileTex.RASPBERRY_BUSH_2, MetaTileRaspberryBush.class),
+    COAL_ORE(TileTex.COAL_ORE, MetaTileCoalOre.class),
+    SAND(TileTex.SAND, MetaTileSand.class),
+    GLASS(TileTex.GLASS, MetaTileGlass.class);
 
-    Solidity solidity;
     Textureable textureable;
-    float breakTime;
-    ItemDropper itemDropper;
-    int maxStability; // set to 1 if LABILE is used
-    TileFix tileFix;
+    Class<? extends MetaTile> metaClazz;
 
-    TileType(Solidity ss, Textureable textureable, float time, Item item, int s, TileFix fd) {
-        this(ss, textureable, time, new ItemDropper(new Item[]{item}, 1), s, fd);
-    }
-
-    TileType(Solidity ss, Textureable textureable, float time, ItemDropper itemDropper, int s, TileFix fd) {
-        this.solidity = ss;
+    TileType(Textureable textureable, Class<? extends MetaTile> clazz) {
         this.textureable = textureable;
-        this.breakTime = time;
-        this.itemDropper = itemDropper;
-        this.maxStability = s;
-        tileFix = fd;
+        this.metaClazz = clazz;
     }
 
     public static TileType getType(int id) {
@@ -63,46 +51,12 @@ public enum TileType implements Textureable {
         return id;
     }
 
-    public Solidity getSolidity() {
-        return solidity;
-    }
-
     public TextureRegion getTex() {
         return textureable.getTex();
     }
 
-    public float getBreakTime() {
-        return breakTime;
-    }
-
-    public ItemDropper getItemDropper() {
-        return itemDropper;
-    }
-
-    public int getMaxStability() {
-        return maxStability;
-    }
-
-    public TileFix getFix() {
-        return tileFix;
-    }
-
-    public boolean isTransparent() {
-        if(this.getFix() == TileFix.SOFT) return true;
-        switch(this) {
-            case GLASS: return true;
-            default: return false;
-        }
-    }
-
-    public boolean isWall() {
-        switch(this) {
-            case WOODEN_WALL:
-            case SOFT_WOODEN_WALL:
-            case GLASS:
-                return true;
-            default: return false;
-        }
+    public Class<? extends MetaTile> getMetaClazz() {
+        return metaClazz;
     }
 
     int id;

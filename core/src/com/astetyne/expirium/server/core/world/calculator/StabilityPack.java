@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;

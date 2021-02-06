@@ -7,7 +7,7 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.badlogic.gdx.math.Vector2;
 
 public class ExpiTileBreaker {
@@ -75,7 +75,7 @@ public class ExpiTileBreaker {
                 speedCoef = 3;
             }
             if(Consts.DEBUG) speedCoef = 50;
-            timeAccumulator += speedCoef / Consts.SERVER_DEFAULT_TPS;
+            timeAccumulator += speedCoef / Consts.SERVER_TPS;
             if(timeAccumulator >= targetTile.getType().getBreakTime()) {
                 world.changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
                 timeAccumulator = 0;

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.event;
 
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerInteractEvent implements Cancellable {

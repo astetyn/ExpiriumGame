@@ -8,8 +8,8 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.*;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
-import com.astetyne.expirium.server.core.world.tiles.RaspberryBush;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.RaspberryBush;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.event;
 
 import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 public class TileChangeEvent implements Cancellable {
 

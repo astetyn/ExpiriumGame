@@ -1,4 +1,4 @@
-package com.astetyne.expirium.server.core.world.tiles;
+package com.astetyne.expirium.server.core.world.tile;
 
 public class RaspberryBush {
 

@@ -112,7 +112,7 @@ public class ClientPacketManager {
                     break;
 
                 case 28: //EnviroPacket
-                    GameScreen.get().setDayTime(in.getFloat());
+                    GameScreen.get().setTime(in.getInt());
                     WeatherType weather = WeatherType.getType(in.getInt());
                     break;
 

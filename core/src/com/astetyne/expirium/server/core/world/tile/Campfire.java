@@ -1,4 +1,4 @@
-package com.astetyne.expirium.server.core.world.tiles;
+package com.astetyne.expirium.server.core.world.tile;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.ItemStack;

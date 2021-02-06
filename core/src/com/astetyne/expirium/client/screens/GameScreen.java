@@ -8,7 +8,6 @@ import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRootable;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.TileTex;
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.Background;
 import com.astetyne.expirium.client.world.GameWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -31,8 +30,7 @@ public class GameScreen implements Screen {
     private final WarnMsgLabel warnMsgLabel;
     private final GameWorld gameWorld;
     private final Background background;
-    private float dayTime;
-    private final int serverTPS;
+    private int time;
     private final PlayerDataHandler playerDataHandler;
     private GameRootable activeRoot;
     private boolean buildViewActive;
@@ -42,8 +40,6 @@ public class GameScreen implements Screen {
         gameScreen = this;
 
         buildViewActive = false;
-
-        serverTPS = Consts.SERVER_DEFAULT_TPS;
 
         batch = ExpiGame.get().getBatch();
         multiplexer = new InputMultiplexer();
@@ -87,7 +83,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        background.draw(batch, dayTime);
+        background.draw(batch, time);
 
         gameWorld.draw(batch);
 
@@ -154,20 +150,16 @@ public class GameScreen implements Screen {
         return gameScreen;
     }
 
-    public float getDayTime() {
-        return dayTime;
+    public int getTime() {
+        return time;
     }
 
-    public void setDayTime(float dayTime) {
-        this.dayTime = dayTime;
+    public void setTime(int time) {
+        this.time = time;
     }
 
     public InputMultiplexer getMultiplexer() {
         return multiplexer;
-    }
-
-    public int getServerTPS() {
-        return serverTPS;
     }
 
     public PlayerDataHandler getPlayerData() {

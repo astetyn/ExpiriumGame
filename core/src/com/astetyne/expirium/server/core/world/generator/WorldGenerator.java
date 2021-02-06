@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator;
 
 import com.astetyne.expirium.client.tiles.TileType;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 public class WorldGenerator {
 
@@ -124,7 +124,7 @@ public class WorldGenerator {
 
             // 3 tiles tall trunk fixed
             for(int i = 0; i < 3; i++) {
-                worldTerrain[y + i][x].setType(TileType.TREE1);
+                worldTerrain[y + i][x].setType(TileType.LOG1);
             }
 
             // trunk random
@@ -133,16 +133,16 @@ public class WorldGenerator {
                 double rand = Math.random();
 
                 if(rand < 0.6) {
-                    worldTerrain[y + i][x].setType(TileType.TREE1);
+                    worldTerrain[y + i][x].setType(TileType.LOG1);
                 }else if(rand < 0.8) {
-                    worldTerrain[y + i][x].setType(TileType.TREE2);
-                    if(x != w - 1) worldTerrain[y + i][x + 1].setType(TileType.TREE6);
+                    worldTerrain[y + i][x].setType(TileType.LOG2);
+                    if(x != w - 1) worldTerrain[y + i][x + 1].setType(TileType.LEAVES3);
                 }else {
-                    worldTerrain[y + i][x].setType(TileType.TREE3);
-                    worldTerrain[y + i][x - 1].setType(TileType.TREE5);
+                    worldTerrain[y + i][x].setType(TileType.LOG3);
+                    worldTerrain[y + i][x - 1].setType(TileType.LEAVES2);
                 }
             }
-            worldTerrain[y + treeHeight][x].setType(TileType.TREE4);
+            worldTerrain[y + treeHeight][x].setType(TileType.LEAVES1);
 
             lastTree = x;
         }

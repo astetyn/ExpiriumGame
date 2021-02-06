@@ -6,7 +6,7 @@ import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.util.HashSet;
 

@@ -13,7 +13,7 @@ import com.astetyne.expirium.server.core.event.PlayerInteractListener;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
-import com.astetyne.expirium.server.core.world.tiles.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.util.HashSet;
 import java.util.List;
@@ -190,7 +190,7 @@ public class ServerPacketManager {
 
     public void putEnviroPacket() {
         out.startPacket(28);
-        out.putFloat(server.getWorld().getTime());
+        out.putInt(server.getWorld().getTime());
         out.putInt(server.getWorld().getWeather().getID());
     }
 
