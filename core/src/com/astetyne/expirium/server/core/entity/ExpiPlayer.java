@@ -294,9 +294,7 @@ public class ExpiPlayer extends LivingEntity {
     public void onTick(float delta) {
         super.onTick(delta);
 
-        if(worldLoader.isCompleted()) {
-            mainInv.updateHotSlots();
-        }else {
+        if(!worldLoader.isCompleted()) {
             worldLoader.update();
         }
 

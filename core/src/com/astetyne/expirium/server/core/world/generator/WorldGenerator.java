@@ -40,7 +40,6 @@ public class WorldGenerator {
                 sandZone = false;
             }
 
-
             if(sandZone) terrainHeight = lastSandHeight;
 
             terrainLevel[x] = terrainHeight;

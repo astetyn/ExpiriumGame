@@ -31,7 +31,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
         isCon = new ItemStack(Item.EMPTY);
         chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
-        label = "This is better than minecraft.";
+        label = "Note that game is still in alpha!";
     }
 
     public ExpiPlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {

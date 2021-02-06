@@ -39,15 +39,15 @@ public class SwitchArrow extends Widget {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        if(pressed) {
-            batch.setColor(Color.GRAY);
-        }
+        if(pressed) batch.setColor(Color.GRAY);
 
         if(toRight) {
             batch.draw(texture, getX(), getY(), getWidth()/2, getHeight()/2, getWidth(), getHeight(), -1, 1, 0);
         }else {
             batch.draw(texture, getX(), getY(), getWidth(), getHeight());
         }
+
+        if(pressed) batch.setColor(Color.WHITE);
     }
 
 }

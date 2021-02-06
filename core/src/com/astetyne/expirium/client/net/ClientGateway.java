@@ -128,12 +128,12 @@ public class ClientGateway extends TerminableLooper {
      */
     public void connectToServer(InetAddress address) {
 
-        running = true;
         this.address = address;
 
         if(socket != null && !socket.isClosed()) {
             close();
         }
+        running = true;
 
         Thread t = new Thread(this);
         t.setName("Client gateway");
