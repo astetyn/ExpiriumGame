@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.items;
 
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.tiles.Material;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -105,19 +105,19 @@ public enum Item {
         return category;
     }
 
-    public TileType getBuildTile() {
+    public Material getBuildTile() {
         switch(this) {
-            case STONE: return TileType.STONE;
-            case RHYOLITE: return TileType.RHYOLITE;
-            case DIRT: return TileType.DIRT;
-            case GRASS: return TileType.GRASS;
-            case WOODEN_WALL: return TileType.WOODEN_WALL;
-            case SOFT_WOODEN_WALL: return TileType.SOFT_WOODEN_WALL;
-            case RASPBERRY_BUSH: return TileType.RASPBERRY_BUSH_1;
-            case WOODEN_SUPPORT: return TileType.WOODEN_SUPPORT;
-            case CAMPFIRE: return TileType.CAMPFIRE_BIG;
-            case SAND: return TileType.SAND;
-            case GLASS: return TileType.GLASS;
+            case STONE: return Material.STONE;
+            case RHYOLITE: return Material.RHYOLITE;
+            case DIRT: return Material.DIRT;
+            case GRASS: return Material.GRASS;
+            case WOODEN_WALL: return Material.WOODEN_WALL;
+            case SOFT_WOODEN_WALL: return Material.SOFT_WOODEN_WALL;
+            case RASPBERRY_BUSH: return Material.RASPBERRY_BUSH_1;
+            case WOODEN_SUPPORT: return Material.WOODEN_SUPPORT;
+            case CAMPFIRE: return Material.CAMPFIRE_BIG;
+            case SAND: return Material.SAND;
+            case GLASS: return Material.GLASS;
             default: return null;
         }
     }

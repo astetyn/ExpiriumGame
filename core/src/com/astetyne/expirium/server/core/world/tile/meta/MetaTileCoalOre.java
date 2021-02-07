@@ -37,4 +37,5 @@ public class MetaTileCoalOre extends MetaTile {
     public float getBreakTime() {
         return 10;
     }
+
 }

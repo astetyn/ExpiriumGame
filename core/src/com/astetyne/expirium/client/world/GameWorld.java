@@ -7,8 +7,8 @@ import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.BreakingTile;
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.tiles.Tile;
-import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.WorldInputListener;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
@@ -70,7 +70,7 @@ public class GameWorld {
 
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = 0; j < terrainHeight; j++) {
-                terrain[i][j] = new Tile(TileType.AIR, (byte)0);
+                terrain[i][j] = new Tile(Material.AIR, (byte)0);
             }
         }
 
@@ -116,7 +116,7 @@ public class GameWorld {
                     batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
                 }
 
-                if(t.getType() == TileType.AIR) continue;
+                if(t.getType() == Material.AIR) continue;
 
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
                 batch.setColor(b,b,b,1);
@@ -172,7 +172,7 @@ public class GameWorld {
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = yOff; j < yOff + partHeight; j++) {
                 Tile t = terrain[i][j];
-                TileType type = TileType.getType(in.getByte());
+                Material type = Material.getMaterial(in.getByte());
                 byte stability = in.getByte();
                 boolean backWall = in.getBoolean();
                 t.setType(type);
@@ -188,13 +188,13 @@ public class GameWorld {
 
     public void onTileChange(PacketInputStream in) {
 
-        TileType type = TileType.getType((byte) in.getInt());
+        Material type = Material.getMaterial((byte) in.getInt());
         int x = in.getInt();
         int y = in.getInt();
 
         Tile t = terrain[x][y];
 
-        TileType oldType = t.getType();
+        Material oldType = t.getType();
 
         t.setType(type);
 

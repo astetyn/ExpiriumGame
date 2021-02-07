@@ -103,7 +103,7 @@ public class ServerPacketManager {
         for(int i = 0; i < terrain[0].length; i++) {
             for(int j = yOff; j < yOff + partHeight; j++) {
                 ExpiTile t = terrain[j][i];
-                out.putByte((byte) t.getType().getID());
+                out.putByte((byte) t.getMaterial().getID());
                 out.putByte((byte) t.getStability());
                 out.putBoolean(t.hasBackWall());
             }
@@ -171,9 +171,9 @@ public class ServerPacketManager {
         out.putInt(consIS.getAmount());
     }
 
-    public void putTileChangePacket(ExpiTile t) {
+    public void putMaterialChangePacket(ExpiTile t) {
         out.startPacket(22);
-        out.putInt(t.getType().getID());
+        out.putInt(t.getMaterial().getID());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }

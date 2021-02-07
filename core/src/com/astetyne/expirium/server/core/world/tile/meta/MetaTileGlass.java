@@ -47,4 +47,5 @@ public class MetaTileGlass extends MetaTile {
     public boolean isWall() {
         return true;
     }
+
 }

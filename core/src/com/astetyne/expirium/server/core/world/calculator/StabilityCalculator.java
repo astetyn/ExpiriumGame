@@ -1,12 +1,13 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.MetaTile;
 
 import java.util.HashSet;
 
@@ -34,7 +35,7 @@ public class StabilityCalculator {
     public void generateStability() {
 
         for(int j = 0; j < w; j++) {
-            worldTerrain[0][j].setStability(worldTerrain[0][j].getType().getMaxStability());
+            worldTerrain[0][j].setStability(worldTerrain[0][j].getMeta().getMaxStability());
         }
 
         for(int i = 1; i < h; i++) {
@@ -68,7 +69,7 @@ public class StabilityCalculator {
         for(ExpiTile t2 : affectedTiles) {
             if(t2.getStability() == 0) {
                 boolean withDrop = Math.random() < 4.0 / affectedTiles.size();
-                server.getWorld().changeTile(t2, TileType.AIR, withDrop, null, Source.STABILITY);
+                server.getWorld().changeMaterial(t2, Material.AIR, withDrop, Source.STABILITY);
             }
         }
 
@@ -114,13 +115,13 @@ public class StabilityCalculator {
     /**
      * @return True if tile can be changed and stability will be correct.
      */
-    public boolean canBeChanged(ExpiTile t, TileType checkType) {
+    public boolean canBeChanged(ExpiTile t, Material material) {
 
-        TileType oldType = t.getType();
+        MetaTile oldMeta = t.getMeta();
 
-        t.setType(checkType);
+        t.setMaterial(material);
         int actualS = getActualStability(t);
-        t.setType(oldType);
+        t.setMeta(oldMeta);
         return actualS != 0;
     }
 
@@ -149,7 +150,7 @@ public class StabilityCalculator {
     }
 
     private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
-        if(t.getType() == TileType.AIR) return;
+        if(t.getMaterial() == Material.AIR) return;
         if(t.getStability() > getActualStability(t) && t.getY() != 0) {
             findStrongConnections(t, pack);
         }else {
@@ -166,13 +167,13 @@ public class StabilityCalculator {
         int maxAvailStab = 0;
 
         // left tile
-        if(x != 0 && !worldTerrain[y][x-1].isLabile() && !t.getType().getSolidity().isVert())
+        if(x != 0 && !worldTerrain[y][x-1].isLabile() && !t.getMeta().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x-1].getStability()-1);
         // top tile
-        if(y != h-1 && !worldTerrain[y+1][x].isLabile() && !t.getType().getSolidity().isVert())
+        if(y != h-1 && !worldTerrain[y+1][x].isLabile() && !t.getMeta().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y+1][x].getStability()-2);
         // right tile
-        if(x != w-1 && !worldTerrain[y][x+1].isLabile() && !t.getType().getSolidity().isVert())
+        if(x != w-1 && !worldTerrain[y][x+1].isLabile() && !t.getMeta().getSolidity().isVert())
             maxAvailStab = Math.max(maxAvailStab, worldTerrain[y][x+1].getStability()-1);
         // bottom tile
         if(y != 0 && !worldTerrain[y-1][x].isLabile())
@@ -188,17 +189,17 @@ public class StabilityCalculator {
                 int s1 = t1.getStability();
                 int s2 = t2.getStability();
                 int s3 = t3.getStability();
-                TileType type1 = t1.getType();
-                TileType type2 = t2.getType();
-                TileType type3 = t3.getType();
+                Material type1 = t1.getMaterial();
+                Material type2 = t2.getMaterial();
+                Material type3 = t3.getMaterial();
                 if(s1 == s2 && s2 == s3 && s1 != 0) {
                     maxAvailStab = Math.max(maxAvailStab, s1 + 1);
-                }else if(type1 != TileType.AIR && type1 == type2 && type2 == type3) {
+                }else if(type1 != Material.AIR && type1 == type2 && type2 == type3) {
                     maxAvailStab = Math.max(maxAvailStab, Math.min(s1, Math.min(s2, s3))+1);
                 }
             }
         }
-        return Math.min(t.getType().getMaxStability(), maxAvailStab);
+        return Math.min(t.getMeta().getMaxStability(), maxAvailStab);
     }
 
     /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/
@@ -224,7 +225,7 @@ public class StabilityCalculator {
 
         ExpiTile t = worldTerrain[y][x];
 
-        if(t.getType() == TileType.AIR) return;
+        if(t.getMaterial() == Material.AIR) return;
         int realStability = getActualStability(t);
         if(realStability > t.getStability()) {
             t.setStability(realStability);

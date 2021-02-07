@@ -3,13 +3,18 @@ package com.astetyne.expirium.client.tiles;
 import com.astetyne.expirium.client.resources.Textureable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
+import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.meta.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-public enum TileType implements Textureable {
+public enum Material implements Textureable {
 
     AIR(null, MetaTileAir.class),
     STONE(TileTex.STONE, MetaTileStone.class),
@@ -38,12 +43,12 @@ public enum TileType implements Textureable {
     Textureable textureable;
     Class<? extends MetaTile> metaClazz;
 
-    TileType(Textureable textureable, Class<? extends MetaTile> clazz) {
+    Material(Textureable textureable, Class<? extends MetaTile> clazz) {
         this.textureable = textureable;
         this.metaClazz = clazz;
     }
 
-    public static TileType getType(int id) {
+    public static Material getMaterial(int id) {
         return map.get(id);
     }
 
@@ -55,17 +60,38 @@ public enum TileType implements Textureable {
         return textureable.getTex();
     }
 
-    public Class<? extends MetaTile> getMetaClazz() {
-        return metaClazz;
+    // this method should be used rarely only in edge cases
+    public MetaTile init(ExpiServer s) {
+        return new ExpiTile(s, this, 0, 0).getMeta();
+    }
+
+    public MetaTile init(ExpiServer s, ExpiTile t) {
+        try {
+            return metaClazz.getConstructor(ExpiServer.class, ExpiTile.class).newInstance(s, t);
+        }catch(InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new MetaTileAir(s, t);
+    }
+
+    public MetaTile init(ExpiServer s, ExpiTile t, DataInputStream in) throws IOException {
+        try {
+            return metaClazz.getConstructor(ExpiServer.class, ExpiTile.class, DataInputStream.class)
+                    .newInstance(s, t, in);
+        }catch(InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+            return init(s, t);
+        }catch(InvocationTargetException e) {
+            throw (IOException) e.getTargetException(); // idk if this is correct
+        }
     }
 
     int id;
-    private static final HashMap<Integer, TileType> map;
+    private static final HashMap<Integer, Material> map;
     static {
         System.out.println("TileType class loading.");
         map = new HashMap<>();
         int i = 0;
-        for(TileType tt : TileType.values()) {
+        for(Material tt : Material.values()) {
             tt.id = i;
             map.put(tt.id, tt);
             i++;

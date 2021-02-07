@@ -1,9 +1,7 @@
 package com.astetyne.expirium.server.core.world.modules;
 
-import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
-import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.event.TileChangeListener;
 import com.astetyne.expirium.server.core.world.tile.Campfire;
@@ -41,21 +39,21 @@ public class CampfireListener implements TileChangeListener, Saveable {
     @Override
     public void onTileChange(TileChangeEvent event) {
 
-        TileType from = event.getFrom();
-        TileType toType = event.getTile().getType();
+        /*Material from = event.getFromMat();
+        Material toType = event.getTile().getMaterial();
 
-        if(event.getSource() == Source.NATURAL && from == TileType.CAMPFIRE_BIG && toType == TileType.CAMPFIRE_SMALL) {
+        if(event.getSource() == Source.NATURAL && from == Material.CAMPFIRE_BIG && toType == Material.CAMPFIRE_SMALL) {
             return;
         }
 
-        if(from == TileType.CAMPFIRE_BIG || from == TileType.CAMPFIRE_SMALL) {
+        if(from == Material.CAMPFIRE_BIG || from == Material.CAMPFIRE_SMALL) {
             campfires.remove(event.getTile());
         }
 
-        if(toType == TileType.CAMPFIRE_BIG || toType == TileType.CAMPFIRE_SMALL) {
+        if(toType == Material.CAMPFIRE_BIG || toType == Material.CAMPFIRE_SMALL) {
             Campfire cf = new Campfire(server, event.getTile());
             campfires.put(cf.getTile(), cf);
-        }
+        }*/
 
     }
 

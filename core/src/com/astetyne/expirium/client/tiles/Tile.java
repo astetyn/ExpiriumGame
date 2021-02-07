@@ -5,12 +5,12 @@ import com.astetyne.expirium.client.utils.Consts;
 
 public class Tile {
 
-    private TileType type;
+    private Material type;
     private byte stability;
     private byte skyLight, localLight;
     private boolean backWall;
 
-    public Tile(TileType type, byte stability) {
+    public Tile(Material type, byte stability) {
         this.type = type;
         this.stability = stability;
         skyLight = 0;
@@ -25,11 +25,11 @@ public class Tile {
         this.stability = stability;
     }
 
-    public TileType getType() {
+    public Material getType() {
         return type;
     }
 
-    public void setType(TileType type) {
+    public void setType(Material type) {
         this.type = type;
     }
 

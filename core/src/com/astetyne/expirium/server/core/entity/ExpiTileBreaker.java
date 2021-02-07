@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.event.Source;
@@ -58,7 +58,7 @@ public class ExpiTileBreaker {
                 targetTile = null;
                 break;
             }
-            if(newTarget.getType() != TileType.AIR) {
+            if(newTarget.getMaterial() != Material.AIR) {
                 if(newTarget != targetTile && newTarget.getY() != 0) {
                     timeAccumulator = 0;
                     targetTile = newTarget;
@@ -76,14 +76,14 @@ public class ExpiTileBreaker {
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_TPS;
-            if(timeAccumulator >= targetTile.getType().getBreakTime()) {
-                world.changeTile(targetTile, TileType.AIR, true, owner, Source.PLAYER);
+            if(timeAccumulator >= targetTile.getMeta().getBreakTime()) {
+                world.changeMaterial(targetTile, Material.AIR, true, Source.PLAYER);
                 timeAccumulator = 0;
                 targetTile = null;
             }else {
                 // breaking in action
                 for(ExpiPlayer ep : server.getPlayers()) {
-                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getType().getBreakTime());
+                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getMeta().getBreakTime());
                 }
                 if(lastPunchTime + 200 < System.currentTimeMillis()) { // cca 450 is full animation (200 is half)
                     lastPunchTime = System.currentTimeMillis();

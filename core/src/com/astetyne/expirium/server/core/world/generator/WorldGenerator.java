@@ -1,16 +1,19 @@
 package com.astetyne.expirium.server.core.world.generator;
 
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.tiles.Material;
+import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 public class WorldGenerator {
 
+    private final ExpiServer server;
     private final ExpiTile[][] worldTerrain;
     private final int w, h;
     private final int[] terrainLevel;
     private final long seed;
 
-    public WorldGenerator(ExpiTile[][] worldTerrain, long seed) {
+    public WorldGenerator(ExpiServer server, ExpiTile[][] worldTerrain, long seed) {
+        this.server = server;
         this.worldTerrain = worldTerrain;
         this.seed = seed;
         this.h = worldTerrain.length;
@@ -47,20 +50,20 @@ public class WorldGenerator {
             for(int y = 0; y < h; y++) {
                 if(y == terrainHeight) {
                     if(sandZone) {
-                        worldTerrain[y][x] = new ExpiTile(TileType.SAND, x, y);
+                        worldTerrain[y][x] = new ExpiTile(server, Material.SAND, x, y);
                     }else {
-                        worldTerrain[y][x] = new ExpiTile(TileType.GRASS, x, y);
+                        worldTerrain[y][x] = new ExpiTile(server, Material.GRASS, x, y);
                     }
                 }else if(y < terrainHeight && y > terrainHeight-7) {
                     if(sandZone) {
-                        worldTerrain[y][x] = new ExpiTile(TileType.SAND, x, y);
+                        worldTerrain[y][x] = new ExpiTile(server, Material.SAND, x, y);
                     }else {
-                        worldTerrain[y][x] = new ExpiTile(TileType.DIRT, x, y);
+                        worldTerrain[y][x] = new ExpiTile(server, Material.DIRT, x, y);
                     }
                 }else if(y < terrainHeight) {
-                    worldTerrain[y][x] = new ExpiTile(TileType.STONE, x, y);
+                    worldTerrain[y][x] = new ExpiTile(server, Material.STONE, x, y);
                 }else {
-                    worldTerrain[y][x] = new ExpiTile(TileType.AIR, x, y);
+                    worldTerrain[y][x] = new ExpiTile(server, Material.AIR, x, y);
                 }
             }
         }
@@ -76,9 +79,9 @@ public class WorldGenerator {
 
             if(x != 0) {
                 if(grassHeight < terrainLevel[x - 1]) {
-                    worldTerrain[terrainLevel[x - 1]][x-1].setType(TileType.GRASS_SLOPE_L);
+                    worldTerrain[terrainLevel[x - 1]][x-1].setMaterial(Material.GRASS_SLOPE_L);
                 }else if(grassHeight > terrainLevel[x - 1]) {
-                    worldTerrain[grassHeight][x].setType(TileType.GRASS_SLOPE_R);
+                    worldTerrain[grassHeight][x].setMaterial(Material.GRASS_SLOPE_R);
                 }
             }
         }
@@ -101,7 +104,7 @@ public class WorldGenerator {
                 int left = Math.max(x - width, 0);
                 for(int j = 0; j < width; j++) {
                     if(bottom + i > terrainLevel[left+j] + 1) continue;
-                    worldTerrain[bottom + i][left + j].setType(TileType.RHYOLITE);
+                    worldTerrain[bottom + i][left + j].setMaterial(Material.RHYOLITE);
                 }
             }
             lastHill = x;
@@ -116,7 +119,7 @@ public class WorldGenerator {
 
             int y = terrainLevel[x] + 1;
 
-            if(worldTerrain[y-1][x].getType() != TileType.GRASS) continue;
+            if(worldTerrain[y-1][x].getMaterial() != Material.GRASS) continue;
 
             if(Math.random() < 0.8f || lastTree + 2 > x) continue;
 
@@ -124,7 +127,7 @@ public class WorldGenerator {
 
             // 3 tiles tall trunk fixed
             for(int i = 0; i < 3; i++) {
-                worldTerrain[y + i][x].setType(TileType.LOG1);
+                worldTerrain[y + i][x].setMaterial(Material.LOG1);
             }
 
             // trunk random
@@ -133,16 +136,16 @@ public class WorldGenerator {
                 double rand = Math.random();
 
                 if(rand < 0.6) {
-                    worldTerrain[y + i][x].setType(TileType.LOG1);
+                    worldTerrain[y + i][x].setMaterial(Material.LOG1);
                 }else if(rand < 0.8) {
-                    worldTerrain[y + i][x].setType(TileType.LOG2);
-                    if(x != w - 1) worldTerrain[y + i][x + 1].setType(TileType.LEAVES3);
+                    worldTerrain[y + i][x].setMaterial(Material.LOG2);
+                    if(x != w - 1) worldTerrain[y + i][x + 1].setMaterial(Material.LEAVES3);
                 }else {
-                    worldTerrain[y + i][x].setType(TileType.LOG3);
-                    worldTerrain[y + i][x - 1].setType(TileType.LEAVES2);
+                    worldTerrain[y + i][x].setMaterial(Material.LOG3);
+                    worldTerrain[y + i][x - 1].setMaterial(Material.LEAVES2);
                 }
             }
-            worldTerrain[y + treeHeight][x].setType(TileType.LEAVES1);
+            worldTerrain[y + treeHeight][x].setMaterial(Material.LEAVES1);
 
             lastTree = x;
         }
@@ -156,11 +159,11 @@ public class WorldGenerator {
 
             int y = terrainLevel[x] + 1;
 
-            if(worldTerrain[y - 1][x].getType() != TileType.GRASS || worldTerrain[y][x].getType() != TileType.AIR) continue;
+            if(worldTerrain[y - 1][x].getMaterial() != Material.GRASS || worldTerrain[y][x].getMaterial() != Material.AIR) continue;
 
             if(Math.random() < 0.9f || lastRasp + 2 > x) continue;
 
-            worldTerrain[y][x].setType(TileType.RASPBERRY_BUSH_2);
+            worldTerrain[y][x].setMaterial(Material.RASPBERRY_BUSH_2);
             lastRasp = x;
         }
 

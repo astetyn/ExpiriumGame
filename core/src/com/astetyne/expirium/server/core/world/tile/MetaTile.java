@@ -2,11 +2,13 @@ package com.astetyne.expirium.server.core.world.tile;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
-import com.astetyne.expirium.server.core.event.TileChangeEvent;
+import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataOutputStream;
@@ -23,9 +25,12 @@ public abstract class MetaTile implements Saveable {
         this.owner = owner;
     }
 
-    public void onTick() {}
+    /** Returns true if meta should be kept. False if meta should be changed.*/
+    public boolean onMaterialChange(Material to) {
+        return false;
+    }
 
-    public void onTileChange(TileChangeEvent e) {}
+    public void onInteract(ExpiPlayer p, InteractType type) {}
 
     public void dropItems() {}
 

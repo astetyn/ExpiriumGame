@@ -37,4 +37,5 @@ public class MetaTileGrassSlopeR extends MetaTile {
     public float getBreakTime() {
         return 3;
     }
+
 }

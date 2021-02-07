@@ -37,4 +37,5 @@ public class MetaTileLog extends MetaTile {
     public float getBreakTime() {
         return 3;
     }
+
 }

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.world.modules;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.tiles.TileType;
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
@@ -41,7 +41,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
         for(int i = 0; i < h; i++) {
             for(int j = 0; j < w; j++) {
                 ExpiTile t = terrain[i][j];
-                if(t.getType() == TileType.RASPBERRY_BUSH_1) {
+                if(t.getMaterial() == Material.RASPBERRY_BUSH_1) {
                     RaspberryBush bush = new RaspberryBush(t, (float) (Math.random() * 600));
                     growingBushes.add(bush);
                     lookUp.put(t, bush);
@@ -74,13 +74,13 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
     @Override
     public void onInteract(PlayerInteractEvent event) {
 
-        if(event.getTile().getType() != TileType.RASPBERRY_BUSH_2) return;
+        if(event.getTile().getMaterial() != Material.RASPBERRY_BUSH_2) return;
 
         ExpiPlayer p = event.getPlayer();
         if(!p.isInInteractRadius(event.getLoc())) return;
 
         // confirmed
-        server.getWorld().changeTile(event.getTile(), TileType.RASPBERRY_BUSH_1, false, p, Source.PLAYER);
+        server.getWorld().changeMaterial(event.getTile(), Material.RASPBERRY_BUSH_1, false, Source.PLAYER);
 
         for(ExpiPlayer ep : server.getPlayers()) {
             ep.getNetManager().putHandPunchPacket(p);
@@ -98,13 +98,13 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
     @Override
     public void onTileChange(TileChangeEvent event) {
 
-        if(event.getTile().getType() == TileType.RASPBERRY_BUSH_1) {
+        if(event.getTile().getMaterial() == Material.RASPBERRY_BUSH_1) {
             RaspberryBush bush = new RaspberryBush(event.getTile(), (float) (Math.random() * 600));
             growingBushes.add(bush);
             lookUp.put(event.getTile(), bush);
         }
 
-        if(event.getFrom() == TileType.RASPBERRY_BUSH_1) {
+        if(event.getFromMat() == Material.RASPBERRY_BUSH_1) {
             RaspberryBush bush = lookUp.get(event.getTile());
             if(bush != null) {
                 growingBushes.remove(bush);
@@ -123,7 +123,7 @@ public class RaspberryListener implements PlayerInteractListener, TileChangeList
             if(bush.getGrowTime() <= 0) {
                 it.remove();
                 lookUp.remove(bush.getTile());
-                server.getWorld().changeTile(bush.getTile(), TileType.RASPBERRY_BUSH_2, false, null, Source.NATURAL);
+                server.getWorld().changeMaterial(bush.getTile(), Material.RASPBERRY_BUSH_2, false, Source.NATURAL);
             }
         }
     }

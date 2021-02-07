@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.world;
 
+import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.tiles.Tile;
-import com.astetyne.expirium.client.tiles.TileType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 
@@ -39,10 +39,10 @@ public class LightCalculator {
         for(int i = h - 1; i >= 0; i--) {
             Tile t = terrain[c][i];
             t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
-            if(!t.getType().isTransparent()) {
+            /*if(!t.getType() == ) {
                 firstNotDirect = i-1;
                 break;
-            }
+            }*/
         }
 
         // tiles under
@@ -130,7 +130,7 @@ public class LightCalculator {
         }
     }
 
-    public void onTileChange(TileType from, TileType to, int x, int y) {
+    public void onTileChange(Material from, Material to, int x, int y) {
 
         Tile t = terrain[x][y];
 
@@ -149,9 +149,9 @@ public class LightCalculator {
             lightSources.remove(t);
         }
 
-        if(to == TileType.CAMPFIRE_BIG) {
+        if(to == Material.CAMPFIRE_BIG) {
             lightSources.put(t, new LightSource((byte)10, new IntVector2(x, y)));
-        }else if(to == TileType.CAMPFIRE_SMALL) {
+        }else if(to == Material.CAMPFIRE_SMALL) {
             lightSources.put(t, new LightSource((byte)5, new IntVector2(x, y)));
         }
 
