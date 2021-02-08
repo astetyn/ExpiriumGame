@@ -10,6 +10,7 @@ import com.astetyne.expirium.client.resources.BGRes;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
+import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
@@ -37,6 +39,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	private ExpiServer server;
 	private final Queue<Runnable> tasks;
 	private final MulticastListener multicastListener;
+	Box2DDebugRenderer debugRenderer;
 
 	public ExpiGame() {
 		expiGame = this;
@@ -65,6 +68,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		Item.loadTextures(gui);
 		batch = new SpriteBatch();
 		setScreen(new MenuScreen());
+		debugRenderer = new Box2DDebugRenderer();
 	}
 
 	public void update() {
@@ -81,6 +85,10 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	public void render () {
 		update();
 		super.render();
+		// this is only for debug purposes, ultra unsafe
+		if(server != null && server.getWorld() != null && GameScreen.get() != null && GameScreen.get().getWorld() != null) {
+			debugRenderer.render(server.getWorld().getB2dWorld(), GameScreen.get().getWorld().getCamera().combined);
+		}
 	}
 
 	@Override

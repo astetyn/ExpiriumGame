@@ -3,63 +3,76 @@ package com.astetyne.expirium.server.core.world.tile.meta;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.Material;
-import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
+import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.inventory.CookingInventory;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
-import com.astetyne.expirium.server.core.world.tile.TileFix;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class MetaTileCampfire extends MetaTile {
 
+    private final long placeTick;
     private final CookingInventory inventory;
-    private final long placeTime;
-    private boolean invalid;
     private ExpiPlayer lastClicker;
 
-    public MetaTileCampfire(ExpiServer server, ExpiTile owner) {
-        super(server, owner);
-        this.inventory = new CookingInventory(2, 2, 5);
-        placeTime = System.currentTimeMillis();
-        invalid = false;
+    public MetaTileCampfire(ExpiWorld world, ExpiTile owner) {
+        super(world, owner);
+        placeTick = world.getTick();
+        inventory = new CookingInventory(2, 2, 5);
         lastClicker = null;
-        server.getWorld().scheduleTask(this::onReduce, Consts.SERVER_TPS*100);
-        server.getWorld().scheduleTask(this::onEnd, Consts.SERVER_TPS*120);
-        server.getWorld().scheduleTask(this::onInvTick, Consts.SERVER_TPS);
+    }
+
+    public MetaTileCampfire(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
+        super(world, owner);
+        placeTick = in.readLong();
+        inventory = new CookingInventory(2, 2, 5, in);
+        lastClicker = null;
+    }
+
+    public void postInit() {
+        long tickPassed = world.getTick() - placeTick;
+        world.scheduleTask(this::onReduce, Consts.SERVER_TPS*100 - tickPassed);
+        world.scheduleTask(this::onEnd, Consts.SERVER_TPS*120 - tickPassed);
+        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS - tickPassed);
+    }
+
+    @Override
+    public void writeData(DataOutputStream out) throws IOException {
+        out.writeLong(placeTick);
+        inventory.writeData(out);
     }
 
     public void onInvTick() {
-        if(invalid) return;
+        if(owner.getMeta() != this) return;
         inventory.onTick();
-        server.getWorld().scheduleTask(this::onInvTick, Consts.SERVER_TPS);
+        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS);
     }
 
     public void onReduce() {
-        if(invalid) return;
-        server.getWorld().changeMaterial(owner, Material.CAMPFIRE_SMALL, false, Source.NATURAL);
+        if(owner.getMeta() != this) return;
+        world.changeMaterial(owner, Material.CAMPFIRE_SMALL, false, Source.NATURAL);
     }
 
     public void onEnd() {
-        if(invalid) return;
-        server.getWorld().changeMaterial(owner, Material.AIR, false, Source.NATURAL);
+        if(owner.getMeta() != this) return;
+        world.changeMaterial(owner, Material.AIR, false, Source.NATURAL);
         if(lastClicker != null) {
             lastClicker.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
         }
-        for(ItemStack is : inventory.getItems()) {
-            for(int i = 0; i < is.getAmount(); i++) {
-                dropItem(is.getItem());
-            }
-        }
+        dropInvItems();
     }
 
     @Override
     public void onInteract(ExpiPlayer p, InteractType type) {
-        if(placeTime + 500 > System.currentTimeMillis()) return;
+        if(placeTick + 10 > world.getTick()) return;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
         p.getNetManager().putInvFeedPacket();
@@ -71,7 +84,7 @@ public class MetaTileCampfire extends MetaTile {
         if(to == Material.CAMPFIRE_SMALL) {
             return true;
         }
-        invalid = true;
+        dropInvItems();
         return false;
     }
 
@@ -80,24 +93,12 @@ public class MetaTileCampfire extends MetaTile {
         dropItem(Item.CAMPFIRE);
     }
 
-    @Override
-    public Solidity getSolidity() {
-        return Solidity.LABILE_VERT;
-    }
-
-    @Override
-    public TileFix getFix() {
-        return TileFix.CAMPFIRE;
-    }
-
-    @Override
-    public int getMaxStability() {
-        return 1;
-    }
-
-    @Override
-    public float getBreakTime() {
-        return 0.5f;
+    private void dropInvItems() {
+        for(ItemStack is : inventory.getItems()) {
+            for(int i = 0; i < is.getAmount(); i++) {
+                dropItem(is.getItem());
+            }
+        }
     }
 
 }

@@ -46,7 +46,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     private ExpiContactListener contactListener;
     private long tick; // total ticks since world was generated
     private int time; // from midnight = 0 ticks
-    private int day; // completed days from server creation
+    private long day; // completed days from server creation
     private final int width, height;
     private final long seed;
     private PriorityQueue<TickTask> scheduledTickTasks;
@@ -60,7 +60,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         seed = preferences.seed;
 
         terrain = new ExpiTile[preferences.height][preferences.width];
-        new WorldGenerator(server, terrain, seed).generateWorld();
+        new WorldGenerator(this, terrain, seed).generateWorld();
 
         time = 11200; // 7:00
         day = 0;
@@ -74,6 +74,11 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         this.server = server;
 
+        tick = in.readLong();
+        day = tick / Consts.DAY_TICKS;
+        time = (int) (tick % Consts.DAY_TICKS);
+        System.out.println("tick: "+tick+" "+" day: "+day+" time: "+time);
+
         width = in.readInt();
         height = in.readInt();
         seed = in.readLong();
@@ -82,12 +87,9 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                terrain[h][w] = new ExpiTile(server, in, w, h);
+                terrain[h][w] = new ExpiTile(this, in, w, h);
             }
         }
-
-        time = in.readInt();
-        day = in.readInt();
 
         //todo: len docasne zatial
         weatherType = WeatherType.SUNNY;
@@ -124,6 +126,12 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         server.getEventManager().getPlayerInteractListeners().add(this);
 
+        for(int h = 0; h < height; h++) {
+            for(int w = 0; w < width; w++) {
+                terrain[h][w].getMeta().postInit();
+            }
+        }
+
     }
 
     public void dispose() {
@@ -135,20 +143,22 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         tick++;
         time += 100;
-        if(time == Consts.DAY_TICKS) { // midnight
+        if(time >= Consts.DAY_TICKS) { // midnight
             time = 0;
             day++;
         }
 
-        for(ExpiPlayer pp : server.getPlayers()) {
-            pp.applyPhysics();
+        // time step should be 1/32 but then items are kinda buggy, so it is doubled
+        for(int i = 0; i < 2; i++) {
+            for(ExpiPlayer pp : server.getPlayers()) {
+                pp.applyPhysics();
+            }
+            b2dWorld.step(1f/64, 6, 2);
         }
-
-        b2dWorld.step(1f/Consts.SERVER_TPS, 12, 4);
 
         while(!scheduledTickTasks.isEmpty()) {
             TickTask task = scheduledTickTasks.peek();
-            if(task.tick == tick) {
+            if(task.tick <= tick) {
                 task.runnable.run();
                 scheduledTickTasks.remove();
             }else {
@@ -180,11 +190,11 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         if(item.getCategory() != ItemCat.MATERIAL || event.getTile().getMaterial() != Material.AIR) return;
 
-        if(item.getBuildTile() == null) return;
+        if(item.getBuildMaterial() == null) return;
 
         if(!isTileFree(t, item)) return;
 
-        if(!stabilityCalc.canBeChanged(t, item.getBuildTile())) return;
+        if(!stabilityCalc.canBeChanged(t, item.getBuildMaterial())) return;
 
         // confirmed from here
         p.getInv().removeItem(new ItemStack(item, 1));
@@ -194,19 +204,17 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             ep.getNetManager().putHandPunchPacket(p);
         }
 
-        changeMaterial(t, item.getBuildTile(), true, Source.PLAYER);
+        changeMaterial(t, item.getBuildMaterial(), true, Source.PLAYER);
     }
 
     public void changeMaterial(ExpiTile t, Material to, boolean withDrops, Source source) {
-
-        System.out.println("changing material");
 
         Material fromMat = t.getMaterial();
         MetaTile fromMeta = t.getMeta();
 
         if(to == Material.AIR && withDrops) t.getMeta().dropItems();
 
-        t.setMaterial(to);
+        t.changeMaterial(to);
         for(ExpiPlayer ep : server.getPlayers()) {
             ep.getNetManager().putMaterialChangePacket(t);
         }
@@ -230,7 +238,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         int x = t.getX();
         int y = t.getY();
 
-        if(toPlace.getBuildTile().init(server).getFix() == TileFix.SOFT) return true;
+        if(toPlace.getBuildMaterial().getFix() == TileFix.SOFT) return true;
 
         for(ExpiEntity p : server.getEntities()) {
 
@@ -250,7 +258,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     public Vector2 getSpawnLocation() {
         int x = (int) (width/2 -10 + Math.random()*11);
         int y = height-2;
-        while(terrain[y][x].getMeta().getFix() == TileFix.SOFT) {
+        while(terrain[y][x].getMaterial().getFix() == TileFix.SOFT) {
             if(y == 0) {
                 x = (int) (Math.random() * width);
                 y = height-2;
@@ -299,10 +307,10 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
         if(x <= 0 || x + ew >= width || y <= 0 || y + eh >= height) return false;
 
-        if(getTileAt(x, y).getMeta().getFix() != TileFix.SOFT) return false;
-        if(getTileAt(x + ew, y).getMeta().getFix() != TileFix.SOFT) return false;
-        if(getTileAt(x + ew, y + eh).getMeta().getFix() != TileFix.SOFT) return false;
-        if(getTileAt(x, y + eh).getMeta().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x, y).getMaterial().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x + ew, y).getMaterial().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x + ew, y + eh).getMaterial().getFix() != TileFix.SOFT) return false;
+        if(getTileAt(x, y + eh).getMaterial().getFix() != TileFix.SOFT) return false;
 
         return true;
     }
@@ -351,7 +359,7 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return partHeight;
     }
 
-    public int getDay() {
+    public long getDay() {
         return day;
     }
 
@@ -373,15 +381,17 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
     }
 
     public void scheduleTask(TickTask task) {
-        if(task.tick <= tick) {
-            System.out.println("Wrong tick schedule: "+task+" ST: "+task.tick+" tick: "+tick);
-            return;
-        }
         scheduledTickTasks.add(task);
+    }
+
+    public ExpiServer getServer() {
+        return server;
     }
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
+
+        out.writeLong(tick);
 
         out.writeInt(width);
         out.writeInt(height);
@@ -392,9 +402,6 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
                 terrain[h][w].writeData(out);
             }
         }
-
-        out.writeInt(time);
-        out.writeInt(day);
 
     }
 }

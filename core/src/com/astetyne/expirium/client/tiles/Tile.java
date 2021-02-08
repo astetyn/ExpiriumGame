@@ -25,11 +25,11 @@ public class Tile {
         this.stability = stability;
     }
 
-    public Material getType() {
+    public Material getMaterial() {
         return type;
     }
 
-    public void setType(Material type) {
+    public void setMaterial(Material type) {
         this.type = type;
     }
 

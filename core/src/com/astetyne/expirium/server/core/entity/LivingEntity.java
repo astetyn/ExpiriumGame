@@ -1,12 +1,15 @@
 package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.event.TickListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -50,6 +53,40 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
         alive = true;
         invincible = false;
         server.getWorld().getCL().registerListener(this);
+    }
+
+    @Override
+    public void createBodyFixtures() {
+
+        body.setFixedRotation(true);
+
+        PolygonShape polyShape = new PolygonShape();
+        FixtureDef fixtureDef = new FixtureDef();
+
+        fixtureDef.density = 30f;
+        fixtureDef.restitution = 0f;
+        fixtureDef.friction = 0;
+        fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
+        fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
+        fixtureDef.shape = polyShape;
+
+        float w = getWidth();
+        float h = getHeight();
+        float gw = 0.05f;
+        float gh = 0.05f;
+
+        // upper poly
+        float[] verts = new float[]{0, gh, gw, 0, w-gw, 0, w, gh, w, h, 0, h};
+        polyShape.set(verts);
+        body.createFixture(fixtureDef);
+
+        // ground sensor
+        polyShape.setAsBox(w/2-gw, gh/2, new Vector2(w/2, 0), 0);
+        fixtureDef.density = 0f;
+        fixtureDef.isSensor = true;
+        groundSensor = body.createFixture(fixtureDef);
+
+        polyShape.dispose();
     }
 
     @Override

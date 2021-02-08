@@ -76,14 +76,14 @@ public class ExpiTileBreaker {
             }
             if(Consts.DEBUG) speedCoef = 50;
             timeAccumulator += speedCoef / Consts.SERVER_TPS;
-            if(timeAccumulator >= targetTile.getMeta().getBreakTime()) {
+            if(timeAccumulator >= targetTile.getMaterial().getBreakTime()) {
                 world.changeMaterial(targetTile, Material.AIR, true, Source.PLAYER);
                 timeAccumulator = 0;
                 targetTile = null;
             }else {
                 // breaking in action
                 for(ExpiPlayer ep : server.getPlayers()) {
-                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getMeta().getBreakTime());
+                    ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getMaterial().getBreakTime());
                 }
                 if(lastPunchTime + 200 < System.currentTimeMillis()) { // cca 450 is full animation (200 is half)
                     lastPunchTime = System.currentTimeMillis();

@@ -10,8 +10,6 @@ import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.WorldFileManager;
 import com.astetyne.expirium.server.core.world.generator.CreateWorldPreferences;
 import com.astetyne.expirium.server.core.world.generator.WorldLoadingException;
-import com.astetyne.expirium.server.core.world.modules.CampfireListener;
-import com.astetyne.expirium.server.core.world.modules.RaspberryListener;
 import com.astetyne.expirium.server.net.MulticastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
 
@@ -74,8 +72,6 @@ public class ExpiServer implements Saveable {
 
             // this is executed when user is creating new world and no data is saved
             expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences, this);
-            saveableModules.add(new RaspberryListener(this));
-            saveableModules.add(new CampfireListener(this));
         }else {
 
             try {
@@ -93,9 +89,6 @@ public class ExpiServer implements Saveable {
                 for(int i = 0; i < entitiesSize; i++) {
                     EntityType.getType(in.readInt()).initEntity(this, in);
                 }
-
-                saveableModules.add(new RaspberryListener(this, in));
-                saveableModules.add(new CampfireListener(this, in));
 
                 in.close();
             } catch(IOException e) {

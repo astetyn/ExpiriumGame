@@ -85,6 +85,7 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
                 destroy();
             }
         }
+        System.out.println("di loc: "+getLocation());
     }
 
     public Item getItem() {

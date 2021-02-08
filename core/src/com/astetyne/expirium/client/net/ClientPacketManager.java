@@ -56,7 +56,7 @@ public class ClientPacketManager {
                     break;
                 case 12: // DeathPacket
                     boolean firstDeath = in.getBoolean();
-                    int daysSurvived = in.getInt();
+                    long daysSurvived = in.getLong();
                     GameScreen.get().setRoot(new DeathRoot(firstDeath, daysSurvived));
                     break;
 

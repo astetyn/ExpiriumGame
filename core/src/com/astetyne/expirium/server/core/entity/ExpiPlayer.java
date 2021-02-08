@@ -16,8 +16,6 @@ import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,7 +32,7 @@ public class ExpiPlayer extends LivingEntity {
     private long lastJump;
     private final Vector2 resurrectLoc;
     private boolean wasAlreadyDead;
-    private int lastDeathDay;
+    private long lastDeathDay;
     private final WorldLoader worldLoader;
 
     public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
@@ -77,56 +75,11 @@ public class ExpiPlayer extends LivingEntity {
         lastJump = 0;
         resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
         wasAlreadyDead = in.readBoolean();
-        lastDeathDay = in.readInt();
+        lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
         createBodyFixtures();
         server.getPlayers().add(this);
         server.getEventManager().getTickListeners().add(this);
-    }
-
-    public void createBodyFixtures() {
-
-        body.setFixedRotation(true);
-
-        PolygonShape polyShape = new PolygonShape();
-        FixtureDef fixtureDef = new FixtureDef();
-
-        fixtureDef.density = 30f;
-        fixtureDef.restitution = 0f;
-        fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
-        fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
-
-        // upper poly
-        polyShape.setAsBox(type.getWidth()/2, (type.getHeight()-0.15f)/2, new Vector2(type.getWidth()/2, (type.getHeight()-0.15f)/2+0.1f), 0);
-        fixtureDef.shape = polyShape;
-        fixtureDef.friction = 0;
-        body.createFixture(fixtureDef);
-
-        // bottom poly
-        float[] verts = new float[8];
-        verts[0] = 0.05f;
-        verts[1] = 0.15f;
-        verts[2] = 0.2f;
-        verts[3] = 0;
-        verts[4] = 0.7f;
-        verts[5] = 0;
-        verts[6] = 0.85f;
-        verts[7] = 0.15f;
-
-        polyShape.set(verts);
-        fixtureDef.friction = 1;
-        body.createFixture(fixtureDef);
-
-        // ground sensor
-        //todo: spravit vseobecny ground sensor pre living entity?
-        polyShape.setAsBox(0.4f, 0.3f, new Vector2(0.45f, 0.2f), 0);
-        fixtureDef.density = 0f;
-        fixtureDef.isSensor = true;
-        fixtureDef.friction = 0;
-
-        groundSensor = body.createFixture(fixtureDef);
-
-        polyShape.dispose();
     }
 
     @Override
@@ -273,7 +226,7 @@ public class ExpiPlayer extends LivingEntity {
 
         float vY = body.getLinearVelocity().y;
 
-        if(onGround && tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis() && vY >= -0.01f) {
+        if(onGround && tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
             Vector2 center = body.getWorldCenter();
             body.applyLinearImpulse(0, 320, center.x, center.y, true);
             lastJump = System.currentTimeMillis();
@@ -288,6 +241,14 @@ public class ExpiPlayer extends LivingEntity {
         }else {
             body.applyForceToCenter((50000.0f/Consts.SERVER_TPS) * tsData1.horz, 0, true);
         }
+        //System.out.println("loc: "+getLocation());
+        Vector2 vel = body.getLinearVelocity();
+        if(vel.x > 0 && onGround) {
+            vel.x -= 0.1f;
+        }else if(onGround){
+            vel.x += 0.1f;
+        }
+        body.setLinearVelocity(vel);
     }
 
     @Override
@@ -403,6 +364,6 @@ public class ExpiPlayer extends LivingEntity {
         out.writeFloat(resurrectLoc.x);
         out.writeFloat(resurrectLoc.y);
         out.writeBoolean(wasAlreadyDead);
-        out.writeInt(lastDeathDay);
+        out.writeLong(lastDeathDay);
     }
 }

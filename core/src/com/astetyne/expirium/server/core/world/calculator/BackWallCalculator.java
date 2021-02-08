@@ -37,7 +37,7 @@ public class BackWallCalculator {
         int x = t.getX();
         int y = t.getY();
 
-        if(t.getMeta().isWall()) {
+        if(t.getMaterial().isWall()) {
 
             List<ExpiTile> affectedTiles = new ArrayList<>();
 
@@ -46,19 +46,19 @@ public class BackWallCalculator {
             boolean b1, b2, b3, b4;
             b1 = b2 = b3 = b4 = false;
 
-            if(t.getX() != 0 && !terrain[y][x-1].getMeta().isWall()) {
+            if(t.getX() != 0 && !terrain[y][x-1].getMaterial().isWall()) {
                 clearMap();
                 b1 = isAreaClosed(terrain[y][x-1]);
             }
-            if(t.getX() != w-1 && !terrain[y][x+1].getMeta().isWall()) {
+            if(t.getX() != w-1 && !terrain[y][x+1].getMaterial().isWall()) {
                 clearMap();
                 b2 = isAreaClosed(terrain[y][x+1]);
             }
-            if(t.getY() != 0 && !terrain[y-1][x].getMeta().isWall()) {
+            if(t.getY() != 0 && !terrain[y-1][x].getMaterial().isWall()) {
                 clearMap();
                 b3 = isAreaClosed(terrain[y-1][x]);
             }
-            if(t.getY() != h-1 && !terrain[y+1][x].getMeta().isWall()) {
+            if(t.getY() != h-1 && !terrain[y+1][x].getMaterial().isWall()) {
                 clearMap();
                 b4 = isAreaClosed(terrain[y+1][x]);
             }
@@ -82,7 +82,7 @@ public class BackWallCalculator {
                 ep.getNetManager().putBackWallPacket(affectedTiles);
             }
 
-        }else if(e.getFromMeta().isWall()) {
+        }else if(e.getFromMat().isWall()) {
 
             List<ExpiTile> affectedTiles = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class BackWallCalculator {
                     clearBackWallsFlood(x-1, y, affectedTiles);
                 }
             }
-            if(t.getX() != w-1 && !terrain[y][x+1].getMeta().isWall()) {
+            if(t.getX() != w-1 && !terrain[y][x+1].getMaterial().isWall()) {
                 clearMap();
                 if(isAreaClosed(terrain[y][x+1])) {
                     t.setBackWall(true);
@@ -104,7 +104,7 @@ public class BackWallCalculator {
                     clearBackWallsFlood(x+1, y, affectedTiles);
                 }
             }
-            if(t.getY() != 0 && !terrain[y-1][x].getMeta().isWall()) {
+            if(t.getY() != 0 && !terrain[y-1][x].getMaterial().isWall()) {
                 clearMap();
                 if(isAreaClosed(terrain[y-1][x])) {
                     t.setBackWall(true);
@@ -113,7 +113,7 @@ public class BackWallCalculator {
                     clearBackWallsFlood(x, y-1, affectedTiles);
                 }
             }
-            if(t.getY() != h-1 && !terrain[y+1][x].getMeta().isWall()) {
+            if(t.getY() != h-1 && !terrain[y+1][x].getMaterial().isWall()) {
                 clearMap();
                 if(isAreaClosed(terrain[y+1][x])) {
                     t.setBackWall(true);
@@ -144,7 +144,7 @@ public class BackWallCalculator {
         if(x < 0 || x == w || y < 0 || y == h) return;
 
         ExpiTile t = terrain[y][x];
-        if(t.hasBackWall() || t.getMeta().isWall()) return;
+        if(t.hasBackWall() || t.getMaterial().isWall()) return;
 
         t.setBackWall(true);
 
@@ -182,7 +182,7 @@ public class BackWallCalculator {
 
         if(wasVisited(x, y)) return true;
 
-        if(t.getMeta().isWall()) return true;
+        if(t.getMaterial().isWall()) return true;
 
         markVisited(x, y);
 

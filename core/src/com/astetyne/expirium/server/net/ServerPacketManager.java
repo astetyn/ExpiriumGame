@@ -213,10 +213,10 @@ public class ServerPacketManager {
         out.putInt(p.getID());
     }
 
-    public void putDeathPacket(boolean firstDeath, int daysSurvived) {
+    public void putDeathPacket(boolean firstDeath, long daysSurvived) {
         out.startPacket(12);
         out.putBoolean(firstDeath);
-        out.putInt(daysSurvived);
+        out.putLong(daysSurvived);
     }
 
     public void putInjurePacket(int id, float damageValue) {

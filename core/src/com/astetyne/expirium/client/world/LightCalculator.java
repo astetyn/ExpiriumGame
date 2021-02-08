@@ -39,10 +39,10 @@ public class LightCalculator {
         for(int i = h - 1; i >= 0; i--) {
             Tile t = terrain[c][i];
             t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
-            /*if(!t.getType() == ) {
+            if(!t.getMaterial().isTransparent()) {
                 firstNotDirect = i-1;
                 break;
-            }*/
+            }
         }
 
         // tiles under

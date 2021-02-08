@@ -85,15 +85,15 @@ public class FixtureCalculator implements Disposable {
         }
         t.getFixtures().clear();
 
-        if(t.getMeta().getFix() == TileFix.SOFT) return;
+        if(t.getMaterial().getFix() == TileFix.SOFT) return;
 
-        fixDef.friction = t.getMeta().getFix().getFriction();
+        fixDef.friction = t.getMaterial().getFix().getFriction();
 
-        if(t.getMeta().getFix() != TileFix.FULL) {
+        if(t.getMaterial().getFix() != TileFix.FULL) {
             // case when tile has own custom fixtures
-            float[] vertices = t.getMeta().getFix().getVertices();
+            float[] vertices = t.getMaterial().getFix().getVertices();
             if(vertices.length < 4 || vertices.length % 2 != 0)  {
-                System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getMeta().getFix());
+                System.out.println("Bad fixture vertices. Check TileFix please for: "+t.getMaterial().getFix());
                 return;
             }
             float lastX = vertices[0];
@@ -106,16 +106,16 @@ public class FixtureCalculator implements Disposable {
             return;
         }
 
-        if(y != 0 && worldTerrain[y-1][x].getMeta().getFix() != TileFix.FULL) {
+        if(y != 0 && worldTerrain[y-1][x].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y, x+1,y);
         }
-        if(y != h-1 && worldTerrain[y+1][x].getMeta().getFix() != TileFix.FULL) {
+        if(y != h-1 && worldTerrain[y+1][x].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y+1, x+1,y+1);
         }
-        if(x != 0 && worldTerrain[y][x-1].getMeta().getFix() != TileFix.FULL) {
+        if(x != 0 && worldTerrain[y][x-1].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y, x,y+1);
         }
-        if(x != w-1 && worldTerrain[y][x+1].getMeta().getFix() != TileFix.FULL) {
+        if(x != w-1 && worldTerrain[y][x+1].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x+1, y, x+1,y+1);
         }
     }

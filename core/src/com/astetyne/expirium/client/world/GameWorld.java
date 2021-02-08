@@ -26,7 +26,7 @@ import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 32; // pixel per meter when zoom == 1
+    public static float PPM = 64; // pixel per meter when zoom == 1
 
     private Tile[][] terrain;
     private final HashMap<Integer, Entity> entitiesID;
@@ -116,7 +116,7 @@ public class GameWorld {
                     batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
                 }
 
-                if(t.getType() == Material.AIR) continue;
+                if(t.getMaterial() == Material.AIR) continue;
 
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
                 batch.setColor(b,b,b,1);
@@ -126,7 +126,7 @@ public class GameWorld {
                     batch.setColor(stabColors[t.getStability()-1]);
                     batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
                 }else {
-                    batch.draw(t.getType().getTex(), i, j, 1, 1);
+                    batch.draw(t.getMaterial().getTex(), i, j, 1, 1);
                 }
             }
         }
@@ -175,7 +175,7 @@ public class GameWorld {
                 Material type = Material.getMaterial(in.getByte());
                 byte stability = in.getByte();
                 boolean backWall = in.getBoolean();
-                t.setType(type);
+                t.setMaterial(type);
                 t.setStability(stability);
                 t.setBackWall(backWall);
             }
@@ -194,9 +194,9 @@ public class GameWorld {
 
         Tile t = terrain[x][y];
 
-        Material oldType = t.getType();
+        Material oldType = t.getMaterial();
 
-        t.setType(type);
+        t.setMaterial(type);
 
         lightCalculator.onTileChange(oldType, type, x, y);
 

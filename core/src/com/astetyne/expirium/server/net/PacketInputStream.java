@@ -40,6 +40,10 @@ public class PacketInputStream {
         return readBuffer.getInt();
     }
 
+    public long getLong() {
+        return readBuffer.getLong();
+    }
+
     public float getFloat() {
         return readBuffer.getFloat();
     }

@@ -105,7 +105,7 @@ public enum Item {
         return category;
     }
 
-    public Material getBuildTile() {
+    public Material getBuildMaterial() {
         switch(this) {
             case STONE: return Material.STONE;
             case RHYOLITE: return Material.RHYOLITE;

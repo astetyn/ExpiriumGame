@@ -19,7 +19,7 @@ public class DeathRoot extends WidgetGroup implements GameRootable {
     private final Label timeRemainingLabel;
     private final boolean firstDeath;
 
-    public DeathRoot(boolean firstDeath, int daysSurvived) {
+    public DeathRoot(boolean firstDeath, long daysSurvived) {
 
         this.firstDeath = firstDeath;
 

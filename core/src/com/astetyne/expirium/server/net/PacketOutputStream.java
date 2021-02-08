@@ -51,6 +51,10 @@ public class PacketOutputStream {
         writeBuffer.putInt(i);
     }
 
+    public void putLong(long l) {
+        writeBuffer.putLong(l);
+    }
+
     public void putFloat(float f) {
         writeBuffer.putFloat(f);
     }

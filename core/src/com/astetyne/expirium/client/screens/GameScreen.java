@@ -61,6 +61,7 @@ public class GameScreen implements Screen {
         gameWorld.loadData(in);
 
         background = new Background(gameWorld);
+
     }
 
     public void update() {
