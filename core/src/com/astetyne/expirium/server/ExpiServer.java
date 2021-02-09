@@ -1,7 +1,6 @@
 package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.server.backend.TickLooper;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -17,7 +16,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ExpiServer implements Saveable {
@@ -30,8 +28,6 @@ public class ExpiServer implements Saveable {
 
     private final List<ExpiEntity> entities;
     private final List<ExpiPlayer> players;
-
-    private final HashMap<Integer, ExpiEntity> entitiesID;
 
     private final EventManager eventManager;
     private final WorldFileManager fileManager;
@@ -56,7 +52,6 @@ public class ExpiServer implements Saveable {
 
         entities = new ArrayList<>();
         players = new ArrayList<>();
-        entitiesID = new HashMap<>();
 
         eventManager = new EventManager();
 
@@ -200,10 +195,6 @@ public class ExpiServer implements Saveable {
         return eventManager;
     }
 
-    public HashMap<Integer, ExpiEntity> getEntitiesID() {
-        return entitiesID;
-    }
-
     public WorldFileManager getFileManager() {
         return fileManager;
     }
@@ -235,9 +226,14 @@ public class ExpiServer implements Saveable {
 
     public int getRandomEntityID() {
         int randomID;
-        do {
+        outer:
+        while(true) {
             randomID = (int)(Math.random()*Integer.MAX_VALUE);
-        } while(entitiesID.containsKey(randomID));
+            for(ExpiEntity entities : entities) {
+                if(randomID == entities.getId()) continue outer;
+            }
+            break;
+        }
         return randomID;
     }
 }

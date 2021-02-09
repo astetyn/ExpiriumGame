@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
-import com.astetyne.expirium.server.core.event.TickListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -15,7 +14,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class LivingEntity extends ExpiEntity implements Saveable, Collidable, TickListener {
+public abstract class LivingEntity extends ExpiEntity implements Saveable, Collidable {
 
     private final static float MAX_HEALTH_LEVEL = 100;
     private final static float MAX_FOOD_LEVEL = 100;
@@ -97,12 +96,12 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
     }
 
     @Override
-    public void onTick(float delta) {
+    public void onTick() {
 
-        decreaseFoodLevel(delta/10); // from 100 to 0 in 1000 seconds = 16.7 mins
+        decreaseFoodLevel(1f/(10*Consts.SERVER_TPS)); // 1 food per 10 seconds
 
         if(foodLevel <= 5) {
-            injure(delta/2); // 1 health per 2 seconds
+            injure(1f/(2*Consts.SERVER_TPS)); // 1 health per 2 seconds
         }
 
     }
@@ -114,6 +113,7 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
     }
 
     public void injure(float damage) {
+        System.out.println("damage: "+damage);
         if(invincible) return;
         healthLevel -= damage;
         if(healthLevel <= 0) {

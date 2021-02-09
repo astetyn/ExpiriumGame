@@ -5,7 +5,6 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.event.TickListener;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -15,31 +14,31 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ExpiDroppedItem extends ExpiEntity implements TickListener {
+public class ExpiDroppedItem extends ExpiEntity {
 
-    private float livingTime;
     private final Item item;
-    private final float pickCooldown, despawnTime;
+    private final long pickTick;
+    private final int ticksCooldown;
 
-    public ExpiDroppedItem(ExpiServer server, Vector2 loc, Item item, float pickCooldown) {
+    public ExpiDroppedItem(ExpiServer server, Vector2 loc, Item item, int ticksCooldown) {
         super(server, EntityType.DROPPED_ITEM, loc);
         this.item = item;
-        this.pickCooldown = pickCooldown;
-        livingTime = 0;
-        despawnTime = Consts.ITEM_DESPAWN_TIME;
+        pickTick = server.getWorld().getTick();
+        this.ticksCooldown = ticksCooldown;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);
-        createBodyFixtures();
-        server.getEventManager().getTickListeners().add(this);
+        postInit();
+        server.getWorld().scheduleTask(this::checkPick, 8); //every 8 ticks
+        server.getWorld().scheduleTask(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }
 
     public ExpiDroppedItem(ExpiServer server, DataInputStream in) throws IOException {
         super(server, EntityType.DROPPED_ITEM, in);
         item = Item.getType(in.readInt());
-        pickCooldown = 5;
-        livingTime = 0;
-        despawnTime = Consts.ITEM_DESPAWN_TIME;
-        createBodyFixtures();
-        server.getEventManager().getTickListeners().add(this);
+        pickTick = server.getWorld().getTick();
+        ticksCooldown = Consts.SERVER_TPS * 3;
+        postInit();
+        server.getWorld().scheduleTask(this::checkPick, 8); //every 8 ticks
+        server.getWorld().scheduleTask(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }
 
     public void createBodyFixtures() {
@@ -56,45 +55,29 @@ public class ExpiDroppedItem extends ExpiEntity implements TickListener {
 
         body.createFixture(fixtureDef);
         polyShape.dispose();
-
     }
 
-    @Override
-    public void onTick(float delta) {
-
-        livingTime += delta;
-
-        if(livingTime >= despawnTime) {
-            for(ExpiPlayer pp : server.getPlayers()) {
-                pp.getNetManager().putEntityDespawnPacket(this);
-            }
-            destroy();
-        }
-
-        if(livingTime < pickCooldown) {
+    public void checkPick() {
+        if(destroyed) return;
+        if(pickTick + ticksCooldown >= server.getWorld().getTick()) {
+            server.getWorld().scheduleTask(this::checkPick, 8);
             return;
         }
+
         for(ExpiPlayer p : server.getPlayers()) {
             Vector2 dif = p.getCenter().sub(getCenter());
             if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(item, 1)) {
                 p.getInv().addItem(new ItemStack(item), true);
                 p.getNetManager().putInvFeedPacket();
-                for(ExpiPlayer pp : server.getPlayers()) {
-                    pp.getNetManager().putEntityDespawnPacket(this);
-                }
                 destroy();
+                return;
             }
         }
-        System.out.println("di loc: "+getLocation());
+        server.getWorld().scheduleTask(this::checkPick, 8);
     }
 
     public Item getItem() {
         return item;
-    }
-
-    public void destroy() {
-        server.getEventManager().getTickListeners().remove(this);
-        super.destroy();
     }
 
     @Override

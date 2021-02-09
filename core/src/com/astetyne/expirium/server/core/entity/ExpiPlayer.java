@@ -8,7 +8,7 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.backend.WorldLoader;
+import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.core.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -50,12 +50,11 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = false;
         lastDeathDay = 0;
         worldLoader = new WorldLoader(server, this);
-        createBodyFixtures();
+        postInit();
         server.getPlayers().add(this);
-        server.getEventManager().getTickListeners().add(this);
     }
 
-    public ExpiPlayer(ExpiServer server, DataInputStream in, ServerPlayerGateway gateway) throws IOException {
+    public ExpiPlayer(ExpiServer server, ServerPlayerGateway gateway, DataInputStream in) throws IOException {
         super(server, EntityType.PLAYER, in);
         // order is important - must be same as in writeData()
         server.getWorld().getCL().registerListener(this);
@@ -77,9 +76,8 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = in.readBoolean();
         lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
-        createBodyFixtures();
+        postInit();
         server.getPlayers().add(this);
-        server.getEventManager().getTickListeners().add(this);
     }
 
     @Override
@@ -252,11 +250,11 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     @Override
-    public void onTick(float delta) {
-        super.onTick(delta);
+    public void onTick() {
+        super.onTick();
 
         if(!worldLoader.isCompleted()) {
-            worldLoader.update();
+            worldLoader.onTick();
         }
 
         getNetManager().putLivingStatsPacket();

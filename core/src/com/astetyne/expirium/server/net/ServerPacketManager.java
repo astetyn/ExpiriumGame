@@ -4,12 +4,9 @@ import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.event.PlayerInteractEvent;
-import com.astetyne.expirium.server.core.event.PlayerInteractListener;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
@@ -48,15 +45,7 @@ public class ServerPacketManager {
                     break;
 
                 case 16: //InteractPacket
-                    float x = in.getFloat();
-                    float y = in.getFloat();
-                    InteractType type = InteractType.getType(in.getInt());
-                    ExpiTile tile = server.getWorld().getTileAt(x, y);
-                    PlayerInteractEvent e = new PlayerInteractEvent(owner, x, y, tile, type);
-                    List<PlayerInteractListener> list = server.getEventManager().getPlayerInteractListeners();
-                    for(int j = list.size() - 1; j >= 0; j--) {
-                        list.get(j).onInteract(e);
-                    }
+                    server.getWorld().onInteract(owner, in);
                     break;
 
                 case 25: {//InvItemMoveReqPacket
@@ -87,8 +76,9 @@ public class ServerPacketManager {
 
         out.putInt(owner.getId());
         out.putVector(owner.getLocation());
-        out.putInt(entities.size());
+        out.putInt(entities.size()-1);
         for(ExpiEntity e : entities) {
+            if(owner == e) continue;
             out.putEntity(e);
         }
     }

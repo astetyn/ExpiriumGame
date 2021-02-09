@@ -45,20 +45,20 @@ public enum Item {
         this(cat, weight, false);
     }
 
-    Item(ItemCat cat, float weight, boolean hasCustomGrid) {
-        this(cat, 1, 1, weight, hasCustomGrid);
+    Item(ItemCat cat, float weight, boolean hasCustomGridTex) {
+        this(cat, 1, 1, weight, hasCustomGridTex);
     }
 
     Item(ItemCat cat, int gw, int gh, float weight) {
         this(cat, gw, gh, weight, false);
     }
 
-    Item(ItemCat cat, int gw, int gh, float weight, boolean hasCustomGrid) {
+    Item(ItemCat cat, int gw, int gh, float weight, boolean hasCustomGridTex) {
         category = cat;
         gridWidth = gw;
         gridHeight = gh;
         this.weight = weight;
-        this.hasCustomGridTex = hasCustomGrid;
+        this.hasCustomGridTex = hasCustomGridTex;
 
         StringBuilder sb = new StringBuilder(name().toLowerCase(Locale.US).replaceAll("_", " "));
         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
@@ -119,6 +119,15 @@ public enum Item {
             case SAND: return Material.SAND;
             case GLASS: return Material.GLASS;
             default: return null;
+        }
+    }
+
+    public boolean isMergeable() {
+        switch(this) {
+            case WOODEN_MATTOCK:
+            case RHYOLITE_MATTOCK:
+                return false;
+            default: return true;
         }
     }
 

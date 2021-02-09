@@ -5,12 +5,14 @@ import com.astetyne.expirium.client.items.ItemCat;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.Saveable;
 import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.event.*;
+import com.astetyne.expirium.server.core.event.Source;
+import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
@@ -20,6 +22,7 @@ import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.TickTask;
 import com.astetyne.expirium.server.core.world.tile.TileFix;
+import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -29,10 +32,9 @@ import com.badlogic.gdx.utils.Disposable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.PriorityQueue;
 
-public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
+public class ExpiWorld implements Saveable, Disposable {
 
     private final ExpiServer server;
     private final ExpiTile[][] terrain;
@@ -124,8 +126,6 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
 
-        server.getEventManager().getPlayerInteractListeners().add(this);
-
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
                 terrain[h][w].getMeta().postInit();
@@ -166,6 +166,10 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
             }
         }
 
+        for(int i = server.getEntities().size() - 1; i >= 0; i--) {
+            server.getEntities().get(i).onTick();
+        }
+
         for(ExpiPlayer pp : server.getPlayers()) {
             for(ExpiEntity ee : server.getEntities()) {
                 pp.getNetManager().putEntityMovePacket(ee);
@@ -174,21 +178,24 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         }
     }
 
-    public void onInteract(PlayerInteractEvent event) {
+    public void onInteract(ExpiPlayer p, PacketInputStream in) {
 
-        if(event.getPlayer().isInInteractRadius(event.getLoc())) {
-            getTileAt(event.getLoc()).onInteract(event.getPlayer(), event.getType());
+        float x = in.getFloat();
+        float y = in.getFloat();
+        Vector2 loc = new Vector2(x, y);
+        InteractType type = InteractType.getType(in.getInt());
+        ExpiTile t = server.getWorld().getTileAt(x, y);
+
+        if(p.isInInteractRadius(loc)) {
+            t.onInteract(p, type);
         }
 
-        // this is only for tile placing
-
-        ExpiPlayer p = event.getPlayer();
-        if(!p.isInInteractRadius(event.getLoc())) return;
+        // following code is only for tile placing
+        if(!p.isInInteractRadius(loc)) return;
 
         Item item = p.getInv().getItemInHand().getItem();
-        ExpiTile t = event.getTile();
 
-        if(item.getCategory() != ItemCat.MATERIAL || event.getTile().getMaterial() != Material.AIR) return;
+        if(item.getCategory() != ItemCat.MATERIAL || t.getMaterial() != Material.AIR) return;
 
         if(item.getBuildMaterial() == null) return;
 
@@ -225,10 +232,10 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         stabilityCalc.onTileChange(e); // not sure if this should be before or after modules
 
         // modules
-        List<TileChangeListener> list = server.getEventManager().getTileChangeListeners();
+        /*List<TileChangeListener> list = server.getEventManager().getTileChangeListeners();
         for(int i = list.size() - 1; i >= 0; i--) {
             list.get(i).onTileChange(e);
-        }
+        }*/
 
         backWallCalculator.onTileChange(e);
     }
@@ -363,11 +370,8 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
         return day;
     }
 
-    public void spawnDroppedItem(Item item, Vector2 loc, float cooldown) {
-        ExpiDroppedItem edi = new ExpiDroppedItem(server, loc, item, cooldown);
-        for(ExpiPlayer pp : server.getPlayers()) {
-            pp.getNetManager().putEntitySpawnPacket(edi);
-        }
+    public void spawnDroppedItem(Item item, Vector2 loc, int ticksCooldown) {
+        new ExpiDroppedItem(server, loc, item, ticksCooldown);
     }
 
     public long getTick() {
@@ -376,7 +380,6 @@ public class ExpiWorld implements Saveable, Disposable, PlayerInteractListener {
 
     public void scheduleTask(Runnable runnable, long afterTicks) {
         TickTask task = new TickTask(runnable, tick + afterTicks);
-        System.out.println("adding: "+task.tick);
         scheduleTask(task);
     }
 

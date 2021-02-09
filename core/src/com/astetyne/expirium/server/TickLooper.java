@@ -1,11 +1,7 @@
-package com.astetyne.expirium.server.backend;
+package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.event.TickListener;
-
-import java.util.List;
 
 public class TickLooper extends TerminableLooper {
 
@@ -34,15 +30,14 @@ public class TickLooper extends TerminableLooper {
                 ep.getNetManager().processIncomingPackets();
             }
 
-            float delta = 1f / Consts.SERVER_TPS;
-
             server.getWorld().onTick();
 
+            /*float delta = 1f / Consts.SERVER_TPS;
             List<TickListener> list = server.getEventManager().getTickListeners();
             for(int i = list.size() - 1; i >= 0; i--) {
                 //todo: delta is ideal, not real
                 list.get(i).onTick(delta);
-            }
+            }*/
 
             server.getFileManager().onTick();
 

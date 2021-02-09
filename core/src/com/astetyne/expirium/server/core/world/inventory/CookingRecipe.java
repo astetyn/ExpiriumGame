@@ -2,25 +2,26 @@ package com.astetyne.expirium.server.core.world.inventory;
 
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.utils.Consts;
 
 public enum CookingRecipe {
 
-    COOKED_APPLE(10, new ItemStack[]{new ItemStack(Item.APPLE)}, new ItemStack(Item.COOKED_APPLE)),
-    FRUIT_JAM(20, new ItemStack[]{new ItemStack(Item.RASPBERRY), new ItemStack(Item.APPLE), new ItemStack(Item.WOODEN_BOWL)}, new ItemStack(Item.FRUIT_JAM)),
-    GLASS(5, new ItemStack[]{new ItemStack(Item.SAND, 2)}, new ItemStack(Item.GLASS));
+    COOKED_APPLE(Consts.SERVER_TPS*10, new ItemStack[]{new ItemStack(Item.APPLE)}, new ItemStack(Item.COOKED_APPLE)),
+    FRUIT_JAM(Consts.SERVER_TPS*20, new ItemStack[]{new ItemStack(Item.RASPBERRY), new ItemStack(Item.APPLE), new ItemStack(Item.WOODEN_BOWL)}, new ItemStack(Item.FRUIT_JAM)),
+    GLASS(Consts.SERVER_TPS*5, new ItemStack[]{new ItemStack(Item.SAND, 2)}, new ItemStack(Item.GLASS));
 
-    float time;
-    ItemStack[] requiredItems;
-    ItemStack product;
+    private final int ticks;
+    private final ItemStack[] requiredItems;
+    private final ItemStack product;
 
-    CookingRecipe(float time, ItemStack[] requiredItems, ItemStack product) {
-        this.time = time;
+    CookingRecipe(int ticks, ItemStack[] requiredItems, ItemStack product) {
+        this.ticks = ticks;
         this.requiredItems = requiredItems;
         this.product = product;
     }
 
-    public float getTime() {
-        return time;
+    public int getTicks() {
+        return ticks;
     }
 
     public ItemStack[] getRequiredItems() {

@@ -1,8 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.backend.TerminableLooper;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 
 import java.io.DataInputStream;
@@ -85,9 +84,6 @@ public class ServerGateway extends TerminableLooper {
         synchronized(leavingPlayers) {
             for(ExpiPlayer p : leavingPlayers) {
                 server.getPlayers().remove(p);
-                for(ExpiPlayer pp : server.getPlayers()) {
-                    pp.getNetManager().putEntityDespawnPacket(p);
-                }
                 p.destroySafe();
                 p.getGateway().stop();
                 try {
@@ -101,53 +97,37 @@ public class ServerGateway extends TerminableLooper {
             leavingPlayers.clear();
         }
 
-        List<ExpiPlayer> joiningPlayers = new ArrayList<>();
-
         synchronized(joiningClients) {
-            // read init data from client
+
             for(ServerPlayerGateway gateway : joiningClients) {
                 // here we assume that joining client is verified and thus following reads will not fail
                 PacketInputStream in = gateway.getIn();
                 String name = in.getString();
                 DataInputStream dataIn = server.getFileManager().getPlayerDataStream(name);
-                ExpiPlayer ep = null;
+                ExpiPlayer p = null;
                 if(dataIn == null) {
-                    ep = new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
+                    p = new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
                 }else {
                     try {
-                        ep = new ExpiPlayer(server, dataIn, gateway);
+                        p = new ExpiPlayer(server, gateway, dataIn);
                     }catch(IOException e) {
                         e.printStackTrace();
                     }
                 }
-                joiningPlayers.add(ep);
+                if(p == null) {
+                    gateway.stop();
+                    continue;
+                }
+
+                // initial packet
+                p.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), server.getEntities());
+                p.getGateway().getOut().swap();
+                synchronized(p.getGateway().getJoinLock()) {
+                    p.getGateway().getJoinLock().notify();
+                }
+                System.out.println("Player "+p.getName()+" joined the server.");
             }
             joiningClients.clear();
         }
-
-        for(ExpiPlayer newPlayer : joiningPlayers) {
-
-            // create list of entities (for new players)
-            List<ExpiEntity> alreadyExistingEntities = new ArrayList<>();
-            for(ExpiEntity e : server.getEntities()) {
-                if(e == newPlayer) continue;
-                alreadyExistingEntities.add(e);
-            }
-
-            // initial packet for new player
-            newPlayer.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), alreadyExistingEntities);
-            newPlayer.getGateway().getOut().swap();
-
-            synchronized(newPlayer.getGateway().getJoinLock()) {
-                newPlayer.getGateway().getJoinLock().notify();
-            }
-
-            // notify all players about new players
-            for(ExpiPlayer p : server.getPlayers()) {
-                if(p == newPlayer) continue;
-                p.getNetManager().putEntitySpawnPacket(newPlayer);
-            }
-        }
-        joiningPlayers.clear();
     }
 }

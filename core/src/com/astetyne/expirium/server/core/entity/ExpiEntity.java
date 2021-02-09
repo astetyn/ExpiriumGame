@@ -18,10 +18,12 @@ public abstract class ExpiEntity implements Metaable, Saveable {
     private final int id;
     protected final EntityType type;
     private final Vector2 centerLoc;
-    protected Body body;
+    protected final Body body;
+    protected boolean destroyed;
 
     public ExpiEntity(ExpiServer server, EntityType type, Vector2 loc) {
         this.server = server;
+        destroyed = false;
         id = server.getRandomEntityID();
         this.type = type;
         centerLoc = new Vector2();
@@ -31,7 +33,6 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         bodyDef.position.set(loc);
         body = server.getWorld().getB2dWorld().createBody(bodyDef);
 
-        server.getEntitiesID().put(id, this);
         server.getEntities().add(this);
     }
 
@@ -39,7 +40,18 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         this(server, type, new Vector2(in.readFloat(), in.readFloat()));
     }
 
-    public abstract void createBodyFixtures();
+    // must be called as one of the last methods in the most super class
+    protected void postInit() {
+        createBodyFixtures();
+        for(ExpiPlayer pp : server.getPlayers()) {
+            if(pp == this) continue;
+            pp.getNetManager().putEntitySpawnPacket(this);
+        }
+    }
+
+    protected void createBodyFixtures() {}
+
+    public void onTick() {}
 
     public int getId() {
         return id;
@@ -83,9 +95,14 @@ public abstract class ExpiEntity implements Metaable, Saveable {
     }
 
     public void destroy() {
-        server.getEntitiesID().remove(id);
+        //System.out.println("destroying entity: "+this+" already destroyed: "+destroyed);
+        if(destroyed) return;
+        destroyed = true;
         server.getEntities().remove(this);
         server.getWorld().getB2dWorld().destroyBody(body);
+        for(ExpiPlayer pp : server.getPlayers()) {
+            pp.getNetManager().putEntityDespawnPacket(this);
+        }
     }
 
     public void writeData(DataOutputStream out) throws IOException {

@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.net;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.backend.TerminableLooper;
+import com.astetyne.expirium.server.TerminableLooper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

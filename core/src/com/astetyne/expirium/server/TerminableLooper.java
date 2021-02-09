@@ -1,4 +1,4 @@
-package com.astetyne.expirium.server.backend;
+package com.astetyne.expirium.server;
 
 public abstract class TerminableLooper implements Runnable {
 

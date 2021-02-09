@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.backend.TerminableLooper;
+import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 
 import java.io.IOException;

@@ -1,8 +1,7 @@
-package com.astetyne.expirium.server.backend;
+package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
 
 public class WorldLoader {
 
@@ -18,7 +17,7 @@ public class WorldLoader {
         completed = false;
     }
 
-    public void update() {
+    public void onTick() {
         if(owner.getGateway().getOut().occupied() > 0.5f) return;
         owner.getNetManager().putWorldFeedPacket(world.getTerrain(), world.getPartHeight(), partNumber);
         partNumber++;

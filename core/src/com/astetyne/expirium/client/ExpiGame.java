@@ -87,7 +87,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		super.render();
 		// this is only for debug purposes, ultra unsafe
 		if(server != null && server.getWorld() != null && GameScreen.get() != null && GameScreen.get().getWorld() != null) {
-			debugRenderer.render(server.getWorld().getB2dWorld(), GameScreen.get().getWorld().getCamera().combined);
+			//debugRenderer.render(server.getWorld().getB2dWorld(), GameScreen.get().getWorld().getCamera().combined);
 		}
 	}
 

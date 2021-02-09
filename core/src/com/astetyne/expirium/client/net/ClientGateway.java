@@ -3,7 +3,7 @@ package com.astetyne.expirium.client.net;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.backend.TerminableLooper;
+import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 

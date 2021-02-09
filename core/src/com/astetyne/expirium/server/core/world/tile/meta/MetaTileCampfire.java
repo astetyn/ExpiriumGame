@@ -26,14 +26,14 @@ public class MetaTileCampfire extends MetaTile {
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
         placeTick = world.getTick();
-        inventory = new CookingInventory(2, 2, 5);
+        inventory = new CookingInventory(world, 2, 2, 5);
         lastClicker = null;
     }
 
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         placeTick = in.readLong();
-        inventory = new CookingInventory(2, 2, 5, in);
+        inventory = new CookingInventory(world, 2, 2, 5, in);
         lastClicker = null;
     }
 
@@ -41,7 +41,7 @@ public class MetaTileCampfire extends MetaTile {
         long tickPassed = world.getTick() - placeTick;
         world.scheduleTask(this::onReduce, Consts.SERVER_TPS*100 - tickPassed);
         world.scheduleTask(this::onEnd, Consts.SERVER_TPS*120 - tickPassed);
-        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS - tickPassed);
+        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS/2 - tickPassed);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class MetaTileCampfire extends MetaTile {
 
     public void onInvTick() {
         if(owner.getMeta() != this) return;
-        inventory.onTick();
-        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS);
+        inventory.onCookingUpdate();
+        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS/2);
     }
 
     public void onReduce() {

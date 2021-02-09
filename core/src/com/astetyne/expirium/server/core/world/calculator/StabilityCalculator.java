@@ -118,9 +118,9 @@ public class StabilityCalculator {
 
         Material oldMat = t.getMaterial();
 
-        t.changeMaterial(material);
+        t.setMaterial(material);
         int actualS = getActualStability(t);
-        t.changeMaterial(oldMat);
+        t.setMaterial(oldMat);
         return actualS != 0;
     }
 
