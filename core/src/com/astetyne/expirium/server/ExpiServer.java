@@ -1,26 +1,26 @@
 package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.EventManager;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
-import com.astetyne.expirium.server.core.world.WorldFileManager;
-import com.astetyne.expirium.server.core.world.generator.CreateWorldPreferences;
-import com.astetyne.expirium.server.core.world.generator.WorldLoadingException;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.core.world.file.WorldFileManager;
+import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
 import com.astetyne.expirium.server.net.MulticastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpiServer implements Saveable {
+public class ExpiServer implements WorldSaveable {
 
-    private static final int version = 1;
+    public static final int version = 1;
 
     private ExpiWorld expiWorld;
     private final ServerGateway serverGateway;
@@ -32,7 +32,7 @@ public class ExpiServer implements Saveable {
     private final EventManager eventManager;
     private final WorldFileManager fileManager;
 
-    private final List<Saveable> saveableModules;
+    private final List<WorldSaveable> saveableModules;
 
     private final ServerFailListener failListener;
     private final MulticastSender multicastSender;
@@ -43,7 +43,7 @@ public class ExpiServer implements Saveable {
     /** Object representing whole game server.
      * Only constructor will run on main thread, whole server will then run on dedicated thread.
      */
-    public ExpiServer(ServerPreferences serverPreferences, ServerFailListener listener) {
+    public ExpiServer(ServerFailListener listener, boolean createNew) {
 
         this.failListener = listener;
         closeRequest = false;
@@ -56,44 +56,36 @@ public class ExpiServer implements Saveable {
         eventManager = new EventManager();
 
         tickLooper = new TickLooper(this);
-        serverGateway = new ServerGateway(serverPreferences.port, this);
+        serverGateway = new ServerGateway(Consts.SERVER_PORT, this);
         multicastSender = new MulticastSender();
 
-        fileManager = new WorldFileManager(this, serverPreferences.worldPreferences.worldName);
+        fileManager = new WorldFileManager(this, createNew);
 
         saveableModules = new ArrayList<>();
 
-        if(serverPreferences.worldPreferences instanceof CreateWorldPreferences) {
+        try {
 
-            // this is executed when user is creating new world and no data is saved
-            expiWorld = new ExpiWorld((CreateWorldPreferences) serverPreferences.worldPreferences, this);
-        }else {
+            WorldQuickInfo wqi = WorldFileManager.getQuickInfo();
+            if(wqi == null) throw new IOException("Cant load quick info.");
 
-            try {
-                // this is executed when user wants to load his world from file
-                DataInputStream in = fileManager.loadGameServer();
+            if(wqi.worldVersion != version) failListener.onServerFail("World has incompatible version." +
+                    " ("+wqi.worldVersion+") Your is: "+" ("+version+")");
 
-                int savedVersion = in.readInt();
-                if(savedVersion != version) failListener.onServerFail("World has incompatible version." +
-                        " ("+savedVersion+") Your is: "+" ("+version+")");
+            DataInputStream in = fileManager.getWorldInputStream();
+            expiWorld = new ExpiWorld(in, wqi.tick, this);
 
-                expiWorld = new ExpiWorld(in, this);
-
-                // this must be loaded here, because it requires fully loaded ExpiWorld
-                int entitiesSize = in.readInt();
-                for(int i = 0; i < entitiesSize; i++) {
-                    EntityType.getType(in.readInt()).initEntity(this, in);
-                }
-
-                in.close();
-            } catch(IOException e) {
-                failListener.onServerFail("IOException during loading server.");
-                return;
-            }catch(WorldLoadingException e) {
-                failListener.onServerFail("World is corrupted.");
-                return;
+            // this must be loaded here, because it requires fully loaded ExpiWorld
+            int entitiesSize = in.readInt();
+            for(int i = 0; i < entitiesSize; i++) {
+                EntityType.getType(in.readInt()).initEntity(this, in);
             }
+            in.close();
+        } catch(IOException e) {
+            failListener.onServerFail("IOException during loading server.");
+            e.printStackTrace();
+            return;
         }
+
 
         Thread t = new Thread(serverGateway);
         t.setName("Server gateway");
@@ -122,7 +114,7 @@ public class ExpiServer implements Saveable {
      */
     public void faultClose() {
         System.out.println("performing fault close");
-        fileManager.saveGameServer();
+        fileManager.saveServer();
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
@@ -137,7 +129,7 @@ public class ExpiServer implements Saveable {
 
     private void performClose() {
         System.out.println("performing normal close");
-        fileManager.saveGameServer();
+        fileManager.saveServer();
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
@@ -200,9 +192,7 @@ public class ExpiServer implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
-
-        out.writeInt(version);
+    public void writeData(WorldBuffer out) {
 
         expiWorld.writeData(out);
 
@@ -219,9 +209,9 @@ public class ExpiServer implements Saveable {
             e.writeData(out);
         }
 
-        for(Saveable saveable : saveableModules) {
-            saveable.writeData(out);
-        }
+        /*for(WorldSaveable worldSaveable : saveableModules) {
+            worldSaveable.writeData(out);
+        }*/
     }
 
     public int getRandomEntityID() {

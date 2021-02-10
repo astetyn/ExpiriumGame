@@ -26,7 +26,7 @@ import java.util.List;
 
 public class GameWorld {
 
-    public static float PPM = 64; // pixel per meter when zoom == 1
+    public static float PPM = 32; // pixel per meter when zoom == 1
 
     private Tile[][] terrain;
     private final HashMap<Integer, Entity> entitiesID;
@@ -182,7 +182,7 @@ public class GameWorld {
         }
 
         if(yOff + partHeight == terrainHeight) {
-            lightCalculator.recalcSkyLights();
+            lightCalculator.recalcAllTiles();
         }
     }
 
@@ -194,11 +194,9 @@ public class GameWorld {
 
         Tile t = terrain[x][y];
 
-        Material oldType = t.getMaterial();
-
         t.setMaterial(type);
 
-        lightCalculator.onTileChange(oldType, type, x, y);
+        lightCalculator.onTileChange(x, y);
 
     }
 

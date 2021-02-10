@@ -7,7 +7,7 @@ import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -16,8 +16,7 @@ import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
-import com.astetyne.expirium.server.core.world.generator.CreateWorldPreferences;
-import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.TickTask;
@@ -30,53 +29,33 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.PriorityQueue;
 
-public class ExpiWorld implements Saveable, Disposable {
+public class ExpiWorld implements WorldSaveable, Disposable {
 
     private final ExpiServer server;
     private final ExpiTile[][] terrain;
-    private int partHeight;
-    private World b2dWorld;
-    private Body terrainBody;
-    private StabilityCalculator stabilityCalc;
-    private FixtureCalculator fixtureCalc;
-    private BackWallCalculator backWallCalculator;
-    private WeatherType weatherType;
-    private ExpiContactListener contactListener;
+    private final int partHeight;
+    private final World b2dWorld;
+    private final Body terrainBody;
+    private final StabilityCalculator stabilityCalc;
+    private final FixtureCalculator fixtureCalc;
+    private final BackWallCalculator backWallCalculator;
+    private final WeatherType weatherType;
+    private final ExpiContactListener contactListener;
     private long tick; // total ticks since world was generated
     private int time; // from midnight = 0 ticks
     private long day; // completed days from server creation
     private final int width, height;
     private final long seed;
-    private PriorityQueue<TickTask> scheduledTickTasks;
+    private final PriorityQueue<TickTask> scheduledTickTasks;
 
-    public ExpiWorld(CreateWorldPreferences preferences, ExpiServer server) {
-
-        this.server = server;
-
-        width = preferences.width;
-        height = preferences.height;
-        seed = preferences.seed;
-
-        terrain = new ExpiTile[preferences.height][preferences.width];
-        new WorldGenerator(this, terrain, seed).generateWorld();
-
-        time = 11200; // 7:00
-        day = 0;
-        weatherType = WeatherType.SUNNY;
-
-        initAfterCreation();
-
-    }
-
-    public ExpiWorld(DataInputStream in, ExpiServer server) throws IOException {
+    public ExpiWorld(DataInputStream in, long tick, ExpiServer server) throws IOException {
 
         this.server = server;
 
-        tick = in.readLong();
+        this.tick = tick;
         day = tick / Consts.DAY_TICKS;
         time = (int) (tick % Consts.DAY_TICKS);
         System.out.println("tick: "+tick+" "+" day: "+day+" time: "+time);
@@ -95,12 +74,6 @@ public class ExpiWorld implements Saveable, Disposable {
 
         //todo: len docasne zatial
         weatherType = WeatherType.SUNNY;
-
-        initAfterCreation();
-
-    }
-
-    private void initAfterCreation() {
 
         scheduledTickTasks = new PriorityQueue<>();
 
@@ -392,9 +365,7 @@ public class ExpiWorld implements Saveable, Disposable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
-
-        out.writeLong(tick);
+    public void writeData(WorldBuffer out) {
 
         out.writeInt(width);
         out.writeInt(height);

@@ -26,10 +26,9 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     // from input adapter
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         savedZoom = GameScreen.get().getWorld().getCamera().zoom;
         detector.touchDown(screenX, screenY, pointer, button);
-
-        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return false;
@@ -41,8 +40,8 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         detector.touchUp(screenX, screenY, pointer, button);
-
         if(!pressed) return true;
         pressed = false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
@@ -56,8 +55,8 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         detector.touchDragged(screenX, screenY, pointer);
-
         if(!pressed) return false;
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {

@@ -52,4 +52,5 @@ public class MetaTileRaspberryBush extends MetaTile {
     public boolean onMaterialChange(Material to) {
         return to == Material.RASPBERRY_BUSH_2;
     }
+
 }

@@ -4,7 +4,6 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -86,11 +85,7 @@ public class ServerGateway extends TerminableLooper {
                 server.getPlayers().remove(p);
                 p.destroySafe();
                 p.getGateway().stop();
-                try {
-                    server.getFileManager().savePlayer(p);
-                }catch(IOException e) {
-                    e.printStackTrace();
-                }
+                server.getFileManager().savePlayer(p);
                 System.out.println("Player "+p.getName()+" left the server.");
                 break;
             }
@@ -103,21 +98,7 @@ public class ServerGateway extends TerminableLooper {
                 // here we assume that joining client is verified and thus following reads will not fail
                 PacketInputStream in = gateway.getIn();
                 String name = in.getString();
-                DataInputStream dataIn = server.getFileManager().getPlayerDataStream(name);
-                ExpiPlayer p = null;
-                if(dataIn == null) {
-                    p = new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
-                }else {
-                    try {
-                        p = new ExpiPlayer(server, gateway, dataIn);
-                    }catch(IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(p == null) {
-                    gateway.stop();
-                    continue;
-                }
+                ExpiPlayer p = server.getFileManager().loadPlayer(gateway, name);
 
                 // initial packet
                 p.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), server.getEntities());

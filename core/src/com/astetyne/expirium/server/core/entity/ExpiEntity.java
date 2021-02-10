@@ -3,16 +3,16 @@ package com.astetyne.expirium.server.core.entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.Metaable;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class ExpiEntity implements Metaable, Saveable {
+public abstract class ExpiEntity implements Metaable, WorldSaveable {
 
     protected final ExpiServer server;
     private final int id;
@@ -105,7 +105,7 @@ public abstract class ExpiEntity implements Metaable, Saveable {
         }
     }
 
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         out.writeFloat(body.getPosition().x);
         out.writeFloat(body.getPosition().y);
     }

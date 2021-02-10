@@ -9,6 +9,7 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.world.WorldLoader;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
 import com.astetyne.expirium.server.core.world.inventory.ExpiPlayerInventory;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -18,7 +19,6 @@ import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ExpiPlayer extends LivingEntity {
@@ -54,18 +54,12 @@ public class ExpiPlayer extends LivingEntity {
         server.getPlayers().add(this);
     }
 
-    public ExpiPlayer(ExpiServer server, ServerPlayerGateway gateway, DataInputStream in) throws IOException {
+    public ExpiPlayer(ExpiServer server, ServerPlayerGateway gateway, String name, DataInputStream in) throws IOException {
         super(server, EntityType.PLAYER, in);
         // order is important - must be same as in writeData()
-        server.getWorld().getCL().registerListener(this);
-        int nameLength = in.readInt();
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < nameLength; i++) {
-            sb.append(in.readChar());
-        }
         this.gateway = gateway;
         gateway.setOwner(this);
-        name = sb.toString();
+        this.name = name;
         mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new ExpiInventory(1, 1, 1, false);
         tileBreaker = new ExpiTileBreaker(server, this);
@@ -354,10 +348,8 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         super.writeData(out);
-        out.writeInt(name.length());
-        out.writeChars(name);
         mainInv.writeData(out);
         out.writeFloat(resurrectLoc.x);
         out.writeFloat(resurrectLoc.y);

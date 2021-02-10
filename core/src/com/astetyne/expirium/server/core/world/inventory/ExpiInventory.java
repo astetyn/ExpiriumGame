@@ -3,10 +3,10 @@ package com.astetyne.expirium.server.core.world.inventory;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Notes: 0,0 is in the bottom left corner, x and y are as normal
  */
-public class ExpiInventory implements Saveable {
+public class ExpiInventory implements WorldSaveable {
 
     protected final List<GridItemStack> items;
     protected final GridItemStack[][] grid;
@@ -265,7 +265,7 @@ public class ExpiInventory implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         out.writeInt(items.size());
         for(GridItemStack is : items) {
             is.writeData(out);

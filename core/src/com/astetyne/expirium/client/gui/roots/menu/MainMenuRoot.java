@@ -75,7 +75,7 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
         });
 
         // host button
-        TextButton hostButton = new TextButton("Host a game.", Res.TEXT_BUTTON_STYLE);
+        TextButton hostButton = new TextButton("Create a game.", Res.TEXT_BUTTON_STYLE);
         hostButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -83,7 +83,7 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
                     setInfo("You must enter your nickname.", Color.RED);
                     return;
                 }
-                menu.setRoot(new HostCreatorRoot(menu));
+                menu.setRoot(new WorldManagerRoot(menu));
             }
         });
 

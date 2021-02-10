@@ -3,9 +3,9 @@ package com.astetyne.expirium.server.core.world.inventory;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class CookingInventory extends ExpiInventory {
@@ -117,7 +117,7 @@ public class CookingInventory extends ExpiInventory {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeLong(startTick);
     }

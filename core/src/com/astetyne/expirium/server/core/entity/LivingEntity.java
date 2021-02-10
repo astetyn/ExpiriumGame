@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -11,10 +11,9 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class LivingEntity extends ExpiEntity implements Saveable, Collidable {
+public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     private final static float MAX_HEALTH_LEVEL = 100;
     private final static float MAX_FOOD_LEVEL = 100;
@@ -171,7 +170,7 @@ public abstract class LivingEntity extends ExpiEntity implements Saveable, Colli
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeFloat(healthLevel);
         out.writeFloat(foodLevel);

@@ -5,13 +5,13 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ExpiDroppedItem extends ExpiEntity {
@@ -86,7 +86,7 @@ public class ExpiDroppedItem extends ExpiEntity {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeInt(item.getId());
     }

@@ -5,15 +5,13 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-public class MetaTile implements Saveable {
+public class MetaTile implements WorldSaveable {
 
     protected final ExpiWorld world;
     protected final ExpiTile owner;
@@ -39,7 +37,7 @@ public class MetaTile implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {}
+    public void writeData(WorldBuffer out) {}
 
     public void dropItem(Item item) {
         float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;

@@ -3,16 +3,16 @@ package com.astetyne.expirium.server.core.world.inventory;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemCat;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
+public class ExpiPlayerInventory extends ExpiInventory implements WorldSaveable {
 
     private final ExpiPlayer owner;
     private ItemStack itemInHand;
@@ -195,7 +195,7 @@ public class ExpiPlayerInventory extends ExpiInventory implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeInt(indexTools);
         out.writeInt(indexMats);

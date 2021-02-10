@@ -23,7 +23,17 @@ public class LightCalculator {
         invalidedSources = new HashSet<>();
     }
 
-    public void recalcSkyLights() {
+    public void recalcAllTiles() {
+
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                Tile t = terrain[x][y];
+                registerLightSource(t, x, y);
+            }
+        }
+
+        recalcAllLights();
+
         for(int x = 0; x < w; x++) {
             recalcSkyLightHardColumn(x);
         }
@@ -130,7 +140,7 @@ public class LightCalculator {
         }
     }
 
-    public void onTileChange(Material from, Material to, int x, int y) {
+    public void onTileChange(int x, int y) {
 
         Tile t = terrain[x][y];
 
@@ -149,11 +159,7 @@ public class LightCalculator {
             lightSources.remove(t);
         }
 
-        if(to == Material.CAMPFIRE_BIG) {
-            lightSources.put(t, new LightSource((byte)10, new IntVector2(x, y)));
-        }else if(to == Material.CAMPFIRE_SMALL) {
-            lightSources.put(t, new LightSource((byte)5, new IntVector2(x, y)));
-        }
+        registerLightSource(t, x, y);
 
         recalcAllLights();
     }
@@ -193,6 +199,18 @@ public class LightCalculator {
 
             terrain[x][y].setLocalLight(radius);
             calcTileLocalLights(x, y);
+        }
+
+    }
+
+    private void registerLightSource(Tile t, int x, int y) {
+
+        Material to = t.getMaterial();
+
+        if(to == Material.CAMPFIRE_BIG) {
+            lightSources.put(t, new LightSource((byte)10, new IntVector2(x, y)));
+        }else if(to == Material.CAMPFIRE_SMALL) {
+            lightSources.put(t, new LightSource((byte)5, new IntVector2(x, y)));
         }
 
     }

@@ -1,13 +1,13 @@
 package com.astetyne.expirium.client.items;
 
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class GridItemStack extends ItemStack implements Saveable {
+public class GridItemStack extends ItemStack implements WorldSaveable {
 
     private final IntVector2 gridPos;
 
@@ -36,7 +36,7 @@ public class GridItemStack extends ItemStack implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
+    public void writeData(WorldBuffer out) {
         out.writeInt(item.getId());
         out.writeInt(amount);
         out.writeInt(gridPos.x);

@@ -8,13 +8,13 @@ import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.CookingInventory;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class MetaTileCampfire extends MetaTile {
@@ -42,12 +42,6 @@ public class MetaTileCampfire extends MetaTile {
         world.scheduleTask(this::onReduce, Consts.SERVER_TPS*100 - tickPassed);
         world.scheduleTask(this::onEnd, Consts.SERVER_TPS*120 - tickPassed);
         world.scheduleTask(this::onInvTick, Consts.SERVER_TPS/2 - tickPassed);
-    }
-
-    @Override
-    public void writeData(DataOutputStream out) throws IOException {
-        out.writeLong(placeTick);
-        inventory.writeData(out);
     }
 
     public void onInvTick() {
@@ -99,6 +93,20 @@ public class MetaTileCampfire extends MetaTile {
                 dropItem(is.getItem());
             }
         }
+    }
+
+    @Override
+    public void writeData(WorldBuffer out) {
+        out.writeLong(placeTick);
+        inventory.writeData(out);
+    }
+
+    public static void writeDefaultData(WorldBuffer out) {
+        out.writeLong(0);
+        // inv
+        out.writeInt(0);
+        out.writeFloat(0);
+        out.writeLong(0);
     }
 
 }

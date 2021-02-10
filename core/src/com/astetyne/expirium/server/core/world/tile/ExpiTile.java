@@ -2,18 +2,18 @@ package com.astetyne.expirium.server.core.world.tile;
 
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.core.Saveable;
+import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpiTile implements Saveable {
+public class ExpiTile implements WorldSaveable {
 
     private final ExpiWorld world;
     private Material material;
@@ -23,20 +23,9 @@ public class ExpiTile implements Saveable {
     private int stability;
     private boolean backWall;
 
-    public ExpiTile(ExpiWorld world, int x, int y) {
-        this.world = world;
-        this.material = Material.AIR;
-        metaTile = material.init(world, this);
-        fixtures = new ArrayList<>();
-        this.x = x;
-        this.y = y;
-        stability = 0;
-        backWall = false;
-    }
-
     public ExpiTile(ExpiWorld world, DataInputStream in, int x, int y) throws IOException {
         this.world = world;
-        material = Material.getMaterial(in.readByte());
+        material = Material.getMaterial(in.readInt());
         metaTile = material.init(this.world, this, in);
         fixtures = new ArrayList<>();
         this.x = x;
@@ -61,10 +50,6 @@ public class ExpiTile implements Saveable {
 
     public void onInteract(ExpiPlayer p, InteractType type) {
         metaTile.onInteract(p, type);
-    }
-
-    public void recreateMeta() {
-        metaTile = material.init(world, this);
     }
 
     public Material getMaterial() {
@@ -104,8 +89,8 @@ public class ExpiTile implements Saveable {
     }
 
     @Override
-    public void writeData(DataOutputStream out) throws IOException {
-        out.writeByte(material.getID());
+    public void writeData(WorldBuffer out) {
+        out.writeMaterial(material);
         metaTile.writeData(out);
         out.writeBoolean(backWall);
     }

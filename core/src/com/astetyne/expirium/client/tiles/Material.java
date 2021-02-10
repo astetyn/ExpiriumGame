@@ -5,6 +5,7 @@ import com.astetyne.expirium.client.resources.Textureable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.TileFix;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public enum Material implements Textureable {
@@ -84,6 +86,15 @@ public enum Material implements Textureable {
         }catch(InvocationTargetException e) {
             e.printStackTrace();
             throw (IOException) e.getCause(); // idk if this is correct
+        }
+    }
+
+    public void writeDefaultMetaData(WorldBuffer out) {
+        try {
+            Method m = metaClazz.getMethod("writeDefaultData", WorldBuffer.class);
+            m.invoke(null, out);
+        }catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            //e.printStackTrace();
         }
     }
 

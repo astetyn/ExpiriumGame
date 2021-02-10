@@ -14,7 +14,6 @@ import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
-import com.astetyne.expirium.server.ServerPreferences;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -114,15 +113,14 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		return expiGame;
 	}
 
-	public void startServer(ServerPreferences preferences, MenuScreen menu) {
+	public void startServer(MenuScreen menu, boolean createNew) {
 		hostingServer = true;
 		menu.setRoot(new LoadingRoot("Loading world..."));
 		//todo: port free check
-		server = new ExpiServer(preferences, this);
+		server = new ExpiServer(this, createNew);
 	}
 
 	public void stopServer() {
-		System.out.println("stopping server "+server);
 		if(server == null) return;
 		server.close();
 	}
