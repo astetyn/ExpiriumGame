@@ -48,10 +48,15 @@ public class BaseGrid extends Widget {
             TextureRegion tex = is.getItem().getGridTexture();
             int w = is.getItem().getGridWidth();
             int h = is.getItem().getGridHeight();
-            if(is == selectedItem) batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
+            if(selectedItem != null) {
+                IntVector2 siPos = selectedItem.getGridPos();
+                if(pos.x == siPos.x && pos.y == siPos.y) batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
+            }
             float off = tileSizeX * 0.1f;
             batch.draw(tex, getX() + pos.x * tileSizeX + off, getY() + pos.y * tileSizeY + off, w * tileSizeX - 2*off, h * tileSizeY - 2*off);
             batch.setColor(1,1,1,1);
+
+            if(!is.getItem().isMergeable()) continue;
 
             String label = is.getAmount()+"";
             float xOff = tileSizeX/1.4f - Utils.getTextWidth(label, Res.MAIN_FONT)/2;

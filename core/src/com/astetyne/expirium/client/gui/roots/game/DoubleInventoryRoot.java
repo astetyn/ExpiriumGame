@@ -55,7 +55,6 @@ public class DoubleInventoryRoot extends Table implements GameRootable {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                //System.out.println("x: "+x+" y: "+y);
                 GridItemStack is = storage1.getItemAt(x - storageCell1.getActorX(), y - storageCell1.getActorY());
                 GridItemStack is2 = storage2.getItemAt(x - storageCell2.getActorX(), y - storageCell2.getActorY());
                 if(is != null) {
@@ -92,7 +91,6 @@ public class DoubleInventoryRoot extends Table implements GameRootable {
                 }else {
                     selItem = storage2.getGrid().getSelectedItem();
                 }
-                System.out.println("FM: "+fromMain+" P1: "+selItem.getGridPos()+" TM: "+toMain+" P2: "+finalPos);
                 ExpiGame.get().getClientGateway().getManager().putInvItemMoveReqPacket(fromMain, selItem.getGridPos(), toMain, finalPos);
                 storage1.getGrid().setSelectedItem(null);
                 storage2.getGrid().setSelectedItem(null);

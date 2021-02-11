@@ -2,7 +2,6 @@ package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -66,9 +65,8 @@ public class ExpiDroppedItem extends ExpiEntity {
 
         for(ExpiPlayer p : server.getPlayers()) {
             Vector2 dif = p.getCenter().sub(getCenter());
-            if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canBeAdded(item, 1)) {
-                p.getInv().addItem(new ItemStack(item), true);
-                p.getNetManager().putInvFeedPacket();
+            if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canAppend(item, 1)) {
+                p.getInv().append(item, 1);
                 destroy();
                 return;
             }

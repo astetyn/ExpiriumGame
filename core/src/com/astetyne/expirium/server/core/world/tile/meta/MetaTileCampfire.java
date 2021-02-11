@@ -69,7 +69,6 @@ public class MetaTileCampfire extends MetaTile {
         if(placeTick + 10 > world.getTick()) return;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
-        p.getNetManager().putInvFeedPacket();
         lastClicker = p;
     }
 

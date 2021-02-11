@@ -22,7 +22,6 @@ public class WorldLoader {
         owner.getNetManager().putWorldFeedPacket(world.getTerrain(), world.getPartHeight(), partNumber);
         partNumber++;
         if(world.getTerrainHeight() / world.getPartHeight() == partNumber) {
-            owner.getInv().updateHotSlots();
             completed = true;
         }
     }

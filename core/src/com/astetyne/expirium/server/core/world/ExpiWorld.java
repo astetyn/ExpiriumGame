@@ -2,7 +2,6 @@ package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemCat;
-import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
@@ -166,7 +165,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         // following code is only for tile placing
         if(!p.isInInteractRadius(loc)) return;
 
-        Item item = p.getInv().getItemInHand().getItem();
+        Item item = p.getInv().getItemInHand().getItem();;
 
         if(item.getCategory() != ItemCat.MATERIAL || t.getMaterial() != Material.AIR) return;
 
@@ -177,8 +176,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         if(!stabilityCalc.canBeChanged(t, item.getBuildMaterial())) return;
 
         // confirmed from here
-        p.getInv().removeItem(new ItemStack(item, 1));
-        p.getNetManager().putInvFeedPacket();
+        p.getInv().remove(item, 1);
 
         for(ExpiPlayer ep : server.getPlayers()) {
             ep.getNetManager().putHandPunchPacket(p);

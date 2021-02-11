@@ -8,7 +8,7 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
-import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
+import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
@@ -49,7 +49,7 @@ public class ServerPacketManager {
                     break;
 
                 case 25: {//InvItemMoveReqPacket
-                    owner.onInvMove(in);
+                    owner.getInv().onMove(owner.getSecondInv(), in);
                     break;
                 }
                 case 26: {//InvItemMakeReqPacket
@@ -121,8 +121,8 @@ public class ServerPacketManager {
     }
 
     public void putInvFeedPacket() {
-        ExpiInventory inv1 = owner.getInv();
-        ExpiInventory inv2 = owner.getSecondInv();
+        Inventory inv1 = owner.getInv();
+        Inventory inv2 = owner.getSecondInv();
         out.startPacket(24);
         out.putString(inv1.getLabel());
         out.putFloat(inv1.getTotalWeight());

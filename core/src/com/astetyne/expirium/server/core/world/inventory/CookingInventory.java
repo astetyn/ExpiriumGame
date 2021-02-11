@@ -1,6 +1,5 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
-import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -8,7 +7,7 @@ import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class CookingInventory extends ExpiInventory {
+public class CookingInventory extends Inventory {
 
     private final ExpiWorld world;
     private long startTick;
@@ -16,14 +15,14 @@ public class CookingInventory extends ExpiInventory {
     private int multiply;
 
     public CookingInventory(ExpiWorld world, int rows, int columns, float maxWeight) {
-        super(rows, columns, maxWeight, false);
+        super(rows, columns, maxWeight);
         this.world = world;
         startTick = world.getTick();
         multiply = 0;
     }
 
     public CookingInventory(ExpiWorld world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
-        super(rows, columns, maxWeight, false, in);
+        super(rows, columns, maxWeight, in);
         this.world = world;
         startTick = in.readLong();
         multiply = 0;
@@ -31,7 +30,7 @@ public class CookingInventory extends ExpiInventory {
 
     // should be called every half second = 16 ticks
     public void onCookingUpdate() {
-        invalid = true;
+        willNeedUpdate();
         if(recipe == null) {
             label = "Unknown recipe";
             return;
@@ -39,9 +38,10 @@ public class CookingInventory extends ExpiInventory {
 
         label = "Cooking: "+Math.min((int)((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100)+"%";
         if(startTick + recipe.getTicks() < world.getTick()) {
-            super.clear();
-            super.addItem(recipe.getProduct(), true);
+            CookingRecipe currRecipe = recipe;
             recipe = null;
+            clear(); // this will null recipe anyways
+            append(currRecipe.getProduct().getItem(), currRecipe.getProduct().getAmount()*multiply);
         }
     }
 
@@ -85,34 +85,8 @@ public class CookingInventory extends ExpiInventory {
     }
 
     @Override
-    public boolean addItem(ItemStack addIS, boolean merge) {
-        boolean b = super.addItem(addIS, false);
-        if(b) startTick = 0;
-        matchRecipe();
-        return b;
-    }
-
-    @Override
-    public void removeItem(ItemStack remIS) {
-        super.removeItem(remIS);
-        matchRecipe();
-    }
-
-    @Override
-    public void removeGridItem(GridItemStack remIS) {
-        super.removeGridItem(remIS);
-        matchRecipe();
-    }
-
-    @Override
-    public void increaseWeight(float f) {
-        super.increaseWeight(f);
-        matchRecipe();
-    }
-
-    @Override
-    public void decreaseWeight(float f) {
-        super.decreaseWeight(f);
+    public void refresh() {
+        super.refresh();
         matchRecipe();
     }
 

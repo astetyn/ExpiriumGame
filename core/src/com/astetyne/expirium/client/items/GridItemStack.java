@@ -23,7 +23,12 @@ public class GridItemStack extends ItemStack implements WorldSaveable {
 
     public GridItemStack(Item item, int amount, IntVector2 pos) {
         super(item, amount);
-        gridPos = pos;
+        gridPos = new IntVector2(pos);
+    }
+
+    public GridItemStack(ItemStack is, IntVector2 pos) {
+        super(is);
+        gridPos = new IntVector2(pos);
     }
 
     public GridItemStack(DataInputStream in) throws IOException {

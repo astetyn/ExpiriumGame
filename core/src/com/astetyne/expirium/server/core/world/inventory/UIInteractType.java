@@ -9,7 +9,7 @@ public enum UIInteractType {
     SLOT_TOOLS,
     SLOT_MATERIALS,
     SLOT_CONSUMABLE,
-    OPEN_INV,
+    OPEN_INV, //useless?
     CONSUME_BUTTON;
 
     int id;

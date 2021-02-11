@@ -39,4 +39,8 @@ public class ItemStack {
         amount -= decreaseAmount;
     }
 
+    public float getWeight() {
+        return item.getWeight() * amount;
+    }
+
 }

@@ -2,16 +2,14 @@ package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
-import com.astetyne.expirium.server.core.world.inventory.ExpiInventory;
-import com.astetyne.expirium.server.core.world.inventory.ExpiPlayerInventory;
+import com.astetyne.expirium.server.core.world.inventory.Inventory;
+import com.astetyne.expirium.server.core.world.inventory.PlayerInventory;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
@@ -25,8 +23,8 @@ public class ExpiPlayer extends LivingEntity {
 
     private final ServerPlayerGateway gateway;
     private final String name;
-    private final ExpiPlayerInventory mainInv;
-    private ExpiInventory secondInv;
+    private final PlayerInventory mainInv;
+    private Inventory secondInv;
     private final ExpiTileBreaker tileBreaker;
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
@@ -40,8 +38,8 @@ public class ExpiPlayer extends LivingEntity {
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
-        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
-        secondInv = new ExpiInventory(1, 1, 1, false);
+        mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
+        secondInv = new Inventory(1, 1, 1);
         tileBreaker = new ExpiTileBreaker(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
@@ -60,8 +58,8 @@ public class ExpiPlayer extends LivingEntity {
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
-        mainInv = new ExpiPlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
-        secondInv = new ExpiInventory(1, 1, 1, false);
+        mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
+        secondInv = new Inventory(1, 1, 1);
         tileBreaker = new ExpiTileBreaker(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
@@ -100,114 +98,6 @@ public class ExpiPlayer extends LivingEntity {
         tsData1.vert = in.getFloat();
         tsData2.horz = in.getFloat();
         tsData2.vert = in.getFloat();
-    }
-
-    public void onInvMove(PacketInputStream in) {
-
-        boolean fromMain = in.getBoolean();
-        IntVector2 pos1 = in.getIntVector();
-        boolean toMain = in.getBoolean();
-        IntVector2 pos2 = in.getIntVector();
-
-        int row1 = pos1.y;
-        int column1 = pos1.x;
-        int row2 = pos2.y;
-        int column2 = pos2.x;
-
-        if(row1 == row2 && column1 == column2) return;
-
-        //System.out.println("fromMain: "+fromMain+" pos1: "+pos1+" toMain: "+toMain+" pos2: "+pos2);
-
-        if(fromMain) {
-            GridItemStack is = mainInv.getGrid()[row1][column1];
-            if(is == null) return;
-
-            if(column2 == -1) {
-                mainInv.removeGridItem(is);
-                throwAwayItem(is);
-                return;
-            }
-
-            if(toMain) {
-                if(row2 == 0 && column2 == mainInv.getColumns() - 2 && mainInv.isPlaceFor(is.getItem())) { //split
-                    if(is.getAmount() == 1) return;
-                    is.decreaseAmount(1);
-                    mainInv.decreaseWeight(is.getItem().getWeight());
-                    mainInv.addItem(new ItemStack(is.getItem()), false);
-                    getNetManager().putInvFeedPacket();
-                    return;
-                }else if(row2 == 0 && column2 == mainInv.getColumns() - 1) { //throw
-                    mainInv.removeGridItem(is);
-                    throwAwayItem(is);
-                    return;
-                }
-                ItemStack destIS = mainInv.getGrid()[row2][column2];
-                if(destIS != null && destIS != is && destIS.getItem() == is.getItem()) {
-                    destIS.increaseAmount(is.getAmount());
-                    mainInv.increaseWeight(is.getItem().getWeight() * is.getAmount());
-                    mainInv.removeGridItem(is);
-                    getNetManager().putInvFeedPacket();
-                    return;
-                }
-                if(!mainInv.isPlaceFor(is.getItem(), row2, column2, row1, column1)) return;
-                mainInv.cleanGridFrom(is);
-                is.getGridPos().set(pos2);
-                mainInv.insertToGrid(is);
-            }else {
-                if(!secondInv.canBeAdded(is.getItem(), is.getAmount())) return;
-                secondInv.addItem(is, true);
-                mainInv.removeGridItem(is);
-            }
-        }else {
-            GridItemStack is = secondInv.getGrid()[row1][column1];
-            if(is == null) return;
-
-            if(column2 == -1) {
-                secondInv.removeGridItem(is);
-                throwAwayItem(is);
-                return;
-            }
-
-            if(toMain) {
-                if(row2 == 0 && column2 == mainInv.getColumns() - 2 && secondInv.isPlaceFor(is.getItem())) { //split
-                    if(is.getAmount() == 1) return;
-                    is.decreaseAmount(1);
-                    secondInv.decreaseWeight(is.getItem().getWeight());
-                    secondInv.addItem(new ItemStack(is.getItem()), false);
-                    getNetManager().putInvFeedPacket();
-                    return;
-                }else if(row2 == 0 && column2 == mainInv.getColumns() - 1) { //throw
-                    secondInv.removeGridItem(is);
-                    throwAwayItem(is);
-                    return;
-                }
-                if(!mainInv.canBeAdded(is.getItem(), is.getAmount())) return;
-                mainInv.addItem(is, true);
-                secondInv.removeGridItem(is);
-            }else {
-                ItemStack destIS = secondInv.getGrid()[row2][column2];
-                if(destIS != null && destIS != is && destIS.getItem() == is.getItem()) {
-                    destIS.increaseAmount(is.getAmount());
-                    secondInv.increaseWeight(is.getItem().getWeight() * is.getAmount());
-                    secondInv.removeGridItem(is);
-                    getNetManager().putInvFeedPacket();
-                    return;
-                }
-                if(!secondInv.isPlaceFor(is.getItem(), row2, column2, row1, column1)) return;
-                secondInv.cleanGridFrom(is);
-                is.getGridPos().set(pos2);
-                secondInv.insertToGrid(is);
-            }
-        }
-        getNetManager().putInvFeedPacket();
-    }
-
-    private void throwAwayItem(ItemStack is) {
-        for(int i = 0; i < is.getAmount(); i++) {
-            //todo: vytvorit spravnu lokaciu itemu, podla otocenia hraca? podla okolitych blokov?
-            server.getWorld().spawnDroppedItem(is.getItem(), getCenter(), Consts.ITEM_COOLDOWN_DROP);
-        }
-        getNetManager().putInvFeedPacket();
     }
 
     public void applyPhysics() {
@@ -253,10 +143,12 @@ public class ExpiPlayer extends LivingEntity {
 
         getNetManager().putLivingStatsPacket();
 
-        if(mainInv.isInvalid() || secondInv.isInvalid()) {
+        if(mainInv.needsUpdate(this) || secondInv.needsUpdate(this)) {
             getNetManager().putInvFeedPacket();
-            mainInv.setInvalid(false);
-            secondInv.setInvalid(false);
+            mainInv.updateHotSlots();
+            mainInv.wasUpdated(this);
+            secondInv.wasUpdated(this);
+            System.out.println("invs were updated");
         }
 
         tileBreaker.onTick(tsData2);
@@ -266,22 +158,20 @@ public class ExpiPlayer extends LivingEntity {
         System.out.println("Wants to make item");
         if(Consts.DEBUG) {
             System.out.println("Overriding item check (debug mode)");
-            mainInv.addItem(recipe.getProduct(), true);
-            getNetManager().putInvFeedPacket();
+            mainInv.append(recipe.getProduct());
             return;
         }
-        for(ItemStack is : recipe.getRequiredItems()) {
-            if(!mainInv.contains(is)) return;
-        }
+
+        if(!mainInv.contains(recipe.getRequiredItems())) return;
+
         System.out.println("Has req items");
-        if(!mainInv.canBeAdded(recipe.getProduct().getItem(), recipe.getProduct().getAmount())) return;
+        if(!mainInv.canAppend(recipe.getProduct())) return;
         System.out.println("Can be added");
 
         for(ItemStack is : recipe.getRequiredItems()) {
-            mainInv.removeItem(is);
+            mainInv.remove(is);
         }
-        mainInv.addItem(recipe.getProduct(), true);
-        getNetManager().putInvFeedPacket();
+        mainInv.append(recipe.getProduct());
         System.out.println("Added");
     }
 
@@ -304,13 +194,12 @@ public class ExpiPlayer extends LivingEntity {
 
     @Override
     public void destroy() {
-        destroySafe();
+        super.destroy();
         server.getPlayers().remove(this);
     }
 
     public void destroySafe() {
         super.destroy();
-        server.getEventManager().getTickListeners().remove(this);
     }
 
     @Override
@@ -318,16 +207,17 @@ public class ExpiPlayer extends LivingEntity {
         out.putString(name);
     }
 
-    public ExpiPlayerInventory getInv() {
+    public PlayerInventory getInv() {
         return mainInv;
     }
 
-    public ExpiInventory getSecondInv() {
+    public Inventory getSecondInv() {
         return secondInv;
     }
 
-    public void setSecondInv(ExpiInventory secondInv) {
+    public void setSecondInv(Inventory secondInv) {
         this.secondInv = secondInv;
+        secondInv.willNeedUpdate();
     }
 
     public Vector2 getResurrectLoc() {
