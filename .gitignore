@@ -48,4 +48,6 @@ gradle-app.setting
 Thumbs.db
 
 ## my own
-world/
+world/players
+world/data.expi
+world/quick.expi
