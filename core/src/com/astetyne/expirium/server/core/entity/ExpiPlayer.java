@@ -148,7 +148,6 @@ public class ExpiPlayer extends LivingEntity {
             mainInv.updateHotSlots();
             mainInv.wasUpdated(this);
             secondInv.wasUpdated(this);
-            System.out.println("invs were updated");
         }
 
         tileBreaker.onTick(tsData2);

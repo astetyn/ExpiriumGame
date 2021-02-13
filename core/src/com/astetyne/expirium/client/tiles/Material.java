@@ -9,9 +9,7 @@ import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.TileFix;
-import com.astetyne.expirium.server.core.world.tile.meta.MetaTileCampfire;
-import com.astetyne.expirium.server.core.world.tile.meta.MetaTileLeaves;
-import com.astetyne.expirium.server.core.world.tile.meta.MetaTileRaspberryBush;
+import com.astetyne.expirium.server.core.world.tile.meta.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.io.DataInputStream;
@@ -26,25 +24,41 @@ public enum Material implements Textureable {
     STONE(TileTex.STONE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 4, 10, Item.STONE),
     RHYOLITE(TileTex.RHYOLITE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 6, Item.RHYOLITE),
     GRASS(TileTex.GRASS, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 4, Item.GRASS),
-    GRASS_SLOPE_R(TileTex.GRASS_SLOPE_R, MetaTile.class, TileFix.GRASS_SLOPE_R, Solidity.LABILE, 1, 3, Item.GRASS),
-    GRASS_SLOPE_L(TileTex.GRASS_SLOPE_L, MetaTile.class, TileFix.GRASS_SLOPE_L, Solidity.LABILE, 1, 3, Item.GRASS),
+    GRASS_SLOPE_R(TileTex.GRASS_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE, 1, 3, Item.GRASS),
+    GRASS_SLOPE_L(TileTex.GRASS_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE, 1, 3, Item.GRASS),
     DIRT(TileTex.DIRT, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 4, Item.DIRT),
-    LOG1(TileTex.TREE1, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
-    LOG2(TileTex.TREE2, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
-    LOG3(TileTex.TREE3, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
-    LEAVES1(TileTex.TREE4, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
-    LEAVES2(TileTex.TREE5, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
-    LEAVES3(TileTex.TREE6, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
+    LOG_SHOREA(TileTex.LOG_SHOREA, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
+    LOG_SHOREA_RIGHT(TileTex.LOG_SHOREA_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
+    LOG_SHOREA_LEFT(TileTex.LOG_SHOREA_LEFT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
+    LEAVES_SHOREA_TOP(TileTex.LEAVES_SHOREA_TOP, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
+    LEAVES_SHOREA_LEFT(TileTex.LEAVES_SHOREA_LEFT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
+    LEAVES_SHOREA_RIGHT(TileTex.LEAVES_SHOREA_RIGHT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     CAMPFIRE_SMALL(TileTexAnim.CAMPFIRE_SMALL, MetaTileCampfire.class, TileFix.CAMPFIRE, Solidity.LABILE_VERT, 1, 0.5f),
     CAMPFIRE_BIG(TileTexAnim.CAMPFIRE_BIG, MetaTileCampfire.class, TileFix.CAMPFIRE, Solidity.LABILE_VERT, 1, 0.5f),
     WOODEN_WALL(TileTex.WOODEN_WALL, MetaTile.class, TileFix.FULL, Solidity.SOLID, 6, 2, Item.WOODEN_WALL),
     SOFT_WOODEN_WALL(TileTex.SOFT_WOODEN_WALL, MetaTile.class, TileFix.SOFT, Solidity.SOLID, 6, 2, Item.SOFT_WOODEN_WALL),
     WOODEN_SUPPORT(TileTex.WOODEN_SUPPORT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 6, 1),
-    RASPBERRY_BUSH_1(TileTex.RASPBERRY_BUSH_1, MetaTileRaspberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
-    RASPBERRY_BUSH_2(TileTex.RASPBERRY_BUSH_2, MetaTileRaspberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    RASPBERRY_BUSH(TileTex.RASPBERRY_BUSH, MetaTileRaspberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    RASPBERRY_BUSH_GROWN(TileTex.RASPBERRY_BUSH_GROWN, MetaTileRaspberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     COAL_ORE(TileTex.COAL_ORE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 10, Item.COAL),
     SAND(TileTex.SAND, MetaTile.class, TileFix.FULL, Solidity.SOLID_VERT, 1, 3, Item.SAND),
-    GLASS(TileTex.GLASS, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 1, Item.GLASS);
+    GLASS(TileTex.GLASS, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 1, Item.GLASS),
+    CACTUS_DOUBLE(TileTex.CACTUS_DOUBLE, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
+    CACTUS_RIGHT(TileTex.CACTUS_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
+    CACTUS_LEFT(TileTex.CACTUS_LEFT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
+    CACTUS_TOP(TileTex.CACTUS_TOP, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
+    LEAVES_FIR_TOP(TileTex.LEAVES_FIR_TOP, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    LEAVES_FIR_RIGHT(TileTex.LEAVES_FIR_RIGHT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
+    LEAVES_FIR_LEFT(TileTex.LEAVES_FIR_LEFT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
+    LEAVES_FIR_FULL(TileTex.LEAVES_FIR_FULL, MetaTileLeaves.class, TileFix.SOFT, Solidity.SOLID, 3, 1),
+    LOG_FIR(TileTex.LOG_FIR, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 3, 3, Item.RAW_WOOD),
+    BLUEBERRY_BUSH(TileTex.BLUEBERRY_BUSH, MetaTileBlueberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    BLUEBERRY_BUSH_GROWN(TileTex.BLUEBERRY_BUSH_GROWN, MetaTileBlueberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    GROWING_PLANT(TileTex.GROWING_PLANT, MetaTilePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    LIMESTONE(TileTex.LIMESTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.LIMESTONE),
+    SAND_SLOPE_RIGHT(TileTex.SAND_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE_VERT, 1, 2, Item.SAND),
+    SAND_SLOPE_LEFT(TileTex.SAND_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE_VERT, 1, 2, Item.SAND),
+    ;
 
     private final Textureable textureable;
     private final Class<? extends MetaTile> metaClazz;

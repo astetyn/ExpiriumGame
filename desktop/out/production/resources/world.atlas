@@ -1,229 +1,320 @@
 
 world.png
-size: 128,128
+size: 512,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+---
+  rotate: false
+  xy: 277, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 back_wall
   rotate: false
-  xy: 1, 7
+  xy: 1, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+blueberry_bush
+  rotate: false
+  xy: 241, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+blueberry_bush_grown
+  rotate: false
+  xy: 277, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cactus_double
+  rotate: false
+  xy: 127, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cactus_left
+  rotate: false
+  xy: 421, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cactus_right
+  rotate: false
+  xy: 349, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cactus_top
+  rotate: false
+  xy: 493, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 campfire_big
   rotate: false
-  xy: 1, 93
+  xy: 1, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_big
   rotate: false
-  xy: 35, 93
+  xy: 69, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_big
   rotate: false
-  xy: 35, 59
+  xy: 137, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 campfire_small
   rotate: false
-  xy: 1, 59
+  xy: 35, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_small
   rotate: false
-  xy: 1, 25
+  xy: 103, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_small
   rotate: false
-  xy: 69, 93
+  xy: 171, 22
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-coal_ore_tile
+coal_ore
   rotate: false
-  xy: 37, 23
+  xy: 349, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-dirt_tile
+dirt
   rotate: false
-  xy: 71, 57
+  xy: 457, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass
   rotate: false
-  xy: 55, 5
+  xy: 331, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 91, 39
+  xy: 181, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_left
   rotate: false
-  xy: 105, 91
+  xy: 259, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_right
   rotate: false
-  xy: 37, 5
+  xy: 91, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-raspberry_bush_2_tile
+growing_plant
   rotate: false
-  xy: 35, 41
+  xy: 205, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-raspberry_bush_tile
+leaves_fir_full
   rotate: false
-  xy: 91, 21
+  xy: 331, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-rhyolite_tile
+leaves_fir_right
   rotate: false
-  xy: 109, 55
+  xy: 205, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+leaves_fir_top
+  rotate: false
+  xy: 145, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+leaves_shorea_right
+  rotate: false
+  xy: 295, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+leaves_shorea_top
+  rotate: false
+  xy: 439, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+limestone
+  rotate: false
+  xy: 109, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+log_fir
+  rotate: false
+  xy: 241, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+log_shorea
+  rotate: false
+  xy: 403, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+log_shorea_left
+  rotate: false
+  xy: 367, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+log_shorea_right
+  rotate: false
+  xy: 55, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+raspberry_bush
+  rotate: false
+  xy: 385, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+raspberry_bush_grown
+  rotate: false
+  xy: 19, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+rhyolite
+  rotate: false
+  xy: 223, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 89, 57
+  xy: 163, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+sand_slope_right
+  rotate: false
+  xy: 313, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 soft_wooden_wall
   rotate: false
-  xy: 109, 37
+  xy: 313, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-stone_tile
+stone
   rotate: false
-  xy: 109, 19
+  xy: 259, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tile_break
   rotate: false
-  xy: 69, 75
+  xy: 223, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 2
 tile_break
   rotate: false
-  xy: 55, 23
+  xy: 295, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 4
 tile_break
   rotate: false
-  xy: 73, 39
+  xy: 367, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 tile_break
   rotate: false
-  xy: 91, 3
+  xy: 475, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 3
-tree1
-  rotate: false
-  xy: 109, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tree2
-  rotate: false
-  xy: 73, 3
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tree3
-  rotate: false
-  xy: 87, 75
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tree4
-  rotate: false
-  xy: 107, 73
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tree5
-  rotate: false
-  xy: 73, 21
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tree6
-  rotate: false
-  xy: 103, 109
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 white_tile
   rotate: false
-  xy: 1, 4
+  xy: 1, 1
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 wooden_support
   rotate: false
-  xy: 53, 41
+  xy: 73, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall
   rotate: false
-  xy: 19, 7
+  xy: 37, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

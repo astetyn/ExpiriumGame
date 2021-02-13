@@ -21,20 +21,17 @@ public class MetaTileCampfire extends MetaTile {
 
     private final long placeTick;
     private final CookingInventory inventory;
-    private ExpiPlayer lastClicker;
 
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
         placeTick = world.getTick();
         inventory = new CookingInventory(world, 2, 2, 5);
-        lastClicker = null;
     }
 
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         placeTick = in.readLong();
         inventory = new CookingInventory(world, 2, 2, 5, in);
-        lastClicker = null;
     }
 
     public void postInit() {
@@ -58,8 +55,10 @@ public class MetaTileCampfire extends MetaTile {
     public void onEnd() {
         if(owner.getMeta() != this) return;
         world.changeMaterial(owner, Material.AIR, false, Source.NATURAL);
-        if(lastClicker != null) {
-            lastClicker.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
+        for(ExpiPlayer ep : world.getServer().getPlayers()) {
+            if(ep.getSecondInv() == inventory) {
+                ep.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
+            }
         }
         dropInvItems();
     }
@@ -69,7 +68,6 @@ public class MetaTileCampfire extends MetaTile {
         if(placeTick + 10 > world.getTick()) return;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
-        lastClicker = p;
     }
 
     @Override

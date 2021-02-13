@@ -31,7 +31,13 @@ public enum Item {
     FRUIT_JAM(ItemCat.CONSUMABLE, 0.1f),
     COAL(ItemCat.MISC, 0.1f),
     SAND(ItemCat.MATERIAL, 0.08f),
-    GLASS(ItemCat.MATERIAL, 0.06f);
+    GLASS(ItemCat.MATERIAL, 0.06f),
+    CACTUS(ItemCat.MISC, 0.05f),
+    BLUEBERRY(ItemCat.CONSUMABLE, 0.01f),
+    BLUEBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
+    FIR_CONE(ItemCat.MATERIAL, 0.02f),
+    LIMESTONE(ItemCat.MISC, 0.1f),
+    ;
 
     ItemCat category;
     int gridWidth;
@@ -113,11 +119,13 @@ public enum Item {
             case GRASS: return Material.GRASS;
             case WOODEN_WALL: return Material.WOODEN_WALL;
             case SOFT_WOODEN_WALL: return Material.SOFT_WOODEN_WALL;
-            case RASPBERRY_BUSH: return Material.RASPBERRY_BUSH_1;
+            case RASPBERRY_BUSH: return Material.RASPBERRY_BUSH;
             case WOODEN_SUPPORT: return Material.WOODEN_SUPPORT;
             case CAMPFIRE: return Material.CAMPFIRE_BIG;
             case SAND: return Material.SAND;
             case GLASS: return Material.GLASS;
+            case BLUEBERRY_BUSH: return Material.BLUEBERRY_BUSH;
+            case CACTUS: return Material.CACTUS_DOUBLE;
             default: return null;
         }
     }
