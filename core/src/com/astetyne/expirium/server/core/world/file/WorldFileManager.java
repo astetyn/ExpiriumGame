@@ -39,14 +39,14 @@ public class WorldFileManager {
 
     private void createNewWorld() {
 
-        int width = 200;
-        int height = 500;
+        int width = 2000;
+        int height = 256;
         long seed = (long) (Math.random() * Long.MAX_VALUE);
 
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         gen.generateWorld();
 
-        WorldBuffer wb = new WorldBuffer(1048576);
+        WorldBuffer wb = new WorldBuffer(4194304);
 
         wb.writeInt(width);
         wb.writeInt(height);
@@ -103,7 +103,7 @@ public class WorldFileManager {
 
         saveQuickInfo(server.getWorld().getTick(), true);
 
-        WorldBuffer wb = new WorldBuffer(1048576);
+        WorldBuffer wb = new WorldBuffer(4194304);
         server.writeData(wb);
         saveAsync(wb);
 
@@ -152,7 +152,7 @@ public class WorldFileManager {
             DataOutputStream out = new DataOutputStream(file.write(false));
             out.writeLong(tick);
             out.writeBoolean(firstLife);
-            out.writeInt(ExpiServer.version);
+            out.writeInt(Consts.VERSION);
             out.close();
 
         }catch(IOException e) {

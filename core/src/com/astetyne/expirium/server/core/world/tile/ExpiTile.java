@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.core.world.tile;
 
 import com.astetyne.expirium.client.tiles.Material;
+import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -22,6 +23,7 @@ public class ExpiTile implements WorldSaveable {
     private final int x, y;
     private int stability;
     private boolean backWall;
+    private final IntVector2 tempLoc;
 
     public ExpiTile(ExpiWorld world, DataInputStream in, int x, int y) throws IOException {
         this.world = world;
@@ -32,6 +34,7 @@ public class ExpiTile implements WorldSaveable {
         this.y = y;
         stability = 0;
         backWall = in.readBoolean();
+        tempLoc = new IntVector2(x, y);
     }
 
     /** This is unsafe. Do not call this if you have no big reason.*/
@@ -86,6 +89,11 @@ public class ExpiTile implements WorldSaveable {
 
     public MetaTile getMeta() {
         return metaTile;
+    }
+
+    public IntVector2 getLoc() {
+        tempLoc.set(x, y);
+        return tempLoc;
     }
 
     @Override

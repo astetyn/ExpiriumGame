@@ -27,9 +27,9 @@ public enum Material implements Textureable {
     GRASS_SLOPE_R(TileTex.GRASS_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE, 1, 3, Item.GRASS),
     GRASS_SLOPE_L(TileTex.GRASS_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE, 1, 3, Item.GRASS),
     DIRT(TileTex.DIRT, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 4, Item.DIRT),
-    LOG_SHOREA(TileTex.LOG_SHOREA, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
-    LOG_SHOREA_RIGHT(TileTex.LOG_SHOREA_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
-    LOG_SHOREA_LEFT(TileTex.LOG_SHOREA_LEFT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 3, Item.RAW_WOOD),
+    LOG_SHOREA(TileTex.LOG_SHOREA, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 2, 3, Item.RAW_WOOD),
+    LOG_SHOREA_RIGHT(TileTex.LOG_SHOREA_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 2, 3, Item.RAW_WOOD),
+    LOG_SHOREA_LEFT(TileTex.LOG_SHOREA_LEFT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 2, 3, Item.RAW_WOOD),
     LEAVES_SHOREA_TOP(TileTex.LEAVES_SHOREA_TOP, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     LEAVES_SHOREA_LEFT(TileTex.LEAVES_SHOREA_LEFT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     LEAVES_SHOREA_RIGHT(TileTex.LEAVES_SHOREA_RIGHT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
@@ -51,10 +51,11 @@ public enum Material implements Textureable {
     LEAVES_FIR_RIGHT(TileTex.LEAVES_FIR_RIGHT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     LEAVES_FIR_LEFT(TileTex.LEAVES_FIR_LEFT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     LEAVES_FIR_FULL(TileTex.LEAVES_FIR_FULL, MetaTileLeaves.class, TileFix.SOFT, Solidity.SOLID, 3, 1),
-    LOG_FIR(TileTex.LOG_FIR, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 3, 3, Item.RAW_WOOD),
+    LOG_FIR(TileTex.LOG_FIR, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 3, 3, Item.RAW_WOOD),
     BLUEBERRY_BUSH(TileTex.BLUEBERRY_BUSH, MetaTileBlueberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     BLUEBERRY_BUSH_GROWN(TileTex.BLUEBERRY_BUSH_GROWN, MetaTileBlueberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
-    GROWING_PLANT(TileTex.GROWING_PLANT, MetaTilePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    GROWING_PLANT_FIR(TileTex.GROWING_PLANT, MetaTileTreePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    GROWING_PLANT_SHOREA(TileTex.GROWING_PLANT, MetaTileTreePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     LIMESTONE(TileTex.LIMESTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.LIMESTONE),
     SAND_SLOPE_RIGHT(TileTex.SAND_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE_VERT, 1, 2, Item.SAND),
     SAND_SLOPE_LEFT(TileTex.SAND_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE_VERT, 1, 2, Item.SAND),
@@ -139,7 +140,8 @@ public enum Material implements Textureable {
     public boolean isTransparent() {
         if(tileFix == TileFix.SOFT) return true;
         switch(this) {
-            case GLASS: return true;
+            case GLASS:
+            case LIMESTONE: return true;
             default: return false;
         }
     }

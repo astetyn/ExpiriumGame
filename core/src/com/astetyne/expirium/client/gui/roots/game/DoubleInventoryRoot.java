@@ -6,6 +6,7 @@ import com.astetyne.expirium.client.data.StorageGridData;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.screens.GameScreen;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -17,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 
 public class DoubleInventoryRoot extends Table implements GameRootable {
 
@@ -44,10 +44,13 @@ public class DoubleInventoryRoot extends Table implements GameRootable {
         });
 
         // width is here just for making sure, the inv label will not expand table when text is wider
-        storageCell1 = add(storage1).width(800).height(Utils.percFromW(800)).padRight(200);
-        storageCell2 = add(storage2).width(800).height(Utils.percFromW(800));
+        storageCell1 = add(storage1).width(800).growY().padRight(100).fill();
+        storageCell2 = add(storage2).width(800).growY().fill();
 
-        add(returnButton).width(Utils.percFromH(100)).height(100).align(Align.topRight);
+        if(Consts.DEBUG) setDebug(true);
+
+        returnButton.setBounds(1880, 890, 100, Utils.percFromW(100));
+        addActor(returnButton);
 
         setTouchable(Touchable.enabled);
 

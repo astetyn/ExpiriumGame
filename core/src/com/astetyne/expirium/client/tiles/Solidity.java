@@ -11,7 +11,10 @@ public enum Solidity {
     LABILE(true, false),
     /**LABILE means that it will not be used as stability reference for near tiles
      * and will only check stability reference from tile under it.*/
-    LABILE_VERT(true, true);
+    LABILE_VERT(true, true),
+    /**ONLY_VERT means that it will be used as stability reference only for tile above it and will only check stability
+     * reference from tile under it. This is useful for supports or logs.*/
+    ONLY_VERT(true, true);
 
     boolean labile;
     boolean vert;

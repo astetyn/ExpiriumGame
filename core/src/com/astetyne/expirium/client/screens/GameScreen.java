@@ -28,7 +28,7 @@ public class GameScreen implements Screen {
     private final InputMultiplexer multiplexer;
     private final Stage stage;
     private final WarnMsgLabel warnMsgLabel;
-    private final GameWorld gameWorld;
+    private final GameWorld world;
     private final Background background;
     private int time;
     private final PlayerDataHandler playerDataHandler;
@@ -55,19 +55,19 @@ public class GameScreen implements Screen {
 
         multiplexer.addProcessor(stage);
 
-        gameWorld = new GameWorld();
+        world = new GameWorld();
 
         // load init data from server
-        gameWorld.loadData(in);
+        world.loadData(in);
 
-        background = new Background(gameWorld);
+        background = new Background(world);
 
     }
 
     public void update() {
 
         stage.act();
-        gameWorld.update();
+        world.update();
 
     }
 
@@ -86,11 +86,11 @@ public class GameScreen implements Screen {
 
         background.draw(batch, time);
 
-        gameWorld.draw(batch);
+        world.draw(batch);
 
         if(activeRoot.isDimmed()) {
             batch.setColor(0, 0, 0, 0.5f);
-            batch.draw(TileTex.WHITE_TILE.getTex(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(TileTex.WHITE_TILE.getTex(), 0, 0, world.getTerrainWidth(), world.getTerrainHeight());
             batch.setColor(1, 1, 1, 1);
         }
 
@@ -144,7 +144,7 @@ public class GameScreen implements Screen {
     }
 
     public GameWorld getWorld() {
-        return gameWorld;
+        return world;
     }
 
     public static GameScreen get() {

@@ -20,7 +20,7 @@ blueberry_bush_item
   index: -1
 blueberry_item
   rotate: false
-  xy: 871, 228
+  xy: 735, 194
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -55,7 +55,7 @@ cooked_apple_item
   index: -1
 cross_icon
   rotate: false
-  xy: 907, 228
+  xy: 771, 194
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -81,9 +81,9 @@ dirt_item
   orig: 16, 16
   offset: 0, 0
   index: -1
-fir_cone
+fir_cone_item
   rotate: false
-  xy: 771, 194
+  xy: 717, 194
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -144,7 +144,7 @@ fruit_jam_item
   index: -1
 glass_item
   rotate: false
-  xy: 717, 194
+  xy: 267, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -221,14 +221,14 @@ raw_wood_item
   index: -1
 rhyolite_item
   rotate: false
-  xy: 267, 19
+  xy: 401, 53
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item
   rotate: false
-  xy: 735, 194
+  xy: 419, 53
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -242,7 +242,7 @@ rhyolite_mattock_item_grid
   index: -1
 sand_item
   rotate: false
-  xy: 889, 228
+  xy: 753, 194
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -263,21 +263,21 @@ settings_icon
   index: -1
 soft_wooden_wall_item
   rotate: false
-  xy: 753, 194
+  xy: 437, 53
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 stone_item
   rotate: false
-  xy: 419, 53
+  xy: 889, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 switch_arrow
   rotate: false
-  xy: 437, 53
+  xy: 907, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -340,7 +340,7 @@ wooden_bowl_item
   index: -1
 wooden_mattock_item
   rotate: false
-  xy: 401, 53
+  xy: 871, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

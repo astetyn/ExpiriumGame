@@ -25,7 +25,7 @@ public class Consts {
 
     public static final float CAMPFIRE_TIME = 180;
 
-    public static final int ITEM_COOLDOWN_BREAK = SERVER_TPS;
+    public static final int ITEM_COOLDOWN_BREAK = SERVER_TPS/4;
     public static final int ITEM_COOLDOWN_DROP = SERVER_TPS * 6;
 
     public static final int ITEM_DESPAWN_TIME = 60; // in seconds
@@ -48,6 +48,5 @@ public class Consts {
 
     // gui
     public static final int INV_TILE_MLT = 140;
-
 
 }

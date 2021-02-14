@@ -24,6 +24,12 @@ public class IntVector2 {
         this.y = vec.y;
     }
 
+    public IntVector2 add(int x, int y) {
+        this.x += x;
+        this.y += y;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "x: "+x+" y: "+y;

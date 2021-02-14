@@ -25,13 +25,13 @@ public class MetaTileCampfire extends MetaTile {
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
         placeTick = world.getTick();
-        inventory = new CookingInventory(world, 2, 2, 5);
+        inventory = new CookingInventory(world, 1, 2, 5);
     }
 
     public MetaTileCampfire(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         placeTick = in.readLong();
-        inventory = new CookingInventory(world, 2, 2, 5, in);
+        inventory = new CookingInventory(world, 1, 2, 5, in);
     }
 
     public void postInit() {

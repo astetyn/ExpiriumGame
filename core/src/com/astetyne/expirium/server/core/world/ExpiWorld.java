@@ -1,9 +1,9 @@
 package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.items.ItemCat;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
@@ -167,7 +167,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
         Item item = p.getInv().getItemInHand().getItem();;
 
-        if(item.getCategory() != ItemCat.MATERIAL || t.getMaterial() != Material.AIR) return;
+        if(t.getMaterial() != Material.AIR) return;
 
         if(item.getBuildMaterial() == null) return;
 
@@ -301,6 +301,10 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return terrain[(int)vec.y][(int)vec.x];
     }
 
+    public ExpiTile getTileAt(IntVector2 loc) {
+        return terrain[loc.y][loc.x];
+    }
+
     public Body getTerrainBody() {
         return terrainBody;
     }
@@ -349,9 +353,16 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return tick;
     }
 
-    public void scheduleTask(Runnable runnable, long afterTicks) {
+    public long scheduleTask(Runnable runnable, long afterTicks) {
         TickTask task = new TickTask(runnable, tick + afterTicks);
         scheduleTask(task);
+        return task.tick;
+    }
+
+    public long scheduleTaskOn(Runnable runnable, long ticks) {
+        TickTask task = new TickTask(runnable, ticks);
+        scheduleTask(task);
+        return task.tick;
     }
 
     public void scheduleTask(TickTask task) {

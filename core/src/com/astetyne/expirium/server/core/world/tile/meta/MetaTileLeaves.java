@@ -25,8 +25,24 @@ public class MetaTileLeaves extends MetaTile {
 
     @Override
     public void dropItems() {
-        if(Math.random() < 0.3) {
-            dropItem(Item.APPLE);
+        switch(owner.getMaterial()) {
+            case LEAVES_FIR_FULL:
+            case LEAVES_FIR_TOP:
+                dropItem(Item.RAW_WOOD);
+                break;
+            case LEAVES_FIR_LEFT:
+            case LEAVES_FIR_RIGHT:
+                if(Math.random() < 0.3) {
+                    dropItem(Item.FIR_CONE);
+                }
+                break;
+            case LEAVES_SHOREA_LEFT:
+            case LEAVES_SHOREA_RIGHT:
+            case LEAVES_SHOREA_TOP:
+                if(Math.random() < 0.3) {
+                    dropItem(Item.APPLE);
+                }
+                break;
         }
     }
 

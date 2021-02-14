@@ -146,8 +146,8 @@ public class ServerPacketManager {
 
     public void putOpenDoubleInvPacket() {
         out.startPacket(31);
-        out.putInt(owner.getSecondInv().getGrid().length);
-        out.putInt(owner.getSecondInv().getGrid()[0].length);
+        out.putInt(owner.getSecondInv().getRows());
+        out.putInt(owner.getSecondInv().getColumns());
     }
 
     public void putHotSlotsFeedPacket(ChosenSlot slot, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {

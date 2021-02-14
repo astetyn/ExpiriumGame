@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 
-public class BorealForest extends Biome {
+public class BorealForest extends BiomeGenerator {
 
     public BorealForest(Material[][] terrain, int[] surface, int w, int h, long seed) {
         super(terrain, surface, w, h, seed);
@@ -14,8 +14,6 @@ public class BorealForest extends Biome {
         super.generate(from, to, leftMH, rightMH);
         for(int x = from; x < to; x++) {
             int terrainHeight = surface[x];
-
-            //System.out.println("x: "+x+" diff: "+(leftMH - getH(x))+" xDiff: "+(x-from)+" smooth: "+(smoothing - (x-from))/smoothing * (leftMH - getH(x)));
 
             for(int y = 0; y < h; y++) {
                 if(y == terrainHeight) {
@@ -37,12 +35,40 @@ public class BorealForest extends Biome {
                 }
             }
         }
-        //createFirTrees(from, to);
-        //generateBlueberryBushes(from, to);
+        createFirTrees(from, to);
+        createRandSurfacePlacements(from, to, Material.BLUEBERRY_BUSH_GROWN, 0.08, 2);
+        createRandSurfacePlacements(from, to, Material.LIMESTONE, 0.1, 1);
     }
 
     @Override
     public int getH(int x) {
         return (int) (50 + Noise.noise(x / 16.0f, seed) * 10);
+    }
+
+    private void createFirTrees(int from, int to) {
+
+        int last = from;
+
+        for(int x = from+1; x < to-1; x++) {
+
+            int y = surface[x] + 1;
+
+            if(terrain[y-1][x].getSolidity().isLabile() || last + 3 >= x || Math.random() > 0.5) continue;
+
+            int treeHeight = (int) (Math.random() * 5) + 5;
+
+            if(y + treeHeight >= h) continue;
+
+            last = x;
+
+            terrain[y][x] = Material.LOG_FIR;
+
+            for(int i = 1; i < treeHeight; i++) {
+                terrain[y + i][x] = Material.LEAVES_FIR_FULL;
+                terrain[y + i][x+1] = Material.LEAVES_FIR_RIGHT;
+                terrain[y + i][x-1] = Material.LEAVES_FIR_LEFT;
+            }
+            terrain[y + treeHeight][x] = Material.LEAVES_FIR_TOP;
+        }
     }
 }

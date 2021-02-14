@@ -137,4 +137,8 @@ public class Utils {
         return "error";
     }*/
 
+    public static int getRandAddTime(int base) {
+        return  base + (int) (Math.random() * base);
+    }
+
 }

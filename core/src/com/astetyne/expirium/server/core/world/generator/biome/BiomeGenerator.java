@@ -2,16 +2,16 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 
 import com.astetyne.expirium.client.tiles.Material;
 
-public abstract class Biome {
+public abstract class BiomeGenerator {
 
-    protected static final float smoothing = 5;
+    protected static final float smoothing = 7;
 
     protected final Material[][] terrain;
     protected final int[] surface;
     protected final int w, h;
     protected final long seed;
 
-    public Biome(Material[][] terrain, int[] surface, int w, int h, long seed) {
+    public BiomeGenerator(Material[][] terrain, int[] surface, int w, int h, long seed) {
         this.terrain = terrain;
         this.surface = surface;
         this.w = w;
@@ -32,6 +32,21 @@ public abstract class Biome {
         int smooth = x-from <= smoothing ? (int) ((smoothing - (x - from)) / smoothing * (leftMH - getH(x))) : 0;
         smooth = to-x <= smoothing ? (int) ((smoothing - (to - x)) / smoothing * (rightMH - getH(x))) : smooth;
         return getH(x) + smooth;
+    }
+
+    public void createRandSurfacePlacements(int from, int to, Material mat, double chance, int minGap) {
+
+        int last = 0;
+
+        for(int x = from; x < to; x++) {
+            int y = surface[x] + 1;
+
+            if(terrain[y - 1][x].getSolidity().isLabile() || terrain[y][x] != Material.AIR ||
+                    Math.random() > chance || last + minGap > x) continue;
+
+            terrain[y][x] = mat;
+            last = x;
+        }
     }
 
 }

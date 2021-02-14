@@ -4,13 +4,6 @@ size: 512,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
----
-  rotate: false
-  xy: 277, 20
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 back_wall
   rotate: false
   xy: 1, 4
@@ -48,7 +41,7 @@ cactus_left
   index: -1
 cactus_right
   rotate: false
-  xy: 349, 20
+  xy: 313, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -130,13 +123,6 @@ grass
   orig: 16, 16
   offset: 0, 0
   index: -1
-grass_slope_left
-  rotate: false
-  xy: 259, 20
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 grass_slope_right
   rotate: false
   xy: 91, 4
@@ -153,7 +139,7 @@ growing_plant
   index: -1
 leaves_fir_full
   rotate: false
-  xy: 331, 20
+  xy: 295, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -174,7 +160,7 @@ leaves_fir_top
   index: -1
 leaves_shorea_right
   rotate: false
-  xy: 295, 20
+  xy: 259, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -209,7 +195,7 @@ log_shorea
   index: -1
 log_shorea_left
   rotate: false
-  xy: 367, 20
+  xy: 331, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -258,7 +244,7 @@ sand_slope_right
   index: -1
 soft_wooden_wall
   rotate: false
-  xy: 313, 20
+  xy: 277, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

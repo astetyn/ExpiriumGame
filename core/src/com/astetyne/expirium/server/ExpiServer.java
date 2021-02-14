@@ -20,8 +20,6 @@ import java.util.List;
 
 public class ExpiServer implements WorldSaveable {
 
-    public static final int version = 1;
-
     private ExpiWorld expiWorld;
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
@@ -68,8 +66,8 @@ public class ExpiServer implements WorldSaveable {
             WorldQuickInfo wqi = WorldFileManager.getQuickInfo();
             if(wqi == null) throw new IOException("Cant load quick info.");
 
-            if(wqi.worldVersion != version) failListener.onServerFail("World has incompatible version." +
-                    " ("+wqi.worldVersion+") Your is: "+" ("+version+")");
+            if(wqi.worldVersion != Consts.VERSION) failListener.onServerFail("World has incompatible version." +
+                    " ("+wqi.worldVersion+") Your is: "+" ("+Consts.VERSION+")");
 
             DataInputStream in = fileManager.getWorldInputStream();
             expiWorld = new ExpiWorld(in, wqi.tick, this);

@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 
-public class Desert extends Biome {
+public class Desert extends BiomeGenerator {
 
     public Desert(Material[][] terrain, int[] surface, int w, int h, long seed) {
         super(terrain, surface, w, h, seed);
@@ -34,11 +34,41 @@ public class Desert extends Biome {
                 }
             }
         }
-        //generateCacti(from, to);
+        generateCacti(from, to);
+        createRandSurfacePlacements(from, to, Material.LIMESTONE, Math.random()*0.2, 1);
     }
 
     @Override
     public int getH(int x) {
         return (int) (50 + Noise.noise(x / 32.0f, seed) * 4);
+    }
+
+    private void generateCacti(int from, int to) {
+
+        int last = from;
+
+        for(int x = from; x < to; x++) {
+
+            int y = surface[x] + 1;
+
+            if(terrain[y-1][x].getSolidity().isLabile() || last + 10 > x || Math.random() < 0.8) continue;
+
+            last = x;
+
+            int cactusHeight = (int) (Math.random()*3) + 3;
+            for(int i = 0; i < cactusHeight; i++) {
+
+                double rand = Math.random();
+
+                if(rand < 0.33) {
+                    terrain[y + i][x] = Material.CACTUS_DOUBLE;
+                }else if(rand < 0.66) {
+                    terrain[y + i][x] = Material.CACTUS_LEFT;
+                }else {
+                    terrain[y + i][x] = Material.CACTUS_RIGHT;
+                }
+            }
+            terrain[y+cactusHeight-1][x] = Material.CACTUS_TOP;
+        }
     }
 }
