@@ -9,9 +9,9 @@ import java.io.IOException;
 
 public class CookingInventory extends Inventory {
 
-    private final ExpiWorld world;
-    private long startTick;
-    private CookingRecipe recipe;
+    protected final ExpiWorld world;
+    protected long startTick;
+    protected CookingRecipe recipe;
     private int multiply;
 
     public CookingInventory(ExpiWorld world, int rows, int columns, float maxWeight) {
@@ -31,12 +31,9 @@ public class CookingInventory extends Inventory {
     // should be called every half second = 16 ticks
     public void onCookingUpdate() {
         willNeedUpdate();
-        if(recipe == null) {
-            label = "Unknown recipe";
-            return;
-        }
+        generateLabel();
+        if(recipe == null) return;
 
-        label = "Cooking: "+Math.min((int)((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100)+"%";
         if(startTick + recipe.getTicks() < world.getTick()) {
             CookingRecipe currRecipe = recipe;
             recipe = null;
@@ -45,7 +42,16 @@ public class CookingInventory extends Inventory {
         }
     }
 
-    private void matchRecipe() {
+    protected void generateLabel() {
+        if(recipe == null) {
+            label = "Unknown recipe";
+        }else {
+            label = "Cooking: " + Math.min((int) ((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100) + "%";
+        }
+    }
+
+    protected void matchRecipe() {
+
         startTick = world.getTick();
         if(items.size() == 0) {
             recipe = null;
@@ -54,7 +60,7 @@ public class CookingInventory extends Inventory {
 
         recipes:
         for(CookingRecipe r : CookingRecipe.values()) {
-            int maximumMultiply = Integer.MAX_VALUE;
+            int mtp = -1;
 
             // check if inventory has only required items = no extra items - this is important if recipes
             // share common req items
@@ -63,8 +69,7 @@ public class CookingInventory extends Inventory {
                 for(ItemStack is : r.getRequiredItems()) {
                     if(is2.getItem() == is.getItem()) continue outer;
                 }
-                recipe = null;
-                return;
+                continue recipes;
             }
 
             for(ItemStack is : r.getRequiredItems()) {
@@ -74,11 +79,12 @@ public class CookingInventory extends Inventory {
                         foundAmount += is2.getAmount();
                     }
                 }
-                maximumMultiply = Math.min(maximumMultiply, foundAmount / is.getAmount());
-                if(maximumMultiply == 0) continue recipes;
+                int mtpFound = foundAmount / is.getAmount();
+                if(mtpFound == 0 || (mtp != -1 && mtpFound != mtp) || foundAmount % is.getAmount() != 0) continue recipes;
+                mtp = mtpFound;
             }
             recipe = r;
-            multiply = maximumMultiply;
+            multiply = mtp;
             return;
         }
         recipe = null;

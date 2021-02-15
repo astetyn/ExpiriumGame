@@ -42,6 +42,7 @@ public class WorldFileManager {
         int width = 2000;
         int height = 256;
         long seed = (long) (Math.random() * Long.MAX_VALUE);
+        long tick = Consts.TICKS_IN_DAY / 24 * 7;
 
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         gen.generateWorld();
@@ -56,7 +57,7 @@ public class WorldFileManager {
 
         wb.writeInt(0); // number of entities
 
-        saveQuickInfo(0, true);
+        saveQuickInfo(tick, true);
 
         saveSync(wb);
 

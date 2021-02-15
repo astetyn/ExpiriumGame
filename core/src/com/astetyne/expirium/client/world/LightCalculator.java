@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.world;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.tiles.Tile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -204,14 +203,8 @@ public class LightCalculator {
     }
 
     private void registerLightSource(Tile t, int x, int y) {
-
-        Material to = t.getMaterial();
-
-        if(to == Material.CAMPFIRE_BIG) {
-            lightSources.put(t, new LightSource((byte)10, new IntVector2(x, y)));
-        }else if(to == Material.CAMPFIRE_SMALL) {
-            lightSources.put(t, new LightSource((byte)5, new IntVector2(x, y)));
-        }
-
+        byte light = t.getMaterial().getLight();
+        if(light == 0) return;
+        lightSources.put(t, new LightSource(light, new IntVector2(x, y)));
     }
 }

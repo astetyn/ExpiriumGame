@@ -51,7 +51,9 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
 
     protected void createBodyFixtures() {}
 
-    public void onTick() {}
+    public void onTick() {
+        if(getLocation().y <= 0) destroy();
+    }
 
     public int getId() {
         return id;
@@ -94,8 +96,11 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
         return server;
     }
 
+    public boolean isLookingRight() {
+        return true;
+    }
+
     public void destroy() {
-        //System.out.println("destroying entity: "+this+" already destroyed: "+destroyed);
         if(destroyed) return;
         destroyed = true;
         server.getEntities().remove(this);

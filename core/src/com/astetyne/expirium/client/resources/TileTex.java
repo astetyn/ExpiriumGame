@@ -43,7 +43,9 @@ public enum TileTex implements Textureable {
     LEAVES_FIR_TOP,
     LEAVES_FIR_FULL,
     SAND_SLOPE_RIGHT,
-    SAND_SLOPE_LEFT
+    SAND_SLOPE_LEFT,
+    FURNACE_ON,
+    FURNACE_OFF,
     ;
 
     private TextureRegion textureRegion;

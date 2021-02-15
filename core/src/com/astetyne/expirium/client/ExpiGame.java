@@ -10,7 +10,6 @@ import com.astetyne.expirium.client.resources.BGRes;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
-import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
@@ -85,9 +84,9 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		update();
 		super.render();
 		// this is only for debug purposes, ultra unsafe
-		if(server != null && server.getWorld() != null && GameScreen.get() != null && GameScreen.get().getWorld() != null) {
-			//debugRenderer.render(server.getWorld().getB2dWorld(), GameScreen.get().getWorld().getCamera().combined);
-		}
+		/*if(server != null && server.getWorld() != null && GameScreen.get() != null && GameScreen.get().getWorld() != null) {
+			debugRenderer.render(server.getWorld().getB2dWorld(), GameScreen.get().getWorld().getCamera().combined);
+		}*/
 	}
 
 	@Override

@@ -55,8 +55,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         this.server = server;
 
         this.tick = tick;
-        day = tick / Consts.DAY_TICKS;
-        time = (int) (tick % Consts.DAY_TICKS);
+        day = tick / Consts.TICKS_IN_DAY;
+        time = (int) (tick % Consts.TICKS_IN_DAY);
         System.out.println("tick: "+tick+" "+" day: "+day+" time: "+time);
 
         width = in.readInt();
@@ -114,8 +114,9 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     public void onTick() {
 
         tick++;
-        time += 100;
-        if(time >= Consts.DAY_TICKS) { // midnight
+        time++;
+        if(Consts.DEBUG) time += 99;
+        if(time >= Consts.TICKS_IN_DAY) { // midnight
             time = 0;
             day++;
         }
@@ -225,6 +226,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
             float pxe = px + p.getWidth();
             float pye = py + p.getHeight();
 
+            //todo: what if entity is rotated?
             if(((px > x && px < x+1) || (px < x && x < pxe) || (pxe > x && pxe < x+1)) && //check if x collide
                     ((py > y && py < y+1) || (py < y && y < pye) || (pye > y && pye < y+1))) { //check if y collide
                 return false;

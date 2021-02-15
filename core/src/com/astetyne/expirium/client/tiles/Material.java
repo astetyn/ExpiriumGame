@@ -43,10 +43,11 @@ public enum Material implements Textureable {
     COAL_ORE(TileTex.COAL_ORE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 10, Item.COAL),
     SAND(TileTex.SAND, MetaTile.class, TileFix.FULL, Solidity.SOLID_VERT, 1, 3, Item.SAND),
     GLASS(TileTex.GLASS, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 1, Item.GLASS),
-    CACTUS_DOUBLE(TileTex.CACTUS_DOUBLE, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
-    CACTUS_RIGHT(TileTex.CACTUS_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
-    CACTUS_LEFT(TileTex.CACTUS_LEFT, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
-    CACTUS_TOP(TileTex.CACTUS_TOP, MetaTile.class, TileFix.SOFT, Solidity.SOLID_VERT, 1, 2, Item.CACTUS),
+    CACTUS_PLANT(TileTex.CACTUS_DOUBLE, MetaTileCactus.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.CACTUS),
+    CACTUS_DOUBLE(TileTex.CACTUS_DOUBLE, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.CACTUS),
+    CACTUS_RIGHT(TileTex.CACTUS_RIGHT, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.CACTUS),
+    CACTUS_LEFT(TileTex.CACTUS_LEFT, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.CACTUS),
+    CACTUS_TOP(TileTex.CACTUS_TOP, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.CACTUS),
     LEAVES_FIR_TOP(TileTex.LEAVES_FIR_TOP, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     LEAVES_FIR_RIGHT(TileTex.LEAVES_FIR_RIGHT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
     LEAVES_FIR_LEFT(TileTex.LEAVES_FIR_LEFT, MetaTileLeaves.class, TileFix.SOFT, Solidity.LABILE, 1, 1),
@@ -59,6 +60,8 @@ public enum Material implements Textureable {
     LIMESTONE(TileTex.LIMESTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.LIMESTONE),
     SAND_SLOPE_RIGHT(TileTex.SAND_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE_VERT, 1, 2, Item.SAND),
     SAND_SLOPE_LEFT(TileTex.SAND_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE_VERT, 1, 2, Item.SAND),
+    FURNACE_ON(TileTex.FURNACE_ON, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
+    FURNACE_OFF(TileTex.FURNACE_OFF, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
     ;
 
     private final Textureable textureable;
@@ -152,6 +155,16 @@ public enum Material implements Textureable {
             case SOFT_WOODEN_WALL:
             case GLASS: return true;
             default: return false;
+        }
+    }
+
+    public byte getLight() {
+        switch(this) {
+            case CAMPFIRE_BIG:
+            case FURNACE_ON:
+                return 10;
+            case CAMPFIRE_SMALL: return 5;
+            default: return 0;
         }
     }
 

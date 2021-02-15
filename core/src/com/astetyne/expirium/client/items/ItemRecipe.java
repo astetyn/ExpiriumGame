@@ -10,7 +10,10 @@ public enum ItemRecipe {
     SOFT_WOODEN_WALL(Item.SOFT_WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 5)}, "Same as wooden wall but softer to your body."),
     WOODEN_SUPPORT(Item.WOODEN_SUPPORT, 6, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 3)}, "Cheap and useful for maintaining high stability."),
     CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Make it if you are cold. It will warm your small house."),
-    BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska?");
+    BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska?"),
+    FURNACE(Item.FURNACE, new ItemStack[]{new ItemStack(Item.LIMESTONE, 5), new ItemStack(Item.STONE, 20)}, "For cooking better meals."),
+    JAR(Item.JAR, new ItemStack[]{new ItemStack(Item.GLASS, 5)}, "Ideal for tasty jams."),
+    ;
 
     ItemStack product;
     ItemStack[] requiredItems;

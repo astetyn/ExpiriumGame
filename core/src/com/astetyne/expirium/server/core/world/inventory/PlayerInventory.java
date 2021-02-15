@@ -190,6 +190,12 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
                         owner.increaseFoodLevel(5);
                         remove(Item.BLUEBERRY, 1);
                         break;
+
+                    case JAR_BLUEBERRY_JAM:
+                        owner.increaseFoodLevel(20);
+                        remove(Item.JAR_BLUEBERRY_JAM, 1);
+                        append(Item.JAR, 1);
+                        break;
                 }
                 break;
         }

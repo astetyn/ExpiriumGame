@@ -37,6 +37,9 @@ public enum Item {
     BLUEBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     FIR_CONE(ItemCat.MATERIAL, 0.02f),
     LIMESTONE(ItemCat.MISC, 0.1f),
+    FURNACE(ItemCat.MATERIAL, 2, 2, 1),
+    JAR(ItemCat.MISC, 0.05f),
+    JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.1f),
     ;
 
     ItemCat category;
@@ -125,9 +128,10 @@ public enum Item {
             case SAND: return Material.SAND;
             case GLASS: return Material.GLASS;
             case BLUEBERRY_BUSH: return Material.BLUEBERRY_BUSH;
-            case CACTUS: return Material.CACTUS_DOUBLE;
+            case CACTUS: return Material.CACTUS_PLANT;
             case APPLE: return Material.GROWING_PLANT_SHOREA;
             case FIR_CONE: return Material.GROWING_PLANT_FIR;
+            case FURNACE: return Material.FURNACE_OFF;
             default: return null;
         }
     }

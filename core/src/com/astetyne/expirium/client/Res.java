@@ -35,6 +35,8 @@ public class Res {
     public static Animation<TextureRegion> PLAYER_MOVE_ANIM;
     public static Animation<TextureRegion> PLAYER_INTERACT_ANIM;
 
+    public static Animation<TextureRegion> SQUIRREL_IDLE;
+
     public static void loadTextures(TextureAtlas gui, TextureAtlas ent) {
 
         Animation.PlayMode loop_pong = Animation.PlayMode.LOOP_PINGPONG;
@@ -82,6 +84,8 @@ public class Res {
         PLAYER_IDLE_ANIM = new Animation<>(0.5f, ent.findRegions("player_idle"), loop_pong);
         PLAYER_MOVE_ANIM = new Animation<>(0.05f, ent.findRegions("player_move"), loop_pong);
         PLAYER_INTERACT_ANIM = new Animation<>(0.12f, ent.findRegions("player_interact"), Animation.PlayMode.LOOP);
+
+        SQUIRREL_IDLE = new Animation<>(1, ent.findRegion("squirrel_idle"));
 
     }
 

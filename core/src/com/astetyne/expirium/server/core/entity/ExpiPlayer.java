@@ -15,6 +15,7 @@ import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Filter;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -73,6 +74,16 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     @Override
+    public void createBodyFixtures() {
+        super.createBodyFixtures();
+        mainBody.setFriction(0);
+        Filter filter = new Filter();
+        filter.categoryBits = Consts.PLAYER_BIT;
+        filter.maskBits = Consts.DEFAULT_BIT;
+        mainBody.setFilterData(filter);
+    }
+
+    @Override
     public void die() {
         invincible = true;
         getNetManager().putDeathPacket(!wasAlreadyDead, server.getWorld().getDay() - lastDeathDay);
@@ -126,9 +137,9 @@ public class ExpiPlayer extends LivingEntity {
         //System.out.println("loc: "+getLocation());
         Vector2 vel = body.getLinearVelocity();
         if(vel.x > 0 && onGround) {
-            vel.x -= 0.1f;
+            vel.x -= Math.min(0.1f, vel.x);
         }else if(onGround){
-            vel.x += 0.1f;
+            vel.x += Math.min(0.1f, -vel.x);
         }
         body.setLinearVelocity(vel);
     }
@@ -151,6 +162,16 @@ public class ExpiPlayer extends LivingEntity {
         }
 
         tileBreaker.onTick(tsData2);
+    }
+
+    @Override
+    public void recalcLookingDir() {
+        super.recalcLookingDir();
+        if(tsData2.horz > 0) {
+            lookingRight = true;
+        }else if(tsData2.horz < 0) {
+            lookingRight = false;
+        }
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -202,7 +223,7 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     @Override
-    public void writeMeta(PacketOutputStream out) {
+    public void writeInitClientMeta(PacketOutputStream out) {
         out.putString(name);
     }
 

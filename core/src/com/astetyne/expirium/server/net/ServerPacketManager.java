@@ -108,6 +108,7 @@ public class ServerPacketManager {
         out.putFloat(e.getVelocity().x);
         out.putFloat(e.getVelocity().y);
         out.putFloat(e.getBody().getAngle());
+        out.putBoolean(e.isLookingRight());
     }
 
     public void putEntitySpawnPacket(ExpiEntity e) {

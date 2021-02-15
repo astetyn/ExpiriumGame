@@ -4,14 +4,14 @@ public class Consts {
 
     public static final int VERSION = 1;
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // server
     public static final long SAVE_INTERVAL = 20000; // in millis
 
     // networking
     public static final int SERVER_PORT = 1414;
-    public static final int BUFFER_SIZE = 32768; //262144, 2097152, 32768
+    public static final int BUFFER_SIZE = 131072; //262144, 2097152, 32768
     public static final int SERVER_TPS = 32;
     public static final String MULTICAST_ADDRESS = "234.14.14.14";
 
@@ -33,11 +33,12 @@ public class Consts {
     public static final byte MAX_LIGHT_LEVEL = 10;
     public static final int SKY_LIGHT_DECREASE = 3;
 
-    public static final int DAY_TICKS = 38400;
+    public static final int TICKS_IN_DAY = 38400;
+    public static final int TICKS_IN_HOUR = 1600;
     public static final int SUNRISE_START = 9600;
     public static final int SUNRISE_END = 11200;
-    public static final int SUNSET_START = 28800;
-    public static final int SUNSET_END = 30400;
+    public static final int SUNSET_START = 30400;
+    public static final int SUNSET_END = 32000;
 
     // player
     public static final int PLAYER_INV_COLUMNS = 5;

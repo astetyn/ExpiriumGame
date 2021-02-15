@@ -20,12 +20,11 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     private float healthLevel, foodLevel, temperatureLevel;
 
+    protected boolean lookingRight;
     protected boolean onGround;
     private int collisions;
-    protected Fixture groundSensor;
-
+    protected Fixture mainBody, groundSensor;
     protected boolean alive;
-
     protected boolean invincible;
 
     public LivingEntity(ExpiServer server, EntityType type, Vector2 loc) {
@@ -33,6 +32,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         healthLevel = 100;
         foodLevel = 100;
         temperatureLevel = 22;
+        lookingRight = true;
         onGround = false;
         collisions = 0;
         alive = true;
@@ -45,6 +45,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         healthLevel = in.readFloat();
         foodLevel = in.readFloat();
         temperatureLevel = in.readFloat();
+        lookingRight = true;
         alive = in.readBoolean();
         onGround = false;
         collisions = 0;
@@ -63,9 +64,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
         fixtureDef.density = 30f;
         fixtureDef.restitution = 0f;
-        fixtureDef.friction = 0;
-        fixtureDef.filter.categoryBits = Consts.PLAYER_BIT;
-        fixtureDef.filter.maskBits = Consts.DEFAULT_BIT;
+        fixtureDef.friction = 0.2f;
+        fixtureDef.filter.categoryBits = Consts.DEFAULT_BIT;
         fixtureDef.shape = polyShape;
 
         float w = getWidth();
@@ -76,7 +76,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         // upper poly
         float[] verts = new float[]{0, gh, gw, 0, w-gw, 0, w, gh, w, h, 0, h};
         polyShape.set(verts);
-        body.createFixture(fixtureDef);
+        mainBody = body.createFixture(fixtureDef);
 
         // ground sensor
         polyShape.setAsBox(w/2-gw, gh/2, new Vector2(w/2, 0), 0);
@@ -96,13 +96,17 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     @Override
     public void onTick() {
+        super.onTick();
 
         decreaseFoodLevel(1f/(10*Consts.SERVER_TPS)); // 1 food per 10 seconds
 
         if(foodLevel <= 5) {
             injure(1f/(2*Consts.SERVER_TPS)); // 1 health per 2 seconds
+        }else if(foodLevel >= 90) {
+            increaseHealthLevel(1f/(10*Consts.SERVER_TPS)); // 1 health per 10 seconds
         }
 
+        recalcLookingDir();
     }
 
     public void die() {
@@ -112,7 +116,6 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     }
 
     public void injure(float damage) {
-        System.out.println("damage: "+damage);
         if(invincible) return;
         healthLevel -= damage;
         if(healthLevel <= 0) {
@@ -167,6 +170,20 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
+    }
+
+    public void recalcLookingDir() {
+        Vector2 vel = body.getLinearVelocity();
+        if(vel.x > 0) {
+            lookingRight = true;
+        }else if(vel.x < 0) {
+            lookingRight = false;
+        }
+    }
+
+    @Override
+    public boolean isLookingRight() {
+        return lookingRight;
     }
 
     @Override

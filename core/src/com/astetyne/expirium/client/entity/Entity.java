@@ -23,6 +23,7 @@ public abstract class Entity {
     private Vector2 lastLoc;
     private float lastAngle;
     private EntityAnimator animator;
+    private boolean lookingRight;
 
     public Entity(EntityType type, int id, Vector2 loc) {
 
@@ -40,6 +41,7 @@ public abstract class Entity {
         lastLoc = loc.cpy();
         velocity = new Vector2();
         lastAngle = 0;
+        lookingRight = true;
 
         GameScreen.get().getWorld().getEntitiesID().put(ID, this);
         GameScreen.get().getWorld().getEntities().add(this);
@@ -80,6 +82,7 @@ public abstract class Entity {
         targetLocation.set(in.getFloat(), in.getFloat());
         velocity.set(in.getFloat(), in.getFloat());
         targetAngle = in.getFloat();
+        lookingRight = in.getBoolean();
         lastLoc = getLocation().cpy();
         lastAngle = angle;
         interpolationDelta = 0;
@@ -129,5 +132,9 @@ public abstract class Entity {
 
     public void injure(float damageValue) {
         animator.injure(damageValue);
+    }
+
+    public boolean isLookingRight() {
+        return lookingRight;
     }
 }

@@ -119,6 +119,7 @@ public class GameWorld {
                 if(t.getMaterial() == Material.AIR) continue;
 
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
+                //float b = 1;
                 batch.setColor(b,b,b,1);
 
                 ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
@@ -265,6 +266,8 @@ public class GameWorld {
     }
 
     public Tile getTileAt(float x, float y) {
+        if(x < 0) x = 0;
+        if(y < 0) y = 0;
         return terrain[(int)x][(int)y];
     }
 

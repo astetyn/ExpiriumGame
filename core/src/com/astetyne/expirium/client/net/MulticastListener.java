@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client.net;
 
+import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.TerminableLooper;
 
@@ -42,9 +43,9 @@ public class MulticastListener extends TerminableLooper {
 
                 int len = bb.getInt();
                 if(packet.getLength() < 8 + len) continue;
-                StringBuilder sb = new StringBuilder();
+                StringBuilder playerName = new StringBuilder();
                 for(int i = 0; i < len; i++) {
-                    sb.append(bb.getChar());
+                    playerName.append(bb.getChar());
                 }
                 int version = bb.getInt();
                 InetAddress address = packet.getAddress();
@@ -55,7 +56,8 @@ public class MulticastListener extends TerminableLooper {
                         continue outer;
                     }
                 }
-                availableServers.add(new AvailableServer(sb.toString(), version, address));
+                if(ExpiGame.get().getPlayerName().equals(playerName.toString())) continue;
+                availableServers.add(new AvailableServer(playerName.toString(), version, address));
                 serversChanged = true;
             }
 

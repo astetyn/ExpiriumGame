@@ -45,7 +45,7 @@ public class ExpiDroppedItem extends ExpiEntity {
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        polyShape.setAsBox(0.25f, 0.25f);
+        polyShape.setAsBox(0.25f, 0.25f, new Vector2(0.25f, 0.25f), 0);
         fixtureDef.density = 30f;
         fixtureDef.restitution = 0.2f;
         fixtureDef.friction = 0.2f;
@@ -79,7 +79,7 @@ public class ExpiDroppedItem extends ExpiEntity {
     }
 
     @Override
-    public void writeMeta(PacketOutputStream out) {
+    public void writeInitClientMeta(PacketOutputStream out) {
         out.putInt(item.getId());
     }
 

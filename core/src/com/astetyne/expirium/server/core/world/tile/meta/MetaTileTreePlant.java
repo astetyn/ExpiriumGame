@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class MetaTileTreePlant extends MetaTile {
 
-    private final static int GROW_TIME = Consts.SERVER_TPS * 3;
+    private final static int GROW_TIME = Consts.SERVER_TPS * 300;
 
     private long growTick;
 

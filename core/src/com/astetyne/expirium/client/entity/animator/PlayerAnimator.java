@@ -36,7 +36,7 @@ public class PlayerAnimator extends MoveableEntityAnimator {
         float playerW = EntityType.PLAYER.getWidth();
 
         if(lastInteractTime + (long)(interactAnim.getAnimationDuration()*1000) > System.currentTimeMillis() && timer <= interactAnim.getAnimationDuration()) {
-            if(lastState == 0 || lastState == 2) {
+            if(entity.isLookingRight()) {
                 batch.draw(interactAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, 0, 0, w, h, 1, 1, 1);
             }else {
                 batch.draw(interactAnim.getKeyFrame(timer), loc.x + w, loc.y - yOffset, 0, 0, w, h, -1, 1, 1);
@@ -45,7 +45,7 @@ public class PlayerAnimator extends MoveableEntityAnimator {
             if(tex == null) return;
             float delta = (float)interactAnim.getKeyFrameIndex(timer) / interactAnim.getKeyFrames().length;
 
-            if(lastState == 0 || lastState == 2) {
+            if(entity.isLookingRight()) {
 
                 Vector2 tempStart = new Vector2(loc.x + xOff + 0.3f, loc.y + yOff + 0.2f);
                 Vector2 tempEnd = new Vector2(loc.x + xOff, loc.y + yOff);
@@ -68,7 +68,7 @@ public class PlayerAnimator extends MoveableEntityAnimator {
             super.draw(batch);
 
             if(tex == null) return;
-            if(lastState == 0 || lastState == 2) {
+            if(entity.isLookingRight()) {
                 batch.draw(tex, loc.x + xOff, loc.y + yOff, itemW/2, itemH/2, itemW, itemH, 1, 1, baseAngle);
             }else {
                 batch.draw(tex, loc.x + playerW - xOff - itemW, loc.y + yOff, itemW/2, itemH/2, itemW, itemH, -1, 1, -baseAngle);

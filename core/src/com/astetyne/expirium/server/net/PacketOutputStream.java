@@ -81,7 +81,7 @@ public class PacketOutputStream {
         putInt(e.getId());
         putFloat(e.getLocation().x);
         putFloat(e.getLocation().y);
-        e.writeMeta(this);
+        e.writeInitClientMeta(this);
     }
 
     public void putFixture(int id, float x1, float y1, float x2, float y2) {

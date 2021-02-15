@@ -18,6 +18,6 @@ public class StaticEntityAnimator extends EntityAnimator {
     public void draw(SpriteBatch batch) {
         Vector2 loc = entity.getLocation();
         float angle = entity.getAngle();
-        batch.draw(texture, loc.x - w/2, loc.y - h/2, w/2, h/2, w, h, 1, 1, (float) (angle*180/Math.PI));
+        batch.draw(texture, loc.x, loc.y, 0, 0, w, h, 1, 1, (float) (angle*180/Math.PI));
     }
 }

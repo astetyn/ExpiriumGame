@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.MenuScreen;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.world.file.WorldFileManager;
 import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
@@ -44,14 +45,24 @@ public class WorldManagerRoot extends WidgetGroup implements MenuRootable {
 
         Label savedWorldStatusLabel = new Label("", Res.LABEL_STYLE);
         savedWorldTable.add(savedWorldStatusLabel);
+        savedWorldTable.row();
 
         WorldQuickInfo wqi = WorldFileManager.getQuickInfo();
 
         if(wqi != null) {
 
             savedWorldStatusLabel.setText("Saved world");
-            //todo: zobrazit den, firstLife a verziu
-
+            Label dayLabel = new Label("Day: "+(wqi.tick / Consts.TICKS_IN_DAY), Res.LABEL_STYLE);
+            Label firstLife = new Label("First life: "+(wqi.firstLife ? "Yes" : "No"), Res.LABEL_STYLE);
+            Label versionLabel = new Label("Version: "+wqi.worldVersion, Res.LABEL_STYLE);
+            dayLabel.setColor(Color.ORANGE);
+            firstLife.setColor(Color.ORANGE);
+            versionLabel.setColor(Color.ORANGE);
+            savedWorldTable.add(dayLabel).padTop(100);
+            savedWorldTable.row();
+            savedWorldTable.add(firstLife);
+            savedWorldTable.row();
+            savedWorldTable.add(versionLabel);
         }else {
             savedWorldStatusLabel.setText("No saved world");
             loadWorldButton.setDisabled(true);

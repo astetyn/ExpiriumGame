@@ -38,6 +38,7 @@ public class BorealForest extends BiomeGenerator {
         createFirTrees(from, to);
         createRandSurfacePlacements(from, to, Material.BLUEBERRY_BUSH_GROWN, 0.08, 2);
         createRandSurfacePlacements(from, to, Material.LIMESTONE, 0.1, 1);
+        createRhyoliteOres(from, to);
     }
 
     @Override

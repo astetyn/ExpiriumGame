@@ -130,3 +130,10 @@ player_right_run
   orig: 64, 88
   offset: 0, 0
   index: 2
+squirrel_idle
+  rotate: false
+  xy: 547, 44
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: 1

@@ -38,6 +38,7 @@ public class TropicalForest extends BiomeGenerator {
         }
         createShoreaTrees(from, to);
         createRandSurfacePlacements(from, to, Material.RASPBERRY_BUSH_GROWN, 0.08, 2);
+        createCoalOres(from, to);
     }
 
     @Override

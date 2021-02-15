@@ -26,7 +26,7 @@ public class Desert extends BiomeGenerator {
                 }
             }
 
-            if(x != 0) {
+            if(x != from) {
                 if(terrainHeight < surface[x - 1]) {
                     terrain[surface[x - 1]][x-1] = Material.SAND_SLOPE_LEFT;
                 }else if(terrainHeight > surface[x - 1]) {
@@ -35,7 +35,8 @@ public class Desert extends BiomeGenerator {
             }
         }
         generateCacti(from, to);
-        createRandSurfacePlacements(from, to, Material.LIMESTONE, Math.random()*0.2, 1);
+        createRandSurfacePlacements(from, to, Material.LIMESTONE, Math.random()*0.1, 1);
+        createCoalOres(from, to);
     }
 
     @Override

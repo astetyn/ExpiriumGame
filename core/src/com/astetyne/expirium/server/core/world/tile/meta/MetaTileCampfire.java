@@ -1,7 +1,6 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
@@ -38,7 +37,7 @@ public class MetaTileCampfire extends MetaTile {
         long tickPassed = world.getTick() - placeTick;
         world.scheduleTask(this::onReduce, Consts.SERVER_TPS*100 - tickPassed);
         world.scheduleTask(this::onEnd, Consts.SERVER_TPS*120 - tickPassed);
-        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS/2 - tickPassed);
+        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS/2);
     }
 
     public void onInvTick() {
@@ -60,7 +59,7 @@ public class MetaTileCampfire extends MetaTile {
                 ep.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
             }
         }
-        dropInvItems();
+        dropInvItems(inventory);
     }
 
     @Override
@@ -75,21 +74,13 @@ public class MetaTileCampfire extends MetaTile {
         if(to == Material.CAMPFIRE_SMALL) {
             return true;
         }
-        dropInvItems();
+        dropInvItems(inventory);
         return false;
     }
 
     @Override
     public void dropItems() {
         dropItem(Item.CAMPFIRE);
-    }
-
-    private void dropInvItems() {
-        for(ItemStack is : inventory.getItems()) {
-            for(int i = 0; i < is.getAmount(); i++) {
-                dropItem(is.getItem());
-            }
-        }
     }
 
     @Override

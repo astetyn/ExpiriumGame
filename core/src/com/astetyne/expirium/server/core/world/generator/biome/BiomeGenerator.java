@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
 import com.astetyne.expirium.client.tiles.Material;
+import com.astetyne.expirium.client.utils.IntVector2;
 
 public abstract class BiomeGenerator {
 
@@ -34,7 +35,7 @@ public abstract class BiomeGenerator {
         return getH(x) + smooth;
     }
 
-    public void createRandSurfacePlacements(int from, int to, Material mat, double chance, int minGap) {
+    protected void createRandSurfacePlacements(int from, int to, Material mat, double chance, int minGap) {
 
         int last = 0;
 
@@ -46,6 +47,39 @@ public abstract class BiomeGenerator {
 
             terrain[y][x] = mat;
             last = x;
+        }
+    }
+
+    protected void createOreLayers(IntVector2 locMid, Material ore) {
+        if(locMid.y == 0) return;
+        int width1 = (int)(Math.random() * 3) + 1;
+        int width2 = width1 + (int)(Math.random() * 4);
+        if(locMid.x - width1/2 < 0 || locMid.x - width2/2 < 0) return;
+        for(int i = 0; i < width1; i++) {
+            if(terrain[locMid.y][locMid.x-width1/2+i] == Material.AIR) return;
+        }
+        for(int i = 0; i < width2; i++) {
+            if(terrain[locMid.y-1][locMid.x-width2/2+i] == Material.AIR) return;
+        }
+        for(int i = 0; i < width1; i++) {
+            terrain[locMid.y][locMid.x-width1/2+i] = ore;
+        }
+        for(int i = 0; i < width2; i++) {
+            terrain[locMid.y-1][locMid.x-width2/2+i] = ore;
+        }
+    }
+
+    protected void createCoalOres(int from, int to) {
+        for(int x = from; x < to; x++) {
+            if(Math.random() > 0.3) continue;
+            createOreLayers(new IntVector2(x, (int) (Math.random() * (surface[x]-10))), Material.COAL_ORE);
+        }
+    }
+
+    protected void createRhyoliteOres(int from, int to) {
+        for(int x = from; x < to; x++) {
+            if(Math.random() > 0.2) continue;
+            createOreLayers(new IntVector2(x, (int) (Math.random() * (surface[x]-10))), Material.RHYOLITE);
         }
     }
 

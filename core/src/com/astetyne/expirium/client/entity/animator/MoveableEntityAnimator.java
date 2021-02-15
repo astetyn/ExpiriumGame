@@ -8,12 +8,12 @@ import com.badlogic.gdx.math.Vector2;
 
 public class MoveableEntityAnimator extends EntityAnimator {
 
-    protected byte lastState; // 0=idle right, 1=idle left, 2=run right, 3=run left
+    protected boolean moving; // 0=idle right, 1=idle left, 2=run right, 3=run left
     private final Animation<TextureRegion> idleAnim, moveAnim;
 
     public MoveableEntityAnimator(Entity e, Animation<TextureRegion> idleAnim, Animation<TextureRegion> moveAnim) {
         super(e);
-        lastState = 0;
+        moving = false;
         this.idleAnim = idleAnim;
         this.moveAnim = moveAnim;
     }
@@ -24,23 +24,11 @@ public class MoveableEntityAnimator extends EntityAnimator {
 
         Vector2 vel = entity.getVelocity();
 
-        if(Math.abs(vel.x) <= 0.1) {
-            // idle right
-            if(lastState == 2) {
-                lastState = 0;
-                timer = 0;
-            // idle left
-            }else if(lastState == 3) {
-                lastState = 1;
-                timer = 0;
-            }
-        }else if(vel.x > 0 && lastState != 2) {
-            // run right
-            lastState = 2;
+        if(Math.abs(vel.x) <= 0.01 && moving) {
+            moving = false;
             timer = 0;
-        }else if(vel.x < 0 && lastState != 3){
-            // run left
-            lastState = 3;
+        }else if(Math.abs(vel.x) >= 0.01 && !moving) {
+            moving = true;
             timer = 0;
         }
 
@@ -50,14 +38,18 @@ public class MoveableEntityAnimator extends EntityAnimator {
 
         Vector2 loc = entity.getLocation();
 
-        if(lastState == 0) {
-            batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
-        }else if(lastState == 1) {
-            batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
-        }else if(lastState == 2) {
-            batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
-        }else if(lastState == 3) {
-            batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
+        if(moving) {
+            if(entity.isLookingRight()) {
+                batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
+            }else {
+                batch.draw(moveAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
+            }
+        }else {
+            if(entity.isLookingRight()) {
+                batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w, h);
+            }else {
+                batch.draw(idleAnim.getKeyFrame(timer), loc.x, loc.y - yOffset, w/2, 0, w, h, -1, 1, 1);
+            }
         }
 
     }

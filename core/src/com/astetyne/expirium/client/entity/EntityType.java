@@ -4,6 +4,7 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.Squirrel;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,7 +15,9 @@ import java.util.HashMap;
 public enum EntityType {
 
     PLAYER(FriendPlayer.class, ExpiPlayer.class, 0.9f, 1.5f),
-    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, 0.5f, 0.5f);
+    DROPPED_ITEM(DroppedItemEntity.class, ExpiDroppedItem.class, 0.5f, 0.5f),
+    SQUIRREL(SquirrelEntity.class, Squirrel.class, 0.6f, 0.6f),
+    ;
 
     Class<? extends Entity> entityClazz;
     Class<? extends ExpiEntity> entityClazz2;
