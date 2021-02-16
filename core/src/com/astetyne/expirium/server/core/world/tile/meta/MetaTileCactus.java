@@ -20,21 +20,13 @@ public class MetaTileCactus extends MetaTile {
 
     public MetaTileCactus(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
-        growTick = -1;
+        growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
     }
 
     public MetaTileCactus(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         growTick = in.readLong();
-    }
-
-    @Override
-    public void postInit() {
-        if(growTick == -1) {
-            growTick = world.scheduleTask(this::grow, Utils.getRandAddTime(GROW_TIME));
-        }else {
-            world.scheduleTaskOn(this::grow, growTick);
-        }
+        schedule(this::grow, growTick);
     }
 
     @Override
@@ -43,7 +35,6 @@ public class MetaTileCactus extends MetaTile {
     }
 
     private void grow() {
-        if(owner.getMeta() != this) return;
 
         int cactusHeight = (int) (Math.random() * 4) + 1;
 
@@ -53,7 +44,7 @@ public class MetaTileCactus extends MetaTile {
         for(int i = 1; i < cactusHeight+1; i++) {
             ExpiTile t = world.getTileAt(owner.getX(), owner.getY() + i);
             if(t.getMaterial() != Material.AIR) {
-                growTick = world.scheduleTask(this::grow, Utils.getRandAddTime(GROW_TIME/2));
+                growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME/2));
                 return;
             }
         }

@@ -25,10 +25,14 @@ public class ExpiTile implements WorldSaveable {
     private boolean backWall;
     private final IntVector2 tempLoc;
 
-    public ExpiTile(ExpiWorld world, DataInputStream in, int x, int y) throws IOException {
+    public ExpiTile(ExpiWorld world, int x, int y, DataInputStream in, boolean createMeta) throws IOException {
         this.world = world;
         material = Material.getMaterial(in.readInt());
-        metaTile = material.init(this.world, this, in);
+        if(createMeta) {
+            metaTile = material.init(world, this);
+        }else {
+            metaTile = material.init(world, this, in);
+        }
         fixtures = new ArrayList<>();
         this.x = x;
         this.y = y;
@@ -47,7 +51,6 @@ public class ExpiTile implements WorldSaveable {
         this.material = material;
         if(!metaTile.onMaterialChange(material)) {
             metaTile = material.init(world, this);
-            metaTile.postInit();
         }
     }
 

@@ -4,7 +4,7 @@ public class Consts {
 
     public static final int VERSION = 1;
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // server
     public static final long SAVE_INTERVAL = 20000; // in millis
@@ -21,7 +21,7 @@ public class Consts {
     public static final short DEFAULT_BIT = 1;
     public static final short PLAYER_BIT = 2;
 
-    public static final float D_I_PICK_DIST = 1.3f;
+    public static final float D_I_PICK_DIST = 1.5f;
 
     public static final float CAMPFIRE_TIME = 180;
 

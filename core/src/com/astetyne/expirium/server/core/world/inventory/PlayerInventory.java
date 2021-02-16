@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemCat;
@@ -85,7 +86,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
                 // throw
                 remove(pos1);
                 for(int i = 0; i < gis.getAmount(); i++) {
-                    owner.getServer().getWorld().spawnDroppedItem(gis.getItem(), owner.getCenter(), Consts.ITEM_COOLDOWN_DROP);
+                    owner.getServer().getWorld().spawnEntity(EntityType.DROPPED_ITEM, owner.getCenter(), gis.getItem() , Consts.ITEM_COOLDOWN_DROP);
                 }
                 willNeedUpdate();
                 return;
@@ -108,7 +109,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         if(pos2.x == -1 || pos2.y == -1) {
             from.remove(pos1);
             for(int i = 0; i < gis.getAmount(); i++) {
-                owner.getServer().getWorld().spawnDroppedItem(gis.getItem(), owner.getCenter(), Consts.ITEM_COOLDOWN_DROP);
+                owner.getServer().getWorld().spawnEntity(EntityType.DROPPED_ITEM, owner.getCenter(), gis.getItem() , Consts.ITEM_COOLDOWN_DROP);
             }
             return;
         }

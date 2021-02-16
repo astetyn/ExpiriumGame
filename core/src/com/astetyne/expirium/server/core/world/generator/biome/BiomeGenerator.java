@@ -54,7 +54,7 @@ public abstract class BiomeGenerator {
         if(locMid.y == 0) return;
         int width1 = (int)(Math.random() * 3) + 1;
         int width2 = width1 + (int)(Math.random() * 4);
-        if(locMid.x - width1/2 < 0 || locMid.x - width2/2 < 0) return;
+        if(locMid.x - width1/2 < 0 || locMid.x - width2/2 < 0 || locMid.x + width1/2 >= w || locMid.x + width2/2 >= w) return;
         for(int i = 0; i < width1; i++) {
             if(terrain[locMid.y][locMid.x-width1/2+i] == Material.AIR) return;
         }

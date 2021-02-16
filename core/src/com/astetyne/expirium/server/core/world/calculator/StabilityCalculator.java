@@ -6,7 +6,6 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.util.HashSet;
@@ -25,11 +24,11 @@ public class StabilityCalculator {
     private final ExpiTile[][] terrain;
     private final int w, h;
 
-    public StabilityCalculator(ExpiServer server, ExpiWorld world) {
+    public StabilityCalculator(ExpiServer server, ExpiTile[][] terrain, int w, int h) {
         this.server = server;
-        this.terrain = world.getTerrain();
-        this.h = terrain.length;
-        this.w = terrain[0].length;
+        this.terrain = terrain;
+        this.h = h;
+        this.w = w;
     }
 
     public void generateStability() {

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.file;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -52,6 +53,8 @@ public class WorldFileManager {
         wb.writeInt(width);
         wb.writeInt(height);
         wb.writeLong(seed);
+
+        wb.writeBoolean(true);
 
         gen.writeData(wb);
 
@@ -117,16 +120,22 @@ public class WorldFileManager {
     public ExpiPlayer loadPlayer(ServerPlayerGateway gateway, String name) {
         FileHandle file = Gdx.files.local(path+playersPath+name);
 
-        if(!file.exists()) return new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
+        if(!file.exists())
+            return (ExpiPlayer) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
 
         DataInputStream in = new DataInputStream(new BufferedInputStream(file.read()));
         try {
             ExpiPlayer ep = new ExpiPlayer(server, gateway, name, in);
             in.close();
+            ep.createBodyFixtures();
+            for(ExpiPlayer ep2 : server.getPlayers()) {
+                if(ep == ep2) continue;
+                ep2.getNetManager().putEntitySpawnPacket(ep);
+            }
             return ep;
         }catch(IOException e) {
             e.printStackTrace();
-            return new ExpiPlayer(server, server.getWorld().getSpawnLocation(), gateway, name);
+            return (ExpiPlayer) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
         }
     }
 

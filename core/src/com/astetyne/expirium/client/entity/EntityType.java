@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.entity;
 
-import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
@@ -8,7 +7,6 @@ import com.astetyne.expirium.server.core.entity.Squirrel;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.DataInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -45,16 +43,6 @@ public enum EntityType {
         return null;
     }
 
-    public ExpiEntity initEntity(ExpiServer server, DataInputStream in) {
-        if(this == EntityType.PLAYER) return null;
-        try {
-            return entityClazz2.getConstructor(ExpiServer.class, DataInputStream.class).newInstance(server, in);
-        }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     int id;
     private static final HashMap<Integer, EntityType> map;
     static {
@@ -77,4 +65,9 @@ public enum EntityType {
     public float getHeight() {
         return height;
     }
+
+    public Class<? extends ExpiEntity> getEntityClass() {
+        return entityClazz2;
+    }
+
 }

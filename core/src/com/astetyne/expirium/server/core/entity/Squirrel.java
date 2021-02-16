@@ -12,12 +12,10 @@ public class Squirrel extends LivingEntity {
 
     public Squirrel(ExpiServer server, Vector2 loc) {
         super(server, EntityType.SQUIRREL, loc);
-        postInit();
     }
 
     public Squirrel(ExpiServer server, DataInputStream in) throws IOException {
         super(server, EntityType.SQUIRREL, in);
-        postInit();
     }
 
     @Override
@@ -34,4 +32,5 @@ public class Squirrel extends LivingEntity {
 
     @Override
     public void writeInitClientMeta(PacketOutputStream out) {}
+
 }

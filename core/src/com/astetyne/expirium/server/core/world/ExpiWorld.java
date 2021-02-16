@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world;
 
+import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
@@ -7,7 +8,6 @@ import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.ExpiDroppedItem;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.PriorityQueue;
 
 public class ExpiWorld implements WorldSaveable, Disposable {
@@ -53,28 +54,28 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     public ExpiWorld(DataInputStream in, long tick, ExpiServer server) throws IOException {
 
         this.server = server;
-
         this.tick = tick;
+
         day = tick / Consts.TICKS_IN_DAY;
         time = (int) (tick % Consts.TICKS_IN_DAY);
-        System.out.println("tick: "+tick+" "+" day: "+day+" time: "+time);
+
+        scheduledTickTasks = new PriorityQueue<>();
 
         width = in.readInt();
         height = in.readInt();
         seed = in.readLong();
 
+        boolean createMeta = in.readBoolean();
         terrain = new ExpiTile[height][width];
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
-                terrain[h][w] = new ExpiTile(this, in, w, h);
+                terrain[h][w] = new ExpiTile(this, w, h, in, createMeta);
             }
         }
 
         //todo: len docasne zatial
         weatherType = WeatherType.SUNNY;
-
-        scheduledTickTasks = new PriorityQueue<>();
 
         partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
 
@@ -88,22 +89,15 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         terrainDef.position.set(0, 0);
         terrainBody = b2dWorld.createBody(terrainDef);
 
-        stabilityCalc = new StabilityCalculator(server, this);
-        fixtureCalc = new FixtureCalculator(this, terrainBody);
-        backWallCalculator = new BackWallCalculator(server, this);
+        stabilityCalc = new StabilityCalculator(server, terrain, width, height);
+        fixtureCalc = new FixtureCalculator(terrain, width, height, terrainBody);
+        backWallCalculator = new BackWallCalculator(server, terrain, width, height);
 
         System.out.println("Creating fixtures...");
         fixtureCalc.generateWorldFixtures();
         System.out.println("Recalculating stability...");
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
-
-        for(int h = 0; h < height; h++) {
-            for(int w = 0; w < width; w++) {
-                terrain[h][w].getMeta().postInit();
-            }
-        }
-
     }
 
     public void dispose() {
@@ -347,22 +341,18 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return day;
     }
 
-    public void spawnDroppedItem(Item item, Vector2 loc, int ticksCooldown) {
-        new ExpiDroppedItem(server, loc, item, ticksCooldown);
-    }
-
     public long getTick() {
         return tick;
     }
 
-    public long scheduleTask(Runnable runnable, long afterTicks) {
+    public long scheduleTaskAfter(Runnable runnable, long afterTicks) {
         TickTask task = new TickTask(runnable, tick + afterTicks);
         scheduleTask(task);
         return task.tick;
     }
 
-    public long scheduleTaskOn(Runnable runnable, long ticks) {
-        TickTask task = new TickTask(runnable, ticks);
+    public long scheduleTask(Runnable runnable, long tick) {
+        TickTask task = new TickTask(runnable, tick);
         scheduleTask(task);
         return task.tick;
     }
@@ -375,12 +365,57 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return server;
     }
 
+    public ExpiEntity spawnEntity(EntityType type, Vector2 loc, Object... args) {
+        Class<?>[] argClasses = new Class[args.length+2];
+        Object[] objects = new Object[args.length+2];
+        for(int i = 0; i < args.length; i++) {
+            argClasses[i+2] = args[i].getClass();
+            objects[i+2] = args[i];
+        }
+
+        argClasses[0] = ExpiServer.class;
+        argClasses[1] = Vector2.class;
+
+        objects[0] = server;
+        objects[1] = loc;
+
+        try {
+            ExpiEntity e = type.getEntityClass().getConstructor(argClasses).newInstance(objects);
+            e.createBodyFixtures();
+            for(ExpiPlayer ep : server.getPlayers()) {
+                if(e == ep) continue;
+                ep.getNetManager().putEntitySpawnPacket(e);
+            }
+            return e;
+        }catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ExpiEntity spawnEntity(EntityType type, DataInputStream in) {
+        try {
+            ExpiEntity e = type.getEntityClass().getConstructor(ExpiServer.class, DataInputStream.class).newInstance(server, in);
+            e.createBodyFixtures();
+            for(ExpiPlayer ep : server.getPlayers()) {
+                if(e == ep) continue;
+                ep.getNetManager().putEntitySpawnPacket(e);
+            }
+            return e;
+        }catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void writeData(WorldBuffer out) {
 
         out.writeInt(width);
         out.writeInt(height);
         out.writeLong(seed);
+
+        out.writeBoolean(false);
 
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {

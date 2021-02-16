@@ -268,6 +268,8 @@ public class GameWorld {
     public Tile getTileAt(float x, float y) {
         if(x < 0) x = 0;
         if(y < 0) y = 0;
+        if(x >= terrainWidth) x = terrainWidth-1;
+        if(y >= terrainHeight) y = terrainHeight-1;
         return terrain[(int)x][(int)y];
     }
 

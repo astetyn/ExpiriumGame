@@ -49,7 +49,6 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = false;
         lastDeathDay = 0;
         worldLoader = new WorldLoader(server, this);
-        postInit();
         server.getPlayers().add(this);
     }
 
@@ -69,18 +68,17 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = in.readBoolean();
         lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
-        postInit();
         server.getPlayers().add(this);
     }
 
     @Override
     public void createBodyFixtures() {
         super.createBodyFixtures();
-        mainBody.setFriction(0);
+        bodyFix.setFriction(0);
         Filter filter = new Filter();
         filter.categoryBits = Consts.PLAYER_BIT;
         filter.maskBits = Consts.DEFAULT_BIT;
-        mainBody.setFilterData(filter);
+        bodyFix.setFilterData(filter);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class ExpiPlayer extends LivingEntity {
         for(ItemStack is : mainInv.getItems()) {
             int dropAmount = (int) (Math.random() * is.getAmount()) + 1;
             for(int i = 0; i < dropAmount; i++) {
-                server.getWorld().spawnDroppedItem(is.getItem(), getCenter(), Consts.ITEM_COOLDOWN_DROP);
+                server.getWorld().spawnEntity(EntityType.DROPPED_ITEM, getCenter(), is.getItem() , Consts.ITEM_COOLDOWN_DROP);
             }
         }
         mainInv.clear();

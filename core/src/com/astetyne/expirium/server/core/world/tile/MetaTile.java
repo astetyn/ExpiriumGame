@@ -24,8 +24,6 @@ public class MetaTile implements WorldSaveable {
         this.owner = owner;
     }
 
-    public void postInit() {}
-
     /** Returns true if meta should be kept. False if meta should be changed.*/
     public boolean onMaterialChange(Material to) {
         return false;
@@ -52,7 +50,21 @@ public class MetaTile implements WorldSaveable {
     public void dropItem(Item item) {
         float off = (1 - EntityType.DROPPED_ITEM.getWidth())/2;
         Vector2 loc = new Vector2(owner.getX() + off, owner.getY() + off);
-        world.spawnDroppedItem(item, loc, Consts.ITEM_COOLDOWN_BREAK);
+        world.spawnEntity(EntityType.DROPPED_ITEM, loc, item, Consts.ITEM_COOLDOWN_BREAK);
+    }
+
+    protected long scheduleAfter(Runnable runnable, long afterTicks) {
+        return world.scheduleTaskAfter(() -> {
+            if(owner.getMeta() != this) return;
+            runnable.run();
+        }, afterTicks);
+    }
+
+    protected long schedule(Runnable runnable, long tick) {
+        return world.scheduleTask(() -> {
+            if(owner.getMeta() != this) return;
+            runnable.run();
+        }, tick);
     }
 
 }

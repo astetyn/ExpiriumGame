@@ -21,36 +21,26 @@ public class MetaTileTreePlant extends MetaTile {
 
     public MetaTileTreePlant(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
-        growTick = -1;
+        growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
     }
 
     public MetaTileTreePlant(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         growTick = in.readLong();
-    }
-
-    @Override
-    public void postInit() {
-        if(growTick == -1) {
-            growTick = world.scheduleTask(this::grow, Utils.getRandAddTime(GROW_TIME));
-        }else {
-            world.scheduleTaskOn(this::grow, growTick);
-        }
+        schedule(this::grow, growTick);
     }
 
     @Override
     public void writeData(WorldBuffer out) {
-        if(owner.getMeta() != this) return;
         out.writeLong(growTick);
     }
 
     private void grow() {
-        if(owner.getMeta() != this) return;
 
         // if soil is not grass or dirt
         if(owner.getY() == 0 || (world.getTileAt(owner.getLoc().add(0, -1)).getMaterial() != Material.GRASS &&
                 world.getTileAt(owner.getLoc().add(0, -1)).getMaterial() != Material.DIRT)) {
-            growTick = world.scheduleTask(this::grow, Utils.getRandAddTime(GROW_TIME));
+            growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
             return;
         }
 
@@ -58,7 +48,7 @@ public class MetaTileTreePlant extends MetaTile {
         else if(owner.getMaterial() == Material.GROWING_PLANT_FIR && growFir(owner.getLoc())) return;
 
         // in case of unsuccessful grow
-        growTick = world.scheduleTask(this::grow, Utils.getRandAddTime(GROW_TIME));
+        growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
     }
 
     private boolean growShorea(IntVector2 loc) {

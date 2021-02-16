@@ -71,10 +71,8 @@ public class WorldGenerator {
     public void writeData(WorldBuffer wb) {
         for(int y = 0; y < h; y++) {
             for(int x = 0; x < w; x++) {
-                Material mat = terrain[y][x];
                 wb.writeMaterial(terrain[y][x]);
-                mat.writeDefaultMetaData(wb);
-                wb.writeBoolean(false);
+                wb.writeBoolean(false); // backwall
             }
         }
     }

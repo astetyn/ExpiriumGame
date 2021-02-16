@@ -13,42 +13,42 @@ back_wall
   index: -1
 blueberry_bush
   rotate: false
-  xy: 241, 20
+  xy: 259, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blueberry_bush_grown
   rotate: false
-  xy: 277, 38
+  xy: 91, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_double
   rotate: false
-  xy: 127, 4
+  xy: 331, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_left
   rotate: false
-  xy: 421, 38
+  xy: 439, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_right
   rotate: false
-  xy: 313, 20
+  xy: 385, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_top
   rotate: false
-  xy: 493, 38
+  xy: 205, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -97,35 +97,49 @@ campfire_small
   index: 3
 coal_ore
   rotate: false
-  xy: 349, 38
+  xy: 163, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dirt
   rotate: false
-  xy: 457, 38
+  xy: 475, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+furnace_off
+  rotate: false
+  xy: 277, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+furnace_on
+  rotate: false
+  xy: 331, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass
   rotate: false
-  xy: 331, 38
+  xy: 145, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 181, 4
+  xy: 385, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_right
   rotate: false
-  xy: 91, 4
+  xy: 295, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -139,42 +153,42 @@ growing_plant
   index: -1
 leaves_fir_full
   rotate: false
-  xy: 295, 20
+  xy: 367, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_fir_right
   rotate: false
-  xy: 205, 20
+  xy: 223, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_fir_top
   rotate: false
-  xy: 145, 4
+  xy: 349, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_shorea_right
   rotate: false
-  xy: 259, 20
+  xy: 313, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_shorea_top
   rotate: false
-  xy: 439, 38
+  xy: 457, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 limestone
   rotate: false
-  xy: 109, 4
+  xy: 313, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -188,14 +202,14 @@ log_fir
   index: -1
 log_shorea
   rotate: false
-  xy: 403, 38
+  xy: 421, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 log_shorea_left
   rotate: false
-  xy: 331, 20
+  xy: 403, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -207,9 +221,23 @@ log_shorea_right
   orig: 16, 16
   offset: 0, 0
   index: -1
+peppermint_bush
+  rotate: false
+  xy: 259, 38
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+peppermint_bush_grown
+  rotate: false
+  xy: 295, 20
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 raspberry_bush
   rotate: false
-  xy: 385, 38
+  xy: 403, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -223,35 +251,35 @@ raspberry_bush_grown
   index: -1
 rhyolite
   rotate: false
-  xy: 223, 20
+  xy: 241, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 163, 4
+  xy: 367, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand_slope_right
   rotate: false
-  xy: 313, 38
+  xy: 127, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 soft_wooden_wall
   rotate: false
-  xy: 277, 20
+  xy: 349, 20
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 stone
   rotate: false
-  xy: 259, 38
+  xy: 73, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -265,21 +293,21 @@ tile_break
   index: 2
 tile_break
   rotate: false
-  xy: 295, 38
+  xy: 109, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 4
 tile_break
   rotate: false
-  xy: 367, 38
+  xy: 181, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 tile_break
   rotate: false
-  xy: 475, 38
+  xy: 493, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -293,7 +321,7 @@ white_tile
   index: -1
 wooden_support
   rotate: false
-  xy: 73, 4
+  xy: 277, 38
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

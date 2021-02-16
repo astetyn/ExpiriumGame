@@ -136,6 +136,6 @@ public class PacketInputStream {
     }
 
     public float occupied() {
-        return (float) readBuffer.position() / Consts.BUFFER_SIZE;
+        return (float) readBuffer.position() / readBuffer.capacity();
     }
 }

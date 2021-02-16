@@ -23,7 +23,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     protected boolean lookingRight;
     protected boolean onGround;
     private int collisions;
-    protected Fixture mainBody, groundSensor;
+    protected Fixture bodyFix, groundSensor;
     protected boolean alive;
     protected boolean invincible;
 
@@ -76,7 +76,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         // upper poly
         float[] verts = new float[]{0, gh, gw, 0, w-gw, 0, w, gh, w, h, 0, h};
         polyShape.set(verts);
-        mainBody = body.createFixture(fixtureDef);
+        bodyFix = body.createFixture(fixtureDef);
 
         // ground sensor
         polyShape.setAsBox(w/2-gw, gh/2, new Vector2(w/2, 0), 0);
@@ -85,6 +85,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         groundSensor = body.createFixture(fixtureDef);
 
         polyShape.dispose();
+        System.out.println("ground: "+groundSensor+" body: "+bodyFix);
     }
 
     @Override
@@ -195,9 +196,17 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         out.writeBoolean(alive);
     }
 
+
     @Override
     public void onCollisionBegin(Contact contact) {
-        if(contact.getFixtureA() == groundSensor || contact.getFixtureB() == groundSensor) {
+        //System.out.println("begin: vel: fixA: "+contact.getFixtureA()+" sen: "+contact.getFixtureA().isSensor()+" fixB: "+contact.getFixtureB()+" sen: "+contact.getFixtureB().isSensor()+" vel: "+getVelocity());
+        if((contact.getFixtureA() == bodyFix && !contact.getFixtureB().isSensor())
+                || (contact.getFixtureB() == bodyFix && !contact.getFixtureA().isSensor())) {
+            onHardCollision();
+        }
+
+        if((contact.getFixtureA() == groundSensor && !contact.getFixtureB().isSensor())
+            || (contact.getFixtureB() == groundSensor && !contact.getFixtureA().isSensor())) {
             collisions++;
             onGround = true;
         }
@@ -209,5 +218,10 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
             collisions--;
             if(collisions == 0) onGround = false;
         }
+    }
+
+    protected void onHardCollision() {
+        System.out.println("hard coll, vel: "+getVelocity());
+        if(getVelocity().y < -12) healthLevel -= 20;
     }
 }

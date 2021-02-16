@@ -19,15 +19,14 @@ public class ExpiDroppedItem extends ExpiEntity {
     private final long pickTick;
     private final int ticksCooldown;
 
-    public ExpiDroppedItem(ExpiServer server, Vector2 loc, Item item, int ticksCooldown) {
+    public ExpiDroppedItem(ExpiServer server, Vector2 loc, Item item, Integer ticksCooldown) {
         super(server, EntityType.DROPPED_ITEM, loc);
         this.item = item;
         pickTick = server.getWorld().getTick();
         this.ticksCooldown = ticksCooldown;
         body.setAngularVelocity(((float)Math.random()-0.5f)*10);
-        postInit();
-        server.getWorld().scheduleTask(this::checkPick, 8); //every 8 ticks
-        server.getWorld().scheduleTask(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
+        server.getWorld().scheduleTaskAfter(this::checkPick, 8); //every 8 ticks
+        server.getWorld().scheduleTaskAfter(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }
 
     public ExpiDroppedItem(ExpiServer server, DataInputStream in) throws IOException {
@@ -35,9 +34,8 @@ public class ExpiDroppedItem extends ExpiEntity {
         item = Item.getType(in.readInt());
         pickTick = server.getWorld().getTick();
         ticksCooldown = Consts.SERVER_TPS * 3;
-        postInit();
-        server.getWorld().scheduleTask(this::checkPick, 8); //every 8 ticks
-        server.getWorld().scheduleTask(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
+        server.getWorld().scheduleTaskAfter(this::checkPick, 8); //every 8 ticks
+        server.getWorld().scheduleTaskAfter(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }
 
     public void createBodyFixtures() {
@@ -59,7 +57,7 @@ public class ExpiDroppedItem extends ExpiEntity {
     public void checkPick() {
         if(destroyed) return;
         if(pickTick + ticksCooldown >= server.getWorld().getTick()) {
-            server.getWorld().scheduleTask(this::checkPick, 8);
+            server.getWorld().scheduleTaskAfter(this::checkPick, 8);
             return;
         }
 
@@ -71,7 +69,7 @@ public class ExpiDroppedItem extends ExpiEntity {
                 return;
             }
         }
-        server.getWorld().scheduleTask(this::checkPick, 8);
+        server.getWorld().scheduleTaskAfter(this::checkPick, 8);
     }
 
     public Item getItem() {

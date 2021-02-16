@@ -5,7 +5,6 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
-import com.astetyne.expirium.server.core.entity.Squirrel;
 import com.astetyne.expirium.server.core.event.EventManager;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -13,7 +12,6 @@ import com.astetyne.expirium.server.core.world.file.WorldFileManager;
 import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
 import com.astetyne.expirium.server.net.MulticastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
-import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -22,7 +20,7 @@ import java.util.List;
 
 public class ExpiServer implements WorldSaveable {
 
-    private ExpiWorld expiWorld;
+    private ExpiWorld world;
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
@@ -72,17 +70,18 @@ public class ExpiServer implements WorldSaveable {
                     " ("+wqi.worldVersion+") Your is: "+" ("+Consts.VERSION+")");
 
             DataInputStream in = fileManager.getWorldInputStream();
-            expiWorld = new ExpiWorld(in, wqi.tick, this);
+            world = new ExpiWorld(in, wqi.tick, this);
 
             // this must be loaded here, because it requires fully loaded ExpiWorld
             int entitiesSize = in.readInt();
             for(int i = 0; i < entitiesSize; i++) {
-                EntityType.getType(in.readInt()).initEntity(this, in);
+                EntityType type = EntityType.getType(in.readInt());
+                world.spawnEntity(type, in);
             }
             in.close();
 
             for(int i = 0; i < 50; i++) {
-                new Squirrel(this, new Vector2((float) (Math.random()*expiWorld.getTerrainWidth()-10), 200));
+                //world.spawnEntity(EntityType.SQUIRREL, new Vector2((float) (Math.random()* world.getTerrainWidth()-10), 200));
             }
 
         } catch(IOException e) {
@@ -152,7 +151,7 @@ public class ExpiServer implements WorldSaveable {
      */
     private void dispose() {
         System.out.println("Disposing server world.");
-        expiWorld.dispose();
+        world.dispose();
     }
 
     public void onTick() {
@@ -177,7 +176,7 @@ public class ExpiServer implements WorldSaveable {
     }
 
     public ExpiWorld getWorld() {
-        return expiWorld;
+        return world;
     }
 
     public TickLooper getTickLooper() {
@@ -199,7 +198,7 @@ public class ExpiServer implements WorldSaveable {
     @Override
     public void writeData(WorldBuffer out) {
 
-        expiWorld.writeData(out);
+        world.writeData(out);
 
         // players are saved independently - during logout
         int entitiesSize = 0;

@@ -23,17 +23,14 @@ public class MetaTileFurnace extends MetaTile {
         super(world, owner);
         inventory = new FuelCookingInventory(world, 2, 2, 5);
         placeTick = world.getTick();
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
     }
 
     public MetaTileFurnace(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
         super(world, owner);
         inventory = new FuelCookingInventory(world, 2, 2, 5, in);
         placeTick = world.getTick();
-    }
-
-    @Override
-    public void postInit() {
-        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS);
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
     }
 
     @Override
@@ -49,14 +46,13 @@ public class MetaTileFurnace extends MetaTile {
     }
 
     private void onInvTick() {
-        if(owner.getMeta() != this) return;
         inventory.onCookingUpdate();
         if(inventory.getFuel() == 0 && owner.getMaterial() != Material.FURNACE_OFF) {
             world.changeMaterial(owner, Material.FURNACE_OFF, false, Source.NATURAL);
         }else if(inventory.getFuel() > 0 && owner.getMaterial() != Material.FURNACE_ON) {
             world.changeMaterial(owner, Material.FURNACE_ON, false, Source.NATURAL);
         }
-        world.scheduleTask(this::onInvTick, Consts.SERVER_TPS);
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
     }
 
     @Override

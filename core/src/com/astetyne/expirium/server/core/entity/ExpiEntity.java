@@ -40,16 +40,7 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
         this(server, type, new Vector2(in.readFloat(), in.readFloat()));
     }
 
-    // must be called as one of the last methods in the most super class
-    protected void postInit() {
-        createBodyFixtures();
-        for(ExpiPlayer pp : server.getPlayers()) {
-            if(pp == this) continue;
-            pp.getNetManager().putEntitySpawnPacket(this);
-        }
-    }
-
-    protected void createBodyFixtures() {}
+    public void createBodyFixtures() {}
 
     public void onTick() {
         if(getLocation().y <= 0) destroy();

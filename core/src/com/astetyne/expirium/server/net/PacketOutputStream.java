@@ -84,14 +84,6 @@ public class PacketOutputStream {
         e.writeInitClientMeta(this);
     }
 
-    public void putFixture(int id, float x1, float y1, float x2, float y2) {
-        putInt(id);
-        putFloat(x1);
-        putFloat(y1);
-        putFloat(x2);
-        putFloat(y2);
-    }
-
     public void flush() throws IOException {
         readBuffer.putInt(0, readBuffer.position());
         readBuffer.putInt(4, lastPacketCounter);
@@ -137,7 +129,7 @@ public class PacketOutputStream {
     }
 
     public float occupied() {
-        return (float) writeBuffer.position() / Consts.BUFFER_SIZE;
+        return (float) writeBuffer.position() / readBuffer.capacity();
     }
 
 }

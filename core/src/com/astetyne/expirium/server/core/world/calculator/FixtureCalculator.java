@@ -1,7 +1,6 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.TileFix;
 import com.badlogic.gdx.physics.box2d.*;
@@ -9,16 +8,16 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class FixtureCalculator implements Disposable {
 
-    private final ExpiTile[][] worldTerrain;
+    private final ExpiTile[][] terrain;
     private final int w, h;
     private final Body terrainBody;
     private final EdgeShape shape;
     private final FixtureDef fixDef;
 
-    public FixtureCalculator(ExpiWorld world, Body terrainBody) {
-        this.worldTerrain = world.getTerrain();
-        this.h = world.getTerrainHeight();
-        this.w = world.getTerrainWidth();
+    public FixtureCalculator(ExpiTile[][] terrain, int w, int h, Body terrainBody) {
+        this.terrain = terrain;
+        this.h = h;
+        this.w = w;
         this.terrainBody = terrainBody;
 
         // default setup for tile fixtures
@@ -78,7 +77,7 @@ public class FixtureCalculator implements Disposable {
 
         if(x < 0 || x >= w || y < 0 || y >= h) return;
 
-        ExpiTile t = worldTerrain[y][x];
+        ExpiTile t = terrain[y][x];
 
         for(Fixture f : t.getFixtures()) {
             terrainBody.destroyFixture(f);
@@ -106,16 +105,16 @@ public class FixtureCalculator implements Disposable {
             return;
         }
 
-        if(y != 0 && worldTerrain[y-1][x].getMaterial().getFix() != TileFix.FULL) {
+        if(y != 0 && terrain[y-1][x].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y, x+1,y);
         }
-        if(y != h-1 && worldTerrain[y+1][x].getMaterial().getFix() != TileFix.FULL) {
+        if(y != h-1 && terrain[y+1][x].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y+1, x+1,y+1);
         }
-        if(x != 0 && worldTerrain[y][x-1].getMaterial().getFix() != TileFix.FULL) {
+        if(x != 0 && terrain[y][x-1].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x, y, x,y+1);
         }
-        if(x != w-1 && worldTerrain[y][x+1].getMaterial().getFix() != TileFix.FULL) {
+        if(x != w-1 && terrain[y][x+1].getMaterial().getFix() != TileFix.FULL) {
             createLineFixture(t, x+1, y, x+1,y+1);
         }
     }

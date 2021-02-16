@@ -5,7 +5,6 @@ import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 
 import java.util.ArrayList;
@@ -21,11 +20,11 @@ public class BackWallCalculator {
     private final boolean[][] visitMap;
     private final IntVector2 tempMiddle;
 
-    public BackWallCalculator(ExpiServer server, ExpiWorld world) {
+    public BackWallCalculator(ExpiServer server, ExpiTile[][] terrain, int w, int h) {
         this.server = server;
-        this.terrain = world.getTerrain();
-        w = world.getTerrainWidth();
-        h = world.getTerrainHeight();
+        this.terrain = terrain;
+        this.w = w;
+        this.h = h;
         visitMap = new boolean[radius*2+1][radius*2+1];
         tempMiddle = new IntVector2(0, 0);
     }

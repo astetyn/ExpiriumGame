@@ -14,17 +14,12 @@ public class MetaTileRaspberryBush extends MetaTile {
 
     public MetaTileRaspberryBush(ExpiWorld world, ExpiTile owner) {
         super(world, owner);
-    }
-
-    @Override
-    public void postInit() {
         if(owner.getMaterial() == Material.RASPBERRY_BUSH) {
-            world.scheduleTask(this::onGrow, Consts.SERVER_TPS*(int)(Math.random()*180+10));
+            scheduleAfter(this::onGrow, Consts.SERVER_TPS*(int)(Math.random()*180+10));
         }
     }
 
     public void onGrow() {
-        if(owner.getMeta() != this) return;
         world.changeMaterial(owner, Material.RASPBERRY_BUSH_GROWN, false, Source.NATURAL);
     }
 
