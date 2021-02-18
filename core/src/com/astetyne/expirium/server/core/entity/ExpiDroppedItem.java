@@ -3,7 +3,9 @@ package com.astetyne.expirium.server.core.entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
@@ -65,6 +67,8 @@ public class ExpiDroppedItem extends ExpiEntity {
             Vector2 dif = p.getCenter().sub(getCenter());
             if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canAppend(item, 1)) {
                 p.getInv().append(item, 1);
+                String text = "+ "+item.getLabel();
+                p.getNetManager().putPlayTextAnim(getCenter().add(0, p.getHeight()/2), text, ExpiColor.ORANGE);
                 destroy();
                 return;
             }

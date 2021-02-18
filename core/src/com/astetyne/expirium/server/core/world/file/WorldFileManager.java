@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.file;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.Gdx;

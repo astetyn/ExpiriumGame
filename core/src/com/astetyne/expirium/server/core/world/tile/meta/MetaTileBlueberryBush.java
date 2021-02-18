@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;

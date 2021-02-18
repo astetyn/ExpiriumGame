@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.EventManager;
 import com.astetyne.expirium.server.core.world.ExpiWorld;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -12,6 +12,7 @@ import com.astetyne.expirium.server.core.world.file.WorldFileManager;
 import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
 import com.astetyne.expirium.server.net.MulticastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
+import com.badlogic.gdx.math.Vector2;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class ExpiServer implements WorldSaveable {
             in.close();
 
             for(int i = 0; i < 50; i++) {
-                //world.spawnEntity(EntityType.SQUIRREL, new Vector2((float) (Math.random()* world.getTerrainWidth()-10), 200));
+                world.spawnEntity(EntityType.SQUIRREL, new Vector2((float) (Math.random()* world.getTerrainWidth()-10), 200));
             }
 
         } catch(IOException e) {

@@ -97,7 +97,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         entityLabel = new Label("", Res.LABEL_STYLE);
         callsLabel = new Label("", Res.LABEL_STYLE);
         buffersLabel = new Label("", Res.LABEL_STYLE);
-        versionLabel = new Label(ExpiGame.version, Res.LABEL_STYLE);
+        versionLabel = new Label(Consts.VERSION_TEXT, Res.LABEL_STYLE);
         versionLabel.setColor(1,0.1f,0.1f,1);
         versionLabel.setAlignment(Align.topLeft);
 
@@ -249,8 +249,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
 
         PlayerDataHandler playerData = GameScreen.get().getPlayerData();
 
-        healthStat.setText((int)Math.ceil(playerData.getHealth())+" %");
-        foodStat.setText((int)Math.ceil(playerData.getFood())+" %");
+        healthStat.setText(playerData.getHealth()+" %");
+        foodStat.setText(playerData.getFood()+" %");
     }
 
     @Override

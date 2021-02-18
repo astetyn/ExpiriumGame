@@ -39,7 +39,7 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
         title.setAlignment(Align.center);
 
         // version label
-        Label versionLabel = new Label(ExpiGame.version, Res.LABEL_STYLE);
+        Label versionLabel = new Label(Consts.VERSION_TEXT, Res.LABEL_STYLE);
         versionLabel.setColor(Color.RED);
 
         // name text field

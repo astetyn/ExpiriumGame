@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 
 public class WorldLoader {
 

@@ -9,7 +9,8 @@ import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.LivingEntity;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
@@ -30,6 +31,8 @@ import com.badlogic.gdx.utils.Disposable;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 public class ExpiWorld implements WorldSaveable, Disposable {
@@ -133,8 +136,9 @@ public class ExpiWorld implements WorldSaveable, Disposable {
             }
         }
 
-        for(int i = server.getEntities().size() - 1; i >= 0; i--) {
-            server.getEntities().get(i).onTick();
+        List<ExpiEntity> copy = new ArrayList<>(server.getEntities());
+        for(ExpiEntity ee : copy) {
+            ee.onTick();
         }
 
         for(ExpiPlayer pp : server.getPlayers()) {
@@ -301,6 +305,10 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return terrain[loc.y][loc.x];
     }
 
+    public boolean isInWorld(Vector2 v) {
+        return v.x >= 0 && v.x < width && v.y >= 0 && v.y < height;
+    }
+
     public Body getTerrainBody() {
         return terrainBody;
     }
@@ -406,6 +414,15 @@ public class ExpiWorld implements WorldSaveable, Disposable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void hitEntity(ExpiEntity attacker, LivingEntity victim, int damage) {
+        //System.out.println("Attacker "+attacker.getType()+" hit "+victim.getType()+" with "+damage+" damage");
+        victim.injure(damage);
+        Vector2 pushVec = new Vector2(victim.getCenter().sub(attacker.getCenter()));
+        pushVec.nor();
+        pushVec.scl(200);
+        victim.getBody().applyLinearImpulse(pushVec, victim.getCenter(), true);
     }
 
     @Override

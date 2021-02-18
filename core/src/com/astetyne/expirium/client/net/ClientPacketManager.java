@@ -98,11 +98,6 @@ public class ClientPacketManager {
                     world.onTileChange(in);
                     break;
 
-                case 23: {//InjurePacket
-                    Entity e = world.getEntitiesID().get(in.getInt());
-                    e.injure(in.getFloat());
-                    break;
-                }
                 case 24: //InvFeedPacket
                     GameScreen.get().getPlayerData().feedInventory(in);
                     break;
@@ -136,6 +131,10 @@ public class ClientPacketManager {
                 }
                 case 34: // BackWallPacket
                     world.onBackWallsChange(in);
+                    break;
+
+                case 35: // PlayTextAnimation
+                    world.getAnimationManager().onPlayTextAnimation(in);
                     break;
             }
         }

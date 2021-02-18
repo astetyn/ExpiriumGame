@@ -13,6 +13,7 @@ public enum ItemRecipe {
     BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "toto ma byt akoze miska?"),
     FURNACE(Item.FURNACE, new ItemStack[]{new ItemStack(Item.LIMESTONE, 5), new ItemStack(Item.STONE, 20)}, "For cooking better meals."),
     JAR(Item.JAR, new ItemStack[]{new ItemStack(Item.GLASS, 5)}, "Ideal for tasty jams."),
+    HUNTING_KNIFE(Item.HUNTING_KNIFE, new ItemStack[]{new ItemStack(Item.STONE, 10)}, "Tired of vegan food?"),
     ;
 
     ItemStack product;

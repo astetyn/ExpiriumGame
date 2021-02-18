@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.calculator;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;

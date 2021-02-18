@@ -1,11 +1,13 @@
-package com.astetyne.expirium.server.core.entity;
+package com.astetyne.expirium.server.core.entity.player;
 
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.LivingEntity;
 import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
@@ -26,7 +28,7 @@ public class ExpiPlayer extends LivingEntity {
     private final String name;
     private final PlayerInventory mainInv;
     private Inventory secondInv;
-    private final ExpiTileBreaker tileBreaker;
+    private ToolManager toolManager;
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
     private final Vector2 resurrectLoc;
@@ -41,7 +43,7 @@ public class ExpiPlayer extends LivingEntity {
         this.name = name;
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new Inventory(1, 1, 1);
-        tileBreaker = new ExpiTileBreaker(server, this);
+        toolManager = new TileBreakToolManager(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
@@ -60,7 +62,7 @@ public class ExpiPlayer extends LivingEntity {
         this.name = name;
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new Inventory(1, 1, 1);
-        tileBreaker = new ExpiTileBreaker(server, this);
+        toolManager = new TileBreakToolManager(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
         lastJump = 0;
@@ -159,7 +161,16 @@ public class ExpiPlayer extends LivingEntity {
             secondInv.wasUpdated(this);
         }
 
-        tileBreaker.onTick(tsData2);
+        Item itemInHand = mainInv.getItemInHand().getItem();
+
+        if(itemInHand.isTileBreaker() && !(toolManager instanceof TileBreakToolManager)) {
+            toolManager.end();
+            toolManager = new TileBreakToolManager(server, this);
+        }else if(itemInHand.isWeapon() && !(toolManager instanceof CombatToolManager)) {
+            toolManager.end();
+            toolManager = new CombatToolManager(server, this);
+        }
+        toolManager.onTick(tsData2);
     }
 
     @Override
@@ -173,24 +184,17 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
-        System.out.println("Wants to make item");
         if(Consts.DEBUG) {
-            System.out.println("Overriding item check (debug mode)");
             mainInv.append(recipe.getProduct());
             return;
         }
-
         if(!mainInv.contains(recipe.getRequiredItems())) return;
-
-        System.out.println("Has req items");
         if(!mainInv.canAppend(recipe.getProduct())) return;
-        System.out.println("Can be added");
 
         for(ItemStack is : recipe.getRequiredItems()) {
             mainInv.remove(is);
         }
         mainInv.append(recipe.getProduct());
-        System.out.println("Added");
     }
 
     public ServerPacketManager getNetManager() {

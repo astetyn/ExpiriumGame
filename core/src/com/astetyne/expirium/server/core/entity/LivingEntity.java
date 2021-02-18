@@ -2,7 +2,9 @@ package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -15,10 +17,10 @@ import java.io.IOException;
 
 public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
-    private final static float MAX_HEALTH_LEVEL = 100;
-    private final static float MAX_FOOD_LEVEL = 100;
+    private final static byte MAX_HEALTH_LEVEL = 100;
+    private final static byte MAX_FOOD_LEVEL = 100;
 
-    private float healthLevel, foodLevel, temperatureLevel;
+    private byte healthLevel, foodLevel;
 
     protected boolean lookingRight;
     protected boolean onGround;
@@ -26,31 +28,32 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     protected Fixture bodyFix, groundSensor;
     protected boolean alive;
     protected boolean invincible;
+    private float lastFallVelocity;
 
     public LivingEntity(ExpiServer server, EntityType type, Vector2 loc) {
         super(server, type, loc);
         healthLevel = 100;
         foodLevel = 100;
-        temperatureLevel = 22;
         lookingRight = true;
         onGround = false;
         collisions = 0;
         alive = true;
         invincible = false;
+        lastFallVelocity = 0;
         server.getWorld().getCL().registerListener(this);
     }
 
     public LivingEntity(ExpiServer server, EntityType type, DataInputStream in) throws IOException {
         super(server, type, in);
-        healthLevel = in.readFloat();
-        foodLevel = in.readFloat();
-        temperatureLevel = in.readFloat();
+        healthLevel = in.readByte();
+        foodLevel = in.readByte();
         lookingRight = true;
         alive = in.readBoolean();
         onGround = false;
         collisions = 0;
         alive = true;
         invincible = false;
+        lastFallVelocity = 0;
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -99,12 +102,18 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     public void onTick() {
         super.onTick();
 
-        decreaseFoodLevel(1f/(10*Consts.SERVER_TPS)); // 1 food per 10 seconds
+        if(server.getWorld().getTick() % 320 == 0) { // once per 10 seconds
+            decreaseFoodLevel(1);
+            if(foodLevel >= 90) heal(1);
+        }
 
-        if(foodLevel <= 5) {
-            injure(1f/(2*Consts.SERVER_TPS)); // 1 health per 2 seconds
-        }else if(foodLevel >= 90) {
-            increaseHealthLevel(1f/(10*Consts.SERVER_TPS)); // 1 health per 10 seconds
+        if(foodLevel <= 5 && server.getWorld().getTick() % 64 == 0) {
+            injure(1); // 1 health per 2 seconds
+        }
+
+        if(lastFallVelocity < -10) {
+            injure(20);
+            lastFallVelocity = 0;
         }
 
         recalcLookingDir();
@@ -114,55 +123,57 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         if(!alive) return;
         alive = false;
         destroy();
+        String text = "Kill";
+        for(ExpiPlayer pp : server.getPlayers()) {
+            pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.RED);
+        }
     }
 
-    public void injure(float damage) {
+    public void injure(int amount) {
         if(invincible) return;
-        healthLevel -= damage;
+        healthLevel -= amount;
         if(healthLevel <= 0) {
             die();
         }else {
+            String text = "-"+amount;
             for(ExpiPlayer pp : server.getPlayers()) {
-                pp.getNetManager().putInjurePacket(getId(), damage);
+                pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.RED);
             }
         }
     }
 
-    public void decreaseFoodLevel(float amount) {
-        if(invincible) return;
-        foodLevel = Math.max(foodLevel - amount, 0);
+    public void heal(int amount) {
+        if(healthLevel == MAX_HEALTH_LEVEL) return;
+        healthLevel = (byte) Math.min(healthLevel + amount, MAX_HEALTH_LEVEL);
+        String text = "+"+amount;
+        for(ExpiPlayer pp : server.getPlayers()) {
+            pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.GREEN);
+        }
     }
 
-    public float getHealthLevel() {
+    public byte getHealthLevel() {
         return healthLevel;
     }
 
     public void setHealthLevel(int healthLevel) {
-        this.healthLevel = healthLevel;
+        this.healthLevel = (byte) healthLevel;
     }
 
-    public float getFoodLevel() {
+    public byte getFoodLevel() {
         return foodLevel;
     }
 
     public void setFoodLevel(int foodLevel) {
-        this.foodLevel = foodLevel;
+        this.foodLevel = (byte) foodLevel;
     }
 
-    public float getTemperatureLevel() {
-        return temperatureLevel;
+    public void increaseFoodLevel(int i) {
+        foodLevel = (byte) Math.min(foodLevel + i, MAX_FOOD_LEVEL);
     }
 
-    public void setTemperatureLevel(int temperatureLevel) {
-        this.temperatureLevel = temperatureLevel;
-    }
-
-    public void increaseHealthLevel(float i) {
-        healthLevel = Math.min(healthLevel + i, MAX_HEALTH_LEVEL);
-    }
-
-    public void increaseFoodLevel(float i) {
-        foodLevel = Math.min(foodLevel + i, MAX_FOOD_LEVEL);
+    public void decreaseFoodLevel(int amount) {
+        if(invincible) return;
+        foodLevel = (byte) Math.max(foodLevel - amount, 0);
     }
 
     public boolean isInvincible() {
@@ -190,23 +201,20 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     @Override
     public void writeData(WorldBuffer out) {
         super.writeData(out);
-        out.writeFloat(healthLevel);
-        out.writeFloat(foodLevel);
-        out.writeFloat(temperatureLevel);
+        out.writeByte(healthLevel);
+        out.writeByte(foodLevel);
         out.writeBoolean(alive);
     }
 
 
     @Override
     public void onCollisionBegin(Contact contact) {
-        //System.out.println("begin: vel: fixA: "+contact.getFixtureA()+" sen: "+contact.getFixtureA().isSensor()+" fixB: "+contact.getFixtureB()+" sen: "+contact.getFixtureB().isSensor()+" vel: "+getVelocity());
         if((contact.getFixtureA() == bodyFix && !contact.getFixtureB().isSensor())
                 || (contact.getFixtureB() == bodyFix && !contact.getFixtureA().isSensor())) {
-            onHardCollision();
+            lastFallVelocity = Math.max(lastFallVelocity, getVelocity().y);
         }
 
-        if((contact.getFixtureA() == groundSensor && !contact.getFixtureB().isSensor())
-            || (contact.getFixtureB() == groundSensor && !contact.getFixtureA().isSensor())) {
+        if(contact.getFixtureA() == groundSensor || contact.getFixtureB() == groundSensor) {
             collisions++;
             onGround = true;
         }
@@ -220,8 +228,4 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         }
     }
 
-    protected void onHardCollision() {
-        System.out.println("hard coll, vel: "+getVelocity());
-        if(getVelocity().y < -12) healthLevel -= 20;
-    }
 }

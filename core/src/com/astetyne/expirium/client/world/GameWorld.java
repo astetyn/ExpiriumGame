@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client.world;
 
+import com.astetyne.expirium.client.animation.WorldAnimationManager;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
@@ -37,6 +38,7 @@ public class GameWorld {
     private LightCalculator lightCalculator;
     private final WorldInputListener worldInputListener;
     private final List<BreakingTile> breakingTiles;
+    private final WorldAnimationManager animationManager;
 
     Color[] stabColors = new Color[] {
             new Color(0.9f, 0f, 0f, 1),
@@ -59,6 +61,7 @@ public class GameWorld {
         camera.update();
 
         breakingTiles = new ArrayList<>();
+        animationManager = new WorldAnimationManager();
     }
 
     public void loadData(PacketInputStream in) {
@@ -92,6 +95,7 @@ public class GameWorld {
             e.update();
         }
         cameraCenter();
+        animationManager.update();
     }
 
     public void draw(SpriteBatch batch) {
@@ -131,7 +135,6 @@ public class GameWorld {
                 }
             }
         }
-
         batch.setColor(Color.WHITE);
 
         // breaking anim
@@ -158,6 +161,7 @@ public class GameWorld {
             }
         }
 
+        animationManager.draw(batch);
     }
 
     public void onServerTick() {
@@ -227,7 +231,6 @@ public class GameWorld {
             boolean has = in.getBoolean();
             terrain[x][y].setBackWall(has);
         }
-
     }
 
     private void cameraCenter() {
@@ -273,4 +276,7 @@ public class GameWorld {
         return terrain[(int)x][(int)y];
     }
 
+    public WorldAnimationManager getAnimationManager() {
+        return animationManager;
+    }
 }

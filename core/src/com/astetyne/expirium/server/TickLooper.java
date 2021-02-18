@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 
 public class TickLooper extends TerminableLooper {
 

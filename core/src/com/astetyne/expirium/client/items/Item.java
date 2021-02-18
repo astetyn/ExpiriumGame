@@ -40,6 +40,7 @@ public enum Item {
     FURNACE(ItemCat.MATERIAL, 2, 2, 1),
     JAR(ItemCat.MISC, 0.05f),
     JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.1f),
+    HUNTING_KNIFE(ItemCat.TOOL, 0.3f), // - treba k tomu texturu a nejaky recept na vyrobu
     ;
 
     ItemCat category;
@@ -85,6 +86,8 @@ public enum Item {
 
             item.texture = gui.findRegion(texName);
             item.gridTexture = gui.findRegion(gridTexName);
+
+            System.out.println("loaded item "+item+" with tex: "+item.texture);
 
         }
     }
@@ -136,11 +139,41 @@ public enum Item {
         }
     }
 
-    public boolean isMergeable() {
+    public boolean isWeapon() {
+        switch(this) {
+            case HUNTING_KNIFE:
+                return true;
+            default: return false;
+        }
+    }
+
+    public boolean isTileBreaker() {
         switch(this) {
             case WOODEN_MATTOCK:
             case RHYOLITE_MATTOCK:
-                return false;
+                return true;
+            default: return false;
+        }
+    }
+
+    public float getBreakingSpeedCoef() {
+        switch(this) {
+            case WOODEN_MATTOCK: return 2;
+            case RHYOLITE_MATTOCK: return 3;
+            default: return 1;
+        }
+    }
+
+    public int getWeaponDamage() {
+        switch(this) {
+            case HUNTING_KNIFE: return 10;
+            default: return 1;
+        }
+    }
+
+    public boolean isMergeable() {
+        if(category == ItemCat.TOOL) return false;
+        switch(this) {
             default: return true;
         }
     }

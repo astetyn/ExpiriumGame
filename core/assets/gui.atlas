@@ -46,6 +46,13 @@ coal_item
   orig: 32, 32
   offset: 0, 0
   index: -1
+hunting_knife_item
+  rotate: false
+  xy: 229, 37
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 cooked_apple_item
   rotate: false
   xy: 231, 19

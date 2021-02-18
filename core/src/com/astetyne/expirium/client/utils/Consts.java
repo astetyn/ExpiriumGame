@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.utils;
 public class Consts {
 
     public static final int VERSION = 1;
+    public static final String VERSION_TEXT = "alpha 1.2";
 
     public static final boolean DEBUG = true;
 
@@ -16,12 +17,14 @@ public class Consts {
     public static final String MULTICAST_ADDRESS = "234.14.14.14";
 
     // world
+    public static final int COMBAT_PRECISION = 6;
+
     public static final int BREAKING_PRECISION = 6;
 
     public static final short DEFAULT_BIT = 1;
     public static final short PLAYER_BIT = 2;
 
-    public static final float D_I_PICK_DIST = 1.5f;
+    public static final float D_I_PICK_DIST = 1.6f;
 
     public static final float CAMPFIRE_TIME = 180;
 

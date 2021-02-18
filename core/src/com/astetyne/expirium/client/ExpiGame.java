@@ -25,8 +25,6 @@ import java.util.Queue;
 
 public class ExpiGame extends Game implements ClientFailListener, ServerFailListener {
 
-	public static final String version = "alpha 1.0";
-
 	private static ExpiGame expiGame;
 
 	private final ClientGateway clientGateway;

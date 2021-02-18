@@ -51,7 +51,9 @@ public class HotBarSlot extends Widget {
             String amount = itemStack.getAmount()+"";
             float xOff = getWidth()/2 - Utils.getTextWidth(amount, Res.MAIN_FONT)/2;
             float yOff = getHeight()/2 + Utils.getTextHeight(amount, Res.MAIN_FONT)/2;
-            Res.MAIN_FONT.draw(batch, amount, getX()+xOff, getY()+yOff);
+            if(itemStack.getItem().isMergeable()) {
+                Res.MAIN_FONT.draw(batch, amount, getX() + xOff, getY() + yOff);
+            }
         }
         batch.setColor(1,1,1,1);
     }

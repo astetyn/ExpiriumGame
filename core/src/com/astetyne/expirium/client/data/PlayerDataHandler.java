@@ -12,7 +12,7 @@ public class PlayerDataHandler {
     private final ThumbStickData thumbStickData1, thumbStickData2;
 
     // living stats
-    private float health, food, temperature;
+    private byte health, food;
 
     public PlayerDataHandler() {
         mainData = new StorageGridData();
@@ -27,9 +27,8 @@ public class PlayerDataHandler {
     }
 
     public void feedLivingStats(PacketInputStream in) {
-        health = in.getFloat();
-        food = in.getFloat();
-        temperature = in.getFloat();
+        health = in.getByte();
+        food = in.getByte();
         GameScreen.get().getActiveRoot().refresh();
     }
 
@@ -51,16 +50,12 @@ public class PlayerDataHandler {
         return hotSlotsData;
     }
 
-    public float getHealth() {
+    public byte getHealth() {
         return health;
     }
 
-    public float getFood() {
+    public byte getFood() {
         return food;
-    }
-
-    public float getTemperature() {
-        return temperature;
     }
 
     public ThumbStickData getThumbStickData1() {

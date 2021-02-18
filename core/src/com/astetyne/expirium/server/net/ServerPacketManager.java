@@ -4,13 +4,15 @@ import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.HashSet;
 import java.util.List;
@@ -101,6 +103,7 @@ public class ServerPacketManager {
     }
 
     public void putEntityMovePacket(ExpiEntity e) {
+        //todo: optimalizacia, pozriet sa, ci to nie je moc daleko
         out.startPacket(19);
         out.putInt(e.getId());
         out.putFloat(e.getLocation().x);
@@ -194,9 +197,8 @@ public class ServerPacketManager {
 
     public void putLivingStatsPacket() {
         out.startPacket(27);
-        out.putFloat(owner.getHealthLevel());
-        out.putFloat(owner.getFoodLevel());
-        out.putFloat(owner.getTemperatureLevel());
+        out.putByte(owner.getHealthLevel());
+        out.putByte(owner.getFoodLevel());
     }
 
     public void putSimpleServerPacket(SimpleServerPacket p) {
@@ -208,12 +210,6 @@ public class ServerPacketManager {
         out.startPacket(12);
         out.putBoolean(firstDeath);
         out.putLong(daysSurvived);
-    }
-
-    public void putInjurePacket(int id, float damageValue) {
-        out.startPacket(23);
-        out.putInt(id);
-        out.putFloat(damageValue);
     }
 
     public void putHandPunchPacket(ExpiPlayer puncher) {
@@ -235,5 +231,13 @@ public class ServerPacketManager {
             out.putInt(t.getY());
             out.putBoolean(t.hasBackWall());
         }
+    }
+
+    public void putPlayTextAnim(Vector2 loc, String text, ExpiColor c) {
+        //todo: optimalizacia, pozriet sa, ci to nie je moc daleko
+        out.startPacket(35);
+        out.putVector(loc);
+        out.putString(text);
+        out.putByte(c.getId());
     }
 }

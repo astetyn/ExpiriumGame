@@ -130,10 +130,6 @@ public abstract class Entity {
         return angle;
     }
 
-    public void injure(float damageValue) {
-        animator.injure(damageValue);
-    }
-
     public boolean isLookingRight() {
         return lookingRight;
     }

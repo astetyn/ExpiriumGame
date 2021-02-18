@@ -8,7 +8,7 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
@@ -142,20 +142,20 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
             case SLOT_MATERIALS: chosenSlot = ChosenSlot.MATERIAL_SLOT; break;
             case SLOT_CONSUMABLE: chosenSlot = ChosenSlot.CONSUMABLE_SLOT; break;
             case SWITCH_UP:
-                if(itemInHand.getItem().getCategory() == ItemCat.TOOL) {
+                if(chosenSlot == ChosenSlot.TOOL_SLOT) {
                     indexTools++;
-                }else if(itemInHand.getItem().getCategory() == ItemCat.MATERIAL){
+                }else if(chosenSlot == ChosenSlot.MATERIAL_SLOT){
                     indexMats++;
-                }else if(itemInHand.getItem().getCategory() == ItemCat.CONSUMABLE){
+                }else if(chosenSlot == ChosenSlot.CONSUMABLE_SLOT){
                     indexCons++;
                 }
                 break;
             case SWITCH_DOWN:
-                if(itemInHand.getItem().getCategory() == ItemCat.TOOL) {
+                if(chosenSlot == ChosenSlot.TOOL_SLOT) {
                     indexTools--;
-                }else if(itemInHand.getItem().getCategory() == ItemCat.MATERIAL){
+                }else if(chosenSlot == ChosenSlot.MATERIAL_SLOT){
                     indexMats--;
-                }else if(itemInHand.getItem().getCategory() == ItemCat.CONSUMABLE){
+                }else if(chosenSlot == ChosenSlot.CONSUMABLE_SLOT){
                     indexCons--;
                 }
                 break;
@@ -209,6 +209,10 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         List<ItemStack> is2 = new ArrayList<>();
         List<ItemStack> is3 = new ArrayList<>();
 
+        is1.add(new ItemStack(Item.EMPTY));
+        is2.add(new ItemStack(Item.EMPTY));
+        is3.add(new ItemStack(Item.EMPTY));
+
         for(ItemStack is : items) {
             if(is.getItem().getCategory() == ItemCat.TOOL) {
                 is1.add(is);
@@ -235,21 +239,9 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
             indexCons = is3.size() - 1;
         }
 
-        if(is1.size() == 0) {
-            isTool = new ItemStack(Item.EMPTY);
-        }else {
-            isTool = is1.get(indexTools);
-        }
-        if(is2.size() == 0) {
-            isMat = new ItemStack(Item.EMPTY);
-        }else {
-            isMat = is2.get(indexMats);
-        }
-        if(is3.size() == 0) {
-            isCon = new ItemStack(Item.EMPTY);
-        }else {
-            isCon = is3.get(indexCons);
-        }
+        isTool = is1.get(indexTools);
+        isMat = is2.get(indexMats);
+        isCon = is3.get(indexCons);
 
         if(chosenSlot == ChosenSlot.TOOL_SLOT) {
             itemInHand = isTool;
@@ -264,7 +256,6 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         for(ExpiPlayer ep : owner.getServer().getPlayers()) {
             ep.getNetManager().putHandItemPacket(owner.getId(), itemInHand.getItem());
         }
-
     }
 
     public ItemStack getItemInHand() {

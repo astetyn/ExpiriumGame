@@ -11,16 +11,12 @@ public abstract class EntityAnimator {
     protected final Entity entity;
     protected float timer;
     protected float w, h;
-    protected long lastInjureTime;
-    protected float lastInjureValue;
 
     public EntityAnimator(Entity entity) {
         this.entity = entity;
         timer = 0;
         this.w = entity.getType().getWidth();
         this.h = entity.getType().getHeight();
-        lastInjureTime = 0;
-        lastInjureValue = 0;
     }
 
     public void update() {
@@ -28,10 +24,5 @@ public abstract class EntityAnimator {
     }
 
     public abstract void draw(SpriteBatch batch);
-
-    public void injure(float damageValue) {
-        lastInjureValue = damageValue;
-        lastInjureTime = System.currentTimeMillis();
-    }
 
 }
