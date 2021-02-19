@@ -24,6 +24,7 @@ public abstract class Entity {
     private float lastAngle;
     private EntityAnimator animator;
     private boolean lookingRight;
+    private boolean active;
 
     public Entity(EntityType type, int id, Vector2 loc) {
 
@@ -42,6 +43,7 @@ public abstract class Entity {
         velocity = new Vector2();
         lastAngle = 0;
         lookingRight = true;
+        active = true;
 
         GameScreen.get().getWorld().getEntitiesID().put(ID, this);
         GameScreen.get().getWorld().getEntities().add(this);
@@ -86,6 +88,7 @@ public abstract class Entity {
         lastLoc = getLocation().cpy();
         lastAngle = angle;
         interpolationDelta = 0;
+        active = true;
     }
 
     public Vector2 getLocation() {
@@ -132,5 +135,13 @@ public abstract class Entity {
 
     public boolean isLookingRight() {
         return lookingRight;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

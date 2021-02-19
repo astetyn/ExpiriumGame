@@ -92,7 +92,7 @@ public class GameWorld {
 
     public void update() {
         for(Entity e : entities) {
-            e.update();
+            if(e.isActive()) e.update();
         }
         cameraCenter();
         animationManager.update();
@@ -144,6 +144,7 @@ public class GameWorld {
 
         // entities + player
         for(Entity e : entities) {
+            if(!e.isActive()) continue;
             // this is for entities from entities.atlas
             if(e.getType() != EntityType.DROPPED_ITEM) {
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
@@ -153,6 +154,7 @@ public class GameWorld {
         }
 
         for(Entity e : entities) {
+            if(!e.isActive()) continue;
             // this is for dropped items from gui.atlas
             if(e.getType() == EntityType.DROPPED_ITEM) {
                 float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
@@ -166,6 +168,9 @@ public class GameWorld {
 
     public void onServerTick() {
         breakingTiles.clear();
+        for(Entity e : entities) {
+            e.setActive(false);
+        }
     }
 
     public void onFeedWorldEvent(PacketInputStream in) {

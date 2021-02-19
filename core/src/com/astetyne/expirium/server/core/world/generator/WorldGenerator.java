@@ -1,8 +1,10 @@
 package com.astetyne.expirium.server.core.world.generator;
 
 import com.astetyne.expirium.client.tiles.Material;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
-import com.astetyne.expirium.server.core.world.generator.biome.*;
+import com.astetyne.expirium.server.core.world.generator.biome.BiomeGenerator;
+import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
 
 public class WorldGenerator {
 
@@ -10,10 +12,7 @@ public class WorldGenerator {
     private final int w, h;
     private final int[] surface;
     private final long seed;
-    private final TropicalForest tropicalForest;
-    private final BorealForest borealForest;
-    private final Desert desert;
-    private final Hills hills;
+    private final BiomeType[] biomes;
 
     public WorldGenerator(int width, int height, long seed) {
         w = width;
@@ -21,50 +20,53 @@ public class WorldGenerator {
         this.seed = seed;
         terrain = new Material[h][w];
         surface = new int[w];
-        tropicalForest = new TropicalForest(terrain, surface, w, h, seed);
-        borealForest = new BorealForest(terrain, surface, w, h, seed);
-        desert = new Desert(terrain, surface, w, h, seed);
-        hills = new Hills(terrain, surface, w, h, seed);
+        biomes = new BiomeType[w/ Consts.BIOME_LEN];
     }
 
     public void generateWorld() {
 
-        int x = 0;
-        BiomeGenerator lastBiome = null;
-        BiomeGenerator nextBiome = getRandBiome();
-
-        while(true) {
-            int biomeWidth = (int) (30 + Math.random() * 30);
-            int endX = Math.min(x+biomeWidth, w);
-
-            BiomeGenerator actualBiome = nextBiome;
-            nextBiome = getRandBiome();
-
-            int leftMH = lastBiome == null ? 70 : (lastBiome.getH(x-1) + actualBiome.getH(x))/2;
-            int rightMH = endX >= w ? 70 : (actualBiome.getH(endX) + nextBiome.getH(endX+1))/2;
-
-            actualBiome.generate(x, endX, leftMH, rightMH);
-
-            lastBiome = actualBiome;
-
-            x += biomeWidth;
-            if(x >= w) {
+        for(BiomeType type : BiomeType.values()) {
+            while(true) {
+                int randPos = (int) (Math.random() * biomes.length);
+                if(biomes[randPos] != null) continue;
+                biomes[randPos] = type;
                 break;
             }
         }
 
+        for(int i = 0; i < biomes.length; i++) {
+            if(biomes[i] != null) continue;
+            biomes[i] = getRandBiomeType();
+        }
+
+        int lastMH = 70;
+
+        for(int i = 0; i < biomes.length-1; i++) {
+
+            BiomeGenerator currentGen = biomes[i].initGenerator(terrain, surface, w, h, seed);
+            BiomeGenerator nextGen = biomes[i+1].initGenerator(terrain, surface, w, h, seed);
+
+            int rightMH = (currentGen.getH((i+1)*Consts.BIOME_LEN-1) + nextGen.getH((i+1)*Consts.BIOME_LEN)) / 2;
+
+            currentGen.generate(i, lastMH, rightMH);
+
+            lastMH = rightMH;
+        }
+
+        BiomeGenerator lastGen = biomes[biomes.length-1].initGenerator(terrain, surface, w, h, seed);
+        lastGen.generate(biomes.length-1, lastMH, 70);
     }
 
-    private BiomeGenerator getRandBiome() {
+    private BiomeType getRandBiomeType() {
         double d = Math.random();
         if(d < 0.3) {
-            return tropicalForest;
+            return BiomeType.TROPICAL_FOREST;
         }else if(d < 0.6) {
-            return borealForest;
+            return BiomeType.BOREAL_FOREST;
         }else if(d < 0.85) {
-            return desert;
+            return BiomeType.DESERT;
         }else {
-            return hills;
+            return BiomeType.HILLS;
         }
     }
 
@@ -74,6 +76,9 @@ public class WorldGenerator {
                 wb.writeMaterial(terrain[y][x]);
                 wb.writeBoolean(false); // backwall
             }
+        }
+        for(BiomeType biome : biomes) {
+            wb.writeInt(biome.getId());
         }
     }
 }

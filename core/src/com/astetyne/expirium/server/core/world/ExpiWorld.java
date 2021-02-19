@@ -17,6 +17,7 @@ import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
 import com.astetyne.expirium.server.core.world.tile.ExpiTile;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.TickTask;
@@ -53,6 +54,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     private final int width, height;
     private final long seed;
     private final PriorityQueue<TickTask> scheduledTickTasks;
+    private final AnimalBalancer animalBalancer;
+    private final BiomeType[] biomes;
 
     public ExpiWorld(DataInputStream in, long tick, ExpiServer server) throws IOException {
 
@@ -75,6 +78,11 @@ public class ExpiWorld implements WorldSaveable, Disposable {
             for(int w = 0; w < width; w++) {
                 terrain[h][w] = new ExpiTile(this, w, h, in, createMeta);
             }
+        }
+
+        biomes = new BiomeType[width/100];
+        for(int i = 0; i < biomes.length; i++) {
+            biomes[i] = BiomeType.get(in.readInt());
         }
 
         //todo: len docasne zatial
@@ -101,6 +109,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         System.out.println("Recalculating stability...");
         stabilityCalc.generateStability();
         System.out.println("Generating world done!");
+
+        animalBalancer = new AnimalBalancer(this);
     }
 
     public void dispose() {
@@ -135,6 +145,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
                 break;
             }
         }
+
+        animalBalancer.onTick();
 
         List<ExpiEntity> copy = new ArrayList<>(server.getEntities());
         for(ExpiEntity ee : copy) {
@@ -353,6 +365,15 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return tick;
     }
 
+    public BiomeType[] getBiomes() {
+        return biomes;
+    }
+
+    public BiomeType getBiomeAt(float x) {
+        int i = (int) (x / Consts.BIOME_LEN);
+        return biomes[i];
+    }
+
     public long scheduleTaskAfter(Runnable runnable, long afterTicks) {
         TickTask task = new TickTask(runnable, tick + afterTicks);
         scheduleTask(task);
@@ -374,6 +395,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     }
 
     public ExpiEntity spawnEntity(EntityType type, Vector2 loc, Object... args) {
+        System.out.println("entity "+type+" spawn on "+loc);
         Class<?>[] argClasses = new Class[args.length+2];
         Object[] objects = new Object[args.length+2];
         for(int i = 0; i < args.length; i++) {
@@ -439,6 +461,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
                 terrain[h][w].writeData(out);
             }
         }
-
+        for(BiomeType biome : biomes) {
+            out.writeInt(biome.getId());
+        }
     }
 }

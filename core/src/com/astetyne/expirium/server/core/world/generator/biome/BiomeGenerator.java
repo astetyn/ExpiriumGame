@@ -21,7 +21,9 @@ public abstract class BiomeGenerator {
     }
 
     // MH = midheight, target y for generation
-    public void generate(int from, int to, int leftMH, int rightMH){
+    public void generate(int i, int leftMH, int rightMH){
+        int from = i*100;
+        int to = (i+1)*100;
         for(int x = from; x < to; x++) {
             surface[x] = getSmoothedH(x, from, to, leftMH, rightMH);
         }

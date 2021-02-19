@@ -17,9 +17,9 @@ import java.io.IOException;
 
 public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
-    private final static byte MAX_HEALTH_LEVEL = 100;
     private final static byte MAX_FOOD_LEVEL = 100;
 
+    private byte maxHealth;
     private byte healthLevel, foodLevel;
 
     protected boolean lookingRight;
@@ -28,11 +28,12 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     protected Fixture bodyFix, groundSensor;
     protected boolean alive;
     protected boolean invincible;
-    private float lastFallVelocity;
+    protected float lastFallVelocity;
 
-    public LivingEntity(ExpiServer server, EntityType type, Vector2 loc) {
+    public LivingEntity(ExpiServer server, EntityType type, Vector2 loc, int maxHealth) {
         super(server, type, loc);
-        healthLevel = 100;
+        this.maxHealth = (byte) maxHealth;
+        healthLevel = this.maxHealth;
         foodLevel = 100;
         lookingRight = true;
         onGround = false;
@@ -40,11 +41,13 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         alive = true;
         invincible = false;
         lastFallVelocity = 0;
+        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
-    public LivingEntity(ExpiServer server, EntityType type, DataInputStream in) throws IOException {
+    public LivingEntity(ExpiServer server, EntityType type, int maxHealth, DataInputStream in) throws IOException {
         super(server, type, in);
+        this.maxHealth = (byte) maxHealth;
         healthLevel = in.readByte();
         foodLevel = in.readByte();
         lookingRight = true;
@@ -54,6 +57,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         alive = true;
         invincible = false;
         lastFallVelocity = 0;
+        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -88,7 +92,6 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         groundSensor = body.createFixture(fixtureDef);
 
         polyShape.dispose();
-        System.out.println("ground: "+groundSensor+" body: "+bodyFix);
     }
 
     @Override
@@ -102,21 +105,27 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     public void onTick() {
         super.onTick();
 
-        if(server.getWorld().getTick() % 320 == 0) { // once per 10 seconds
-            decreaseFoodLevel(1);
-            if(foodLevel >= 90) heal(1);
-        }
-
         if(foodLevel <= 5 && server.getWorld().getTick() % 64 == 0) {
             injure(1); // 1 health per 2 seconds
         }
 
-        if(lastFallVelocity < -10) {
-            injure(20);
-            lastFallVelocity = 0;
-        }
-
+        recalcFallDamage();
         recalcLookingDir();
+
+        lastFallVelocity = 0;
+    }
+
+    // once per 10 seconds
+    protected void plannedStarve() {
+        decreaseFoodLevel(1);
+        if(foodLevel >= 90) heal(1);
+        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
+    }
+
+    protected void recalcFallDamage() {
+        if(lastFallVelocity < -12 && getVelocity().y - lastFallVelocity > 11) {
+            injure((int) (lastFallVelocity*(-1)));
+        }
     }
 
     public void die() {
@@ -143,8 +152,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     }
 
     public void heal(int amount) {
-        if(healthLevel == MAX_HEALTH_LEVEL) return;
-        healthLevel = (byte) Math.min(healthLevel + amount, MAX_HEALTH_LEVEL);
+        if(healthLevel == maxHealth) return;
+        healthLevel = (byte) Math.min(healthLevel + amount, maxHealth);
         String text = "+"+amount;
         for(ExpiPlayer pp : server.getPlayers()) {
             pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.GREEN);
@@ -211,7 +220,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
     public void onCollisionBegin(Contact contact) {
         if((contact.getFixtureA() == bodyFix && !contact.getFixtureB().isSensor())
                 || (contact.getFixtureB() == bodyFix && !contact.getFixtureA().isSensor())) {
-            lastFallVelocity = Math.max(lastFallVelocity, getVelocity().y);
+            lastFallVelocity = Math.min(lastFallVelocity, getVelocity().y);
         }
 
         if(contact.getFixtureA() == groundSensor || contact.getFixtureB() == groundSensor) {

@@ -10,8 +10,10 @@ public class Desert extends BiomeGenerator {
     }
 
     @Override
-    public void generate(int from, int to, int leftMH, int rightMH) {
-        super.generate(from, to, leftMH, rightMH);
+    public void generate(int i, int leftMH, int rightMH) {
+        super.generate(i, leftMH, rightMH);
+        int from = i*100;
+        int to = (i+1)*100;
 
         for(int x = from; x < to; x++) {
             int terrainHeight = surface[x];

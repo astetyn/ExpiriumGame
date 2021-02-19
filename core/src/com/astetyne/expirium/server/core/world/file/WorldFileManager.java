@@ -40,8 +40,8 @@ public class WorldFileManager {
 
     private void createNewWorld() {
 
-        int width = 2000;
-        int height = 256;
+        int width = 4000;
+        int height = 128;
         long seed = (long) (Math.random() * Long.MAX_VALUE);
         long tick = Consts.TICKS_IN_DAY / 24 * 7;
 

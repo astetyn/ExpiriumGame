@@ -13,7 +13,7 @@ apple_item
   index: -1
 blueberry_bush_item
   rotate: false
-  xy: 943, 228
+  xy: 961, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -27,7 +27,7 @@ blueberry_item
   index: -1
 cactus_item
   rotate: false
-  xy: 853, 228
+  xy: 871, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -46,13 +46,6 @@ coal_item
   orig: 32, 32
   offset: 0, 0
   index: -1
-hunting_knife_item
-  rotate: false
-  xy: 229, 37
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: -1
 cooked_apple_item
   rotate: false
   xy: 231, 19
@@ -62,7 +55,7 @@ cooked_apple_item
   index: -1
 cross_icon
   rotate: false
-  xy: 925, 228
+  xy: 943, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -177,6 +170,20 @@ health_icon
   orig: 16, 16
   offset: 0, 0
   index: -1
+hunting_knife_item
+  rotate: false
+  xy: 789, 194
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+hunting_knife_item_grid
+  rotate: false
+  xy: 549, 82
+  size: 16, 32
+  orig: 16, 32
+  offset: 0, 0
+  index: -1
 inv_tile
   rotate: false
   xy: 747, 212
@@ -207,7 +214,7 @@ jar_blueberry_jam_item
   index: -1
 jar_item
   rotate: false
-  xy: 799, 228
+  xy: 817, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -242,35 +249,35 @@ raspberry_item
   index: -1
 raw_wood_item
   rotate: false
-  xy: 817, 228
+  xy: 835, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_item
   rotate: false
-  xy: 871, 228
+  xy: 889, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item
   rotate: false
-  xy: 889, 228
+  xy: 907, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item_grid
   rotate: false
-  xy: 549, 82
+  xy: 781, 212
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 sand_item
   rotate: false
-  xy: 907, 228
+  xy: 925, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -284,7 +291,7 @@ selection
   index: -1
 settings_icon
   rotate: false
-  xy: 961, 228
+  xy: 979, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -375,21 +382,21 @@ wooden_mattock_item
   index: -1
 wooden_mattock_item_grid
   rotate: false
-  xy: 781, 212
+  xy: 799, 212
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 wooden_support_item
   rotate: false
-  xy: 835, 228
+  xy: 853, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall_item
   rotate: false
-  xy: 979, 228
+  xy: 997, 228
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

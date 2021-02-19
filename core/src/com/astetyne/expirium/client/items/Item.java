@@ -40,7 +40,7 @@ public enum Item {
     FURNACE(ItemCat.MATERIAL, 2, 2, 1),
     JAR(ItemCat.MISC, 0.05f),
     JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.1f),
-    HUNTING_KNIFE(ItemCat.TOOL, 0.3f), // - treba k tomu texturu a nejaky recept na vyrobu
+    HUNTING_KNIFE(ItemCat.TOOL, 1, 2, 0.3f, true),
     ;
 
     ItemCat category;

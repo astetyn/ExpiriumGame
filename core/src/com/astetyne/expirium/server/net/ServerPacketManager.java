@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.ExpiEntity;
@@ -103,7 +104,7 @@ public class ServerPacketManager {
     }
 
     public void putEntityMovePacket(ExpiEntity e) {
-        //todo: optimalizacia, pozriet sa, ci to nie je moc daleko
+        if(!owner.getNearActiveEntities().contains(e) && e != owner) return;
         out.startPacket(19);
         out.putInt(e.getId());
         out.putFloat(e.getLocation().x);
@@ -234,7 +235,7 @@ public class ServerPacketManager {
     }
 
     public void putPlayTextAnim(Vector2 loc, String text, ExpiColor c) {
-        //todo: optimalizacia, pozriet sa, ci to nie je moc daleko
+        if(owner.getCenter().dst(loc) > Consts.ACTIVE_ENTITIES_RADIUS) return;
         out.startPacket(35);
         out.putVector(loc);
         out.putString(text);

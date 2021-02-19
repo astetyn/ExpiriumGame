@@ -7,6 +7,7 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.ExpiEntity;
 import com.astetyne.expirium.server.core.entity.LivingEntity;
 import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.HashSet;
 
 public class ExpiPlayer extends LivingEntity {
 
@@ -35,9 +37,10 @@ public class ExpiPlayer extends LivingEntity {
     private boolean wasAlreadyDead;
     private long lastDeathDay;
     private final WorldLoader worldLoader;
+    private final HashSet<ExpiEntity> nearActiveEntities;
 
     public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
-        super(server, EntityType.PLAYER, location);
+        super(server, EntityType.PLAYER, location, 100);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
@@ -51,12 +54,13 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = false;
         lastDeathDay = 0;
         worldLoader = new WorldLoader(server, this);
+        nearActiveEntities = new HashSet<>();
+        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
 
     public ExpiPlayer(ExpiServer server, ServerPlayerGateway gateway, String name, DataInputStream in) throws IOException {
-        super(server, EntityType.PLAYER, in);
-        // order is important - must be same as in writeData()
+        super(server, EntityType.PLAYER, 100, in);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
@@ -70,6 +74,8 @@ public class ExpiPlayer extends LivingEntity {
         wasAlreadyDead = in.readBoolean();
         lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
+        nearActiveEntities = new HashSet<>();
+        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
 
@@ -113,33 +119,42 @@ public class ExpiPlayer extends LivingEntity {
 
     public void applyPhysics() {
 
-        if(invincible && tsData1.horz != 0 || tsData1.vert != 0 || tsData2.horz != 0 || tsData2.vert != 0) {
+        if(invincible && (tsData1.horz != 0 || tsData1.vert != 0 || tsData2.horz != 0 || tsData2.vert != 0)) {
             invincible = false;
         }
 
-        float vY = body.getLinearVelocity().y;
+        float jumpThreshold = 0.6f;
 
-        if(onGround && tsData1.vert >= 0.6f && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
-            Vector2 center = body.getWorldCenter();
-            body.applyLinearImpulse(0, 320, center.x, center.y, true);
-            lastJump = System.currentTimeMillis();
+        if(tsData1.vert >= jumpThreshold) {
+            if((true || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+                Vector2 center = body.getWorldCenter();
+                body.applyLinearImpulse(0, 320, center.x, center.y, true);
+                lastJump = System.currentTimeMillis();
+            }
+            tsData1.horz = Math.abs(tsData1.horz) > 0.5 ? tsData1.horz : 0;
         }
 
-        if((body.getLinearVelocity().x >= 3 && tsData1.horz > 0)) {
+        if(body.getLinearVelocity().x >= 3 && tsData1.horz > 0) {
             tsData1.horz = 0;
-            //body.setLinearVelocity(3, vY);
         }else if(body.getLinearVelocity().x <= -3 && tsData1.horz < 0) {
             tsData1.horz = 0;
-            //body.setLinearVelocity(-3, vY);
         }else {
-            body.applyForceToCenter((50000.0f/Consts.SERVER_TPS) * tsData1.horz, 0, true);
+            body.applyForceToCenter((40000.0f/Consts.SERVER_TPS) * tsData1.horz, 0, true);
         }
-        //System.out.println("loc: "+getLocation());
+
         Vector2 vel = body.getLinearVelocity();
-        if(vel.x > 0 && onGround) {
-            vel.x -= Math.min(0.1f, vel.x);
-        }else if(onGround){
-            vel.x += Math.min(0.1f, -vel.x);
+        if(onGround) {
+            if(vel.x > 0) {
+                vel.x -= Math.min(0.15f, vel.x);
+            }else {
+                vel.x += Math.min(0.15f, -vel.x);
+            }
+        }else {
+            if(vel.x > 0) {
+                vel.x -= Math.min(0.01f, vel.x);
+            }else {
+                vel.x += Math.min(0.01f, -vel.x);
+            }
         }
         body.setLinearVelocity(vel);
     }
@@ -163,7 +178,7 @@ public class ExpiPlayer extends LivingEntity {
 
         Item itemInHand = mainInv.getItemInHand().getItem();
 
-        if(itemInHand.isTileBreaker() && !(toolManager instanceof TileBreakToolManager)) {
+        if((itemInHand.isTileBreaker() || itemInHand == Item.EMPTY) && !(toolManager instanceof TileBreakToolManager)) {
             toolManager.end();
             toolManager = new TileBreakToolManager(server, this);
         }else if(itemInHand.isWeapon() && !(toolManager instanceof CombatToolManager)) {
@@ -181,6 +196,17 @@ public class ExpiPlayer extends LivingEntity {
         }else if(tsData2.horz < 0) {
             lookingRight = false;
         }
+    }
+
+    private void plannedRecalcNearEntities() {
+
+        nearActiveEntities.clear();
+        for(ExpiEntity ee : server.getEntities()) {
+            if(ee == this) continue;
+            if(ee.getCenter().dst(getCenter()) <= Consts.ACTIVE_ENTITIES_RADIUS) nearActiveEntities.add(ee);
+        }
+
+        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -257,6 +283,10 @@ public class ExpiPlayer extends LivingEntity {
 
     public boolean isInInteractRadius(float x, float y) {
         return getCenter().dst(x, y) <= Consts.INTERACT_RADIUS;
+    }
+
+    public HashSet<ExpiEntity> getNearActiveEntities() {
+        return nearActiveEntities;
     }
 
     @Override

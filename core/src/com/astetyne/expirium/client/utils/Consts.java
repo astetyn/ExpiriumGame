@@ -28,6 +28,8 @@ public class Consts {
 
     public static final float CAMPFIRE_TIME = 180;
 
+    public static final int BIOME_LEN = 100;
+
     public static final int ITEM_COOLDOWN_BREAK = SERVER_TPS/4;
     public static final int ITEM_COOLDOWN_DROP = SERVER_TPS * 6;
 
@@ -44,6 +46,7 @@ public class Consts {
     public static final int SUNSET_END = 32000;
 
     // player
+    public static final float ACTIVE_ENTITIES_RADIUS = 30;
     public static final int PLAYER_INV_COLUMNS = 5;
     public static final int PLAYER_INV_ROWS = 5;
     public static final int PLAYER_INV_MAX_WEIGHT = 10;
