@@ -52,7 +52,7 @@ public abstract class BiomeGenerator {
         }
     }
 
-    protected void createOreLayers(IntVector2 locMid, Material ore) {
+    protected void createOreSpot(IntVector2 locMid, Material ore) {
         if(locMid.y == 0) return;
         int width1 = (int)(Math.random() * 3) + 1;
         int width2 = width1 + (int)(Math.random() * 4);
@@ -71,17 +71,10 @@ public abstract class BiomeGenerator {
         }
     }
 
-    protected void createCoalOres(int from, int to) {
+    protected void createOreSpots(Material mat, double density, int from, int to) {
         for(int x = from; x < to; x++) {
-            if(Math.random() > 0.3) continue;
-            createOreLayers(new IntVector2(x, (int) (Math.random() * (surface[x]-10))), Material.COAL_ORE);
-        }
-    }
-
-    protected void createRhyoliteOres(int from, int to) {
-        for(int x = from; x < to; x++) {
-            if(Math.random() > 0.2) continue;
-            createOreLayers(new IntVector2(x, (int) (Math.random() * (surface[x]-10))), Material.RHYOLITE);
+            if(Math.random() < density) continue;
+            createOreSpot(new IntVector2(x, (int) (Math.random() * (surface[x]-10))), mat);
         }
     }
 

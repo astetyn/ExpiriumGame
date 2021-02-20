@@ -8,6 +8,7 @@ public enum TileFix {
     SLOPE_L(new float[]{0, 0, 1, 0, 0, 1, 0, 0}, 0.5f),
     SLOPE_R(new float[]{0, 0, 1, 0, 1, 1, 0, 0}, 0.5f),
     LIMESTONE(new float[]{0.25f, 0, 0.75f, 0, 0.75f, 0.5f, 0.25f, 0.5f, 0.25f, 0}, 0.3f),
+    CHEST(new float[]{0.1f, 0, 0.9f, 0, 0.9f, 0.8f, 0.1f, 0.8f, 0.1f, 0}, 0.8f),
     ;
 
     private final float[] vertices;

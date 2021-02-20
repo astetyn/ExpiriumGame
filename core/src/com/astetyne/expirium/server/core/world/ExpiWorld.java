@@ -416,6 +416,9 @@ public class ExpiWorld implements WorldSaveable, Disposable {
                 if(e == ep) continue;
                 ep.getNetManager().putEntitySpawnPacket(e);
             }
+            for(ExpiPlayer p : server.getPlayers()) {
+                p.recalcNearEntities();
+            }
             return e;
         }catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();

@@ -53,6 +53,9 @@ public class Consts {
     public static final int JUMP_DELAY = 200;
     public static final int INTERACT_RADIUS = 6;
 
+    public static final float JUMP_THRESHOLD = 0.6f;
+    public static final float HORZ_JUMP_THRESHOLD = 0.4f;
+
     // gui
     public static final int INV_TILE_MLT = 140;
 

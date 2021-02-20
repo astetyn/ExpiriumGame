@@ -199,14 +199,16 @@ public class ExpiPlayer extends LivingEntity {
     }
 
     private void plannedRecalcNearEntities() {
+        recalcNearEntities();
+        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
+    }
 
+    public void recalcNearEntities() {
         nearActiveEntities.clear();
         for(ExpiEntity ee : server.getEntities()) {
             if(ee == this) continue;
             if(ee.getCenter().dst(getCenter()) <= Consts.ACTIVE_ENTITIES_RADIUS) nearActiveEntities.add(ee);
         }
-
-        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
     }
 
     public void wantsToMakeItem(ItemRecipe recipe) {
@@ -287,6 +289,10 @@ public class ExpiPlayer extends LivingEntity {
 
     public HashSet<ExpiEntity> getNearActiveEntities() {
         return nearActiveEntities;
+    }
+
+    public boolean isHoldingTS() {
+        return tsData1.horz != 0 || tsData1.vert != 0 || tsData2.vert != 0 || tsData2.horz != 0;
     }
 
     @Override

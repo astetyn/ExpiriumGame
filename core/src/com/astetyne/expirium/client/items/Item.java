@@ -12,14 +12,16 @@ public enum Item {
     // make sure texture with identical name+"_item" can be found in atlas
 
     EMPTY(ItemCat.EMPTY, 0),
-    STONE(ItemCat.MATERIAL, 0.5f),
-    RHYOLITE(ItemCat.MATERIAL, 0.2f),
-    GRASS(ItemCat.MATERIAL, 0.1f),
-    DIRT(ItemCat.MATERIAL, 0.1f),
-    RAW_WOOD(ItemCat.MISC, 0.05f),
-    WOODEN_MATTOCK(ItemCat.TOOL, 1, 2, 1, true),
-    RHYOLITE_MATTOCK(ItemCat.TOOL, 1, 2, 1, true),
-    CAMPFIRE(ItemCat.MATERIAL, 2, 2, 0.5f),
+    LIMESTONE(ItemCat.MATERIAL, 0.08f),
+    RHYOLITE(ItemCat.MATERIAL, 0.07f),
+    MAGNETITE(ItemCat.MISC, 0.07f),
+    CHROMITE(ItemCat.MISC, 0.07f),
+    GRASS(ItemCat.MATERIAL, 0.02f),
+    DIRT(ItemCat.MATERIAL, 0.08f),
+    RAW_WOOD(ItemCat.MISC, 0.04f),
+    WOODEN_MATTOCK(ItemCat.TOOL, 1, 2, 0.3f, true),
+    RHYOLITE_MATTOCK(ItemCat.TOOL, 1, 2, 0.4f, true),
+    CAMPFIRE(ItemCat.MATERIAL, 2, 2, 0.1f),
     WOODEN_WALL(ItemCat.MATERIAL, 0.05f),
     SOFT_WOODEN_WALL(ItemCat.MATERIAL, 0.04f),
     WOODEN_SUPPORT(ItemCat.MATERIAL, 0.02f),
@@ -28,19 +30,23 @@ public enum Item {
     RASPBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     RASPBERRY(ItemCat.CONSUMABLE, 0.01f),
     WOODEN_BOWL(ItemCat.MISC, 0.05f),
-    FRUIT_JAM(ItemCat.CONSUMABLE, 0.1f),
-    COAL(ItemCat.MISC, 0.1f),
+    FRUIT_JAM(ItemCat.CONSUMABLE, 0.05f),
+    COAL(ItemCat.MISC, 0.05f),
     SAND(ItemCat.MATERIAL, 0.08f),
     GLASS(ItemCat.MATERIAL, 0.06f),
     CACTUS(ItemCat.MATERIAL, 0.05f),
     BLUEBERRY(ItemCat.CONSUMABLE, 0.01f),
     BLUEBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     FIR_CONE(ItemCat.MATERIAL, 0.02f),
-    LIMESTONE(ItemCat.MISC, 0.1f),
-    FURNACE(ItemCat.MATERIAL, 2, 2, 1),
+    CLAYSTONE(ItemCat.MISC, 0.05f),
+    FURNACE(ItemCat.MATERIAL, 2, 2, 0.5f),
     JAR(ItemCat.MISC, 0.05f),
-    JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.1f),
-    HUNTING_KNIFE(ItemCat.TOOL, 1, 2, 0.3f, true),
+    JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.06f),
+    HUNTING_KNIFE(ItemCat.TOOL, 1, 2, 0.2f, true),
+    TORCH(ItemCat.MATERIAL, 0.02f),
+    CHEST(ItemCat.MATERIAL, 0.05f),
+    SMALL_MEAT_RAW(ItemCat.CONSUMABLE, 0.01f),
+    SMALL_MEAT_COOKED(ItemCat.CONSUMABLE, 0.01f),
     ;
 
     ItemCat category;
@@ -119,7 +125,7 @@ public enum Item {
 
     public Material getBuildMaterial() {
         switch(this) {
-            case STONE: return Material.STONE;
+            case LIMESTONE: return Material.LIMESTONE;
             case RHYOLITE: return Material.RHYOLITE;
             case DIRT: return Material.DIRT;
             case GRASS: return Material.GRASS;
@@ -135,6 +141,8 @@ public enum Item {
             case APPLE: return Material.GROWING_PLANT_SHOREA;
             case FIR_CONE: return Material.GROWING_PLANT_FIR;
             case FURNACE: return Material.FURNACE_OFF;
+            case CHEST: return Material.CHEST;
+            case TORCH: return Material.TORCH;
             default: return null;
         }
     }

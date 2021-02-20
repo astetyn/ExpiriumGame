@@ -7,10 +7,10 @@ import java.util.HashMap;
 
 public enum BiomeType {
 
-    TROPICAL_FOREST(TropicalForest.class),
-    HILLS(Hills.class),
-    BOREAL_FOREST(BorealForest.class),
-    DESERT(Desert.class),
+    TROPICAL_FOREST(TropicalForestGen.class),
+    HILLS(HillsGen.class),
+    BOREAL_FOREST(BorealForestGen.class),
+    DESERT(DesertGen.class),
     ;
 
     private final Class<? extends BiomeGenerator> clazz;
@@ -26,7 +26,7 @@ public enum BiomeType {
         }catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
-        return new Desert(terrain, surface, w, h, seed);
+        return new DesertGen(terrain, surface, w, h, seed);
     }
 
     int id;

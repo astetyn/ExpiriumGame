@@ -83,7 +83,7 @@ public class ThumbStick extends Widget {
     public void draw(Batch batch, float parentAlpha) {
         validate();
         if(touched) {
-            batch.setColor(1,1,1,0.8f);
+            batch.setColor(Color.WHITE);
         }else {
             batch.setColor(1,1,1,0.4f);
         }

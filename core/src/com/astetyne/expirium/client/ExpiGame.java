@@ -52,16 +52,14 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	@Override
 	public void create () {
-		TextureAtlas world = new TextureAtlas("world.atlas");
-		TextureAtlas gui = new TextureAtlas("gui.atlas");
-		TextureAtlas ent = new TextureAtlas("entities.atlas");
 		TextureAtlas bg = new TextureAtlas("background.atlas");
+		TextureAtlas textures = new TextureAtlas("textures.atlas");
 		BGRes.loadTextures(bg);
-		GuiRes.loadTextures(gui);// must be called before Res
-		Res.loadTextures(gui, ent);
-		TileTex.loadTextures(world);
-		TileTexAnim.loadTextures(world);
-		Item.loadTextures(gui);
+		GuiRes.loadTextures(textures);// must be called before Res
+		Res.loadTextures(textures, textures);
+		TileTex.loadTextures(textures);
+		TileTexAnim.loadTextures(textures);
+		Item.loadTextures(textures);
 		batch = new SpriteBatch();
 		setScreen(new MenuScreen());
 		debugRenderer = new Box2DDebugRenderer();

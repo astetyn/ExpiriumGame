@@ -13,4 +13,8 @@ public class ThumbStickData {
         vert = 0;
         horz = 0;
     }
+
+    public boolean isNeutral() {
+        return vert == 0 && horz == 0;
+    }
 }

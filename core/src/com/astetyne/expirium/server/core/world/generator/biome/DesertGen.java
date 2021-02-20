@@ -3,9 +3,9 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 
-public class Desert extends BiomeGenerator {
+public class DesertGen extends BiomeGenerator {
 
-    public Desert(Material[][] terrain, int[] surface, int w, int h, long seed) {
+    public DesertGen(Material[][] terrain, int[] surface, int w, int h, long seed) {
         super(terrain, surface, w, h, seed);
     }
 
@@ -22,7 +22,7 @@ public class Desert extends BiomeGenerator {
                 if(y <= terrainHeight && y > terrainHeight-10) {
                     terrain[y][x] = Material.SAND;
                 }else if(y < terrainHeight) {
-                    terrain[y][x] = Material.STONE;
+                    terrain[y][x] = Material.LIMESTONE;
                 }else {
                     terrain[y][x] = Material.AIR;
                 }
@@ -37,8 +37,8 @@ public class Desert extends BiomeGenerator {
             }
         }
         generateCacti(from, to);
-        createRandSurfacePlacements(from, to, Material.LIMESTONE, Math.random()*0.1, 1);
-        createCoalOres(from, to);
+        createRandSurfacePlacements(from, to, Material.CLAYSTONE, Math.random()*0.1, 1);
+        createOreSpots(Material.COAL_ORE, 0.3, from, to);
     }
 
     @Override

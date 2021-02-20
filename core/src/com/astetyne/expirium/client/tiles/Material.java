@@ -19,8 +19,10 @@ import java.util.HashMap;
 public enum Material implements Textureable {
 
     AIR(null, MetaTile.class, TileFix.SOFT, Solidity.LABILE, 0, 0),
-    STONE(TileTex.STONE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 4, 10, Item.STONE),
+    LIMESTONE(TileTex.LIMESTONE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 4, 10, Item.LIMESTONE),
     RHYOLITE(TileTex.RHYOLITE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 6, Item.RHYOLITE),
+    MAGNETITE(TileTex.MAGNETITE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 12, Item.MAGNETITE),
+    CHROMITE(TileTex.CHROMITE, MetaTile.class, TileFix.FULL, Solidity.SOLID, 3, 12, Item.CHROMITE),
     GRASS(TileTex.GRASS, MetaTile.class, TileFix.FULL, Solidity.SOLID, 2, 4, Item.GRASS),
     GRASS_SLOPE_R(TileTex.GRASS_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE, 1, 3, Item.GRASS),
     GRASS_SLOPE_L(TileTex.GRASS_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE, 1, 3, Item.GRASS),
@@ -55,11 +57,13 @@ public enum Material implements Textureable {
     BLUEBERRY_BUSH_GROWN(TileTex.BLUEBERRY_BUSH_GROWN, MetaTileBlueberryBush.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     GROWING_PLANT_FIR(TileTex.GROWING_PLANT, MetaTileTreePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     GROWING_PLANT_SHOREA(TileTex.GROWING_PLANT, MetaTileTreePlant.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
-    LIMESTONE(TileTex.LIMESTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.LIMESTONE),
+    CLAYSTONE(TileTex.CLAYSTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.CLAYSTONE),
     SAND_SLOPE_RIGHT(TileTex.SAND_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE_VERT, 1, 2, Item.SAND),
     SAND_SLOPE_LEFT(TileTex.SAND_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE_VERT, 1, 2, Item.SAND),
     FURNACE_ON(TileTex.FURNACE_ON, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
     FURNACE_OFF(TileTex.FURNACE_OFF, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
+    CHEST(TileTex.CHEST, MetaTileChest.class, TileFix.CHEST, Solidity.LABILE_VERT, 1, 2, Item.CHEST),
+    TORCH(TileTex.TORCH, MetaTile.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1, Item.TORCH),
     ;
 
     private final Textureable textureable;
@@ -131,10 +135,14 @@ public enum Material implements Textureable {
     public boolean isTransparent() {
         if(tileFix == TileFix.SOFT) return true;
         switch(this) {
+            case CAMPFIRE_BIG:
+            case CAMPFIRE_SMALL:
             case GLASS:
-            case LIMESTONE:
+            case CLAYSTONE:
             case FURNACE_OFF:
             case FURNACE_ON:
+            case CHEST:
+            case TORCH:
                 return true;
             default: return false;
         }
@@ -154,6 +162,8 @@ public enum Material implements Textureable {
             case CAMPFIRE_BIG:
             case FURNACE_ON:
                 return 10;
+            case TORCH:
+                return 8;
             case CAMPFIRE_SMALL: return 5;
             default: return 0;
         }

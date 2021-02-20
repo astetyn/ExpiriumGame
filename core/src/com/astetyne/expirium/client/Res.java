@@ -1,6 +1,7 @@
 package com.astetyne.expirium.client;
 
 import com.astetyne.expirium.client.gui.widget.BaseGrid;
+import com.astetyne.expirium.client.gui.widget.MoveThumbStick;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.badlogic.gdx.Gdx;
@@ -27,6 +28,7 @@ public class Res {
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
     public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
+    public static MoveThumbStick.MoveThumbStickStyle MOVE_THUMB_STICK_STYLE;
     public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
     public static TextureRegion ARROW;
 
@@ -69,6 +71,8 @@ public class Res {
         TextureRegion invTile = gui.findRegion("inv_tile");
         TextureRegion invTileSplit = gui.findRegion("inv_tile_split");
         TextureRegion invTileThrow = gui.findRegion("trash_icon");
+        TextureRegion moveTsSideArrow = gui.findRegion("ts_move_arrow_side");
+        TextureRegion moveTsUpArrow = gui.findRegion("ts_move_arrow_up");
 
         CROSS_ICON = gui.findRegion("cross_icon");
 
@@ -78,6 +82,7 @@ public class Res {
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
+        MOVE_THUMB_STICK_STYLE = new MoveThumbStick.MoveThumbStickStyle(tsFore, moveTsSideArrow, moveTsUpArrow);
         BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, invTileThrow, invTileSplit);
 
         // entities

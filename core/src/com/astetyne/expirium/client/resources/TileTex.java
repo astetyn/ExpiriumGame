@@ -7,8 +7,10 @@ import java.util.Locale;
 
 public enum TileTex implements Textureable {
 
-    STONE,
+    LIMESTONE,
     RHYOLITE,
+    MAGNETITE,
+    CHROMITE,
     GRASS,
     GRASS_SLOPE_RIGHT,
     GRASS_SLOPE_LEFT,
@@ -33,7 +35,7 @@ public enum TileTex implements Textureable {
     CACTUS_TOP,
     CACTUS_RIGHT,
     CACTUS_LEFT,
-    LIMESTONE,
+    CLAYSTONE,
     LOG_FIR,
     GROWING_PLANT,
     BLUEBERRY_BUSH,
@@ -46,6 +48,8 @@ public enum TileTex implements Textureable {
     SAND_SLOPE_LEFT,
     FURNACE_ON,
     FURNACE_OFF,
+    CHEST,
+    TORCH,
     ;
 
     private TextureRegion textureRegion;

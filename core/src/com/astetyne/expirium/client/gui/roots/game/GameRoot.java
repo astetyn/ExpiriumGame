@@ -5,6 +5,7 @@ import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.HotSlotsData;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.widget.HotBarSlot;
+import com.astetyne.expirium.client.gui.widget.MoveThumbStick;
 import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
 import com.astetyne.expirium.client.resources.GuiRes;
@@ -33,7 +34,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
     private final Image healthImage, foodImage;
     private final HotBarSlot toolSlot, materialSlot, consumableSlot;
     private HotBarSlot focusedSlot, lastFocused;
-    public final ThumbStick moveTS, breakTS;
+    public final MoveThumbStick moveTS;
+    public final ThumbStick breakTS;
     private final SwitchArrow switchArrowLeft, switchArrowRight;
     private final Image inventoryButton, consumeButton, buildViewButton, settingsButton;
     private Actor activeLeftActor;
@@ -86,7 +88,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
             }
         });
 
-        moveTS = new ThumbStick(GameScreen.get().getPlayerData().getThumbStickData1(), Res.THUMB_STICK_STYLE);
+        moveTS = new MoveThumbStick(GameScreen.get().getPlayerData().getThumbStickData1(), Res.MOVE_THUMB_STICK_STYLE);
         breakTS = new ThumbStick(GameScreen.get().getPlayerData().getThumbStickData2(), Res.THUMB_STICK_STYLE);
 
         debugInfoTable = new Table();

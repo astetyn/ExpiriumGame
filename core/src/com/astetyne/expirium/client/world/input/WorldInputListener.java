@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.world.input;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.GameWorld;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -66,6 +67,16 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
         return true;
     }
 
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        if(!Consts.DEBUG) return false;
+        // just for desktop development testing ----
+        OrthographicCamera cam = GameScreen.get().getWorld().getCamera();
+        cam.zoom += amountY*0.1;
+        cam.update();
+        return true;
+    }
+
     // from gesture listener
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
@@ -99,11 +110,14 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean zoom(float initialDistance, float distance) {
+        if(!GameScreen.get().getPlayerData().getThumbStickData1().isNeutral() ||
+                !GameScreen.get().getPlayerData().getThumbStickData2().isNeutral()) return false;
         OrthographicCamera cam = GameScreen.get().getWorld().getCamera();
         if(savedZoom * (initialDistance / distance) * cam.viewportWidth >= world.getTerrainWidth() || savedZoom * (initialDistance / distance) * cam.viewportHeight >= world.getTerrainHeight()) {
             return false;
         }
-        cam.zoom = savedZoom * (initialDistance / distance);
+        cam.zoom = Math.min(savedZoom * (initialDistance / distance), 3);
+        cam.zoom = Math.max(cam.zoom, 0.2f);
         cam.update();
         return false;
     }

@@ -3,9 +3,9 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 
-public class Hills extends BiomeGenerator {
+public class HillsGen extends BiomeGenerator {
 
-    public Hills(Material[][] terrain, int[] surface, int w, int h, long seed) {
+    public HillsGen(Material[][] terrain, int[] surface, int w, int h, long seed) {
         super(terrain, surface, w, h, seed);
     }
 
@@ -21,13 +21,14 @@ public class Hills extends BiomeGenerator {
                 if(y <= terrainHeight && y > terrainHeight-2) {
                     terrain[y][x] = Material.RHYOLITE;
                 }else if(y < terrainHeight) {
-                    terrain[y][x] = Material.STONE;
+                    terrain[y][x] = Material.LIMESTONE;
                 }else {
                     terrain[y][x] = Material.AIR;
                 }
             }
         }
         createRandSurfacePlacements(from, to, Material.BLUEBERRY_BUSH_GROWN, 0.08, 2);
+        createOreSpots(Material.CHROMITE, 0.2, from, to);
     }
 
     @Override
