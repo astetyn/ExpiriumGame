@@ -1,6 +1,8 @@
 package com.astetyne.expirium.server.core.entity;
 
 import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
@@ -27,6 +29,14 @@ public class Squirrel extends LivingEntity {
             }else {
                 body.applyLinearImpulse((float) -(Math.random()*150), (float) (Math.random()*150), getCenter().x, getCenter().y, true);
             }
+        }
+    }
+
+    @Override
+    public void die() {
+        super.die();
+        if(Math.random() > 0.5) {
+            server.getWorld().spawnEntity(EntityType.DROPPED_ITEM, getCenter(), Item.SMALL_MEAT_RAW, Consts.ITEM_COOLDOWN_BREAK);
         }
     }
 

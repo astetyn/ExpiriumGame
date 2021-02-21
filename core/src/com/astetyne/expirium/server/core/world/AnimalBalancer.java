@@ -17,7 +17,7 @@ public class AnimalBalancer {
         for(BiomeType biome : world.getBiomes()) {
             if(biome == BiomeType.BOREAL_FOREST) squirrelBiomesFound++;
         }
-        squirrelLimit = squirrelBiomesFound;
+        squirrelLimit = squirrelBiomesFound*6;
     }
 
     public void onTick() {

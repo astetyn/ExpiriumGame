@@ -126,7 +126,7 @@ public class ExpiPlayer extends LivingEntity {
         float jumpThreshold = 0.6f;
 
         if(tsData1.vert >= jumpThreshold) {
-            if((true || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if((false || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
                 body.applyLinearImpulse(0, 320, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();

@@ -16,11 +16,14 @@ public enum Item {
     RHYOLITE(ItemCat.MATERIAL, 0.07f),
     MAGNETITE(ItemCat.MISC, 0.07f),
     CHROMITE(ItemCat.MISC, 0.07f),
+    IRON(ItemCat.MISC, 0.05f),
+    CHROMIUM(ItemCat.MISC, 0.05f),
     GRASS(ItemCat.MATERIAL, 0.02f),
     DIRT(ItemCat.MATERIAL, 0.08f),
     RAW_WOOD(ItemCat.MISC, 0.04f),
-    WOODEN_MATTOCK(ItemCat.TOOL, 1, 2, 0.3f, true),
-    RHYOLITE_MATTOCK(ItemCat.TOOL, 1, 2, 0.4f, true),
+    WOODEN_MATTOCK(ItemCat.TOOL, 1, 2, 0.2f, true),
+    RHYOLITE_MATTOCK(ItemCat.TOOL, 1, 2, 0.3f, true),
+    IRON_MATTOCK(ItemCat.TOOL, 1, 2, 0.25f, true),
     CAMPFIRE(ItemCat.MATERIAL, 2, 2, 0.1f),
     WOODEN_WALL(ItemCat.MATERIAL, 0.05f),
     SOFT_WOODEN_WALL(ItemCat.MATERIAL, 0.04f),
@@ -42,11 +45,13 @@ public enum Item {
     FURNACE(ItemCat.MATERIAL, 2, 2, 0.5f),
     JAR(ItemCat.MISC, 0.05f),
     JAR_BLUEBERRY_JAM(ItemCat.CONSUMABLE, 0.06f),
+    JAR_RASPBERRY_JAM(ItemCat.CONSUMABLE, 0.06f),
     HUNTING_KNIFE(ItemCat.TOOL, 1, 2, 0.2f, true),
     TORCH(ItemCat.MATERIAL, 0.02f),
     CHEST(ItemCat.MATERIAL, 0.05f),
     SMALL_MEAT_RAW(ItemCat.CONSUMABLE, 0.01f),
     SMALL_MEAT_COOKED(ItemCat.CONSUMABLE, 0.01f),
+    PLANKS(ItemCat.MISC, 0.02f),
     ;
 
     ItemCat category;
@@ -159,6 +164,7 @@ public enum Item {
         switch(this) {
             case WOODEN_MATTOCK:
             case RHYOLITE_MATTOCK:
+            case IRON_MATTOCK:
                 return true;
             default: return false;
         }
@@ -166,8 +172,9 @@ public enum Item {
 
     public float getBreakingSpeedCoef() {
         switch(this) {
-            case WOODEN_MATTOCK: return 2;
-            case RHYOLITE_MATTOCK: return 3;
+            case WOODEN_MATTOCK: return 1.4f;
+            case RHYOLITE_MATTOCK: return 1.8f;
+            case IRON_MATTOCK: return 2.4f;
             default: return 1;
         }
     }

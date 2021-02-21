@@ -75,9 +75,6 @@ public class MetaTileCampfire extends MetaTile {
     }
 
     @Override
-    public void dropItems() {}
-
-    @Override
     public void writeData(WorldBuffer out) {
         out.writeLong(placeTick);
         inventory.writeData(out);

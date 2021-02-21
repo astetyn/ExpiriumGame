@@ -122,8 +122,8 @@ public class GameWorld {
 
                 if(t.getMaterial() == Material.AIR) continue;
 
-                //float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
-                float b = 1;
+                float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
+                //float b = 1;
                 batch.setColor(b,b,b,1);
 
                 ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
