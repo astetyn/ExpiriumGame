@@ -36,7 +36,7 @@ public class PacketOutputStream {
 
     public void startPacket(int packetID) {
         activePacketCounter++;
-        writeBuffer.putInt(packetID);
+        writeBuffer.putShort((short) packetID);
     }
 
     public void putByte(byte b) {
@@ -49,6 +49,10 @@ public class PacketOutputStream {
 
     public void putInt(int i) {
         writeBuffer.putInt(i);
+    }
+
+    public void putShort(short s) {
+        writeBuffer.putShort(s);
     }
 
     public void putLong(long l) {
@@ -78,7 +82,7 @@ public class PacketOutputStream {
 
     public void putEntity(ExpiEntity e) {
         putInt(e.getType().getID());
-        putInt(e.getId());
+        putShort(e.getId());
         putFloat(e.getLocation().x);
         putFloat(e.getLocation().y);
         e.writeInitClientMeta(this);

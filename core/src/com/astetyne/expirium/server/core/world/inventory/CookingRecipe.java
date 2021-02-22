@@ -7,7 +7,7 @@ import com.astetyne.expirium.client.utils.Consts;
 public enum CookingRecipe {
 
     COOKED_APPLE(Consts.SERVER_TPS*10, new ItemStack[]{new ItemStack(Item.APPLE)}, new ItemStack(Item.COOKED_APPLE)),
-    FRUIT_JAM(Consts.SERVER_TPS*20, new ItemStack[]{new ItemStack(Item.RASPBERRY), new ItemStack(Item.APPLE), new ItemStack(Item.WOODEN_BOWL)}, new ItemStack(Item.FRUIT_JAM)),
+    FRUIT_JAM(Consts.SERVER_TPS*20, new ItemStack[]{new ItemStack(Item.RASPBERRY), new ItemStack(Item.APPLE), new ItemStack(Item.WOODEN_BOWL)}, new ItemStack(Item.FRUIT_BOWL)),
     GLASS(Consts.SERVER_TPS*5, new ItemStack[]{new ItemStack(Item.SAND, 2)}, new ItemStack(Item.GLASS)),
     BLUEBERRY_JAM(Consts.SERVER_TPS*20, new ItemStack[]{new ItemStack(Item.BLUEBERRY, 2), new ItemStack(Item.JAR)}, new ItemStack(Item.JAR_BLUEBERRY_JAM)),
     RASPBERRY_JAM(Consts.SERVER_TPS*20, new ItemStack[]{new ItemStack(Item.RASPBERRY, 2), new ItemStack(Item.JAR)}, new ItemStack(Item.JAR_RASPBERRY_JAM)),

@@ -100,7 +100,7 @@ public class WorldFileManager {
     /** Do not forget to close the stream when you are finished with loading.*/
     public DataInputStream getWorldInputStream() {
         FileHandle file = Gdx.files.local(path + dataPath);
-        return new DataInputStream(new BufferedInputStream(file.read()));
+        return new DataInputStream(new BufferedInputStream(file.read(), (int) file.length()+1));
     }
 
     public void saveServer() {

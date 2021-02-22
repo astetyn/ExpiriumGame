@@ -9,7 +9,7 @@ public abstract class Player extends Entity {
 
     private Item itemInHand;
 
-    public Player(int id, Vector2 loc) {
+    public Player(short id, Vector2 loc) {
         super(EntityType.PLAYER, id, loc);
         setAnimator(new PlayerAnimator(this, Res.PLAYER_IDLE_ANIM, Res.PLAYER_MOVE_ANIM));
         itemInHand = Item.EMPTY;

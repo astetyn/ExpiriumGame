@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 public abstract class Entity {
 
     protected EntityType type;
-    protected int ID;
+    protected short id;
     protected final Vector2 location;
     protected float angle;
     protected final Vector2 velocity;
@@ -26,10 +26,10 @@ public abstract class Entity {
     private boolean lookingRight;
     private boolean active;
 
-    public Entity(EntityType type, int id, Vector2 loc) {
+    public Entity(EntityType type, short id, Vector2 loc) {
 
         this.type = type;
-        this.ID = id;
+        this.id = id;
         this.animator = new EntityAnimator(this) {
             @Override
             public void draw(SpriteBatch batch) {}
@@ -45,7 +45,7 @@ public abstract class Entity {
         lookingRight = true;
         active = true;
 
-        GameScreen.get().getWorld().getEntitiesID().put(ID, this);
+        GameScreen.get().getWorld().getEntitiesID().put(this.id, this);
         GameScreen.get().getWorld().getEntities().add(this);
 
     }
@@ -82,10 +82,11 @@ public abstract class Entity {
 
     public void onMove(PacketInputStream in) {
         targetLocation.set(in.getFloat(), in.getFloat());
-        velocity.set(in.getFloat(), in.getFloat());
         targetAngle = in.getFloat();
         lookingRight = in.getBoolean();
         lastLoc = getLocation().cpy();
+        velocity.set(targetLocation);
+        velocity.sub(lastLoc);
         lastAngle = angle;
         interpolationDelta = 0;
         active = true;
@@ -99,12 +100,12 @@ public abstract class Entity {
         return centerLoc.set(getLocation()).add(type.width/2, type.height/2);
     }
 
-    public int getID() {
-        return ID;
+    public short getId() {
+        return id;
     }
 
     public void destroy() {
-        GameScreen.get().getWorld().getEntitiesID().remove(ID);
+        GameScreen.get().getWorld().getEntitiesID().remove(id);
         GameScreen.get().getWorld().getEntities().remove(this);
     }
 

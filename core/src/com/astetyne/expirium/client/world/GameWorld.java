@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.animation.WorldAnimationManager;
 import com.astetyne.expirium.client.entity.Entity;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.MainPlayer;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
@@ -30,7 +31,7 @@ public class GameWorld {
     public static float PPM = 32; // pixel per meter when zoom == 1
 
     private Tile[][] terrain;
-    private final HashMap<Integer, Entity> entitiesID;
+    private final HashMap<Short, Entity> entitiesID;
     private final List<Entity> entities;
     private MainPlayer player;
     private final OrthographicCamera camera;
@@ -46,7 +47,16 @@ public class GameWorld {
             new Color(0.9f, 0.6f, 0f, 1),
             new Color(0.9f, 0.9f, 0f, 1),
             new Color(0.9f, 1f, 0.2f, 1),
-            new Color(0.8f, 1f, 0.2f, 1)};
+            new Color(0.7f, 1f, 0.2f, 1),
+            new Color(0.5f, 1f, 0.2f, 1),
+            new Color(0.2f, 1f, 0.2f, 1),
+            new Color(0.2f, 1f, 0.4f, 1),
+            new Color(0.2f, 1f, 0.6f, 1),
+            new Color(0.2f, 1f, 0.8f, 1),
+            new Color(0.2f, 1f, 1f, 1),
+            new Color(0.2f, 0.7f, 1f, 1),
+            new Color(0.2f, 0.4f, 1f, 1),
+            };
 
     public GameWorld() {
 
@@ -79,7 +89,7 @@ public class GameWorld {
 
         lightCalculator = new LightCalculator(terrain);
 
-        int pID = in.getInt();
+        short pID = in.getShort();
         Vector2 loc = in.getVector();
         player = new MainPlayer(pID, loc);
 
@@ -128,6 +138,10 @@ public class GameWorld {
 
                 ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
                 if(slot == ChosenSlot.MATERIAL_SLOT && GameScreen.get().isBuildViewActive()) {
+                    if(t.getStability() < 1 || t.getStability() >= stabColors.length) {
+                        GuiRes.DEBUG.getDrawable().draw(batch, i, j,1, 1);
+                        continue;
+                    }
                     batch.setColor(stabColors[t.getStability()-1]);
                     batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
                 }else {
@@ -253,7 +267,7 @@ public class GameWorld {
         return camera;
     }
 
-    public HashMap<Integer, Entity> getEntitiesID() {
+    public HashMap<Short, Entity> getEntitiesID() {
         return entitiesID;
     }
 

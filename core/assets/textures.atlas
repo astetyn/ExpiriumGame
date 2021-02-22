@@ -48,14 +48,14 @@ blueberry_item
   index: -1
 cactus_double
   rotate: false
-  xy: 843, 205
+  xy: 375, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_item
   rotate: false
-  xy: 485, 46
+  xy: 503, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -188,7 +188,7 @@ coal_item
   index: -1
 coal_ore
   rotate: false
-  xy: 897, 205
+  xy: 915, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -237,7 +237,7 @@ dirt_item
   index: -1
 fir_cone_item
   rotate: false
-  xy: 973, 221
+  xy: 991, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -319,28 +319,28 @@ furnace_on
   index: -1
 glass
   rotate: false
-  xy: 375, 12
+  xy: 861, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass_item
   rotate: false
-  xy: 375, 12
+  xy: 861, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 503, 64
+  xy: 467, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_item
   rotate: false
-  xy: 467, 46
+  xy: 485, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -361,7 +361,7 @@ growing_plant
   index: -1
 health_icon
   rotate: false
-  xy: 503, 46
+  xy: 973, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -459,7 +459,7 @@ leaves_fir_right
   index: -1
 leaves_fir_top
   rotate: false
-  xy: 861, 205
+  xy: 879, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -487,7 +487,7 @@ limestone
   index: -1
 limestone_item
   rotate: false
-  xy: 567, 91
+  xy: 503, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -557,7 +557,7 @@ peppermint_bush_grown
   index: -1
 planks_item
   rotate: false
-  xy: 991, 221
+  xy: 699, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -655,7 +655,7 @@ raspberry_bush
   index: -1
 raspberry_item
   rotate: false
-  xy: 567, 109
+  xy: 567, 91
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -697,7 +697,7 @@ rhyolite_mattock_item_grid
   index: -1
 sand
   rotate: false
-  xy: 915, 205
+  xy: 567, 109
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -730,14 +730,14 @@ settings_icon
   orig: 16, 16
   offset: 0, 0
   index: -1
-small_meat_cooked
+small_meat_cooked_item
   rotate: false
-  xy: 699, 187
+  xy: 843, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-small_meat_raw
+small_meat_raw_item
   rotate: false
   xy: 375, 30
   size: 16, 16
@@ -802,7 +802,7 @@ tile_break
   index: 4
 tile_break
   rotate: false
-  xy: 879, 205
+  xy: 897, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

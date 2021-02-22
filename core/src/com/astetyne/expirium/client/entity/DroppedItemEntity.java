@@ -9,7 +9,7 @@ public class DroppedItemEntity extends Entity {
 
     private final Item dropItem;
 
-    public DroppedItemEntity(int id, Vector2 loc, PacketInputStream in) {
+    public DroppedItemEntity(short id, Vector2 loc, PacketInputStream in) {
         super(EntityType.DROPPED_ITEM, id, loc);
         dropItem = Item.getType(in.getInt());
         setAnimator(new StaticEntityAnimator(this, dropItem.getTexture()));

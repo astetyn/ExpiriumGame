@@ -73,12 +73,13 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
         boolean createMeta = in.readBoolean();
         terrain = new ExpiTile[height][width];
-
+        long startT = System.nanoTime();
         for(int h = 0; h < height; h++) {
             for(int w = 0; w < width; w++) {
                 terrain[h][w] = new ExpiTile(this, w, h, in, createMeta);
             }
         }
+        System.out.println("Loading tiles time (ms): "+(System.nanoTime() - startT)/1000000);
 
         biomes = new BiomeType[width/100];
         for(int i = 0; i < biomes.length; i++) {
@@ -104,11 +105,8 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         fixtureCalc = new FixtureCalculator(terrain, width, height, terrainBody);
         backWallCalculator = new BackWallCalculator(server, terrain, width, height);
 
-        System.out.println("Creating fixtures...");
         fixtureCalc.generateWorldFixtures();
-        System.out.println("Recalculating stability...");
         stabilityCalc.generateStability();
-        System.out.println("Generating world done!");
 
         animalBalancer = new AnimalBalancer(this);
     }
@@ -395,7 +393,6 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     }
 
     public ExpiEntity spawnEntity(EntityType type, Vector2 loc, Object... args) {
-        System.out.println("entity "+type+" spawn on "+loc);
         Class<?>[] argClasses = new Class[args.length+2];
         Object[] objects = new Object[args.length+2];
         for(int i = 0; i < args.length; i++) {

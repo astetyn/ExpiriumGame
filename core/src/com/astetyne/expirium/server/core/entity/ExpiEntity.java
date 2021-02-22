@@ -16,7 +16,7 @@ import java.io.IOException;
 public abstract class ExpiEntity implements Metaable, WorldSaveable {
 
     protected final ExpiServer server;
-    private final int id;
+    private final short id;
     protected final EntityType type;
     private final Vector2 centerLoc;
     protected final Body body;
@@ -47,7 +47,7 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
         if(getLocation().y <= 0) destroy();
     }
 
-    public int getId() {
+    public short getId() {
         return id;
     }
 

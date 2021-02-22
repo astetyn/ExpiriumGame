@@ -164,43 +164,17 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
                 break;
             case CONSUME_BUTTON:
                 if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE) break;
+                remove(itemInHand.getItem(), 1);
+                owner.increaseFoodLevel(itemInHand.getItem().getFood());
 
                 switch(itemInHand.getItem()) {
-                    case APPLE:
-                        owner.increaseFoodLevel(10);
-                        remove(Item.APPLE, 1);
-                        break;
 
-                    case COOKED_APPLE:
-                        owner.increaseFoodLevel(15);
-                        remove(Item.COOKED_APPLE, 1);
-                        break;
-
-                    case RASPBERRY:
-                        owner.increaseFoodLevel(5);
-                        remove(Item.RASPBERRY, 1);
-                        break;
-
-                    case FRUIT_JAM:
-                        owner.increaseFoodLevel(25);
-                        remove(Item.FRUIT_JAM, 1);
+                    case FRUIT_BOWL:
                         append(Item.WOODEN_BOWL, 1);
                         break;
 
-                    case BLUEBERRY:
-                        owner.increaseFoodLevel(5);
-                        remove(Item.BLUEBERRY, 1);
-                        break;
-
                     case JAR_BLUEBERRY_JAM:
-                        owner.increaseFoodLevel(15);
-                        remove(Item.JAR_BLUEBERRY_JAM, 1);
-                        append(Item.JAR, 1);
-                        break;
-
                     case JAR_RASPBERRY_JAM:
-                        owner.increaseFoodLevel(15);
-                        remove(Item.JAR_RASPBERRY_JAM, 1);
                         append(Item.JAR, 1);
                         break;
                 }

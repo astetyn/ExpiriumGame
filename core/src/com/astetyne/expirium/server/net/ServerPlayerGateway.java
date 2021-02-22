@@ -44,7 +44,7 @@ public class ServerPlayerGateway extends TerminableLooper {
 
             in.swap();
             // verification if connecting client is game or not
-            int packetID = in.getInt();
+            short packetID = in.getShort();
             if(packetID != 10) {
                 System.out.println("Wrong join packet id, refusing.");
                 return;

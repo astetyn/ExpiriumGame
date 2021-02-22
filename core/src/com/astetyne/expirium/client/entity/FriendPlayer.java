@@ -11,7 +11,7 @@ public class FriendPlayer extends Player {
     private final String name;
     private final float nameOffset;
 
-    public FriendPlayer(int id, Vector2 loc, PacketInputStream in) {
+    public FriendPlayer(short id, Vector2 loc, PacketInputStream in) {
         super(id, loc);
         name = in.getString();
         nameOffset = Utils.getTextWidth(name, Res.WORLD_FONT) / 2;

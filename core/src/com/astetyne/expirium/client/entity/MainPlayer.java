@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class MainPlayer extends Player {
 
-    public MainPlayer(int id, Vector2 loc) {
+    public MainPlayer(short id, Vector2 loc) {
         super(id, loc);
     }
 }

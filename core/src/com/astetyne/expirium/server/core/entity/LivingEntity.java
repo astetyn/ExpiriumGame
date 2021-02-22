@@ -19,7 +19,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     private final static byte MAX_FOOD_LEVEL = 100;
 
-    private byte maxHealth;
+    private final byte maxHealth;
     private byte healthLevel, foodLevel;
 
     protected boolean lookingRight;
@@ -124,7 +124,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     protected void recalcFallDamage() {
         if(lastFallVelocity < -12 && getVelocity().y - lastFallVelocity > 11) {
-            injure((int) (lastFallVelocity*(-1)));
+            injure((int) (lastFallVelocity*(-0.5f)));
         }
     }
 
@@ -223,7 +223,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
             lastFallVelocity = Math.min(lastFallVelocity, getVelocity().y);
         }
 
-        if(contact.getFixtureA() == groundSensor || contact.getFixtureB() == groundSensor) {
+        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof ExpiPlayer)
+                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof ExpiPlayer))) {
             collisions++;
             onGround = true;
         }
@@ -231,7 +232,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     @Override
     public void onCollisionEnd(Contact contact) {
-        if(contact.getFixtureA() == groundSensor || contact.getFixtureB() == groundSensor) {
+        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof ExpiPlayer)
+                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof ExpiPlayer))) {
             collisions--;
             if(collisions == 0) onGround = false;
         }

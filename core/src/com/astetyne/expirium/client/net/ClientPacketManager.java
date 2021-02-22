@@ -44,7 +44,7 @@ public class ClientPacketManager {
 
         for(int i = 0; i < availPackets; i++) {
 
-            int packetID = in.getInt();
+            short packetID = in.getShort();
 
             //System.out.println("C: PID: " + packetID);
 
@@ -76,7 +76,7 @@ public class ClientPacketManager {
                     break;
 
                 case 19: {//EntityMovePacket
-                    int eID = in.getInt();
+                    short eID = in.getShort();
                     Entity e = world.getEntitiesID().get(eID);
                     if(e != null) {
                         e.onMove(in);
@@ -90,7 +90,7 @@ public class ClientPacketManager {
                     break;
 
                 case 21: //EntityDespawnPacket
-                    int id = in.getInt();
+                    short id = in.getShort();
                     world.getEntitiesID().get(id).destroy();
                     break;
 
@@ -120,12 +120,12 @@ public class ClientPacketManager {
                     break;
 
                 case 32: {//HandPunchPacket
-                    Player p = (Player) world.getEntitiesID().get(in.getInt());
+                    Player p = (Player) world.getEntitiesID().get(in.getShort());
                     p.onHandPunch();
                     break;
                 }
                 case 33: { //HandItemPacket
-                    Player p = (Player) world.getEntitiesID().get(in.getInt());
+                    Player p = (Player) world.getEntitiesID().get(in.getShort());
                     p.setItemInHand(Item.getType(in.getInt()));
                     break;
                 }

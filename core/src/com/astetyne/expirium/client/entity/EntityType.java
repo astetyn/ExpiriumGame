@@ -34,9 +34,9 @@ public enum EntityType {
 
     public Entity initEntity(PacketInputStream in) {
         try {
-            int id = in.getInt();
+            short id = in.getShort();
             Vector2 loc = new Vector2(in.getFloat(), in.getFloat());
-            return entityClazz.getConstructor(int.class, Vector2.class, PacketInputStream.class).newInstance(id, loc, in);
+            return entityClazz.getConstructor(short.class, Vector2.class, PacketInputStream.class).newInstance(id, loc, in);
         }catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }

@@ -32,7 +32,6 @@ public enum BiomeType {
     int id;
     private static final HashMap<Integer, BiomeType> map;
     static {
-        System.out.println("Biome class loading.");
         map = new HashMap<>();
         int i = 0;
         for(BiomeType it : BiomeType.values()) {

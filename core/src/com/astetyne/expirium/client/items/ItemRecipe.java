@@ -13,7 +13,7 @@ public enum ItemRecipe {
     WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 2)}, "Good for basic house walls. High stability included."),
     SOFT_WOODEN_WALL(Item.SOFT_WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 2)}, "Same as wooden wall but softer to your body."),
     WOODEN_SUPPORT(Item.WOODEN_SUPPORT, 6, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 3)}, "Cheap and useful for maintaining high stability."),
-    CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 15)}, "Make it if you are cold. It will warm your small house."),
+    CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Make it if you are cold. It will warm your small house."),
     FURNACE(Item.FURNACE, new ItemStack[]{new ItemStack(Item.CLAYSTONE, 5), new ItemStack(Item.LIMESTONE, 20)}, "For cooking better meals."),
     CHEST(Item.CHEST, new ItemStack[]{new ItemStack(Item.PLANKS, 15), new ItemStack(Item.LIMESTONE, 4), new ItemStack(Item.IRON, 2)}, "Small storage for your items."),
     BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.PLANKS, 3)}, "herobrine was added"),

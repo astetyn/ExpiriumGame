@@ -17,6 +17,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ExpiServer implements WorldSaveable {
 
@@ -70,7 +71,9 @@ public class ExpiServer implements WorldSaveable {
                     " ("+wqi.worldVersion+") Your is: "+" ("+Consts.VERSION+")");
 
             DataInputStream in = fileManager.getWorldInputStream();
+            long startT = System.nanoTime();
             world = new ExpiWorld(in, wqi.tick, this);
+            System.out.println("Loading world time (ms): "+(System.nanoTime() - startT)/1000000);
 
             // this must be loaded here, because it requires fully loaded ExpiWorld
             int entitiesSize = in.readInt();
@@ -79,6 +82,7 @@ public class ExpiServer implements WorldSaveable {
                 world.spawnEntity(type, in);
             }
             in.close();
+            System.out.println("Loading total time (ms): "+(System.nanoTime() - startT)/1000000);
 
         } catch(IOException e) {
             failListener.onServerFail("IOException during loading server.");
@@ -214,11 +218,12 @@ public class ExpiServer implements WorldSaveable {
         }*/
     }
 
-    public int getRandomEntityID() {
-        int randomID;
+    public short getRandomEntityID() {
+        short randomID;
         outer:
         while(true) {
-            randomID = (int)(Math.random()*Integer.MAX_VALUE);
+            Random rand = new Random();
+            randomID = (short) rand.nextInt(1 << 16);
             for(ExpiEntity entities : entities) {
                 if(randomID == entities.getId()) continue outer;
             }

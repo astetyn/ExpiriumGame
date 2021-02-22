@@ -38,7 +38,7 @@ public class ServerPacketManager {
 
         for(int i = 0; i < in.getAvailablePackets(); i++) {
 
-            int packetID = in.getInt();
+            short packetID = in.getShort();
             //System.out.println("S: PID: " + packetID);
 
             switch(packetID) {
@@ -77,7 +77,7 @@ public class ServerPacketManager {
         out.putInt(w);
         out.putInt(h);
 
-        out.putInt(owner.getId());
+        out.putShort(owner.getId());
         out.putVector(owner.getLocation());
         out.putInt(entities.size()-1);
         for(ExpiEntity e : entities) {
@@ -106,11 +106,9 @@ public class ServerPacketManager {
     public void putEntityMovePacket(ExpiEntity e) {
         if(!owner.getNearActiveEntities().contains(e) && e != owner) return;
         out.startPacket(19);
-        out.putInt(e.getId());
+        out.putShort(e.getId());
         out.putFloat(e.getLocation().x);
         out.putFloat(e.getLocation().y);
-        out.putFloat(e.getVelocity().x);
-        out.putFloat(e.getVelocity().y);
         out.putFloat(e.getBody().getAngle());
         out.putBoolean(e.isLookingRight());
     }
@@ -122,7 +120,7 @@ public class ServerPacketManager {
 
     public void putEntityDespawnPacket(ExpiEntity e) {
         out.startPacket(21);
-        out.putInt(e.getId());
+        out.putShort(e.getId());
     }
 
     public void putInvFeedPacket() {
@@ -215,12 +213,12 @@ public class ServerPacketManager {
 
     public void putHandPunchPacket(ExpiPlayer puncher) {
         out.startPacket(32);
-        out.putInt(puncher.getId());
+        out.putShort(puncher.getId());
     }
 
-    public void putHandItemPacket(int id, Item item) {
+    public void putHandItemPacket(short id, Item item) {
         out.startPacket(33);
-        out.putInt(id);
+        out.putShort(id);
         out.putInt(item.getId());
     }
 

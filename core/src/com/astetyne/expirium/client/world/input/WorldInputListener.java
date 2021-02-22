@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.GameWorld;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -59,6 +60,15 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
         if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
         detector.touchDragged(screenX, screenY, pointer);
         if(!pressed) return false;
+
+        boolean firstTouch = false;
+        for(int i = 0; i < 20; i++) {
+            if(Gdx.input.isTouched(i)) {
+                if(firstTouch) return false;
+                firstTouch = true;
+            }
+        }
+
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {
             return true;

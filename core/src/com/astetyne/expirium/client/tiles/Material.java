@@ -89,6 +89,19 @@ public enum Material implements Textureable {
     }
 
     public MetaTile init(ExpiWorld w, ExpiTile t) {
+
+        // just for optimization
+        if(metaClazz == MetaTile.class) {
+            return new MetaTile(w, t);
+        }else if(metaClazz == MetaTileLeaves.class) {
+            return new MetaTileLeaves(w, t);
+        }else if(metaClazz == MetaTileRaspberryBush.class) {
+            return new MetaTileRaspberryBush(w, t);
+        }else if(metaClazz == MetaTileBlueberryBush.class) {
+            return new MetaTileBlueberryBush(w, t);
+        }
+        // end of optimization
+
         try {
             return metaClazz.getConstructor(ExpiWorld.class, ExpiTile.class).newInstance(w, t);
         }catch(InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -98,6 +111,19 @@ public enum Material implements Textureable {
     }
 
     public MetaTile init(ExpiWorld w, ExpiTile t, DataInputStream in) throws IOException {
+
+        // just for optimization
+        if(metaClazz == MetaTile.class) {
+            return new MetaTile(w, t);
+        }else if(metaClazz == MetaTileLeaves.class) {
+            return new MetaTileLeaves(w, t);
+        }else if(metaClazz == MetaTileRaspberryBush.class) {
+            return new MetaTileRaspberryBush(w, t);
+        }else if(metaClazz == MetaTileBlueberryBush.class) {
+            return new MetaTileBlueberryBush(w, t);
+        }
+        // end of optimization
+
         try {
             return metaClazz.getConstructor(ExpiWorld.class, ExpiTile.class, DataInputStream.class).newInstance(w, t, in);
         }catch(InstantiationException | NoSuchMethodException | IllegalAccessException e) {
@@ -180,7 +206,6 @@ public enum Material implements Textureable {
     int id;
     private static final HashMap<Integer, Material> map;
     static {
-        System.out.println("TileType class loading.");
         map = new HashMap<>();
         int i = 0;
         for(Material tt : Material.values()) {

@@ -33,7 +33,7 @@ public enum Item {
     RASPBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     RASPBERRY(ItemCat.CONSUMABLE, 0.01f),
     WOODEN_BOWL(ItemCat.MISC, 0.05f),
-    FRUIT_JAM(ItemCat.CONSUMABLE, 0.05f),
+    FRUIT_BOWL(ItemCat.CONSUMABLE, 0.05f),
     COAL(ItemCat.MISC, 0.05f),
     SAND(ItemCat.MATERIAL, 0.08f),
     GLASS(ItemCat.MATERIAL, 0.06f),
@@ -183,6 +183,21 @@ public enum Item {
         switch(this) {
             case HUNTING_KNIFE: return 10;
             default: return 1;
+        }
+    }
+
+    public int getFood() {
+        switch(this) {
+            case APPLE: return 10;
+            case JAR_RASPBERRY_JAM:
+            case JAR_BLUEBERRY_JAM:
+            case COOKED_APPLE: return 15;
+            case SMALL_MEAT_RAW:
+            case RASPBERRY:
+            case BLUEBERRY: return 5;
+            case SMALL_MEAT_COOKED:
+            case FRUIT_BOWL: return 25;
+            default: return 0;
         }
     }
 

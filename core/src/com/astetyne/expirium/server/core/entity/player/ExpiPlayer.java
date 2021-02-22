@@ -87,6 +87,7 @@ public class ExpiPlayer extends LivingEntity {
         filter.categoryBits = Consts.PLAYER_BIT;
         filter.maskBits = Consts.DEFAULT_BIT;
         bodyFix.setFilterData(filter);
+        body.setUserData(this);
     }
 
     @Override
@@ -128,7 +129,7 @@ public class ExpiPlayer extends LivingEntity {
         if(tsData1.vert >= jumpThreshold) {
             if((false || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
-                body.applyLinearImpulse(0, 320, center.x, center.y, true);
+                body.applyLinearImpulse(0, 350, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
             }
             tsData1.horz = Math.abs(tsData1.horz) > 0.5 ? tsData1.horz : 0;
