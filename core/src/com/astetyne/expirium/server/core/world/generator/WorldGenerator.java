@@ -39,7 +39,7 @@ public class WorldGenerator {
             biomes[i] = getRandBiomeType();
         }
 
-        int lastMH = 70;
+        int lastMH = h-2;
 
         for(int i = 0; i < biomes.length-1; i++) {
 
@@ -54,7 +54,7 @@ public class WorldGenerator {
         }
 
         BiomeGenerator lastGen = biomes[biomes.length-1].initGenerator(terrain, surface, w, h, seed);
-        lastGen.generate(biomes.length-1, lastMH, 70);
+        lastGen.generate(biomes.length-1, lastMH, h-2);
     }
 
     private BiomeType getRandBiomeType() {
@@ -74,6 +74,7 @@ public class WorldGenerator {
         for(int x = 0; x < w; x++) {
             for(int y = 0; y < h; y++) {
                 wb.writeMaterial(terrain[x][y]);
+                wb.writeByte((byte) 0); // waterLevel
                 wb.writeBoolean(false); // backwall
             }
         }

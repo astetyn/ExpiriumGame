@@ -86,7 +86,7 @@ public class ClientPacketManager {
                     break;
                 }
                 case 20: //EntitySpawnPacket
-                    EntityType.getType(in.getInt()).initEntity(in);
+                    EntityType.getType(in.getInt()).initEntity(world, in);
                     break;
 
                 case 21: //EntityDespawnPacket
@@ -135,6 +135,10 @@ public class ClientPacketManager {
 
                 case 35: // PlayTextAnimation
                     world.getAnimationManager().onPlayTextAnimation(in);
+                    break;
+
+                case 36: // WaterPacket
+                    world.onWaterPacket(in);
                     break;
             }
         }

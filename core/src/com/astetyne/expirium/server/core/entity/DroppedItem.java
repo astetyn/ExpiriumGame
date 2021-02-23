@@ -45,7 +45,7 @@ public class DroppedItem extends Entity {
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        polyShape.setAsBox(0.25f, 0.25f, new Vector2(0.25f, 0.25f), 0);
+        polyShape.setAsBox(type.getWidth()/2, type.getHeight()/2, new Vector2(type.getWidth()/2, type.getHeight()/2), 0);
         fixtureDef.density = 30f;
         fixtureDef.restitution = 0.2f;
         fixtureDef.friction = 0.2f;

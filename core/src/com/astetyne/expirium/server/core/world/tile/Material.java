@@ -192,6 +192,24 @@ public enum Material implements Textureable {
         }
     }
 
+    public boolean isWatertight() {
+        switch(this) {
+            case GRASS:
+            case DIRT:
+            case LIMESTONE:
+            case RHYOLITE:
+            case COAL_ORE:
+            case MAGNETITE:
+            case CHROMITE:
+            case SAND:
+            case GLASS:
+            case WOODEN_WALL:
+            case SOFT_WOODEN_WALL:
+                return true;
+            default: return false;
+        }
+    }
+
     public static Material getMaterial(int id) {
         return map.get(id);
     }

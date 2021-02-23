@@ -816,7 +816,7 @@ tile_break
   index: 3
 tile_break
   rotate: false
-  xy: 969, 167
+  xy: 987, 167
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -870,6 +870,13 @@ warning_icon
   orig: 16, 16
   offset: 0, 0
   index: -1
+water_5
+  rotate: false
+  xy: 969, 167
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: 1
 weight_icon
   rotate: false
   xy: 515, 191

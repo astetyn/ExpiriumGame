@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.entity.animator.EntityAnimator;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public abstract class ClientEntity {
 
+    protected ClientWorld world;
     protected EntityType type;
     protected short id;
     protected final Vector2 location;
@@ -26,7 +28,7 @@ public abstract class ClientEntity {
     private boolean lookingRight;
     private boolean active;
 
-    public ClientEntity(EntityType type, short id, Vector2 loc) {
+    public ClientEntity(ClientWorld world, EntityType type, short id, Vector2 loc) {
 
         this.type = type;
         this.id = id;
@@ -45,8 +47,8 @@ public abstract class ClientEntity {
         lookingRight = true;
         active = true;
 
-        GameScreen.get().getWorld().getEntitiesID().put(this.id, this);
-        GameScreen.get().getWorld().getEntities().add(this);
+        world.getEntitiesID().put(this.id, this);
+        world.getEntities().add(this);
 
     }
 

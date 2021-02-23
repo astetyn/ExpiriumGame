@@ -15,6 +15,7 @@ import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
 import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
+import com.astetyne.expirium.server.core.world.calculator.WaterEngine;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
 import com.astetyne.expirium.server.core.world.tile.*;
@@ -40,6 +41,7 @@ public class World implements WorldSaveable, Disposable {
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
     private final BackWallCalculator backWallCalculator;
+    private final WaterEngine waterEngine;
     private final WeatherType weatherType;
     private final ExpiContactListener contactListener;
     private long tick; // total ticks since world was generated
@@ -96,6 +98,7 @@ public class World implements WorldSaveable, Disposable {
         stabilityCalc = new StabilityCalculator(server, terrain, width, height);
         fixtureCalc = new FixtureCalculator(terrain, width, height, terrainBody);
         backWallCalculator = new BackWallCalculator(server, terrain, width, height);
+        waterEngine = new WaterEngine(server, terrain, width, height);
 
         fixtureCalc.generateWorldFixtures();
         stabilityCalc.generateStability();
@@ -117,6 +120,8 @@ public class World implements WorldSaveable, Disposable {
             time = 0;
             day++;
         }
+
+        waterEngine.onTick(); // should be called before physics step
 
         // time step should be 1/32 but then items are kinda buggy, so it is doubled
         for(int i = 0; i < 2; i++) {
@@ -162,6 +167,10 @@ public class World implements WorldSaveable, Disposable {
         if(p.isInInteractRadius(loc)) {
             t.onInteract(p, type);
         }
+
+        //DEBUG------
+        waterEngine.createWater(t);
+        //DEBUG------
 
         // following code is only for tile placing
         if(!p.isInInteractRadius(loc)) return;
@@ -210,6 +219,9 @@ public class World implements WorldSaveable, Disposable {
         }*/
 
         backWallCalculator.onTileChange(e);
+
+        waterEngine.updateWater(t);
+        waterEngine.updateWater(getTileAt(t.getLoc(new IntVector2(0, 0)).add(0, 1)));
     }
 
     private boolean isTileFree(Tile t, Item toPlace) {

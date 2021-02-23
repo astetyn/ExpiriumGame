@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client.world;
 
+import com.astetyne.expirium.client.animation.WaterAnimationManager;
 import com.astetyne.expirium.client.animation.WorldAnimationManager;
 import com.astetyne.expirium.client.entity.ClientEntity;
 import com.astetyne.expirium.client.entity.EntityType;
@@ -40,6 +41,7 @@ public class ClientWorld {
     private final WorldInputListener worldInputListener;
     private final List<BreakingTile> breakingTiles;
     private final WorldAnimationManager animationManager;
+    private final WaterAnimationManager waterManager;
 
     Color[] stabColors = new Color[] {
             new Color(0.9f, 0f, 0f, 1),
@@ -58,7 +60,7 @@ public class ClientWorld {
             new Color(0.2f, 0.4f, 1f, 1),
             };
 
-    public ClientWorld() {
+    public ClientWorld(PacketInputStream in) {
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
@@ -72,9 +74,6 @@ public class ClientWorld {
 
         breakingTiles = new ArrayList<>();
         animationManager = new WorldAnimationManager();
-    }
-
-    public void loadData(PacketInputStream in) {
 
         terrainWidth = in.getInt();
         terrainHeight = in.getInt();
@@ -88,14 +87,15 @@ public class ClientWorld {
         }
 
         lightCalculator = new LightCalculator(terrain);
+        waterManager = new WaterAnimationManager(terrain, terrainWidth, terrainHeight);
 
         short pID = in.getShort();
         Vector2 loc = in.getVector();
-        player = new MainClientPlayer(pID, loc);
+        player = new MainClientPlayer(this, pID, loc);
 
         int size = in.getInt();
         for(int i = 0; i < size; i++) {
-            EntityType.getType(in.getInt()).initEntity(in);
+            EntityType.getType(in.getInt()).initEntity(this, in);
         }
 
     }
@@ -125,28 +125,30 @@ public class ClientWorld {
                 ClientTile t = terrain[i][j];
 
                 if(t.hasBackWall()) {
-                    float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
+                    float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
                     batch.setColor(b,b,b,1);
                     batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
                 }
 
                 if(t.getMaterial() == Material.AIR) continue;
 
-                float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
-                //float b = 1;
-                batch.setColor(b,b,b,1);
-
+                // stability view
                 ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
                 if(slot == ChosenSlot.MATERIAL_SLOT && GameScreen.get().isBuildViewActive()) {
                     if(t.getStability() < 1 || t.getStability() >= stabColors.length) {
-                        GuiRes.DEBUG.getDrawable().draw(batch, i, j,1, 1);
+                        GuiRes.DEBUG.getDrawable().draw(batch, i, j, 1, 1);
                         continue;
                     }
-                    batch.setColor(stabColors[t.getStability()-1]);
+                    batch.setColor(stabColors[t.getStability() - 1]);
                     batch.draw(TileTex.WHITE_TILE.getTex(), i, j, 1, 1);
-                }else {
-                    batch.draw(t.getMaterial().getTex(), i, j, 1, 1);
+                    continue;
                 }
+
+                // normal view
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
+                //float b = 1;
+                batch.setColor(b,b,b,1);
+                batch.draw(t.getMaterial().getTex(), i, j, 1, 1);
             }
         }
         batch.setColor(Color.WHITE);
@@ -161,7 +163,7 @@ public class ClientWorld {
             if(!e.isActive()) continue;
             // this is for entities from entities.atlas
             if(e.getType() != EntityType.DROPPED_ITEM) {
-                float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
                 batch.setColor(b,b,b,1);
                 e.draw(batch);
             }
@@ -171,13 +173,22 @@ public class ClientWorld {
             if(!e.isActive()) continue;
             // this is for dropped items from gui.atlas
             if(e.getType() == EntityType.DROPPED_ITEM) {
-                float b = 1f / Consts.MAX_LIGHT_LEVEL * e.getCenterTile().getLight();
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
                 batch.setColor(b,b,b,1);
                 e.draw(batch);
             }
         }
-
         animationManager.draw(batch);
+
+        for(int i =  left; i < right; i++) {
+            for(int j = down; j < up; j++) {
+                ClientTile t = terrain[i][j];
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
+                batch.setColor(b,b,b,1);
+                waterManager.draw(batch, t, i, j);
+            }
+        }
+        batch.setColor(Color.WHITE);
     }
 
     public void onServerTick() {
@@ -196,9 +207,11 @@ public class ClientWorld {
             Material type = Material.getMaterial(in.getByte());
             byte stability = in.getByte();
             boolean backWall = in.getBoolean();
+            byte waterLevel = in.getByte();
             t.setMaterial(type);
             t.setStability(stability);
             t.setBackWall(backWall);
+            t.setWaterLevel(waterLevel);
         }
 
         if(layer == terrainHeight-1) {
@@ -238,13 +251,22 @@ public class ClientWorld {
     }
 
     public void onBackWallsChange(PacketInputStream in) {
-
         int size = in.getInt();
         for(int i = 0; i < size; i++) {
             int x = in.getInt();
             int y = in.getInt();
             boolean has = in.getBoolean();
             terrain[x][y].setBackWall(has);
+        }
+    }
+
+    public void onWaterPacket(PacketInputStream in) {
+        int size = in.getInt();
+        for(int i = 0; i < size; i++) {
+            int x = in.getInt();
+            int y = in.getInt();
+            byte waterLevel = in.getByte();
+            terrain[x][y].setWaterLevel(waterLevel);
         }
     }
 
@@ -294,4 +316,5 @@ public class ClientWorld {
     public WorldAnimationManager getAnimationManager() {
         return animationManager;
     }
+
 }

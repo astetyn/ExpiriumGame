@@ -5,7 +5,7 @@ public class Consts {
     public static final int VERSION = 1;
     public static final String VERSION_TEXT = "alpha 1.2";
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // server
     public static final long SAVE_INTERVAL = 20000; // in millis
@@ -24,7 +24,7 @@ public class Consts {
     public static final short DEFAULT_BIT = 1;
     public static final short PLAYER_BIT = 2;
 
-    public static final float D_I_PICK_DIST = 1.6f;
+    public static final float D_I_PICK_DIST = 1.7f;
 
     public static final float CAMPFIRE_TIME = 180;
 
@@ -36,7 +36,10 @@ public class Consts {
     public static final int ITEM_DESPAWN_TIME = 60; // in seconds
 
     public static final byte MAX_LIGHT_LEVEL = 10;
+    public static final float MAX_LIGHT_LEVEL_INVERTED = 1f / MAX_LIGHT_LEVEL;
     public static final int SKY_LIGHT_DECREASE = 3;
+
+    public static final byte MAX_WATER_LEVEL = 5;
 
     public static final int TICKS_IN_DAY = 38400;
     public static final int TICKS_IN_HOUR = 1600;

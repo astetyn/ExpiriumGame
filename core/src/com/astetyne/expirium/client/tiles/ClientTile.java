@@ -10,12 +10,14 @@ public class ClientTile {
     private byte stability;
     private byte skyLight, localLight;
     private boolean backWall;
+    private byte waterLevel;
 
     public ClientTile(Material type, byte stability) {
         this.type = type;
         this.stability = stability;
         skyLight = 0;
         localLight = 0;
+        waterLevel = 0;
     }
 
     public int getStability() {
@@ -50,7 +52,7 @@ public class ClientTile {
         this.localLight = localLight;
     }
 
-    public byte getTimeCompensatedSkyLight() {
+    public int getTimeCompensatedSkyLight() {
         int time = GameScreen.get().getTime();
         float moonLightFactor = 0.2f;
 
@@ -80,8 +82,8 @@ public class ClientTile {
      *
      * @return Real light level, which can be displayed on screen.
      */
-    public byte getLight() {
-        return (byte) Math.max(getTimeCompensatedSkyLight(), localLight);
+    public int getLight() {
+        return Math.max(getTimeCompensatedSkyLight(), localLight);
     }
 
     public boolean hasBackWall() {
@@ -90,5 +92,13 @@ public class ClientTile {
 
     public void setBackWall(boolean backWall) {
         this.backWall = backWall;
+    }
+
+    public byte getWaterLevel() {
+        return waterLevel;
+    }
+
+    public void setWaterLevel(byte waterLevel) {
+        this.waterLevel = waterLevel;
     }
 }

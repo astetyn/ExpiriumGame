@@ -20,9 +20,9 @@ public class Tile implements WorldSaveable {
     private MetaTile metaTile;
     private final List<Fixture> fixtures;
     private final int x, y;
-    private int stability;
+    private byte stability;
+    private byte waterLevel;
     private boolean backWall;
-    private final IntVector2 tempLoc;
 
     public Tile(World world, int x, int y, DataInputStream in, boolean createMeta) throws IOException {
         this.world = world;
@@ -36,8 +36,8 @@ public class Tile implements WorldSaveable {
         this.x = x;
         this.y = y;
         stability = 0;
+        waterLevel = in.readByte();
         backWall = in.readBoolean();
-        tempLoc = new IntVector2(x, y);
     }
 
     /** This is unsafe. Do not call this if you have no big reason.*/
@@ -62,10 +62,10 @@ public class Tile implements WorldSaveable {
     }
 
     public void setStability(int stability) {
-        this.stability = stability;
+        this.stability = (byte) stability;
     }
 
-    public int getStability() {
+    public byte getStability() {
         return stability;
     }
 
@@ -93,15 +93,28 @@ public class Tile implements WorldSaveable {
         return metaTile;
     }
 
-    public IntVector2 getLoc() {
-        tempLoc.set(x, y);
-        return tempLoc;
+    public IntVector2 getLoc(IntVector2 vec) {
+        vec.set(x, y);
+        return vec;
+    }
+
+    public byte getWaterLevel() {
+        return waterLevel;
+    }
+
+    public void setWaterLevel(int waterLevel) {
+        this.waterLevel = (byte) waterLevel;
+    }
+
+    public void increaseWaterLevel(int i) {
+        waterLevel += i;
     }
 
     @Override
     public void writeData(WorldBuffer out) {
         out.writeMaterial(material);
         metaTile.writeData(out);
+        out.writeByte(waterLevel);
         out.writeBoolean(backWall);
     }
 }

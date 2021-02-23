@@ -37,15 +37,17 @@ public class MetaTileTreePlant extends MetaTile {
 
     private void grow() {
 
+        IntVector2 vec = new IntVector2(0, 0);
+
         // if soil is not grass or dirt
-        if(owner.getY() == 0 || (world.getTileAt(owner.getLoc().add(0, -1)).getMaterial() != Material.GRASS &&
-                world.getTileAt(owner.getLoc().add(0, -1)).getMaterial() != Material.DIRT)) {
+        if(owner.getY() == 0 || (world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.GRASS &&
+                world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.DIRT)) {
             growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
             return;
         }
 
-        if(owner.getMaterial() == Material.GROWING_PLANT_SHOREA && growShorea(owner.getLoc())) return;
-        else if(owner.getMaterial() == Material.GROWING_PLANT_FIR && growFir(owner.getLoc())) return;
+        if(owner.getMaterial() == Material.GROWING_PLANT_SHOREA && growShorea(owner.getLoc(vec))) return;
+        else if(owner.getMaterial() == Material.GROWING_PLANT_FIR && growFir(owner.getLoc(vec))) return;
 
         // in case of unsuccessful grow
         growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));

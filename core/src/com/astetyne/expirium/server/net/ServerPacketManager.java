@@ -90,8 +90,9 @@ public class ServerPacketManager {
         for(int i = 0; i < server.getWorld().getTerrainWidth(); i++) {
             Tile t = server.getWorld().getTileAt(i, layer);
             out.putByte((byte) t.getMaterial().getID());
-            out.putByte((byte) t.getStability());
+            out.putByte(t.getStability());
             out.putBoolean(t.hasBackWall());
+            out.putByte(t.getWaterLevel());
         }
     }
 
@@ -221,6 +222,16 @@ public class ServerPacketManager {
             out.putInt(t.getX());
             out.putInt(t.getY());
             out.putBoolean(t.hasBackWall());
+        }
+    }
+
+    public void putWaterPacket(HashSet<Tile> updatedTiles) {
+        out.startPacket(36);
+        out.putInt(updatedTiles.size());
+        for(Tile t : updatedTiles) {
+            out.putInt(t.getX());
+            out.putInt(t.getY());
+            out.putByte(t.getWaterLevel());
         }
     }
 

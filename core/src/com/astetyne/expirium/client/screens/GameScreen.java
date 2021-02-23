@@ -55,10 +55,7 @@ public class GameScreen implements Screen {
 
         multiplexer.addProcessor(stage);
 
-        world = new ClientWorld();
-
-        // load init data from server
-        world.loadData(in);
+        world = new ClientWorld(in);
 
         background = new Background(world);
 

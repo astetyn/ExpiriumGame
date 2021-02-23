@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.world.World;
@@ -53,7 +54,8 @@ public class MetaTileCactus extends MetaTile {
             Tile t = world.getTileAt(owner.getX(), owner.getY() + i);
             world.changeMaterial(t, getRandCactus(), false, Source.NATURAL);
         }
-        world.changeMaterial(world.getTileAt(owner.getLoc().add(0, cactusHeight)), Material.CACTUS_TOP, false, Source.NATURAL);
+        IntVector2 vec = new IntVector2(0, 0);
+        world.changeMaterial(world.getTileAt(owner.getLoc(vec).add(0, cactusHeight)), Material.CACTUS_TOP, false, Source.NATURAL);
     }
 
     private Material getRandCactus() {

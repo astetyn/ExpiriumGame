@@ -187,8 +187,6 @@ public class Player extends LivingEntity {
             toolManager = new CombatToolManager(server, this);
         }
         toolManager.onTick(tsData2);
-
-        System.out.println(getLocation());
     }
 
     @Override

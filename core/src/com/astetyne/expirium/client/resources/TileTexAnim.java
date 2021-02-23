@@ -10,6 +10,8 @@ public enum TileTexAnim implements Textureable {
     CAMPFIRE_BIG("campfire_big", 0.1f, Animation.PlayMode.LOOP_PINGPONG),
     CAMPFIRE_SMALL("campfire_small", 0.1f, Animation.PlayMode.LOOP_PINGPONG),
 
+    WATER("water_5", 0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    
     TILE_BREAK("tile_break", 0.26f, Animation.PlayMode.LOOP);
 
     private final String regionName;
