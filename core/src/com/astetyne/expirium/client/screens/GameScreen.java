@@ -9,7 +9,7 @@ import com.astetyne.expirium.client.gui.roots.game.GameRootable;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.world.Background;
-import com.astetyne.expirium.client.world.GameWorld;
+import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
 import com.badlogic.gdx.Gdx;
@@ -28,7 +28,7 @@ public class GameScreen implements Screen {
     private final InputMultiplexer multiplexer;
     private final Stage stage;
     private final WarnMsgLabel warnMsgLabel;
-    private final GameWorld world;
+    private final ClientWorld world;
     private final Background background;
     private int time;
     private final PlayerDataHandler playerDataHandler;
@@ -55,7 +55,7 @@ public class GameScreen implements Screen {
 
         multiplexer.addProcessor(stage);
 
-        world = new GameWorld();
+        world = new ClientWorld();
 
         // load init data from server
         world.loadData(in);
@@ -143,7 +143,7 @@ public class GameScreen implements Screen {
         }
     }
 
-    public GameWorld getWorld() {
+    public ClientWorld getWorld() {
         return world;
     }
 

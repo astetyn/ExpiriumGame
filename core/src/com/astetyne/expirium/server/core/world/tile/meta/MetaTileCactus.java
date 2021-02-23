@@ -1,13 +1,13 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.event.Source;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -18,12 +18,12 @@ public class MetaTileCactus extends MetaTile {
 
     private long growTick;
 
-    public MetaTileCactus(ExpiWorld world, ExpiTile owner) {
+    public MetaTileCactus(World world, Tile owner) {
         super(world, owner);
         growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
     }
 
-    public MetaTileCactus(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
+    public MetaTileCactus(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
         growTick = in.readLong();
         schedule(this::grow, growTick);
@@ -42,7 +42,7 @@ public class MetaTileCactus extends MetaTile {
 
         // air check
         for(int i = 1; i < cactusHeight+1; i++) {
-            ExpiTile t = world.getTileAt(owner.getX(), owner.getY() + i);
+            Tile t = world.getTileAt(owner.getX(), owner.getY() + i);
             if(t.getMaterial() != Material.AIR) {
                 growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME/2));
                 return;
@@ -50,7 +50,7 @@ public class MetaTileCactus extends MetaTile {
         }
 
         for(int i = 0; i < cactusHeight; i++) {
-            ExpiTile t = world.getTileAt(owner.getX(), owner.getY() + i);
+            Tile t = world.getTileAt(owner.getX(), owner.getY() + i);
             world.changeMaterial(t, getRandCactus(), false, Source.NATURAL);
         }
         world.changeMaterial(world.getTileAt(owner.getLoc().add(0, cactusHeight)), Material.CACTUS_TOP, false, Source.NATURAL);

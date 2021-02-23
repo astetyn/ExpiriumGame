@@ -3,16 +3,16 @@ package com.astetyne.expirium.client.net;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.GameInfo;
 import com.astetyne.expirium.client.data.ThumbStickData;
-import com.astetyne.expirium.client.entity.Entity;
+import com.astetyne.expirium.client.entity.ClientEntity;
+import com.astetyne.expirium.client.entity.ClientPlayer;
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.client.entity.Player;
 import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.client.world.GameWorld;
+import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
@@ -32,7 +32,7 @@ public class ClientPacketManager {
 
     public void processIncomingPackets() {
 
-        GameWorld world = null;
+        ClientWorld world = null;
         if(GameScreen.get() != null) {
             world = GameScreen.get().getWorld();
             world.onServerTick();
@@ -77,7 +77,7 @@ public class ClientPacketManager {
 
                 case 19: {//EntityMovePacket
                     short eID = in.getShort();
-                    Entity e = world.getEntitiesID().get(eID);
+                    ClientEntity e = world.getEntitiesID().get(eID);
                     if(e != null) {
                         e.onMove(in);
                     }else {
@@ -120,12 +120,12 @@ public class ClientPacketManager {
                     break;
 
                 case 32: {//HandPunchPacket
-                    Player p = (Player) world.getEntitiesID().get(in.getShort());
+                    ClientPlayer p = (ClientPlayer) world.getEntitiesID().get(in.getShort());
                     p.onHandPunch();
                     break;
                 }
                 case 33: { //HandItemPacket
-                    Player p = (Player) world.getEntitiesID().get(in.getShort());
+                    ClientPlayer p = (ClientPlayer) world.getEntitiesID().get(in.getShort());
                     p.setItemInHand(Item.getType(in.getInt()));
                     break;
                 }

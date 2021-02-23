@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.entity.animator;
 
-import com.astetyne.expirium.client.entity.Entity;
+import com.astetyne.expirium.client.entity.ClientEntity;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,7 +11,7 @@ public class MoveableEntityAnimator extends EntityAnimator {
     protected boolean moving; // 0=idle right, 1=idle left, 2=run right, 3=run left
     private final Animation<TextureRegion> idleAnim, moveAnim;
 
-    public MoveableEntityAnimator(Entity e, Animation<TextureRegion> idleAnim, Animation<TextureRegion> moveAnim) {
+    public MoveableEntityAnimator(ClientEntity e, Animation<TextureRegion> idleAnim, Animation<TextureRegion> moveAnim) {
         super(e);
         moving = false;
         this.idleAnim = idleAnim;

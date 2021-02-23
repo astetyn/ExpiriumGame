@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.entity.Metaable;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public abstract class ExpiEntity implements Metaable, WorldSaveable {
+public abstract class Entity implements Metaable, WorldSaveable {
 
     protected final ExpiServer server;
     private final short id;
@@ -22,7 +22,7 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
     protected final Body body;
     protected boolean destroyed;
 
-    public ExpiEntity(ExpiServer server, EntityType type, Vector2 loc) {
+    public Entity(ExpiServer server, EntityType type, Vector2 loc) {
         this.server = server;
         destroyed = false;
         id = server.getRandomEntityID();
@@ -37,7 +37,7 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
         server.getEntities().add(this);
     }
 
-    public ExpiEntity(ExpiServer server, EntityType type,  DataInputStream in) throws IOException {
+    public Entity(ExpiServer server, EntityType type, DataInputStream in) throws IOException {
         this(server, type, new Vector2(in.readFloat(), in.readFloat()));
     }
 
@@ -97,7 +97,7 @@ public abstract class ExpiEntity implements Metaable, WorldSaveable {
         destroyed = true;
         server.getEntities().remove(this);
         server.getWorld().getB2dWorld().destroyBody(body);
-        for(ExpiPlayer pp : server.getPlayers()) {
+        for(Player pp : server.getPlayers()) {
             pp.getNetManager().putEntityDespawnPacket(this);
         }
     }

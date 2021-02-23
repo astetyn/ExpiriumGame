@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.core.world.file;
 
-import com.astetyne.expirium.client.tiles.Material;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 import java.nio.ByteBuffer;
 

@@ -5,7 +5,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.badlogic.gdx.math.Vector2;
@@ -15,13 +15,13 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class ExpiDroppedItem extends ExpiEntity {
+public class DroppedItem extends Entity {
 
     private final Item item;
     private final long pickTick;
     private final int ticksCooldown;
 
-    public ExpiDroppedItem(ExpiServer server, Vector2 loc, Item item, Integer ticksCooldown) {
+    public DroppedItem(ExpiServer server, Vector2 loc, Item item, Integer ticksCooldown) {
         super(server, EntityType.DROPPED_ITEM, loc);
         this.item = item;
         pickTick = server.getWorld().getTick();
@@ -31,7 +31,7 @@ public class ExpiDroppedItem extends ExpiEntity {
         server.getWorld().scheduleTaskAfter(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }
 
-    public ExpiDroppedItem(ExpiServer server, DataInputStream in) throws IOException {
+    public DroppedItem(ExpiServer server, DataInputStream in) throws IOException {
         super(server, EntityType.DROPPED_ITEM, in);
         item = Item.getType(in.readInt());
         pickTick = server.getWorld().getTick();
@@ -63,7 +63,7 @@ public class ExpiDroppedItem extends ExpiEntity {
             return;
         }
 
-        for(ExpiPlayer p : server.getPlayers()) {
+        for(Player p : server.getPlayers()) {
             Vector2 dif = p.getCenter().sub(getCenter());
             if(dif.len() < Consts.D_I_PICK_DIST && p.getInv().canAppend(item, 1)) {
                 p.getInv().append(item, 1);

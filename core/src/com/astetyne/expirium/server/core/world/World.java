@@ -2,15 +2,14 @@ package com.astetyne.expirium.server.core.world;
 
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.Entity;
 import com.astetyne.expirium.server.core.entity.LivingEntity;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
 import com.astetyne.expirium.server.core.world.calculator.BackWallCalculator;
@@ -18,15 +17,11 @@ import com.astetyne.expirium.server.core.world.calculator.FixtureCalculator;
 import com.astetyne.expirium.server.core.world.calculator.StabilityCalculator;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
-import com.astetyne.expirium.server.core.world.tile.MetaTile;
-import com.astetyne.expirium.server.core.world.tile.TickTask;
-import com.astetyne.expirium.server.core.world.tile.TileFix;
+import com.astetyne.expirium.server.core.world.tile.*;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import java.io.DataInputStream;
@@ -36,12 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class ExpiWorld implements WorldSaveable, Disposable {
+public class World implements WorldSaveable, Disposable {
 
     private final ExpiServer server;
-    private final ExpiTile[][] terrain;
-    private final int partHeight;
-    private final World b2dWorld;
+    private final Tile[][] terrain;
+    private final com.badlogic.gdx.physics.box2d.World b2dWorld;
     private final Body terrainBody;
     private final StabilityCalculator stabilityCalc;
     private final FixtureCalculator fixtureCalc;
@@ -57,7 +51,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     private final AnimalBalancer animalBalancer;
     private final BiomeType[] biomes;
 
-    public ExpiWorld(DataInputStream in, long tick, ExpiServer server) throws IOException {
+    public World(DataInputStream in, long tick, ExpiServer server) throws IOException {
 
         this.server = server;
         this.tick = tick;
@@ -72,11 +66,11 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         seed = in.readLong();
 
         boolean createMeta = in.readBoolean();
-        terrain = new ExpiTile[height][width];
+        terrain = new Tile[width][height];
         long startT = System.nanoTime();
-        for(int h = 0; h < height; h++) {
-            for(int w = 0; w < width; w++) {
-                terrain[h][w] = new ExpiTile(this, w, h, in, createMeta);
+        for(int w = 0; w < width; w++) {
+            for(int h = 0; h < height; h++) {
+                terrain[w][h] = new Tile(this, w, h, in, createMeta);
             }
         }
         System.out.println("Loading tiles time (ms): "+(System.nanoTime() - startT)/1000000);
@@ -89,9 +83,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         //todo: len docasne zatial
         weatherType = WeatherType.SUNNY;
 
-        partHeight = 2; // todo: this should be calculated from BUFFER_SIZE and terrainWidth
-
-        b2dWorld = new World(new Vector2(0, -17f), false);
+        b2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -17f), false);
 
         contactListener = new ExpiContactListener();
         b2dWorld.setContactListener(contactListener);
@@ -128,7 +120,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
         // time step should be 1/32 but then items are kinda buggy, so it is doubled
         for(int i = 0; i < 2; i++) {
-            for(ExpiPlayer pp : server.getPlayers()) {
+            for(Player pp : server.getPlayers()) {
                 pp.applyPhysics();
             }
             b2dWorld.step(1f/64, 6, 2);
@@ -146,26 +138,26 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
         animalBalancer.onTick();
 
-        List<ExpiEntity> copy = new ArrayList<>(server.getEntities());
-        for(ExpiEntity ee : copy) {
+        List<Entity> copy = new ArrayList<>(server.getEntities());
+        for(Entity ee : copy) {
             ee.onTick();
         }
 
-        for(ExpiPlayer pp : server.getPlayers()) {
-            for(ExpiEntity ee : server.getEntities()) {
+        for(Player pp : server.getPlayers()) {
+            for(Entity ee : server.getEntities()) {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
             pp.getNetManager().putEnviroPacket();
         }
     }
 
-    public void onInteract(ExpiPlayer p, PacketInputStream in) {
+    public void onInteract(Player p, PacketInputStream in) {
 
         float x = in.getFloat();
         float y = in.getFloat();
         Vector2 loc = new Vector2(x, y);
         InteractType type = InteractType.getType(in.getInt());
-        ExpiTile t = server.getWorld().getTileAt(x, y);
+        Tile t = server.getWorld().getTileAt(x, y);
 
         if(p.isInInteractRadius(loc)) {
             t.onInteract(p, type);
@@ -187,14 +179,14 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         // confirmed from here
         p.getInv().remove(item, 1);
 
-        for(ExpiPlayer ep : server.getPlayers()) {
+        for(Player ep : server.getPlayers()) {
             ep.getNetManager().putHandPunchPacket(p);
         }
 
         changeMaterial(t, item.getBuildMaterial(), true, Source.PLAYER);
     }
 
-    public void changeMaterial(ExpiTile t, Material to, boolean withDrops, Source source) {
+    public void changeMaterial(Tile t, Material to, boolean withDrops, Source source) {
 
         Material fromMat = t.getMaterial();
         MetaTile fromMeta = t.getMeta();
@@ -202,7 +194,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         if(to == Material.AIR && withDrops) t.getMeta().dropItems();
 
         t.changeMaterial(to);
-        for(ExpiPlayer ep : server.getPlayers()) {
+        for(Player ep : server.getPlayers()) {
             ep.getNetManager().putMaterialChangePacket(t);
         }
 
@@ -220,14 +212,14 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         backWallCalculator.onTileChange(e);
     }
 
-    private boolean isTileFree(ExpiTile t, Item toPlace) {
+    private boolean isTileFree(Tile t, Item toPlace) {
 
         int x = t.getX();
         int y = t.getY();
 
         if(toPlace.getBuildMaterial().getFix() == TileFix.SOFT) return true;
 
-        for(ExpiEntity p : server.getEntities()) {
+        for(Entity p : server.getEntities()) {
 
             float px = p.getLocation().x;
             float py = p.getLocation().y;
@@ -246,7 +238,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
     public Vector2 getSpawnLocation() {
         int x = (int) (width/2 -10 + Math.random()*11);
         int y = height-2;
-        while(terrain[y][x].getMaterial().getFix() == TileFix.SOFT) {
+        while(terrain[x][y].getMaterial().getFix() == TileFix.SOFT) {
             if(y == 0) {
                 x = (int) (Math.random() * width);
                 y = height-2;
@@ -257,7 +249,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return new Vector2(x, y+2);
     }
 
-    public void teleport(ExpiEntity e, float x, float y) {
+    public void teleport(Entity e, float x, float y) {
 
         float precision = 0.5f;
 
@@ -288,7 +280,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
     }
 
-    private boolean isPlaceSafe(ExpiEntity e, float x, float y) {
+    private boolean isPlaceSafe(Entity e, float x, float y) {
 
         float ew = e.getType().getWidth();
         float eh = e.getType().getHeight();
@@ -303,16 +295,20 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return true;
     }
 
-    public ExpiTile getTileAt(float x, float y) {
-        return terrain[(int)y][(int)x];
+    public Tile getTileAt(float x, float y) {
+        return terrain[(int)x][(int)y];
     }
 
-    public ExpiTile getTileAt(Vector2 vec) {
-        return terrain[(int)vec.y][(int)vec.x];
+    public Tile getTileAt(Vector2 vec) {
+        return terrain[(int)vec.x][(int)vec.y];
     }
 
-    public ExpiTile getTileAt(IntVector2 loc) {
-        return terrain[loc.y][loc.x];
+    public Tile getTileAt(int x, int y) {
+        return terrain[x][y];
+    }
+
+    public Tile getTileAt(IntVector2 loc) {
+        return terrain[loc.x][loc.y];
     }
 
     public boolean isInWorld(Vector2 v) {
@@ -323,7 +319,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return terrainBody;
     }
 
-    public World getB2dWorld() {
+    public com.badlogic.gdx.physics.box2d.World getB2dWorld() {
         return b2dWorld;
     }
 
@@ -339,7 +335,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return time;
     }
 
-    public ExpiTile[][] getTerrain() {
+    public Tile[][] getTerrain() {
         return terrain;
     }
 
@@ -349,10 +345,6 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
     public int getTerrainHeight() {
         return height;
-    }
-
-    public int getPartHeight() {
-        return partHeight;
     }
 
     public long getDay() {
@@ -392,7 +384,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return server;
     }
 
-    public ExpiEntity spawnEntity(EntityType type, Vector2 loc, Object... args) {
+    public Entity spawnEntity(EntityType type, Vector2 loc, Object... args) {
         Class<?>[] argClasses = new Class[args.length+2];
         Object[] objects = new Object[args.length+2];
         for(int i = 0; i < args.length; i++) {
@@ -407,13 +399,13 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         objects[1] = loc;
 
         try {
-            ExpiEntity e = type.getEntityClass().getConstructor(argClasses).newInstance(objects);
+            Entity e = type.getEntityClass().getConstructor(argClasses).newInstance(objects);
             e.createBodyFixtures();
-            for(ExpiPlayer ep : server.getPlayers()) {
+            for(Player ep : server.getPlayers()) {
                 if(e == ep) continue;
                 ep.getNetManager().putEntitySpawnPacket(e);
             }
-            for(ExpiPlayer p : server.getPlayers()) {
+            for(Player p : server.getPlayers()) {
                 p.recalcNearEntities();
             }
             return e;
@@ -423,11 +415,11 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return null;
     }
 
-    public ExpiEntity spawnEntity(EntityType type, DataInputStream in) {
+    public Entity spawnEntity(EntityType type, DataInputStream in) {
         try {
-            ExpiEntity e = type.getEntityClass().getConstructor(ExpiServer.class, DataInputStream.class).newInstance(server, in);
+            Entity e = type.getEntityClass().getConstructor(ExpiServer.class, DataInputStream.class).newInstance(server, in);
             e.createBodyFixtures();
-            for(ExpiPlayer ep : server.getPlayers()) {
+            for(Player ep : server.getPlayers()) {
                 if(e == ep) continue;
                 ep.getNetManager().putEntitySpawnPacket(e);
             }
@@ -438,7 +430,7 @@ public class ExpiWorld implements WorldSaveable, Disposable {
         return null;
     }
 
-    public void hitEntity(ExpiEntity attacker, LivingEntity victim, int damage) {
+    public void hitEntity(Entity attacker, LivingEntity victim, int damage) {
         //System.out.println("Attacker "+attacker.getType()+" hit "+victim.getType()+" with "+damage+" damage");
         victim.injure(damage);
         Vector2 pushVec = new Vector2(victim.getCenter().sub(attacker.getCenter()));
@@ -456,9 +448,9 @@ public class ExpiWorld implements WorldSaveable, Disposable {
 
         out.writeBoolean(false);
 
-        for(int h = 0; h < height; h++) {
-            for(int w = 0; w < width; w++) {
-                terrain[h][w].writeData(out);
+        for(int w = 0; w < width; w++) {
+            for(int h = 0; h < height; h++) {
+                terrain[w][h].writeData(out);
             }
         }
         for(BiomeType biome : biomes) {

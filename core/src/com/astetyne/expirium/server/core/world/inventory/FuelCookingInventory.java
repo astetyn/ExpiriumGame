@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.inventory;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
@@ -14,13 +14,13 @@ public class FuelCookingInventory extends CookingInventory {
     private int fuel;
     private long lastFuelDecreaseTick;
 
-    public FuelCookingInventory(ExpiWorld world, int rows, int columns, float maxWeight) {
+    public FuelCookingInventory(World world, int rows, int columns, float maxWeight) {
         super(world, rows, columns, maxWeight);
         fuel = 0;
         lastFuelDecreaseTick = world.getTick();
     }
 
-    public FuelCookingInventory(ExpiWorld world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
+    public FuelCookingInventory(World world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
         super(world, rows, columns, maxWeight, in);
         fuel = in.readInt();
         lastFuelDecreaseTick = world.getTick();

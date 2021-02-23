@@ -3,10 +3,10 @@ package com.astetyne.expirium.server;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.Entity;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.event.EventManager;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.file.WorldFileManager;
 import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
@@ -21,12 +21,12 @@ import java.util.Random;
 
 public class ExpiServer implements WorldSaveable {
 
-    private ExpiWorld world;
+    private World world;
     private final ServerGateway serverGateway;
     private final TickLooper tickLooper;
 
-    private final List<ExpiEntity> entities;
-    private final List<ExpiPlayer> players;
+    private final List<Entity> entities;
+    private final List<Player> players;
 
     private final EventManager eventManager;
     private final WorldFileManager fileManager;
@@ -72,7 +72,7 @@ public class ExpiServer implements WorldSaveable {
 
             DataInputStream in = fileManager.getWorldInputStream();
             long startT = System.nanoTime();
-            world = new ExpiWorld(in, wqi.tick, this);
+            world = new World(in, wqi.tick, this);
             System.out.println("Loading world time (ms): "+(System.nanoTime() - startT)/1000000);
 
             // this must be loaded here, because it requires fully loaded ExpiWorld
@@ -122,7 +122,7 @@ public class ExpiServer implements WorldSaveable {
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
-        for(ExpiPlayer p : players) {
+        for(Player p : players) {
             p.getGateway().stop();
         }
         synchronized(tickLooper.getTickLock()) {
@@ -137,7 +137,7 @@ public class ExpiServer implements WorldSaveable {
         multicastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
-        for(ExpiPlayer p : players) {
+        for(Player p : players) {
             p.getGateway().stop();
         }
         synchronized(tickLooper.getTickLock()) {
@@ -167,15 +167,15 @@ public class ExpiServer implements WorldSaveable {
 
     }
 
-    public List<ExpiEntity> getEntities() {
+    public List<Entity> getEntities() {
         return entities;
     }
 
-    public List<ExpiPlayer> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public ExpiWorld getWorld() {
+    public World getWorld() {
         return world;
     }
 
@@ -202,13 +202,13 @@ public class ExpiServer implements WorldSaveable {
 
         // players are saved independently - during logout
         int entitiesSize = 0;
-        for(ExpiEntity e : entities) {
-            if(e instanceof ExpiPlayer) continue;
+        for(Entity e : entities) {
+            if(e instanceof Player) continue;
             entitiesSize++;
         }
         out.writeInt(entitiesSize);
-        for(ExpiEntity e : entities) {
-            if(e instanceof ExpiPlayer) continue;
+        for(Entity e : entities) {
+            if(e instanceof Player) continue;
             out.writeInt(e.getType().getID());
             e.writeData(out);
         }
@@ -224,7 +224,7 @@ public class ExpiServer implements WorldSaveable {
         while(true) {
             Random rand = new Random();
             randomID = (short) rand.nextInt(1 << 16);
-            for(ExpiEntity entities : entities) {
+            for(Entity entities : entities) {
                 if(randomID == entities.getId()) continue outer;
             }
             break;

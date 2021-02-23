@@ -5,11 +5,11 @@ import com.astetyne.expirium.client.entity.animator.PlayerAnimator;
 import com.astetyne.expirium.client.items.Item;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Player extends Entity {
+public abstract class ClientPlayer extends ClientEntity {
 
     private Item itemInHand;
 
-    public Player(short id, Vector2 loc) {
+    public ClientPlayer(short id, Vector2 loc) {
         super(EntityType.PLAYER, id, loc);
         setAnimator(new PlayerAnimator(this, Res.PLAYER_IDLE_ANIM, Res.PLAYER_MOVE_ANIM));
         itemInHand = Item.EMPTY;

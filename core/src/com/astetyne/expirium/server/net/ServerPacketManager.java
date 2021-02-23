@@ -7,12 +7,12 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.Entity;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.HashSet;
@@ -23,9 +23,9 @@ public class ServerPacketManager {
     private final ExpiServer server;
     private final PacketInputStream in;
     private final PacketOutputStream out;
-    private final ExpiPlayer owner;
+    private final Player owner;
 
-    public ServerPacketManager(ExpiServer server, ExpiPlayer owner) {
+    public ServerPacketManager(ExpiServer server, Player owner) {
         this.server = server;
         this.owner = owner;
         this.in = owner.getGateway().getIn();
@@ -68,42 +68,34 @@ public class ServerPacketManager {
 
     }
 
-    public void putInitDataPacket(ExpiTile[][] terrain, List<ExpiEntity> entities) {
+    public void putInitDataPacket(List<Entity> entities) {
         out.startPacket(11);
 
-        int w = terrain[0].length;
-        int h = terrain.length;
-
-        out.putInt(w);
-        out.putInt(h);
+        out.putInt(server.getWorld().getTerrainWidth());
+        out.putInt(server.getWorld().getTerrainHeight());
 
         out.putShort(owner.getId());
         out.putVector(owner.getLocation());
         out.putInt(entities.size()-1);
-        for(ExpiEntity e : entities) {
+        for(Entity e : entities) {
             if(owner == e) continue;
             out.putEntity(e);
         }
     }
 
-    public void putWorldFeedPacket(ExpiTile[][] terrain, int partHeight, int partNumber) {
+    public void putWorldFeedPacket(int layer) {
         out.startPacket(13);
 
-        out.putInt(partHeight);
-        out.putInt(partNumber);
-
-        int yOff = partNumber * partHeight;
-        for(int i = 0; i < terrain[0].length; i++) {
-            for(int j = yOff; j < yOff + partHeight; j++) {
-                ExpiTile t = terrain[j][i];
-                out.putByte((byte) t.getMaterial().getID());
-                out.putByte((byte) t.getStability());
-                out.putBoolean(t.hasBackWall());
-            }
+        out.putInt(layer);
+        for(int i = 0; i < server.getWorld().getTerrainWidth(); i++) {
+            Tile t = server.getWorld().getTileAt(i, layer);
+            out.putByte((byte) t.getMaterial().getID());
+            out.putByte((byte) t.getStability());
+            out.putBoolean(t.hasBackWall());
         }
     }
 
-    public void putEntityMovePacket(ExpiEntity e) {
+    public void putEntityMovePacket(Entity e) {
         if(!owner.getNearActiveEntities().contains(e) && e != owner) return;
         out.startPacket(19);
         out.putShort(e.getId());
@@ -113,12 +105,12 @@ public class ServerPacketManager {
         out.putBoolean(e.isLookingRight());
     }
 
-    public void putEntitySpawnPacket(ExpiEntity e) {
+    public void putEntitySpawnPacket(Entity e) {
         out.startPacket(20);
         out.putEntity(e);
     }
 
-    public void putEntityDespawnPacket(ExpiEntity e) {
+    public void putEntityDespawnPacket(Entity e) {
         out.startPacket(21);
         out.putShort(e.getId());
     }
@@ -164,17 +156,17 @@ public class ServerPacketManager {
         out.putInt(consIS.getAmount());
     }
 
-    public void putMaterialChangePacket(ExpiTile t) {
+    public void putMaterialChangePacket(Tile t) {
         out.startPacket(22);
         out.putInt(t.getMaterial().getID());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }
 
-    public void putStabilityPacket(HashSet<ExpiTile> affectedTiles) {
+    public void putStabilityPacket(HashSet<Tile> affectedTiles) {
         out.startPacket(18);
         out.putInt(affectedTiles.size());
-        for(ExpiTile t : affectedTiles) {
+        for(Tile t : affectedTiles) {
             out.putInt(t.getX());
             out.putInt(t.getY());
             out.putByte((byte) t.getStability());
@@ -187,7 +179,7 @@ public class ServerPacketManager {
         out.putInt(server.getWorld().getWeather().getID());
     }
 
-    public void putBreakingTilePacket(ExpiTile t, float state) {
+    public void putBreakingTilePacket(Tile t, float state) {
         out.startPacket(15);
         out.putInt(t.getX());
         out.putInt(t.getY());
@@ -211,7 +203,7 @@ public class ServerPacketManager {
         out.putLong(daysSurvived);
     }
 
-    public void putHandPunchPacket(ExpiPlayer puncher) {
+    public void putHandPunchPacket(Player puncher) {
         out.startPacket(32);
         out.putShort(puncher.getId());
     }
@@ -222,10 +214,10 @@ public class ServerPacketManager {
         out.putInt(item.getId());
     }
 
-    public void putBackWallPacket(List<ExpiTile> backWallTiles) {
+    public void putBackWallPacket(List<Tile> backWallTiles) {
         out.startPacket(34);
         out.putInt(backWallTiles.size());
-        for(ExpiTile t : backWallTiles) {
+        for(Tile t : backWallTiles) {
             out.putInt(t.getX());
             out.putInt(t.getY());
             out.putBoolean(t.hasBackWall());

@@ -1,13 +1,10 @@
-package com.astetyne.expirium.client.tiles;
+package com.astetyne.expirium.server.core.world.tile;
 
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.resources.Textureable;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
-import com.astetyne.expirium.server.core.world.tile.MetaTile;
-import com.astetyne.expirium.server.core.world.tile.TileFix;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.tile.meta.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -88,7 +85,7 @@ public enum Material implements Textureable {
         defaultDropItem = dpi;
     }
 
-    public MetaTile init(ExpiWorld w, ExpiTile t) {
+    public MetaTile init(World w, Tile t) {
 
         // just for optimization
         if(metaClazz == MetaTile.class) {
@@ -103,14 +100,14 @@ public enum Material implements Textureable {
         // end of optimization
 
         try {
-            return metaClazz.getConstructor(ExpiWorld.class, ExpiTile.class).newInstance(w, t);
+            return metaClazz.getConstructor(World.class, Tile.class).newInstance(w, t);
         }catch(InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return new MetaTile(w, t);
     }
 
-    public MetaTile init(ExpiWorld w, ExpiTile t, DataInputStream in) throws IOException {
+    public MetaTile init(World w, Tile t, DataInputStream in) throws IOException {
 
         // just for optimization
         if(metaClazz == MetaTile.class) {
@@ -125,7 +122,7 @@ public enum Material implements Textureable {
         // end of optimization
 
         try {
-            return metaClazz.getConstructor(ExpiWorld.class, ExpiTile.class, DataInputStream.class).newInstance(w, t, in);
+            return metaClazz.getConstructor(World.class, Tile.class, DataInputStream.class).newInstance(w, t, in);
         }catch(InstantiationException | NoSuchMethodException | IllegalAccessException e) {
             return init(w, t);
         }catch(InvocationTargetException e) {

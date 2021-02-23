@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -16,7 +16,7 @@ public class ServerPlayerGateway extends TerminableLooper {
     private ServerPacketManager packetManager;
     private int traffic;
     private long time;
-    private ExpiPlayer owner;
+    private Player owner;
     private final ExpiServer server;
 
     public ServerPlayerGateway(Socket client, ExpiServer server) {
@@ -106,7 +106,7 @@ public class ServerPlayerGateway extends TerminableLooper {
         }catch(IOException ignored) {}
     }
 
-    public void setOwner(ExpiPlayer owner) {
+    public void setOwner(Player owner) {
         this.owner = owner;
         packetManager = new ServerPacketManager(server, owner);
     }

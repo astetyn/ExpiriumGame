@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +15,7 @@ public class ServerGateway extends TerminableLooper {
     private ServerSocket serverSocket;
     private final int port;
     private final List<ServerPlayerGateway> joiningClients;
-    private final List<ExpiPlayer> leavingPlayers;
+    private final List<Player> leavingPlayers;
     private boolean fullyRunning;
     private final ExpiServer server;
 
@@ -72,7 +72,7 @@ public class ServerGateway extends TerminableLooper {
         }
     }
 
-    public void playerPreLeaveAsync(ExpiPlayer p) {
+    public void playerPreLeaveAsync(Player p) {
         synchronized(leavingPlayers) {
             leavingPlayers.add(p);
         }
@@ -81,7 +81,7 @@ public class ServerGateway extends TerminableLooper {
     public void resolveJoiningAndLeavingPlayers() {
 
         synchronized(leavingPlayers) {
-            for(ExpiPlayer p : leavingPlayers) {
+            for(Player p : leavingPlayers) {
                 server.getPlayers().remove(p);
                 p.destroySafe();
                 p.getGateway().stop();
@@ -98,10 +98,10 @@ public class ServerGateway extends TerminableLooper {
                 // here we assume that joining client is verified and thus following reads will not fail
                 PacketInputStream in = gateway.getIn();
                 String name = in.getString();
-                ExpiPlayer p = server.getFileManager().loadPlayer(gateway, name);
+                Player p = server.getFileManager().loadPlayer(gateway, name);
 
                 // initial packet
-                p.getNetManager().putInitDataPacket(server.getWorld().getTerrain(), server.getEntities());
+                p.getNetManager().putInitDataPacket(server.getEntities());
                 p.getGateway().getOut().swap();
                 synchronized(p.getGateway().getJoinLock()) {
                     p.getGateway().getJoinLock().notify();

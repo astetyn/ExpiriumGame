@@ -2,15 +2,16 @@ package com.astetyne.expirium.client.tiles;
 
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
-public class Tile {
+public class ClientTile {
 
     private Material type;
     private byte stability;
     private byte skyLight, localLight;
     private boolean backWall;
 
-    public Tile(Material type, byte stability) {
+    public ClientTile(Material type, byte stability) {
         this.type = type;
         this.stability = stability;
         skyLight = 0;

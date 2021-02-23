@@ -9,14 +9,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Background {
 
-    private final GameWorld world;
+    private final ClientWorld world;
     private final Color orangeSkyC;
     private final Color daySkyC, dayHillsC;
     private final Color nightSkyC, nightHillsC;
     private final int parallaxWidth, parallaxWidth2, parallaxWidth3;
     private final int parallaxHeight;
 
-    public Background(GameWorld world) {
+    public Background(ClientWorld world) {
         this.world = world;
         orangeSkyC = new Color(230 / 255f, 128 / 255f, 64 / 255f, 1);
         daySkyC = new Color(0.6f, 0.8f, 1, 1);

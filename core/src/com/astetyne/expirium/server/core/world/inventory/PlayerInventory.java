@@ -8,7 +8,7 @@ import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
@@ -19,13 +19,13 @@ import java.util.List;
 
 public class PlayerInventory extends Inventory implements WorldSaveable {
 
-    private final ExpiPlayer owner;
+    private final Player owner;
     private ItemStack itemInHand;
     private int indexTools, indexMats, indexCons;
     private ItemStack isTool, isMat, isCon;
     private ChosenSlot chosenSlot;
 
-    public PlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight) {
+    public PlayerInventory(Player owner, int columns, int rows, float maxWeight) {
         super(rows, columns, maxWeight);
         this.owner = owner;
         indexTools = 0;
@@ -39,7 +39,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         label = "Note that game is still in alpha!";
     }
 
-    public PlayerInventory(ExpiPlayer owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {
+    public PlayerInventory(Player owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {
         super(rows, columns, maxWeight, in);
         this.owner = owner;
         indexTools = in.readInt();
@@ -233,7 +233,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
 
         owner.getNetManager().putHotSlotsFeedPacket(chosenSlot, isTool, isMat, isCon);
 
-        for(ExpiPlayer ep : owner.getServer().getPlayers()) {
+        for(Player ep : owner.getServer().getPlayers()) {
             ep.getNetManager().putHandItemPacket(owner.getId(), itemInHand.getItem());
         }
     }

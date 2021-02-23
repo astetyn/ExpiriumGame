@@ -6,12 +6,12 @@ import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public class FriendPlayer extends Player {
+public class FriendClientPlayer extends ClientPlayer {
 
     private final String name;
     private final float nameOffset;
 
-    public FriendPlayer(short id, Vector2 loc, PacketInputStream in) {
+    public FriendClientPlayer(short id, Vector2 loc, PacketInputStream in) {
         super(id, loc);
         name = in.getString();
         nameOffset = Utils.getTextWidth(name, Res.WORLD_FONT) / 2;

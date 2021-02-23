@@ -3,23 +3,22 @@ package com.astetyne.expirium.server.core.world.tile;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.badlogic.gdx.math.Vector2;
 
 public class MetaTile implements WorldSaveable {
 
-    protected final ExpiWorld world;
-    protected final ExpiTile owner;
+    protected final World world;
+    protected final Tile owner;
 
     /** Only this constructor will be called. Do not change parameters in your superclass.*/
-    public MetaTile(ExpiWorld world, ExpiTile owner) {
+    public MetaTile(World world, Tile owner) {
         this.world = world;
         this.owner = owner;
     }
@@ -29,7 +28,7 @@ public class MetaTile implements WorldSaveable {
         return false;
     }
 
-    public void onInteract(ExpiPlayer p, InteractType type) {}
+    public void onInteract(Player p, InteractType type) {}
 
     public void dropItems() {
         if(owner.getMaterial().getDefaultDropItem() == null) return;

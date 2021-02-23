@@ -4,7 +4,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -15,7 +15,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public abstract class LivingEntity extends ExpiEntity implements Collidable {
+public abstract class LivingEntity extends Entity implements Collidable {
 
     private final static byte MAX_FOOD_LEVEL = 100;
 
@@ -133,7 +133,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         alive = false;
         destroy();
         String text = "Kill";
-        for(ExpiPlayer pp : server.getPlayers()) {
+        for(Player pp : server.getPlayers()) {
             pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.RED);
         }
     }
@@ -145,7 +145,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
             die();
         }else {
             String text = "-"+amount;
-            for(ExpiPlayer pp : server.getPlayers()) {
+            for(Player pp : server.getPlayers()) {
                 pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.RED);
             }
         }
@@ -155,7 +155,7 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
         if(healthLevel == maxHealth) return;
         healthLevel = (byte) Math.min(healthLevel + amount, maxHealth);
         String text = "+"+amount;
-        for(ExpiPlayer pp : server.getPlayers()) {
+        for(Player pp : server.getPlayers()) {
             pp.getNetManager().putPlayTextAnim(getCenter().add(0, getHeight()/2), text, ExpiColor.GREEN);
         }
     }
@@ -223,8 +223,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
             lastFallVelocity = Math.min(lastFallVelocity, getVelocity().y);
         }
 
-        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof ExpiPlayer)
-                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof ExpiPlayer))) {
+        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof Player)
+                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof Player))) {
             collisions++;
             onGround = true;
         }
@@ -232,8 +232,8 @@ public abstract class LivingEntity extends ExpiEntity implements Collidable {
 
     @Override
     public void onCollisionEnd(Contact contact) {
-        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof ExpiPlayer)
-                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof ExpiPlayer))) {
+        if(contact.getFixtureA() == groundSensor && !(contact.getFixtureB().getBody().getUserData() instanceof Player)
+                || (contact.getFixtureB() == groundSensor && !(contact.getFixtureA().getBody().getUserData() instanceof Player))) {
             collisions--;
             if(collisions == 0) onGround = false;
         }

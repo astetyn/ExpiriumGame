@@ -2,13 +2,13 @@ package com.astetyne.expirium.server.core.world.tile.meta;
 
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 public class MetaTileLeaves extends MetaTile {
 
-    public MetaTileLeaves(ExpiWorld world, ExpiTile owner) {
+    public MetaTileLeaves(World world, Tile owner) {
         super(world, owner);
         scheduleAfter(this::plantSapling, Consts.SERVER_TPS * (int)(Math.random()*1200+600));
     }

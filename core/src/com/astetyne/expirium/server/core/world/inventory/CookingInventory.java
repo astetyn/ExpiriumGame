@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
@@ -9,19 +9,19 @@ import java.io.IOException;
 
 public class CookingInventory extends Inventory {
 
-    protected final ExpiWorld world;
+    protected final World world;
     protected long startTick;
     protected CookingRecipe recipe;
     private int multiply;
 
-    public CookingInventory(ExpiWorld world, int rows, int columns, float maxWeight) {
+    public CookingInventory(World world, int rows, int columns, float maxWeight) {
         super(rows, columns, maxWeight);
         this.world = world;
         startTick = world.getTick();
         multiply = 0;
     }
 
-    public CookingInventory(ExpiWorld world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
+    public CookingInventory(World world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
         super(rows, columns, maxWeight, in);
         this.world = world;
         startTick = in.readLong();

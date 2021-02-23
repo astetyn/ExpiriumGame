@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class HillsGen extends BiomeGenerator {
 
@@ -19,11 +19,11 @@ public class HillsGen extends BiomeGenerator {
 
             for(int y = 0; y < h; y++) {
                 if(y <= terrainHeight && y > terrainHeight-2) {
-                    terrain[y][x] = Material.RHYOLITE;
+                    terrain[x][y] = Material.RHYOLITE;
                 }else if(y < terrainHeight) {
-                    terrain[y][x] = Material.LIMESTONE;
+                    terrain[x][y] = Material.LIMESTONE;
                 }else {
-                    terrain[y][x] = Material.AIR;
+                    terrain[x][y] = Material.AIR;
                 }
             }
         }

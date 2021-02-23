@@ -2,14 +2,14 @@ package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.entity.animator.EntityAnimator;
 import com.astetyne.expirium.client.screens.GameScreen;
-import com.astetyne.expirium.client.tiles.Tile;
+import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Entity {
+public abstract class ClientEntity {
 
     protected EntityType type;
     protected short id;
@@ -26,7 +26,7 @@ public abstract class Entity {
     private boolean lookingRight;
     private boolean active;
 
-    public Entity(EntityType type, short id, Vector2 loc) {
+    public ClientEntity(EntityType type, short id, Vector2 loc) {
 
         this.type = type;
         this.id = id;
@@ -117,7 +117,7 @@ public abstract class Entity {
         return velocity;
     }
 
-    public Tile getCenterTile() {
+    public ClientTile getCenterTile() {
         Vector2 center = getCenter();
         return GameScreen.get().getWorld().getTileAt(center.x, center.y);
     }

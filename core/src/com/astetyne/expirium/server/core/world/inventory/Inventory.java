@@ -5,7 +5,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 
 import java.io.DataInputStream;
@@ -26,7 +26,7 @@ public class Inventory implements WorldSaveable {
     protected final float maxWeight;
     protected String label;
     protected final int rows, columns;
-    private final HashSet<ExpiPlayer> viewersSinceUpdate;
+    private final HashSet<Player> viewersSinceUpdate;
 
     public Inventory(int rows, int columns, float maxWeight) {
         this.rows = rows;
@@ -284,7 +284,7 @@ public class Inventory implements WorldSaveable {
         totalWeight = Math.round(totalWeight * 100) / 100f;
     }
 
-    public boolean needsUpdate(ExpiPlayer whoAsks) {
+    public boolean needsUpdate(Player whoAsks) {
         return !viewersSinceUpdate.contains(whoAsks);
     }
 
@@ -292,7 +292,7 @@ public class Inventory implements WorldSaveable {
         viewersSinceUpdate.clear();
     }
 
-    public void wasUpdated(ExpiPlayer viewer) {
+    public void wasUpdated(Player viewer) {
         viewersSinceUpdate.add(viewer);
     }
 

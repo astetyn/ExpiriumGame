@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class DesertGen extends BiomeGenerator {
 
@@ -20,19 +20,19 @@ public class DesertGen extends BiomeGenerator {
 
             for(int y = 0; y < h; y++) {
                 if(y <= terrainHeight && y > terrainHeight-10) {
-                    terrain[y][x] = Material.SAND;
+                    terrain[x][y] = Material.SAND;
                 }else if(y < terrainHeight) {
-                    terrain[y][x] = Material.LIMESTONE;
+                    terrain[x][y] = Material.LIMESTONE;
                 }else {
-                    terrain[y][x] = Material.AIR;
+                    terrain[x][y] = Material.AIR;
                 }
             }
 
             if(x != from) {
                 if(terrainHeight < surface[x - 1]) {
-                    terrain[surface[x - 1]][x-1] = Material.SAND_SLOPE_LEFT;
+                    terrain[x-1][surface[x - 1]] = Material.SAND_SLOPE_LEFT;
                 }else if(terrainHeight > surface[x - 1]) {
-                    terrain[terrainHeight][x] = Material.SAND_SLOPE_RIGHT;
+                    terrain[x][terrainHeight] = Material.SAND_SLOPE_RIGHT;
                 }
             }
         }
@@ -54,7 +54,7 @@ public class DesertGen extends BiomeGenerator {
 
             int y = surface[x] + 1;
 
-            if(terrain[y-1][x].getSolidity().isLabile() || last + 10 > x || Math.random() < 0.8) continue;
+            if(terrain[x][y-1].getSolidity().isLabile() || last + 10 > x || Math.random() < 0.8) continue;
 
             last = x;
 
@@ -64,14 +64,14 @@ public class DesertGen extends BiomeGenerator {
                 double rand = Math.random();
 
                 if(rand < 0.33) {
-                    terrain[y + i][x] = Material.CACTUS_DOUBLE;
+                    terrain[x][y + i] = Material.CACTUS_DOUBLE;
                 }else if(rand < 0.66) {
-                    terrain[y + i][x] = Material.CACTUS_LEFT;
+                    terrain[x][y + i] = Material.CACTUS_LEFT;
                 }else {
-                    terrain[y + i][x] = Material.CACTUS_RIGHT;
+                    terrain[x][y + i] = Material.CACTUS_RIGHT;
                 }
             }
-            terrain[y+cactusHeight-1][x] = Material.CACTUS_TOP;
+            terrain[x][y+cactusHeight-1] = Material.CACTUS_TOP;
         }
     }
 }

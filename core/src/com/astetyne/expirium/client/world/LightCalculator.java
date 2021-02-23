@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.world;
 
-import com.astetyne.expirium.client.tiles.Tile;
+import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 
@@ -9,12 +9,12 @@ import java.util.HashSet;
 
 public class LightCalculator {
 
-    private final Tile[][] terrain;
+    private final ClientTile[][] terrain;
     private final int w, h;
-    private final HashMap<Tile, LightSource> lightSources;
+    private final HashMap<ClientTile, LightSource> lightSources;
     private final HashSet<LightSource> invalidedSources;
 
-    public LightCalculator(Tile[][] terrain) {
+    public LightCalculator(ClientTile[][] terrain) {
         this.terrain = terrain;
         w = terrain.length;
         h = terrain[0].length;
@@ -26,7 +26,7 @@ public class LightCalculator {
 
         for(int x = 0; x < w; x++) {
             for(int y = 0; y < h; y++) {
-                Tile t = terrain[x][y];
+                ClientTile t = terrain[x][y];
                 registerLightSource(t, x, y);
             }
         }
@@ -46,7 +46,7 @@ public class LightCalculator {
         // direct sun
         int firstNotDirect = -1;
         for(int i = h - 1; i >= 0; i--) {
-            Tile t = terrain[c][i];
+            ClientTile t = terrain[c][i];
             t.setSkyLight(Consts.MAX_LIGHT_LEVEL);
             if(!t.getMaterial().isTransparent()) {
                 firstNotDirect = i-1;
@@ -56,46 +56,46 @@ public class LightCalculator {
 
         // tiles under
         for(int i = firstNotDirect; i >= 0; i--) {
-            Tile t = terrain[c][i];
+            ClientTile t = terrain[c][i];
             t.setSkyLight((byte) (Math.max(Consts.MAX_LIGHT_LEVEL - (firstNotDirect - i + 1) * Consts.SKY_LIGHT_DECREASE, 0)));
         }
     }
 
     private void recalcSkyLightSoftColumn(int c) {
         for(int i = h - 1; i >= 0; i--) {
-            Tile t = terrain[c][i];
+            ClientTile t = terrain[c][i];
             if(t.getSkyLight() == 0) continue;
             spreadSkyLightFrom(t, c, i);
         }
     }
 
-    private void spreadSkyLightFrom(Tile t, int x, int y) {
+    private void spreadSkyLightFrom(ClientTile t, int x, int y) {
 
         int newLight = t.getSkyLight()-Consts.SKY_LIGHT_DECREASE;
 
         if(x != 0) { // left
-            Tile t2 = terrain[x-1][y];
+            ClientTile t2 = terrain[x-1][y];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
                 spreadSkyLightFrom(t2, x-1, y);
             }
         }
         if(x != w-1) { // right
-            Tile t2 = terrain[x+1][y];
+            ClientTile t2 = terrain[x+1][y];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
                 spreadSkyLightFrom(t2, x+1, y);
             }
         }
         if(y != h-1) { // top
-            Tile t2 = terrain[x][y+1];
+            ClientTile t2 = terrain[x][y+1];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
                 spreadSkyLightFrom(t2, x, y+1);
             }
         }
         if(y != 0) { // bottom
-            Tile t2 = terrain[x][y-1];
+            ClientTile t2 = terrain[x][y-1];
             if(t2.getSkyLight() < newLight) {
                 t2.setSkyLight((byte) newLight);
                 spreadSkyLightFrom(t2, x, y-1);
@@ -105,33 +105,33 @@ public class LightCalculator {
 
     private void calcTileLocalLights(int x, int y) {
 
-        Tile t = terrain[x][y];
+        ClientTile t = terrain[x][y];
 
         int newLight = t.getLocalLight()-1;
 
         if(x != 0) { // left
-            Tile t2 = terrain[x-1][y];
+            ClientTile t2 = terrain[x-1][y];
             if(t2.getLocalLight() < newLight) {
                 t2.setLocalLight((byte) newLight);
                 calcTileLocalLights(x-1, y);
             }
         }
         if(x != w-1) { // right
-            Tile t2 = terrain[x+1][y];
+            ClientTile t2 = terrain[x+1][y];
             if(t2.getLocalLight() < newLight) {
                 t2.setLocalLight((byte) newLight);
                 calcTileLocalLights(x+1, y);
             }
         }
         if(y != h-1) { // top
-            Tile t2 = terrain[x][y+1];
+            ClientTile t2 = terrain[x][y+1];
             if(t2.getLocalLight() < newLight) {
                 t2.setLocalLight((byte) newLight);
                 calcTileLocalLights(x, y+1);
             }
         }
         if(y != 0) { // bottom
-            Tile t2 = terrain[x][y-1];
+            ClientTile t2 = terrain[x][y-1];
             if(t2.getLocalLight() < newLight) {
                 t2.setLocalLight((byte) newLight);
                 calcTileLocalLights(x, y-1);
@@ -141,7 +141,7 @@ public class LightCalculator {
 
     public void onTileChange(int x, int y) {
 
-        Tile t = terrain[x][y];
+        ClientTile t = terrain[x][y];
 
         int left = Math.max(x - Consts.MAX_LIGHT_LEVEL / Consts.SKY_LIGHT_DECREASE, 0);
         int right = Math.min(x + Consts.MAX_LIGHT_LEVEL / Consts.SKY_LIGHT_DECREASE, w-1);
@@ -202,7 +202,7 @@ public class LightCalculator {
 
     }
 
-    private void registerLightSource(Tile t, int x, int y) {
+    private void registerLightSource(ClientTile t, int x, int y) {
         byte light = t.getMaterial().getLight();
         if(light == 0) return;
         lightSources.put(t, new LightSource(light, new IntVector2(x, y)));

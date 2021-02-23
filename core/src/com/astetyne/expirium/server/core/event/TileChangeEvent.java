@@ -1,18 +1,18 @@
 package com.astetyne.expirium.server.core.event;
 
-import com.astetyne.expirium.client.tiles.Material;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 public class TileChangeEvent implements Cancellable {
 
-    private final ExpiTile tile;
+    private final Tile tile;
     private final Material fromMat;
     private final MetaTile fromMeta;
     private final Source source;
     private boolean cancelled;
 
-    public TileChangeEvent(ExpiTile tile, MetaTile fromMeta, Material fromMat, Source source) {
+    public TileChangeEvent(Tile tile, MetaTile fromMeta, Material fromMat, Source source) {
         this.tile = tile;
         this.fromMat = fromMat;
         this.fromMeta = fromMeta;
@@ -20,7 +20,7 @@ public class TileChangeEvent implements Cancellable {
         cancelled = false;
     }
 
-    public ExpiTile getTile() {
+    public Tile getTile() {
         return tile;
     }
 

@@ -3,7 +3,7 @@ package com.astetyne.expirium.client.world.input;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.client.world.GameWorld;
+import com.astetyne.expirium.client.world.ClientWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,11 +14,11 @@ import com.badlogic.gdx.math.Vector3;
 public class WorldInputListener extends InputAdapter implements GestureDetector.GestureListener {
 
     private final GestureDetector detector;
-    private final GameWorld world;
+    private final ClientWorld world;
     private boolean pressed;
     private float savedZoom;
 
-    public WorldInputListener(GameWorld world) {
+    public WorldInputListener(ClientWorld world) {
         this.world = world;
         pressed = false;
         detector = new GestureDetector(this);

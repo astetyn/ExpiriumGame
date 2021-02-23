@@ -7,7 +7,7 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.Entity;
 import com.astetyne.expirium.server.core.entity.LivingEntity;
 import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 
-public class ExpiPlayer extends LivingEntity {
+public class Player extends LivingEntity {
 
     private final ServerPlayerGateway gateway;
     private final String name;
@@ -37,9 +37,9 @@ public class ExpiPlayer extends LivingEntity {
     private boolean wasAlreadyDead;
     private long lastDeathDay;
     private final WorldLoader worldLoader;
-    private final HashSet<ExpiEntity> nearActiveEntities;
+    private final HashSet<Entity> nearActiveEntities;
 
-    public ExpiPlayer(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
+    public Player(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location, 100);
         this.gateway = gateway;
         gateway.setOwner(this);
@@ -59,7 +59,7 @@ public class ExpiPlayer extends LivingEntity {
         server.getPlayers().add(this);
     }
 
-    public ExpiPlayer(ExpiServer server, ServerPlayerGateway gateway, String name, DataInputStream in) throws IOException {
+    public Player(ExpiServer server, ServerPlayerGateway gateway, String name, DataInputStream in) throws IOException {
         super(server, EntityType.PLAYER, 100, in);
         this.gateway = gateway;
         gateway.setOwner(this);
@@ -187,6 +187,8 @@ public class ExpiPlayer extends LivingEntity {
             toolManager = new CombatToolManager(server, this);
         }
         toolManager.onTick(tsData2);
+
+        System.out.println(getLocation());
     }
 
     @Override
@@ -206,7 +208,7 @@ public class ExpiPlayer extends LivingEntity {
 
     public void recalcNearEntities() {
         nearActiveEntities.clear();
-        for(ExpiEntity ee : server.getEntities()) {
+        for(Entity ee : server.getEntities()) {
             if(ee == this) continue;
             if(ee.getCenter().dst(getCenter()) <= Consts.ACTIVE_ENTITIES_RADIUS) nearActiveEntities.add(ee);
         }
@@ -288,7 +290,7 @@ public class ExpiPlayer extends LivingEntity {
         return getCenter().dst(x, y) <= Consts.INTERACT_RADIUS;
     }
 
-    public HashSet<ExpiEntity> getNearActiveEntities() {
+    public HashSet<Entity> getNearActiveEntities() {
         return nearActiveEntities;
     }
 

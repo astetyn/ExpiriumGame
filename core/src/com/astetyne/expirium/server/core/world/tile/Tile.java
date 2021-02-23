@@ -1,11 +1,10 @@
 package com.astetyne.expirium.server.core.world.tile;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.core.WorldSaveable;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
@@ -14,9 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpiTile implements WorldSaveable {
+public class Tile implements WorldSaveable {
 
-    private final ExpiWorld world;
+    private final World world;
     private Material material;
     private MetaTile metaTile;
     private final List<Fixture> fixtures;
@@ -25,7 +24,7 @@ public class ExpiTile implements WorldSaveable {
     private boolean backWall;
     private final IntVector2 tempLoc;
 
-    public ExpiTile(ExpiWorld world, int x, int y, DataInputStream in, boolean createMeta) throws IOException {
+    public Tile(World world, int x, int y, DataInputStream in, boolean createMeta) throws IOException {
         this.world = world;
         material = Material.getMaterial(in.readInt());
         if(createMeta) {
@@ -54,7 +53,7 @@ public class ExpiTile implements WorldSaveable {
         }
     }
 
-    public void onInteract(ExpiPlayer p, InteractType type) {
+    public void onInteract(Player p, InteractType type) {
         metaTile.onInteract(p, type);
     }
 

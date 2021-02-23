@@ -1,19 +1,19 @@
 package com.astetyne.expirium.client.world;
 
 import com.astetyne.expirium.client.animation.WorldAnimationManager;
-import com.astetyne.expirium.client.entity.Entity;
+import com.astetyne.expirium.client.entity.ClientEntity;
 import com.astetyne.expirium.client.entity.EntityType;
-import com.astetyne.expirium.client.entity.MainPlayer;
+import com.astetyne.expirium.client.entity.MainClientPlayer;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.BreakingTile;
-import com.astetyne.expirium.client.tiles.Material;
-import com.astetyne.expirium.client.tiles.Tile;
+import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.WorldInputListener;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GameWorld {
+public class ClientWorld {
 
     public static float PPM = 32; // pixel per meter when zoom == 1
 
-    private Tile[][] terrain;
-    private final HashMap<Short, Entity> entitiesID;
-    private final List<Entity> entities;
-    private MainPlayer player;
+    private ClientTile[][] terrain;
+    private final HashMap<Short, ClientEntity> entitiesID;
+    private final List<ClientEntity> entities;
+    private MainClientPlayer player;
     private final OrthographicCamera camera;
     private int terrainWidth, terrainHeight;
     private LightCalculator lightCalculator;
@@ -58,7 +58,7 @@ public class GameWorld {
             new Color(0.2f, 0.4f, 1f, 1),
             };
 
-    public GameWorld() {
+    public ClientWorld() {
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
@@ -79,11 +79,11 @@ public class GameWorld {
         terrainWidth = in.getInt();
         terrainHeight = in.getInt();
 
-        terrain = new Tile[terrainWidth][terrainHeight];
+        terrain = new ClientTile[terrainWidth][terrainHeight];
 
         for(int i = 0; i < terrainWidth; i++) {
             for(int j = 0; j < terrainHeight; j++) {
-                terrain[i][j] = new Tile(Material.AIR, (byte)0);
+                terrain[i][j] = new ClientTile(Material.AIR, (byte)0);
             }
         }
 
@@ -91,7 +91,7 @@ public class GameWorld {
 
         short pID = in.getShort();
         Vector2 loc = in.getVector();
-        player = new MainPlayer(pID, loc);
+        player = new MainClientPlayer(pID, loc);
 
         int size = in.getInt();
         for(int i = 0; i < size; i++) {
@@ -101,7 +101,7 @@ public class GameWorld {
     }
 
     public void update() {
-        for(Entity e : entities) {
+        for(ClientEntity e : entities) {
             if(e.isActive()) e.update();
         }
         cameraCenter();
@@ -122,7 +122,7 @@ public class GameWorld {
 
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
-                Tile t = terrain[i][j];
+                ClientTile t = terrain[i][j];
 
                 if(t.hasBackWall()) {
                     float b = 1f / Consts.MAX_LIGHT_LEVEL * t.getLight();
@@ -157,7 +157,7 @@ public class GameWorld {
         }
 
         // entities + player
-        for(Entity e : entities) {
+        for(ClientEntity e : entities) {
             if(!e.isActive()) continue;
             // this is for entities from entities.atlas
             if(e.getType() != EntityType.DROPPED_ITEM) {
@@ -167,7 +167,7 @@ public class GameWorld {
             }
         }
 
-        for(Entity e : entities) {
+        for(ClientEntity e : entities) {
             if(!e.isActive()) continue;
             // this is for dropped items from gui.atlas
             if(e.getType() == EntityType.DROPPED_ITEM) {
@@ -182,30 +182,26 @@ public class GameWorld {
 
     public void onServerTick() {
         breakingTiles.clear();
-        for(Entity e : entities) {
+        for(ClientEntity e : entities) {
             e.setActive(false);
         }
     }
 
     public void onFeedWorldEvent(PacketInputStream in) {
 
-        int partHeight = in.getInt();
-        int partNumber = in.getInt();
+        int layer = in.getInt();
 
-        int yOff = partNumber * partHeight;
         for(int i = 0; i < terrainWidth; i++) {
-            for(int j = yOff; j < yOff + partHeight; j++) {
-                Tile t = terrain[i][j];
-                Material type = Material.getMaterial(in.getByte());
-                byte stability = in.getByte();
-                boolean backWall = in.getBoolean();
-                t.setMaterial(type);
-                t.setStability(stability);
-                t.setBackWall(backWall);
-            }
+            ClientTile t = terrain[i][layer];
+            Material type = Material.getMaterial(in.getByte());
+            byte stability = in.getByte();
+            boolean backWall = in.getBoolean();
+            t.setMaterial(type);
+            t.setStability(stability);
+            t.setBackWall(backWall);
         }
 
-        if(yOff + partHeight == terrainHeight) {
+        if(layer == terrainHeight-1) {
             lightCalculator.recalcAllTiles();
         }
     }
@@ -216,7 +212,7 @@ public class GameWorld {
         int x = in.getInt();
         int y = in.getInt();
 
-        Tile t = terrain[x][y];
+        ClientTile t = terrain[x][y];
 
         t.setMaterial(type);
 
@@ -267,15 +263,15 @@ public class GameWorld {
         return camera;
     }
 
-    public HashMap<Short, Entity> getEntitiesID() {
+    public HashMap<Short, ClientEntity> getEntitiesID() {
         return entitiesID;
     }
 
-    public MainPlayer getPlayer() {
+    public MainClientPlayer getPlayer() {
         return player;
     }
 
-    public List<Entity> getEntities() {
+    public List<ClientEntity> getEntities() {
         return entities;
     }
 
@@ -287,7 +283,7 @@ public class GameWorld {
         return terrainHeight;
     }
 
-    public Tile getTileAt(float x, float y) {
+    public ClientTile getTileAt(float x, float y) {
         if(x < 0) x = 0;
         if(y < 0) y = 0;
         if(x >= terrainWidth) x = terrainWidth-1;

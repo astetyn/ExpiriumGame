@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.Entity;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;
@@ -80,7 +80,7 @@ public class PacketOutputStream {
         putInt(vec.y);
     }
 
-    public void putEntity(ExpiEntity e) {
+    public void putEntity(Entity e) {
         putInt(e.getType().getID());
         putShort(e.getId());
         putFloat(e.getLocation().x);

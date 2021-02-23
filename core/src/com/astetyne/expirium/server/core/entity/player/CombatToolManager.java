@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.entity.player;
 import com.astetyne.expirium.client.data.ThumbStickData;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.ExpiEntity;
+import com.astetyne.expirium.server.core.entity.Entity;
 import com.astetyne.expirium.server.core.entity.LivingEntity;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,7 +15,7 @@ public class CombatToolManager extends ToolManager {
     private long lastHitTime;
     private final Vector2 tempVec, incrementDist;
 
-    public CombatToolManager(ExpiServer server, ExpiPlayer owner) {
+    public CombatToolManager(ExpiServer server, Player owner) {
         super(server, owner);
         lastHitTime = 0;
         tempVec = new Vector2();
@@ -34,10 +34,10 @@ public class CombatToolManager extends ToolManager {
 
         incrementDist.set(horz, vert).scl(3f / Consts.COMBAT_PRECISION); // 3 tiles range
 
-        List<ExpiEntity> copy = new ArrayList<>(server.getEntities());
+        List<Entity> copy = new ArrayList<>(server.getEntities());
 
         outer:
-        for(ExpiEntity ee : copy) {
+        for(Entity ee : copy) {
             if(ee == owner || !(ee instanceof LivingEntity)) continue;
             tempVec.set(owner.getCenter());
 
@@ -53,7 +53,7 @@ public class CombatToolManager extends ToolManager {
                 if(cX == eX && eY == cY) {
                     int damage = owner.getInv().getItemInHand().getItem().getWeaponDamage();
                     world.hitEntity(owner, (LivingEntity) ee, damage);
-                    for(ExpiPlayer ep : server.getPlayers()) {
+                    for(Player ep : server.getPlayers()) {
                         ep.getNetManager().putHandPunchPacket(owner);
                     }
                     lastHitTime = System.currentTimeMillis();

@@ -3,7 +3,7 @@ package com.astetyne.expirium.server.core.world.file;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.Gdx;
@@ -111,35 +111,35 @@ public class WorldFileManager {
         server.writeData(wb);
         saveAsync(wb);
 
-        for(ExpiPlayer p : server.getPlayers()) {
+        for(Player p : server.getPlayers()) {
             savePlayer(p);
         }
 
     }
 
-    public ExpiPlayer loadPlayer(ServerPlayerGateway gateway, String name) {
+    public Player loadPlayer(ServerPlayerGateway gateway, String name) {
         FileHandle file = Gdx.files.local(path+playersPath+name);
 
         if(!file.exists())
-            return (ExpiPlayer) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
+            return (Player) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
 
         DataInputStream in = new DataInputStream(new BufferedInputStream(file.read()));
         try {
-            ExpiPlayer ep = new ExpiPlayer(server, gateway, name, in);
+            Player ep = new Player(server, gateway, name, in);
             in.close();
             ep.createBodyFixtures();
-            for(ExpiPlayer ep2 : server.getPlayers()) {
+            for(Player ep2 : server.getPlayers()) {
                 if(ep == ep2) continue;
                 ep2.getNetManager().putEntitySpawnPacket(ep);
             }
             return ep;
         }catch(IOException e) {
             e.printStackTrace();
-            return (ExpiPlayer) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
+            return (Player) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
         }
     }
 
-    public void savePlayer(ExpiPlayer p) {
+    public void savePlayer(Player p) {
         try {
 
             WorldBuffer wb = new WorldBuffer(4096);

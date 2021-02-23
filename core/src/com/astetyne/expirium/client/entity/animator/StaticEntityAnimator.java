@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.entity.animator;
 
-import com.astetyne.expirium.client.entity.Entity;
+import com.astetyne.expirium.client.entity.ClientEntity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -9,7 +9,7 @@ public class StaticEntityAnimator extends EntityAnimator {
 
     private final TextureRegion texture;
 
-    public StaticEntityAnimator(Entity entity, TextureRegion texture) {
+    public StaticEntityAnimator(ClientEntity entity, TextureRegion texture) {
         super(entity);
         this.texture = texture;
     }

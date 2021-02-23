@@ -1,10 +1,10 @@
 package com.astetyne.expirium.server.core.world.generator;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.generator.biome.BiomeGenerator;
 import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class WorldGenerator {
 
@@ -18,7 +18,7 @@ public class WorldGenerator {
         w = width;
         h = height;
         this.seed = seed;
-        terrain = new Material[h][w];
+        terrain = new Material[w][h];
         surface = new int[w];
         biomes = new BiomeType[w/ Consts.BIOME_LEN];
     }
@@ -71,9 +71,9 @@ public class WorldGenerator {
     }
 
     public void writeData(WorldBuffer wb) {
-        for(int y = 0; y < h; y++) {
-            for(int x = 0; x < w; x++) {
-                wb.writeMaterial(terrain[y][x]);
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                wb.writeMaterial(terrain[x][y]);
                 wb.writeBoolean(false); // backwall
             }
         }

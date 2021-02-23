@@ -1,14 +1,14 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.event.Source;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,12 +19,12 @@ public class MetaTileTreePlant extends MetaTile {
 
     private long growTick;
 
-    public MetaTileTreePlant(ExpiWorld world, ExpiTile owner) {
+    public MetaTileTreePlant(World world, Tile owner) {
         super(world, owner);
         growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
     }
 
-    public MetaTileTreePlant(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
+    public MetaTileTreePlant(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
         growTick = in.readLong();
         schedule(this::grow, growTick);
@@ -60,11 +60,11 @@ public class MetaTileTreePlant extends MetaTile {
 
         int treeHeight = Math.min((int) (Math.random() * 5) + 5, y + world.getTerrainHeight()-1);
 
-        ExpiTile[][] terrain = world.getTerrain();
+        Tile[][] terrain = world.getTerrain();
 
         // air check
         for(int i = 1; i < Math.min(3, treeHeight); i++) {
-            if(terrain[y + i][x].getMaterial() != Material.AIR) return false;
+            if(terrain[x][y + i].getMaterial() != Material.AIR) return false;
         }
 
         double[] randomVals = new double[treeHeight-3];
@@ -73,35 +73,35 @@ public class MetaTileTreePlant extends MetaTile {
             double rand = Math.random();
             randomVals[i-3] = rand;
             if(rand < 0.6) {
-                if(terrain[y + i][x].getMaterial() != Material.AIR) return false;
+                if(terrain[x][y + i].getMaterial() != Material.AIR) return false;
             }else if(rand < 0.8) {
-                if(terrain[y + i][x].getMaterial() != Material.AIR
-                        || terrain[y + i][x+1].getMaterial() != Material.AIR) return false;
+                if(terrain[x][y + i].getMaterial() != Material.AIR
+                        || terrain[x+1][y + i].getMaterial() != Material.AIR) return false;
             }else {
-                if(terrain[y + i][x].getMaterial() != Material.AIR
-                        || terrain[y + i][x-1].getMaterial() != Material.AIR) return false;
+                if(terrain[x][y + i].getMaterial() != Material.AIR
+                        || terrain[x-1][y + i].getMaterial() != Material.AIR) return false;
             }
         }
-        if(terrain[y + treeHeight][x].getMaterial() != Material.AIR) return false;
+        if(terrain[x][y + treeHeight].getMaterial() != Material.AIR) return false;
 
         // confirmed
         for(int i = 0; i < Math.min(3, treeHeight); i++) {
-            world.changeMaterial(terrain[y + i][x], Material.LOG_SHOREA, false, Source.NATURAL);
+            world.changeMaterial(terrain[x][y + i], Material.LOG_SHOREA, false, Source.NATURAL);
         }
 
         for(int i = 3; i < treeHeight; i++) {
             double rand = randomVals[i-3];
             if(rand < 0.6) {
-                world.changeMaterial(terrain[y + i][x], Material.LOG_SHOREA, false, Source.NATURAL);
+                world.changeMaterial(terrain[x][y + i], Material.LOG_SHOREA, false, Source.NATURAL);
             }else if(rand < 0.8) {
-                world.changeMaterial(terrain[y + i][x], Material.LOG_SHOREA_RIGHT, false, Source.NATURAL);
-                world.changeMaterial(terrain[y + i][x + 1], Material.LEAVES_SHOREA_RIGHT, false, Source.NATURAL);
+                world.changeMaterial(terrain[x][y + i], Material.LOG_SHOREA_RIGHT, false, Source.NATURAL);
+                world.changeMaterial(terrain[x+1][y + i], Material.LEAVES_SHOREA_RIGHT, false, Source.NATURAL);
             }else {
-                world.changeMaterial(terrain[y + i][x], Material.LOG_SHOREA_LEFT, false, Source.NATURAL);
-                world.changeMaterial(terrain[y + i][x - 1], Material.LEAVES_SHOREA_LEFT, false, Source.NATURAL);
+                world.changeMaterial(terrain[x][y + i], Material.LOG_SHOREA_LEFT, false, Source.NATURAL);
+                world.changeMaterial(terrain[x-1][y + i], Material.LEAVES_SHOREA_LEFT, false, Source.NATURAL);
             }
         }
-        world.changeMaterial(terrain[y + treeHeight][x], Material.LEAVES_SHOREA_TOP, false, Source.NATURAL);
+        world.changeMaterial(terrain[x][y + treeHeight], Material.LEAVES_SHOREA_TOP, false, Source.NATURAL);
         return true;
     }
 
@@ -112,29 +112,29 @@ public class MetaTileTreePlant extends MetaTile {
 
         if(x == 0 || x == world.getTerrainWidth()-1) return false;
 
-        ExpiTile[][] terrain = world.getTerrain();
+        Tile[][] terrain = world.getTerrain();
 
         int treeHeight = (int) (Math.random() * 5) + 5;
 
         if(y + treeHeight >= world.getTerrainHeight()-1) return false;
 
         for(int i = 1; i < treeHeight; i++) {
-            if(terrain[y + i][x].getMaterial() != Material.AIR) return false;
-            if(terrain[y + i][x+1].getMaterial() != Material.AIR) return false;
-            if(terrain[y + i][x-1].getMaterial() != Material.AIR) return false;
+            if(terrain[x][y + i].getMaterial() != Material.AIR) return false;
+            if(terrain[x+1][y + i].getMaterial() != Material.AIR) return false;
+            if(terrain[x-1][y + i].getMaterial() != Material.AIR) return false;
         }
-        if(terrain[y + treeHeight][x].getMaterial() != Material.AIR) return false;
+        if(terrain[x][y + treeHeight].getMaterial() != Material.AIR) return false;
 
         // confirmed
 
-        world.changeMaterial(terrain[y][x], Material.LOG_FIR, false, Source.NATURAL);
+        world.changeMaterial(terrain[x][y], Material.LOG_FIR, false, Source.NATURAL);
 
         for(int i = 1; i < treeHeight; i++) {
-            world.changeMaterial(terrain[y + i][x], Material.LEAVES_FIR_FULL, false, Source.NATURAL);
-            world.changeMaterial(terrain[y + i][x+1], Material.LEAVES_FIR_RIGHT, false, Source.NATURAL);
-            world.changeMaterial(terrain[y + i][x-1], Material.LEAVES_FIR_LEFT, false, Source.NATURAL);
+            world.changeMaterial(terrain[x][y + i], Material.LEAVES_FIR_FULL, false, Source.NATURAL);
+            world.changeMaterial(terrain[x+1][y + i], Material.LEAVES_FIR_RIGHT, false, Source.NATURAL);
+            world.changeMaterial(terrain[x-1][y + i], Material.LEAVES_FIR_LEFT, false, Source.NATURAL);
         }
-        world.changeMaterial(terrain[y + treeHeight][x], Material.LEAVES_FIR_TOP, false, Source.NATURAL);
+        world.changeMaterial(terrain[x][y + treeHeight], Material.LEAVES_FIR_TOP, false, Source.NATURAL);
 
         return true;
     }

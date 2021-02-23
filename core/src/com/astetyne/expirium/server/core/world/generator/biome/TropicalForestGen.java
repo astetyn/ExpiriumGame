@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.server.core.world.generator.Noise;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class TropicalForestGen extends BiomeGenerator {
 
@@ -20,21 +20,21 @@ public class TropicalForestGen extends BiomeGenerator {
 
             for(int y = 0; y < h; y++) {
                 if(y == terrainHeight) {
-                    terrain[y][x] = Material.GRASS;
+                    terrain[x][y] = Material.GRASS;
                 }else if(y < terrainHeight && y > terrainHeight-10) {
-                    terrain[y][x] = Material.DIRT;
+                    terrain[x][y] = Material.DIRT;
                 }else if(y < terrainHeight) {
-                    terrain[y][x] = Material.LIMESTONE;
+                    terrain[x][y] = Material.LIMESTONE;
                 }else {
-                    terrain[y][x] = Material.AIR;
+                    terrain[x][y] = Material.AIR;
                 }
             }
 
             if(x != from) {
                 if(terrainHeight < surface[x - 1]) {
-                    terrain[surface[x - 1]][x-1] = Material.GRASS_SLOPE_L;
+                    terrain[x-1][surface[x - 1]] = Material.GRASS_SLOPE_L;
                 }else if(terrainHeight > surface[x - 1]) {
-                    terrain[terrainHeight][x] = Material.GRASS_SLOPE_R;
+                    terrain[x][terrainHeight] = Material.GRASS_SLOPE_R;
                 }
             }
         }
@@ -56,7 +56,7 @@ public class TropicalForestGen extends BiomeGenerator {
 
             int y = surface[x] + 1;
 
-            if(terrain[y-1][x].getSolidity().isLabile() || last + 3 >= x || Math.random() > 0.5) continue;
+            if(terrain[x][y-1].getSolidity().isLabile() || last + 3 >= x || Math.random() > 0.5) continue;
 
             int treeHeight = (int) (Math.random() * 5) + 5;
 
@@ -66,7 +66,7 @@ public class TropicalForestGen extends BiomeGenerator {
 
             // 3 tiles tall trunk fixed
             for(int i = 0; i < 3; i++) {
-                terrain[y + i][x] = Material.LOG_SHOREA;
+                terrain[x][y + i] = Material.LOG_SHOREA;
             }
 
             // trunk random
@@ -75,16 +75,16 @@ public class TropicalForestGen extends BiomeGenerator {
                 double rand = Math.random();
 
                 if(rand < 0.6) {
-                    terrain[y + i][x] = Material.LOG_SHOREA;
+                    terrain[x][y + i] = Material.LOG_SHOREA;
                 }else if(rand < 0.8) {
-                    terrain[y + i][x] = Material.LOG_SHOREA_RIGHT;
-                    if(x != w - 1) terrain[y + i][x + 1] = Material.LEAVES_SHOREA_RIGHT;
+                    terrain[x][y + i] = Material.LOG_SHOREA_RIGHT;
+                    if(x != w - 1) terrain[x + 1][y + i] = Material.LEAVES_SHOREA_RIGHT;
                 }else {
-                    terrain[y + i][x] = Material.LOG_SHOREA_LEFT;
-                    terrain[y + i][x - 1] = Material.LEAVES_SHOREA_LEFT;
+                    terrain[x][y + i] = Material.LOG_SHOREA_LEFT;
+                    terrain[x - 1][y + i] = Material.LEAVES_SHOREA_LEFT;
                 }
             }
-            terrain[y + treeHeight][x] = Material.LEAVES_SHOREA_TOP;
+            terrain[x][y + treeHeight] = Material.LEAVES_SHOREA_TOP;
         }
     }
 }

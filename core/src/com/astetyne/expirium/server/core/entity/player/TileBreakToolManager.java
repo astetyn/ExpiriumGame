@@ -1,21 +1,21 @@
 package com.astetyne.expirium.server.core.entity.player;
 
 import com.astetyne.expirium.client.data.ThumbStickData;
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.event.Source;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 import com.badlogic.gdx.math.Vector2;
 
 public class TileBreakToolManager extends ToolManager {
 
-    private ExpiTile targetTile;
+    private Tile targetTile;
     private float timeAccumulator;
     private final Vector2 tempVec, incrementDist;
     private long lastPunchTime;
 
-    public TileBreakToolManager(ExpiServer server, ExpiPlayer owner) {
+    public TileBreakToolManager(ExpiServer server, Player owner) {
         super(server, owner);
         targetTile = null;
         timeAccumulator = 0;
@@ -45,7 +45,7 @@ public class TileBreakToolManager extends ToolManager {
                 cancelBreaking();
                 break;
             }
-            ExpiTile checkTile = world.getTileAt(tempVec);
+            Tile checkTile = world.getTileAt(tempVec);
 
             if(checkTile.getMaterial() == Material.AIR || checkTile.getY() == 0) {
                 tempVec.add(incrementDist);
@@ -74,12 +74,12 @@ public class TileBreakToolManager extends ToolManager {
             cancelBreaking();
         }else {
             // breaking in action
-            for(ExpiPlayer ep : server.getPlayers()) {
+            for(Player ep : server.getPlayers()) {
                 ep.getNetManager().putBreakingTilePacket(targetTile, timeAccumulator / targetTile.getMaterial().getBreakTime());
             }
             if(lastPunchTime + 200 < System.currentTimeMillis()) { // cca 450 is full animation (200 is half)
                 lastPunchTime = System.currentTimeMillis();
-                for(ExpiPlayer ep : server.getPlayers()) {
+                for(Player ep : server.getPlayers()) {
                     ep.getNetManager().putHandPunchPacket(owner);
                 }
             }

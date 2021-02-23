@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server;
 
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 
 public class TickLooper extends TerminableLooper {
 
@@ -26,7 +26,7 @@ public class TickLooper extends TerminableLooper {
 
             server.getServerGateway().resolveJoiningAndLeavingPlayers();
 
-            for(ExpiPlayer ep : server.getPlayers()) {
+            for(Player ep : server.getPlayers()) {
                 ep.getNetManager().processIncomingPackets();
             }
 

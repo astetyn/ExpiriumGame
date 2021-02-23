@@ -1,7 +1,7 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.IntVector2;
+import com.astetyne.expirium.server.core.world.tile.Material;
 
 public abstract class BiomeGenerator {
 
@@ -44,10 +44,10 @@ public abstract class BiomeGenerator {
         for(int x = from; x < to; x++) {
             int y = surface[x] + 1;
 
-            if(terrain[y - 1][x].getSolidity().isLabile() || terrain[y][x] != Material.AIR ||
+            if(terrain[x][y - 1].getSolidity().isLabile() || terrain[x][y] != Material.AIR ||
                     Math.random() > chance || last + minGap > x) continue;
 
-            terrain[y][x] = mat;
+            terrain[x][y] = mat;
             last = x;
         }
     }
@@ -58,16 +58,16 @@ public abstract class BiomeGenerator {
         int width2 = width1 + (int)(Math.random() * 4);
         if(locMid.x - width1/2 < 0 || locMid.x - width2/2 < 0 || locMid.x + width1/2 >= w || locMid.x + width2/2 >= w) return;
         for(int i = 0; i < width1; i++) {
-            if(terrain[locMid.y][locMid.x-width1/2+i] == Material.AIR) return;
+            if(terrain[locMid.x-width1/2+i][locMid.y] == Material.AIR) return;
         }
         for(int i = 0; i < width2; i++) {
-            if(terrain[locMid.y-1][locMid.x-width2/2+i] == Material.AIR) return;
+            if(terrain[locMid.x-width2/2+i][locMid.y-1] == Material.AIR) return;
         }
         for(int i = 0; i < width1; i++) {
-            terrain[locMid.y][locMid.x-width1/2+i] = ore;
+            terrain[locMid.x-width1/2+i][locMid.y] = ore;
         }
         for(int i = 0; i < width2; i++) {
-            terrain[locMid.y-1][locMid.x-width2/2+i] = ore;
+            terrain[locMid.x-width2/2+i][locMid.y-1] = ore;
         }
     }
 

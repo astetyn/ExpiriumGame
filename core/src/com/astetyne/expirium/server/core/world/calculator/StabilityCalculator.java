@@ -1,12 +1,12 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
-import com.astetyne.expirium.client.tiles.Material;
-import com.astetyne.expirium.client.tiles.Solidity;
 import com.astetyne.expirium.server.ExpiServer;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
+import com.astetyne.expirium.server.core.world.tile.Solidity;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 import java.util.HashSet;
 
@@ -21,10 +21,10 @@ import java.util.HashSet;
 public class StabilityCalculator {
 
     private final ExpiServer server;
-    private final ExpiTile[][] terrain;
+    private final Tile[][] terrain;
     private final int w, h;
 
-    public StabilityCalculator(ExpiServer server, ExpiTile[][] terrain, int w, int h) {
+    public StabilityCalculator(ExpiServer server, Tile[][] terrain, int w, int h) {
         this.server = server;
         this.terrain = terrain;
         this.h = h;
@@ -33,17 +33,17 @@ public class StabilityCalculator {
 
     public void generateStability() {
 
-        for(int j = 0; j < w; j++) {
-            terrain[0][j].setStability(terrain[0][j].getMaterial().getMaxStability());
+        for(int i = 0; i < w; i++) {
+            terrain[i][0].setStability(terrain[i][0].getMaterial().getMaxStability());
         }
 
-        for(int i = 1; i < h; i++) {
-            for(int j = 0; j < w; j++) {
+        for(int i = 0; i < w; i++) {
+            for(int j = 1; j < h; j++) {
                 terrain[i][j].setStability(getActualStability(terrain[i][j]));
             }
         }
-        for(int i = 1; i < h; i++) {
-            for(int j = w-1; j >= 0; j--) {
+        for(int i = w-1; i >= 0; i--) {
+            for(int j = 1; j < h; j++) {
                 terrain[i][j].setStability(getActualStability(terrain[i][j]));
             }
         }
@@ -53,11 +53,11 @@ public class StabilityCalculator {
 
         if(e.getSource() == Source.STABILITY) return;
 
-        ExpiTile t = e.getTile();
+        Tile t = e.getTile();
 
-        HashSet<ExpiTile> affectedTiles = updateStability(t);
+        HashSet<Tile> affectedTiles = updateStability(t);
 
-        for(ExpiTile t2 : affectedTiles) {
+        for(Tile t2 : affectedTiles) {
             if(t2.getStability() == 0) {
                 boolean withDrop = Math.random() < 4.0 / affectedTiles.size();
                 server.getWorld().changeMaterial(t2, Material.AIR, withDrop, Source.STABILITY);
@@ -66,7 +66,7 @@ public class StabilityCalculator {
 
         affectedTiles.add(t);
 
-        for(ExpiPlayer pp : server.getPlayers()) {
+        for(Player pp : server.getPlayers()) {
             pp.getNetManager().putStabilityPacket(affectedTiles);
         }
 
@@ -77,23 +77,23 @@ public class StabilityCalculator {
      * @param t changed tile from which stability should be recalculated
      * @return all affected tiles
      */
-    public HashSet<ExpiTile> updateStability(ExpiTile t) {
+    public HashSet<Tile> updateStability(Tile t) {
 
         int newStability = getActualStability(t);
 
-        HashSet<ExpiTile> affectedTiles = new HashSet<>();
+        HashSet<Tile> affectedTiles = new HashSet<>();
 
         if(newStability > t.getStability()) {
 
             t.setStability(newStability);
             recalculateStabilityForNearbyTiles(t, affectedTiles);
-            if(t.getY()-1 != h) recalculateStabilityForNearbyTiles(terrain[t.getY()+1][t.getX()], affectedTiles);
+            if(t.getY()-1 != h) recalculateStabilityForNearbyTiles(terrain[t.getX()][t.getY()+1], affectedTiles);
 
         }else if(newStability < t.getStability()) {
 
             StabilityPack pack = new StabilityPack();
             findStrongConnections(t, pack);
-            for(ExpiTile t2 : pack.strongTiles) {
+            for(Tile t2 : pack.strongTiles) {
                 recalculateStabilityForNearbyTiles(t2, affectedTiles);
             }
             affectedTiles = pack.changedTiles;
@@ -106,7 +106,7 @@ public class StabilityCalculator {
     /**
      * @return True if tile can be changed and stability will be correct.
      */
-    public boolean canBeChanged(ExpiTile t, Material material) {
+    public boolean canBeChanged(Tile t, Material material) {
 
         Material oldMat = t.getMaterial();
 
@@ -116,7 +116,7 @@ public class StabilityCalculator {
         return actualS != 0;
     }
 
-    private void findStrongConnections(ExpiTile t, StabilityPack pack) {
+    private void findStrongConnections(Tile t, StabilityPack pack) {
 
         int x = t.getX();
         int y = t.getY();
@@ -125,22 +125,22 @@ public class StabilityCalculator {
         pack.changedTiles.add(t);
 
         // left tile
-        if(x != 0) checkStrongConnection(terrain[y][x-1], pack);
+        if(x != 0) checkStrongConnection(terrain[x-1][y], pack);
         // top tile
-        if(y != h-1) checkStrongConnection(terrain[y+1][x], pack);
+        if(y != h-1) checkStrongConnection(terrain[x][y+1], pack);
         // right tile
-        if(x != w-1) checkStrongConnection(terrain[y][x+1], pack);
+        if(x != w-1) checkStrongConnection(terrain[x+1][y], pack);
         // bottom tile
-        if(y != 0) checkStrongConnection(terrain[y-1][x], pack);
+        if(y != 0) checkStrongConnection(terrain[x][y-1], pack);
 
         // top left tile - for magic triangle
-        if(y != h-1 && x != 0) checkStrongConnection(terrain[y+1][x-1], pack);
+        if(y != h-1 && x != 0) checkStrongConnection(terrain[x-1][y+1], pack);
         // top right tile - for magic triangle
-        if(y != h-1 && x != w-1) checkStrongConnection(terrain[y+1][x+1], pack);
+        if(y != h-1 && x != w-1) checkStrongConnection(terrain[x+1][y+1], pack);
 
     }
 
-    private void checkStrongConnection(ExpiTile t, StabilityPack pack) {
+    private void checkStrongConnection(Tile t, StabilityPack pack) {
         if(t.getMaterial() == Material.AIR) return;
         if(t.getStability() > getActualStability(t) && t.getY() != 0) {
             findStrongConnections(t, pack);
@@ -150,7 +150,7 @@ public class StabilityCalculator {
     }
 
     /** This method will return new stability of the tile based on nearby tiles.*/
-    private int getActualStability(ExpiTile t) {
+    private int getActualStability(Tile t) {
 
         int x = t.getX();
         int y = t.getY();
@@ -158,24 +158,24 @@ public class StabilityCalculator {
         int maxAvailStab = 0;
 
         // left tile
-        if(x != 0 && !terrain[y][x-1].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
-            maxAvailStab = Math.max(maxAvailStab, terrain[y][x-1].getStability()-1);
+        if(x != 0 && !terrain[x-1][y].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
+            maxAvailStab = Math.max(maxAvailStab, terrain[x-1][y].getStability()-1);
         // top tile
-        if(y != h-1 && !terrain[y+1][x].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
-            maxAvailStab = Math.max(maxAvailStab, terrain[y+1][x].getStability()-2);
+        if(y != h-1 && !terrain[x][y+1].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
+            maxAvailStab = Math.max(maxAvailStab, terrain[x][y+1].getStability()-2);
         // right tile
-        if(x != w-1 && !terrain[y][x+1].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
-            maxAvailStab = Math.max(maxAvailStab, terrain[y][x+1].getStability()-1);
+        if(x != w-1 && !terrain[x+1][y].getMaterial().getSolidity().isLabile() && !t.getMaterial().getSolidity().isVert())
+            maxAvailStab = Math.max(maxAvailStab, terrain[x+1][y].getStability()-1);
         // bottom tile
-        if(y != 0 && (!terrain[y-1][x].getMaterial().getSolidity().isLabile() ||
-                terrain[y-1][x].getMaterial().getSolidity() == Solidity.ONLY_VERT))
-            maxAvailStab = Math.max(maxAvailStab, terrain[y-1][x].getStability());
+        if(y != 0 && (!terrain[x][y-1].getMaterial().getSolidity().isLabile() ||
+                terrain[x][y-1].getMaterial().getSolidity() == Solidity.ONLY_VERT))
+            maxAvailStab = Math.max(maxAvailStab, terrain[x][y-1].getStability());
 
         //magic triangle
         if(x > 0 && x < w-1 && y > 0) {
-            ExpiTile t1 = terrain[y-1][x-1];
-            ExpiTile t2 = terrain[y-1][x];
-            ExpiTile t3 = terrain[y-1][x+1];
+            Tile t1 = terrain[x-1][y-1];
+            Tile t2 = terrain[x][y-1];
+            Tile t3 = terrain[x+1][y-1];
             Material mat1 = t1.getMaterial();
             Material mat2 = t2.getMaterial();
             Material mat3 = t3.getMaterial();
@@ -195,7 +195,7 @@ public class StabilityCalculator {
     }
 
     /** This method will add all nearby tiles which have less stability than their real stability and set the new the stability.*/
-    private void recalculateStabilityForNearbyTiles(ExpiTile t, HashSet<ExpiTile> changed) {
+    private void recalculateStabilityForNearbyTiles(Tile t, HashSet<Tile> changed) {
 
         int x = t.getX();
         int y = t.getY();
@@ -211,11 +211,11 @@ public class StabilityCalculator {
 
     }
 
-    private void floodHigherStability(int x, int y, HashSet<ExpiTile> changed) {
+    private void floodHigherStability(int x, int y, HashSet<Tile> changed) {
 
         if(x < 0 || x == w || y < 0 || y == h) return;
 
-        ExpiTile t = terrain[y][x];
+        Tile t = terrain[x][y];
 
         if(t.getMaterial() == Material.AIR) return;
         int realStability = getActualStability(t);

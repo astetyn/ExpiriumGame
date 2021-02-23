@@ -1,4 +1,4 @@
-package com.astetyne.expirium.client.tiles;
+package com.astetyne.expirium.server.core.world.tile;
 
 public enum Solidity {
 

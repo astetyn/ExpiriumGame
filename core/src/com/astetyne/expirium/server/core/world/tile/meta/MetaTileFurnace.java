@@ -1,15 +1,15 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
-import com.astetyne.expirium.client.tiles.Material;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.InteractType;
-import com.astetyne.expirium.server.core.entity.player.ExpiPlayer;
+import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.event.Source;
-import com.astetyne.expirium.server.core.world.ExpiWorld;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.FuelCookingInventory;
-import com.astetyne.expirium.server.core.world.tile.ExpiTile;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,14 +19,14 @@ public class MetaTileFurnace extends MetaTile {
     private final FuelCookingInventory inventory;
     private final long placeTick;
 
-    public MetaTileFurnace(ExpiWorld world, ExpiTile owner) {
+    public MetaTileFurnace(World world, Tile owner) {
         super(world, owner);
         inventory = new FuelCookingInventory(world, 2, 2, 5);
         placeTick = world.getTick();
         scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
     }
 
-    public MetaTileFurnace(ExpiWorld world, ExpiTile owner, DataInputStream in) throws IOException {
+    public MetaTileFurnace(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
         inventory = new FuelCookingInventory(world, 2, 2, 5, in);
         placeTick = world.getTick();
@@ -39,7 +39,7 @@ public class MetaTileFurnace extends MetaTile {
     }
 
     @Override
-    public void onInteract(ExpiPlayer p, InteractType type) {
+    public void onInteract(Player p, InteractType type) {
         if(placeTick + 10 > world.getTick()) return;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
