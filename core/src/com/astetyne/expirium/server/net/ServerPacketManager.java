@@ -8,6 +8,7 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.Entity;
+import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
@@ -61,7 +62,7 @@ public class ServerPacketManager {
                     break;
                 }
                 case 29://UIInteractPacket
-                    owner.getInv().onInteract(UIInteractType.getType(in.getInt()));
+                    owner.getInv().onInteract(UIInteractType.get(in.getInt()));
                     break;
             }
         }
@@ -89,7 +90,7 @@ public class ServerPacketManager {
         out.putInt(layer);
         for(int i = 0; i < server.getWorld().getTerrainWidth(); i++) {
             Tile t = server.getWorld().getTileAt(i, layer);
-            out.putByte((byte) t.getMaterial().getID());
+            out.putByte((byte) t.getMaterial().ordinal());
             out.putByte(t.getStability());
             out.putBoolean(t.hasBackWall());
             out.putByte(t.getWaterLevel());
@@ -125,7 +126,7 @@ public class ServerPacketManager {
         out.putFloat(inv1.getMaxWeight());
         out.putInt(inv1.getItems().size());
         for(GridItemStack is : inv1.getItems()) {
-            out.putInt(is.getItem().getId());
+            out.putInt(is.getItem().ordinal());
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());
         }
@@ -134,7 +135,7 @@ public class ServerPacketManager {
         out.putFloat(inv2.getMaxWeight());
         out.putInt(inv2.getItems().size());
         for(GridItemStack is : inv2.getItems()) {
-            out.putInt(is.getItem().getId());
+            out.putInt(is.getItem().ordinal());
             out.putInt(is.getAmount());
             out.putIntVector(is.getGridPos());
         }
@@ -148,18 +149,18 @@ public class ServerPacketManager {
 
     public void putHotSlotsFeedPacket(ChosenSlot slot, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
         out.startPacket(30);
-        out.putByte((byte) slot.getId());
-        out.putInt(toolIS.getItem().getId());
+        out.putByte((byte) slot.ordinal());
+        out.putInt(toolIS.getItem().ordinal());
         out.putInt(toolIS.getAmount());
-        out.putInt(materialIS.getItem().getId());
+        out.putInt(materialIS.getItem().ordinal());
         out.putInt(materialIS.getAmount());
-        out.putInt(consIS.getItem().getId());
+        out.putInt(consIS.getItem().ordinal());
         out.putInt(consIS.getAmount());
     }
 
     public void putMaterialChangePacket(Tile t) {
         out.startPacket(22);
-        out.putInt(t.getMaterial().getID());
+        out.putInt(t.getMaterial().ordinal());
         out.putInt(t.getX());
         out.putInt(t.getY());
     }
@@ -170,14 +171,14 @@ public class ServerPacketManager {
         for(Tile t : affectedTiles) {
             out.putInt(t.getX());
             out.putInt(t.getY());
-            out.putByte((byte) t.getStability());
+            out.putByte(t.getStability());
         }
     }
 
     public void putEnviroPacket() {
         out.startPacket(28);
         out.putInt(server.getWorld().getTime());
-        out.putInt(server.getWorld().getWeather().getID());
+        out.putInt(server.getWorld().getWeather().ordinal());
     }
 
     public void putBreakingTilePacket(Tile t, float state) {
@@ -191,11 +192,15 @@ public class ServerPacketManager {
         out.startPacket(27);
         out.putByte(owner.getHealthLevel());
         out.putByte(owner.getFoodLevel());
+        out.putByte((byte) owner.getActiveLivingEffects().size());
+        for(LivingEffect effect : owner.getActiveLivingEffects()) {
+            out.putByte((byte) effect.ordinal());
+        }
     }
 
     public void putSimpleServerPacket(SimpleServerPacket p) {
         out.startPacket(17);
-        out.putInt(p.getID());
+        out.putInt(p.ordinal());
     }
 
     public void putDeathPacket(boolean firstDeath, long daysSurvived) {
@@ -212,7 +217,7 @@ public class ServerPacketManager {
     public void putHandItemPacket(short id, Item item) {
         out.startPacket(33);
         out.putShort(id);
-        out.putInt(item.getId());
+        out.putInt(item.ordinal());
     }
 
     public void putBackWallPacket(List<Tile> backWallTiles) {

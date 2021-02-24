@@ -18,10 +18,10 @@ public class HotSlotsData {
     }
 
     public void feed(PacketInputStream in) {
-        chosenSlot = ChosenSlot.getSlot(in.getByte());
-        is1 = new ItemStack(Item.getType(in.getInt()), in.getInt());
-        is2 = new ItemStack(Item.getType(in.getInt()), in.getInt());
-        is3 = new ItemStack(Item.getType(in.getInt()), in.getInt());
+        chosenSlot = ChosenSlot.get(in.getByte());
+        is1 = new ItemStack(Item.get(in.getInt()), in.getInt());
+        is2 = new ItemStack(Item.get(in.getInt()), in.getInt());
+        is3 = new ItemStack(Item.get(in.getInt()), in.getInt());
     }
 
     public ChosenSlot getChosenSlot() {

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
@@ -22,8 +23,8 @@ public abstract class BiomeGenerator {
 
     // MH = midheight, target y for generation
     public void generate(int i, int leftMH, int rightMH){
-        int from = i*100;
-        int to = (i+1)*100;
+        int from = i * Consts.WORLD_BIOME_WIDTH;
+        int to = (i+1)*Consts.WORLD_BIOME_WIDTH;
         for(int x = from; x < to; x++) {
             surface[x] = getSmoothedH(x, from, to, leftMH, rightMH);
         }

@@ -4,7 +4,6 @@ import com.astetyne.expirium.server.core.world.tile.Material;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 public enum Item {
@@ -99,29 +98,11 @@ public enum Item {
             item.gridTexture = gui.findRegion(gridTexName);
 
             System.out.println("loaded item "+item+" with tex: "+item.texture);
-
         }
     }
 
-    int id;
-    private static final HashMap<Integer, Item> map;
-    static {
-        System.out.println("Item class loading.");
-        map = new HashMap<>();
-        int i = 0;
-        for(Item it : Item.values()) {
-            it.id = i;
-            map.put(it.id, it);
-            i++;
-        }
-    }
-
-    public static Item getType(int id) {
-        return map.get(id);
-    }
-
-    public int getId() {
-        return id;
+    public static Item get(int i) {
+        return values()[i];
     }
 
     public ItemCat getCategory() {

@@ -1,7 +1,5 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
-import java.util.HashMap;
-
 public enum UIInteractType {
 
     SWITCH_UP,
@@ -12,25 +10,8 @@ public enum UIInteractType {
     OPEN_INV, //useless?
     CONSUME_BUTTON;
 
-    int id;
-
-    public static UIInteractType getType(int id) {
-        return map.get(id);
-    }
-
-    public int getID() {
-        return id;
-    }
-
-    private static final HashMap<Integer, UIInteractType> map;
-    static {
-        map = new HashMap<>();
-        int i = 0;
-        for(UIInteractType tt : UIInteractType.values()) {
-            tt.id = i;
-            map.put(tt.id, tt);
-            i++;
-        }
+    public static UIInteractType get(int id) {
+        return values()[id];
     }
 
 }

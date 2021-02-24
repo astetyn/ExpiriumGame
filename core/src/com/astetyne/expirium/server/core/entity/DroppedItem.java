@@ -33,7 +33,7 @@ public class DroppedItem extends Entity {
 
     public DroppedItem(ExpiServer server, DataInputStream in) throws IOException {
         super(server, EntityType.DROPPED_ITEM, in);
-        item = Item.getType(in.readInt());
+        item = Item.get(in.readInt());
         pickTick = server.getWorld().getTick();
         ticksCooldown = Consts.SERVER_TPS * 3;
         server.getWorld().scheduleTaskAfter(this::checkPick, 8); //every 8 ticks
@@ -82,12 +82,12 @@ public class DroppedItem extends Entity {
 
     @Override
     public void writeInitClientMeta(PacketOutputStream out) {
-        out.putInt(item.getId());
+        out.putInt(item.ordinal());
     }
 
     @Override
     public void writeData(WorldBuffer out) {
         super.writeData(out);
-        out.writeInt(item.getId());
+        out.writeInt(item.ordinal());
     }
 }

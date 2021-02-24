@@ -23,8 +23,9 @@ public abstract class LivingEntity extends Entity implements Collidable {
     private byte healthLevel, foodLevel;
 
     protected boolean lookingRight;
-    protected boolean onGround;
+    protected boolean onGround, underWater;
     private int collisions;
+    protected int ticksUnderWater;
     protected Fixture bodyFix, groundSensor;
     protected boolean alive;
     protected boolean invincible;
@@ -36,12 +37,14 @@ public abstract class LivingEntity extends Entity implements Collidable {
         healthLevel = this.maxHealth;
         foodLevel = 100;
         lookingRight = true;
-        onGround = false;
+        onGround = underWater = false;
         collisions = 0;
+        ticksUnderWater = 0;
         alive = true;
         invincible = false;
         lastFallVelocity = 0;
-        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
+        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -54,10 +57,11 @@ public abstract class LivingEntity extends Entity implements Collidable {
         alive = in.readBoolean();
         onGround = false;
         collisions = 0;
-        alive = true;
+        ticksUnderWater = in.readInt();
         invincible = false;
         lastFallVelocity = 0;
-        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
+        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -105,21 +109,33 @@ public abstract class LivingEntity extends Entity implements Collidable {
     public void onTick() {
         super.onTick();
 
-        if(foodLevel <= 5 && server.getWorld().getTick() % 64 == 0) {
-            injure(1); // 1 health per 2 seconds
-        }
-
         recalcFallDamage();
         recalcLookingDir();
 
         lastFallVelocity = 0;
     }
 
+    // once per 2 seconds
+    protected void interval2Sec() {
+        if(!alive) return;
+        if(foodLevel <= 5) {
+            injure(1);
+        }
+        if(underWater) {
+            ticksUnderWater += Consts.SERVER_TPS * 2;
+            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
+                injure(5);
+            }
+        }
+        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+    }
+
     // once per 10 seconds
-    protected void plannedStarve() {
+    protected void interval10Sec() {
+        if(!alive) return;
         decreaseFoodLevel(1);
         if(foodLevel >= 90) heal(1);
-        server.getWorld().scheduleTaskAfter(this::plannedStarve, Consts.SERVER_TPS * 10);
+        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
     }
 
     protected void recalcFallDamage() {
@@ -207,14 +223,25 @@ public abstract class LivingEntity extends Entity implements Collidable {
         return lookingRight;
     }
 
+    public boolean isUnderWater() {
+        return underWater;
+    }
+
+    public void setUnderWater(boolean underWater) {
+        this.underWater = underWater;
+        if(!underWater) {
+            ticksUnderWater = 0;
+        }
+    }
+
     @Override
     public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeByte(healthLevel);
         out.writeByte(foodLevel);
         out.writeBoolean(alive);
+        out.writeInt(ticksUnderWater);
     }
-
 
     @Override
     public void onCollisionBegin(Contact contact) {

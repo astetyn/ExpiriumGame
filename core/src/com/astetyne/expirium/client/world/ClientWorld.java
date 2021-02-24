@@ -204,7 +204,7 @@ public class ClientWorld {
 
         for(int i = 0; i < terrainWidth; i++) {
             ClientTile t = terrain[i][layer];
-            Material type = Material.getMaterial(in.getByte());
+            Material type = Material.get(in.getByte());
             byte stability = in.getByte();
             boolean backWall = in.getBoolean();
             byte waterLevel = in.getByte();
@@ -221,7 +221,7 @@ public class ClientWorld {
 
     public void onTileChange(PacketInputStream in) {
 
-        Material type = Material.getMaterial((byte) in.getInt());
+        Material type = Material.get((byte) in.getInt());
         int x = in.getInt();
         int y = in.getInt();
 

@@ -54,7 +54,7 @@ public class ClientTile {
 
     public int getTimeCompensatedSkyLight() {
         int time = GameScreen.get().getTime();
-        float moonLightFactor = 0.2f;
+        float moonLightFactor = 0.3f;
 
         int srs = Consts.SUNRISE_START;
         float srd = Consts.SUNRISE_END - Consts.SUNRISE_START;

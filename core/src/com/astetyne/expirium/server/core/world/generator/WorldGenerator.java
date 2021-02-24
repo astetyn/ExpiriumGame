@@ -20,10 +20,14 @@ public class WorldGenerator {
         this.seed = seed;
         terrain = new Material[w][h];
         surface = new int[w];
-        biomes = new BiomeType[w/ Consts.BIOME_LEN];
+        biomes = new BiomeType[w / Consts.WORLD_BIOME_WIDTH];
     }
 
     public void generateWorld() {
+
+        if(BiomeType.values().length > biomes.length) {
+            throw new IllegalArgumentException();
+        }
 
         for(BiomeType type : BiomeType.values()) {
             while(true) {
@@ -46,7 +50,7 @@ public class WorldGenerator {
             BiomeGenerator currentGen = biomes[i].initGenerator(terrain, surface, w, h, seed);
             BiomeGenerator nextGen = biomes[i+1].initGenerator(terrain, surface, w, h, seed);
 
-            int rightMH = (currentGen.getH((i+1)*Consts.BIOME_LEN-1) + nextGen.getH((i+1)*Consts.BIOME_LEN)) / 2;
+            int rightMH = (currentGen.getH((i+1)*Consts.WORLD_BIOME_WIDTH -1) + nextGen.getH((i+1)*Consts.WORLD_BIOME_WIDTH)) / 2;
 
             currentGen.generate(i, lastMH, rightMH);
 
@@ -79,7 +83,7 @@ public class WorldGenerator {
             }
         }
         for(BiomeType biome : biomes) {
-            wb.writeInt(biome.getId());
+            wb.writeInt(biome.ordinal());
         }
     }
 }

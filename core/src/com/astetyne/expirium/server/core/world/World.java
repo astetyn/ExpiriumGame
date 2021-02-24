@@ -77,7 +77,7 @@ public class World implements WorldSaveable, Disposable {
         }
         System.out.println("Loading tiles time (ms): "+(System.nanoTime() - startT)/1000000);
 
-        biomes = new BiomeType[width/100];
+        biomes = new BiomeType[width/Consts.WORLD_BIOME_WIDTH];
         for(int i = 0; i < biomes.length; i++) {
             biomes[i] = BiomeType.get(in.readInt());
         }
@@ -128,6 +128,7 @@ public class World implements WorldSaveable, Disposable {
             for(Player pp : server.getPlayers()) {
                 pp.applyPhysics();
             }
+            waterEngine.applyPhysics();
             b2dWorld.step(1f/64, 6, 2);
         }
 
@@ -299,6 +300,7 @@ public class World implements WorldSaveable, Disposable {
 
         if(x <= 0 || x + ew >= width || y <= 0 || y + eh >= height) return false;
 
+        //todo: what if entity is bigger than 2 tiles?
         if(getTileAt(x, y).getMaterial().getFix() != TileFix.SOFT) return false;
         if(getTileAt(x + ew, y).getMaterial().getFix() != TileFix.SOFT) return false;
         if(getTileAt(x + ew, y + eh).getMaterial().getFix() != TileFix.SOFT) return false;
@@ -372,7 +374,7 @@ public class World implements WorldSaveable, Disposable {
     }
 
     public BiomeType getBiomeAt(float x) {
-        int i = (int) (x / Consts.BIOME_LEN);
+        int i = (int) (x / Consts.WORLD_BIOME_WIDTH);
         return biomes[i];
     }
 
@@ -466,7 +468,7 @@ public class World implements WorldSaveable, Disposable {
             }
         }
         for(BiomeType biome : biomes) {
-            out.writeInt(biome.getId());
+            out.writeInt(biome.ordinal());
         }
     }
 }

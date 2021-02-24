@@ -32,7 +32,7 @@ public class StorageGridData {
             int itemID = in.getInt();
             int amount = in.getInt();
             IntVector2 pos = in.getIntVector();
-            items.add(new GridItemStack(Item.getType(itemID), amount, pos));
+            items.add(new GridItemStack(Item.get(itemID), amount, pos));
         }
     }
 }

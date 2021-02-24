@@ -3,7 +3,7 @@ package com.astetyne.expirium.client.utils;
 public class Consts {
 
     public static final int VERSION = 1;
-    public static final String VERSION_TEXT = "alpha 1.2";
+    public static final String VERSION_TEXT = "alpha 1.3";
 
     public static final boolean DEBUG = true;
 
@@ -17,8 +17,11 @@ public class Consts {
     public static final String MULTICAST_ADDRESS = "234.14.14.14";
 
     // world
-    public static final int COMBAT_PRECISION = 6;
+    public static final int WORLD_BIOME_WIDTH = 80; // <-- this should NOT change
+    public static final int WORLD_BIOMES_NUMBER = 4; // world width will be calculated as WORLD_BIOME_WIDTH * WORLD_BIOMES_NUMBER
+    public static final int WORLD_HEIGHT = 128; // this should be used only while creating world and allow custom world size to exists
 
+    public static final int COMBAT_PRECISION = 6;
     public static final int BREAKING_PRECISION = 6;
 
     public static final short DEFAULT_BIT = 1;
@@ -27,8 +30,6 @@ public class Consts {
     public static final float D_I_PICK_DIST = 1.7f;
 
     public static final float CAMPFIRE_TIME = 180;
-
-    public static final int BIOME_LEN = 100;
 
     public static final int ITEM_COOLDOWN_BREAK = SERVER_TPS/4;
     public static final int ITEM_COOLDOWN_DROP = SERVER_TPS * 6;
@@ -40,6 +41,7 @@ public class Consts {
     public static final int SKY_LIGHT_DECREASE = 3;
 
     public static final byte MAX_WATER_LEVEL = 5;
+    public static final int DROWNING_TICKS = SERVER_TPS * 10;
 
     public static final int TICKS_IN_DAY = 38400;
     public static final int TICKS_IN_HOUR = 1600;

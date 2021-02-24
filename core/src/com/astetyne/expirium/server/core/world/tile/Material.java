@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 public enum Material implements Textureable {
 
@@ -210,23 +209,8 @@ public enum Material implements Textureable {
         }
     }
 
-    public static Material getMaterial(int id) {
-        return map.get(id);
+    public static Material get(int i) {
+        return values()[i];
     }
 
-    public int getID() {
-        return id;
-    }
-
-    int id;
-    private static final HashMap<Integer, Material> map;
-    static {
-        map = new HashMap<>();
-        int i = 0;
-        for(Material tt : Material.values()) {
-            tt.id = i;
-            map.put(tt.id, tt);
-            i++;
-        }
-    }
 }

@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.data;
 
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
 public class PlayerDataHandler {
@@ -29,6 +30,10 @@ public class PlayerDataHandler {
     public void feedLivingStats(PacketInputStream in) {
         health = in.getByte();
         food = in.getByte();
+        byte effectsSize = in.getByte();
+        for(int i = 0; i < effectsSize; i++) {
+            LivingEffect effect = LivingEffect.get(in.getByte());
+        }
         GameScreen.get().getActiveRoot().refresh();
     }
 

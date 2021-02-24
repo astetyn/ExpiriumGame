@@ -38,6 +38,7 @@ public class Player extends LivingEntity {
     private long lastDeathDay;
     private final WorldLoader worldLoader;
     private final HashSet<Entity> nearActiveEntities;
+    private final HashSet<LivingEffect> activeLivingEffects;
 
     public Player(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location, 100);
@@ -55,6 +56,7 @@ public class Player extends LivingEntity {
         lastDeathDay = 0;
         worldLoader = new WorldLoader(server, this);
         nearActiveEntities = new HashSet<>();
+        activeLivingEffects = new HashSet<>();
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -75,6 +77,7 @@ public class Player extends LivingEntity {
         lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
         nearActiveEntities = new HashSet<>();
+        activeLivingEffects = new HashSet<>();
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -127,9 +130,13 @@ public class Player extends LivingEntity {
         float jumpThreshold = 0.6f;
 
         if(tsData1.vert >= jumpThreshold) {
-            if((false || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if(inWater) {
+                body.applyForceToCenter(new Vector2(0, 400), true);
+            }
+            if(!underWater && (false || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
-                body.applyLinearImpulse(0, 350, center.x, center.y, true);
+                float impulse = inWater ? 200 : 350;
+                body.applyLinearImpulse(0, impulse, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
             }
             tsData1.horz = Math.abs(tsData1.horz) > 0.5 ? tsData1.horz : 0;
@@ -294,6 +301,10 @@ public class Player extends LivingEntity {
 
     public boolean isHoldingTS() {
         return tsData1.horz != 0 || tsData1.vert != 0 || tsData2.vert != 0 || tsData2.horz != 0;
+    }
+
+    public HashSet<LivingEffect> getActiveLivingEffects() {
+        return activeLivingEffects;
     }
 
     @Override

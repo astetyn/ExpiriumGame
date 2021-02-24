@@ -1,14 +1,21 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
+import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
+import com.astetyne.expirium.server.core.entity.Entity;
+import com.astetyne.expirium.server.core.entity.LivingEntity;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.tile.Tile;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
 public class WaterEngine {
 
+    private final static float waterDensity = 28;
     private final static byte maxLevel = 5;
     private final static int updateTicks = 4;
 
@@ -17,6 +24,7 @@ public class WaterEngine {
     private final int w, h;
     private final PriorityQueue<WaterTask> scheduledWaterTicks;
     private final HashSet<Tile> updatedTiles;
+    private final Vector2 tempVec; // just for optimization purpose
 
     public WaterEngine(ExpiServer server, Tile[][] terrain, int w, int h) {
         this.server = server;
@@ -25,6 +33,7 @@ public class WaterEngine {
         this.h = h;
         scheduledWaterTicks = new PriorityQueue<>();
         updatedTiles = new HashSet<>();
+        tempVec = new Vector2();
     }
 
     public void onTick() {
@@ -39,10 +48,75 @@ public class WaterEngine {
             }
         }
 
-        for(Player p : server.getPlayers()) {
-            p.getNetManager().putWaterPacket(updatedTiles);
+        if(updatedTiles.size() > 0) {
+            for(Player p : server.getPlayers()) {
+                p.getNetManager().putWaterPacket(updatedTiles);
+            }
+            updatedTiles.clear();
         }
-        updatedTiles.clear();
+        recalcEntitiesOverlap();
+    }
+
+    public void applyPhysics() {
+
+        for(Entity e : server.getEntities()) {
+            if(!e.isInWater()) continue;
+
+            Body body = e.getBody();
+            EntityType type = e.getType();
+
+            float area = type.getWidth() * type.getHeight();
+            tempVec.set(0, area * waterDensity * body.getWorld().getGravity().y * -1); // buoyant force
+            body.applyForceToCenter(tempVec, true);
+            tempVec.set(body.getLinearVelocity());
+            tempVec.scl(0.05f);
+            body.setLinearVelocity(body.getLinearVelocity().sub(tempVec.x * tempVec.x * tempVec.x, tempVec.y * tempVec.y * tempVec.y));
+        }
+    }
+
+    private void recalcEntitiesOverlap() {
+
+        for(Entity e : server.getEntities()) {
+
+            float w = e.getWidth();
+            float h = e.getHeight();
+            float wh = w/2;
+            float hh = h/2;
+            Vector2 center = e.getCenter();
+
+            int leftX = (int) (center.x - wh);
+            int bottomY = (int) (center.y - hh);
+            int upperY = (int) (center.y + hh);
+
+            boolean found = false;
+            // check if is in the water - only checks bottom overlapping tiles
+            for(int x = leftX; x <= leftX + w; x++) {
+                Tile t = server.getWorld().getTileAt(x, bottomY);
+                if(t.getWaterLevel() == 0) continue;
+                float th = (float)t.getWaterLevel() / Consts.MAX_WATER_LEVEL;
+                if(bottomY + th >= center.y - hh) {
+                    e.setInWater(true);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) e.setInWater(false);
+
+            if(!(e instanceof LivingEntity)) continue;
+
+            found = false;
+            // check if is under water - only checks upper overlapping tiles
+            for(int x = leftX; x <= leftX + w; x++) {
+                Tile t = server.getWorld().getTileAt(x, upperY);
+                float th = (float)t.getWaterLevel() / Consts.MAX_WATER_LEVEL;
+                if(upperY + th < center.y + hh) {
+                    ((LivingEntity)e).setUnderWater(false);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) ((LivingEntity)e).setUnderWater(true);
+        }
     }
 
     public void createWater(Tile t) {

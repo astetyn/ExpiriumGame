@@ -45,11 +45,11 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         indexTools = in.readInt();
         indexMats = in.readInt();
         indexCons = in.readInt();
-        isTool = new ItemStack(Item.getType(in.readInt()));
-        isMat = new ItemStack(Item.getType(in.readInt()));
-        isCon = new ItemStack(Item.getType(in.readInt()));
-        chosenSlot = ChosenSlot.getSlot(in.readInt());
-        itemInHand = new ItemStack(Item.getType(in.readInt()));
+        isTool = new ItemStack(Item.get(in.readInt()));
+        isMat = new ItemStack(Item.get(in.readInt()));
+        isCon = new ItemStack(Item.get(in.readInt()));
+        chosenSlot = ChosenSlot.get(in.readInt());
+        itemInHand = new ItemStack(Item.get(in.readInt()));
         label = "Note that game is still in alpha!";
     }
 
@@ -248,10 +248,10 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         out.writeInt(indexTools);
         out.writeInt(indexMats);
         out.writeInt(indexCons);
-        out.writeInt(isTool.getItem().getId());
-        out.writeInt(isMat.getItem().getId());
-        out.writeInt(isCon.getItem().getId());
-        out.writeInt(chosenSlot.getId());
-        out.writeInt(itemInHand.getItem().getId());
+        out.writeInt(isTool.getItem().ordinal());
+        out.writeInt(isMat.getItem().ordinal());
+        out.writeInt(isCon.getItem().ordinal());
+        out.writeInt(chosenSlot.ordinal());
+        out.writeInt(itemInHand.getItem().ordinal());
     }
 }

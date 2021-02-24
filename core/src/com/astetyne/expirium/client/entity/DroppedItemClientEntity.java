@@ -12,7 +12,7 @@ public class DroppedItemClientEntity extends ClientEntity {
 
     public DroppedItemClientEntity(ClientWorld world, short id, Vector2 loc, PacketInputStream in) {
         super(world, EntityType.DROPPED_ITEM, id, loc);
-        dropItem = Item.getType(in.getInt());
+        dropItem = Item.get(in.getInt());
         setAnimator(new StaticEntityAnimator(this, dropItem.getTexture()));
     }
 

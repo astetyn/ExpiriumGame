@@ -69,7 +69,7 @@ public class ClientPacketManager {
                     break;
 
                 case 17: //SimpleServerPacket
-                    GameScreen.get().onSimplePacket(SimpleServerPacket.getType(in.getInt()));
+                    GameScreen.get().onSimplePacket(SimpleServerPacket.get(in.getInt()));
                     break;
                 case 18: //StabilityPacket
                     world.onStabilityChange(in);
@@ -108,7 +108,7 @@ public class ClientPacketManager {
 
                 case 28: //EnviroPacket
                     GameScreen.get().setTime(in.getInt());
-                    WeatherType weather = WeatherType.getType(in.getInt());
+                    WeatherType weather = WeatherType.get(in.getInt());
                     break;
 
                 case 30: //InvHotSlotsFeedPacket
@@ -126,7 +126,7 @@ public class ClientPacketManager {
                 }
                 case 33: { //HandItemPacket
                     ClientPlayer p = (ClientPlayer) world.getEntitiesID().get(in.getShort());
-                    p.setItemInHand(Item.getType(in.getInt()));
+                    p.setItemInHand(Item.get(in.getInt()));
                     break;
                 }
                 case 34: // BackWallPacket
@@ -169,7 +169,7 @@ public class ClientPacketManager {
 
     public void putUIInteractPacket(UIInteractType action) {
         out.startPacket(29);
-        out.putInt(action.getID());
+        out.putInt(action.ordinal());
     }
 
     public void putInvItemMoveReqPacket(boolean fromMain, IntVector2 pos1, boolean toMain, IntVector2 pos2) {

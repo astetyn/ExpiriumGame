@@ -26,7 +26,7 @@ public class Tile implements WorldSaveable {
 
     public Tile(World world, int x, int y, DataInputStream in, boolean createMeta) throws IOException {
         this.world = world;
-        material = Material.getMaterial(in.readInt());
+        material = Material.get(in.readInt());
         if(createMeta) {
             metaTile = material.init(world, this);
         }else {

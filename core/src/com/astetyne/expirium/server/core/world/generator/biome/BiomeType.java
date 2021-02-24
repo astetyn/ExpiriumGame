@@ -3,7 +3,6 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 public enum BiomeType {
 
@@ -29,24 +28,8 @@ public enum BiomeType {
         return new DesertGen(terrain, surface, w, h, seed);
     }
 
-    int id;
-    private static final HashMap<Integer, BiomeType> map;
-    static {
-        map = new HashMap<>();
-        int i = 0;
-        for(BiomeType it : BiomeType.values()) {
-            it.id = i;
-            map.put(it.id, it);
-            i++;
-        }
-    }
-
-    public static BiomeType get(int id) {
-        return map.get(id);
-    }
-
-    public int getId() {
-        return id;
+    public static BiomeType get(int i) {
+        return values()[i];
     }
 
 }

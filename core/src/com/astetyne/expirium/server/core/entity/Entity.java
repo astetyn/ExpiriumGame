@@ -18,16 +18,16 @@ public abstract class Entity implements Metaable, WorldSaveable {
     protected final ExpiServer server;
     private final short id;
     protected final EntityType type;
-    private final Vector2 centerLoc;
     protected final Body body;
     protected boolean destroyed;
+    protected boolean inWater;
 
     public Entity(ExpiServer server, EntityType type, Vector2 loc) {
         this.server = server;
+        this.type = type;
         destroyed = false;
         id = server.getRandomEntityID();
-        this.type = type;
-        centerLoc = new Vector2();
+        inWater = false;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -61,7 +61,8 @@ public abstract class Entity implements Metaable, WorldSaveable {
     }
 
     public Vector2 getCenter() {
-        return centerLoc.set(body.getPosition().x + type.getWidth()/2, body.getPosition().y + type.getHeight()/2);
+        return body.getWorldCenter();
+        //return centerLoc.set(body.getPosition().x + type.getWidth()/2, body.getPosition().y + type.getHeight()/2);
     }
 
     public Vector2 getVelocity() {
@@ -90,6 +91,14 @@ public abstract class Entity implements Metaable, WorldSaveable {
 
     public boolean isLookingRight() {
         return true;
+    }
+
+    public boolean isInWater() {
+        return inWater;
+    }
+
+    public void setInWater(boolean inWater) {
+        this.inWater = inWater;
     }
 
     public void destroy() {

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
@@ -12,8 +13,8 @@ public class BorealForestGen extends BiomeGenerator {
     @Override
     public void generate(int i, int leftMH, int rightMH) {
         super.generate(i, leftMH, rightMH);
-        int from = i*100;
-        int to = (i+1)*100;
+        int from = i* Consts.WORLD_BIOME_WIDTH;
+        int to = (i+1)*Consts.WORLD_BIOME_WIDTH;
         for(int x = from; x < to; x++) {
             int terrainHeight = surface[x];
 

@@ -41,7 +41,7 @@ public class Squirrel extends LivingEntity {
     }
 
     @Override
-    protected void plannedStarve() {}
+    protected void interval10Sec() {}
 
     @Override
     protected void recalcFallDamage() {

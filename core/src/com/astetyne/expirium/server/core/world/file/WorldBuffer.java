@@ -52,7 +52,7 @@ public class WorldBuffer {
     }
 
     public void writeMaterial(Material material) {
-        buffer.putInt(material.getID());
+        buffer.putInt(material.ordinal());
     }
 
     public ByteBuffer getBuffer() {

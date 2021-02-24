@@ -32,7 +32,7 @@ public class GridItemStack extends ItemStack implements WorldSaveable {
     }
 
     public GridItemStack(DataInputStream in) throws IOException {
-        super(Item.getType(in.readInt()), in.readInt());
+        super(Item.get(in.readInt()), in.readInt());
         gridPos = new IntVector2(in.readInt(), in.readInt());
     }
 
@@ -42,7 +42,7 @@ public class GridItemStack extends ItemStack implements WorldSaveable {
 
     @Override
     public void writeData(WorldBuffer out) {
-        out.writeInt(item.getId());
+        out.writeInt(item.ordinal());
         out.writeInt(amount);
         out.writeInt(gridPos.x);
         out.writeInt(gridPos.y);

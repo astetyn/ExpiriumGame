@@ -47,6 +47,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 		multicastListener = new MulticastListener();
 		Thread t = new Thread(multicastListener);
+		t.setName("Multicast listener");
 		t.start();
 	}
 
