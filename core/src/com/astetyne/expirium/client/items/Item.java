@@ -51,6 +51,7 @@ public enum Item {
     SMALL_MEAT_RAW(ItemCat.CONSUMABLE, 0.01f),
     SMALL_MEAT_COOKED(ItemCat.CONSUMABLE, 0.01f),
     PLANKS(ItemCat.MISC, 0.02f),
+    LADDER(ItemCat.MATERIAL, 0.05f),
     ;
 
     ItemCat category;
@@ -86,7 +87,6 @@ public enum Item {
     }
 
     public static void loadTextures(TextureAtlas gui) {
-        System.out.println("Loading textures for items.");
         for(Item item : values()) {
             if(item == EMPTY) continue;
 
@@ -129,6 +129,7 @@ public enum Item {
             case FURNACE: return Material.FURNACE_OFF;
             case CHEST: return Material.CHEST;
             case TORCH: return Material.TORCH;
+            case LADDER: return Material.LADDER;
             default: return null;
         }
     }

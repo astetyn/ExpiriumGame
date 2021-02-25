@@ -98,6 +98,10 @@ public class ClientPacketManager {
                     world.onTileChange(in);
                     break;
 
+                case 23: //WarningMsgPacket
+                    GameScreen.get().onWarningMsgPacket(in);
+                    break;
+
                 case 24: //InvFeedPacket
                     GameScreen.get().getPlayerData().feedInventory(in);
                     break;

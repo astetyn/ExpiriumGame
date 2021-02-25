@@ -6,6 +6,7 @@ import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -17,7 +18,8 @@ import java.io.IOException;
 
 public abstract class LivingEntity extends Entity implements Collidable {
 
-    private final static byte MAX_FOOD_LEVEL = 100;
+    protected final static byte MAX_FOOD_LEVEL = 100;
+    protected final static float BODY_DENSITY = 30;
 
     private final byte maxHealth;
     private byte healthLevel, foodLevel;
@@ -73,7 +75,7 @@ public abstract class LivingEntity extends Entity implements Collidable {
         PolygonShape polyShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        fixtureDef.density = 30f;
+        fixtureDef.density = BODY_DENSITY;
         fixtureDef.restitution = 0f;
         fixtureDef.friction = 0.2f;
         fixtureDef.filter.categoryBits = Consts.DEFAULT_BIT;
@@ -118,7 +120,7 @@ public abstract class LivingEntity extends Entity implements Collidable {
     // once per 2 seconds
     protected void interval2Sec() {
         if(!alive) return;
-        if(foodLevel <= 5) {
+        if(foodLevel <= Consts.STARVATION_LEVEL) {
             injure(1);
         }
         if(underWater) {
@@ -142,6 +144,32 @@ public abstract class LivingEntity extends Entity implements Collidable {
         if(lastFallVelocity < -12 && getVelocity().y - lastFallVelocity > 11) {
             injure((int) (lastFallVelocity*(-0.5f)));
         }
+    }
+
+    @Override
+    protected void recalcWater() {
+        super.recalcWater();
+
+        float w = getWidth();
+        float h = getHeight();
+        float wh = w/2;
+        float hh = h/2;
+        Vector2 center = getCenter();
+
+        int leftX = (int) (center.x - wh);
+        int upperY = (int) (center.y + hh);
+
+        // check if is under water - only checks upper overlapping tiles
+        for(int x = leftX; x <= center.x + w; x++) {
+            Tile t = server.getWorld().getTileAt(x, upperY);
+            float th = (float)t.getWaterLevel() / Consts.MAX_WATER_LEVEL;
+            if(upperY + th < center.y + hh) {
+                underWater = false;
+                ticksUnderWater = 0;
+                return;
+            }
+        }
+        underWater = true;
     }
 
     public void die() {
@@ -201,14 +229,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         foodLevel = (byte) Math.max(foodLevel - amount, 0);
     }
 
-    public boolean isInvincible() {
-        return invincible;
-    }
-
-    public void setInvincible(boolean invincible) {
-        this.invincible = invincible;
-    }
-
     public void recalcLookingDir() {
         Vector2 vel = body.getLinearVelocity();
         if(vel.x > 0) {
@@ -221,17 +241,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
     @Override
     public boolean isLookingRight() {
         return lookingRight;
-    }
-
-    public boolean isUnderWater() {
-        return underWater;
-    }
-
-    public void setUnderWater(boolean underWater) {
-        this.underWater = underWater;
-        if(!underWater) {
-            ticksUnderWater = 0;
-        }
     }
 
     @Override

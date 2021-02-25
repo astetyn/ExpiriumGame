@@ -13,6 +13,7 @@ public enum ItemRecipe {
     WOODEN_WALL(Item.WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 2)}, "Good for basic house walls. High stability included."),
     SOFT_WOODEN_WALL(Item.SOFT_WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 2)}, "Same as wooden wall but softer to your body."),
     WOODEN_SUPPORT(Item.WOODEN_SUPPORT, 6, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 3)}, "Cheap and useful for maintaining high stability."),
+    LADDER(Item.LADDER, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 4), new ItemStack(Item.RHYOLITE, 1)}, "Wood is maybe not the hardest material but do not be afraid."),
     CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Make it if you are cold. It will warm your small house."),
     FURNACE(Item.FURNACE, new ItemStack[]{new ItemStack(Item.CLAYSTONE, 5), new ItemStack(Item.LIMESTONE, 20)}, "For cooking better meals."),
     CHEST(Item.CHEST, new ItemStack[]{new ItemStack(Item.PLANKS, 15), new ItemStack(Item.LIMESTONE, 4), new ItemStack(Item.IRON, 2)}, "Small storage for your items."),

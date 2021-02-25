@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.badlogic.gdx.math.Vector2;
 
@@ -67,6 +68,10 @@ public class PacketInputStream {
 
     public IntVector2 getIntVector() {
         return new IntVector2(readBuffer.getInt(), readBuffer.getInt());
+    }
+
+    public ExpiColor getColor() {
+        return ExpiColor.get(getByte());
     }
 
     public int fillBuffer() throws IOException {

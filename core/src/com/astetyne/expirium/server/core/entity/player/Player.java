@@ -13,6 +13,7 @@ import com.astetyne.expirium.server.core.world.WorldLoader;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.inventory.PlayerInventory;
+import com.astetyne.expirium.server.core.world.tile.Tile;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
 import com.astetyne.expirium.server.net.ServerPacketManager;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public class Player extends LivingEntity {
+
+    private final static float jumpThreshold = 0.6f;
 
     private final ServerPlayerGateway gateway;
     private final String name;
@@ -39,6 +42,7 @@ public class Player extends LivingEntity {
     private final WorldLoader worldLoader;
     private final HashSet<Entity> nearActiveEntities;
     private final HashSet<LivingEffect> activeLivingEffects;
+    private boolean onLadder;
 
     public Player(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location, 100);
@@ -57,6 +61,7 @@ public class Player extends LivingEntity {
         worldLoader = new WorldLoader(server, this);
         nearActiveEntities = new HashSet<>();
         activeLivingEffects = new HashSet<>();
+        onLadder = false;
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -78,6 +83,7 @@ public class Player extends LivingEntity {
         worldLoader = new WorldLoader(server, this);
         nearActiveEntities = new HashSet<>();
         activeLivingEffects = new HashSet<>();
+        onLadder = false;
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -91,6 +97,27 @@ public class Player extends LivingEntity {
         filter.maskBits = Consts.DEFAULT_BIT;
         bodyFix.setFilterData(filter);
         body.setUserData(this);
+    }
+
+    @Override
+    protected void interval2Sec() {
+        super.interval2Sec();
+        if(underWater) {
+            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
+                activeLivingEffects.remove(LivingEffect.DROWNING);
+                activeLivingEffects.add(LivingEffect.SERIOUS_DROWNING);
+            }else {
+                activeLivingEffects.add(LivingEffect.DROWNING);
+            }
+        }else {
+            activeLivingEffects.remove(LivingEffect.DROWNING);
+            activeLivingEffects.remove(LivingEffect.SERIOUS_DROWNING);
+        }
+        if(getFoodLevel() <= Consts.STARVATION_LEVEL) {
+            activeLivingEffects.add(LivingEffect.STARVATION);
+        }else {
+            activeLivingEffects.remove(LivingEffect.STARVATION);
+        }
     }
 
     @Override
@@ -122,35 +149,60 @@ public class Player extends LivingEntity {
     }
 
     public void applyPhysics() {
+        super.applyPhysics();
 
-        if(invincible && (tsData1.horz != 0 || tsData1.vert != 0 || tsData2.horz != 0 || tsData2.vert != 0)) {
-            invincible = false;
-        }
-
-        float jumpThreshold = 0.6f;
+        Vector2 vel = body.getLinearVelocity();
 
         if(tsData1.vert >= jumpThreshold) {
-            if(inWater) {
-                body.applyForceToCenter(new Vector2(0, 400), true);
-            }
-            if(!underWater && (false || onGround) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
-                Vector2 center = body.getWorldCenter();
-                float impulse = inWater ? 200 : 350;
-                body.applyLinearImpulse(0, impulse, center.x, center.y, true);
-                lastJump = System.currentTimeMillis();
-            }
             tsData1.horz = Math.abs(tsData1.horz) > 0.5 ? tsData1.horz : 0;
         }
 
-        if(body.getLinearVelocity().x >= 3 && tsData1.horz > 0) {
-            tsData1.horz = 0;
-        }else if(body.getLinearVelocity().x <= -3 && tsData1.horz < 0) {
-            tsData1.horz = 0;
+        float horzFactor;
+        float maxHorzVel;
+
+        if(inWater) {
+            horzFactor = 500;
+            maxHorzVel = 2;
+            if(tsData1.vert >= jumpThreshold) {
+                body.applyForceToCenter(0, 400, true);
+
+                if(!underWater && onGround && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+                    Vector2 center = body.getWorldCenter();
+                    body.applyLinearImpulse(0, 200, center.x, center.y, true);
+                    lastJump = System.currentTimeMillis();
+                }
+            }
+        }else if(onLadder) {
+
+            horzFactor = 500;
+            maxHorzVel = 0.5f;
+
+            float area = type.getWidth() * type.getHeight();
+            tempVec.set(0, area * BODY_DENSITY * body.getWorld().getGravity().y * -0.7f);
+            body.applyForceToCenter(tempVec, true);
+            if(vel.y <= -2) {
+                body.setLinearVelocity(vel.x, -2);
+            }
+            if(tsData1.vert >= jumpThreshold && vel.y <= 5) {
+                body.applyForceToCenter(0, tsData1.vert * 500, true);
+            }
         }else {
-            body.applyForceToCenter((40000.0f/Consts.SERVER_TPS) * tsData1.horz, 0, true);
+            horzFactor = 1250;
+            maxHorzVel = 3;
+            if(tsData1.vert >= jumpThreshold && onGround && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+                Vector2 center = body.getWorldCenter();
+                body.applyLinearImpulse(0, 350f, center.x, center.y, true);
+                lastJump = System.currentTimeMillis();
+            }
         }
 
-        Vector2 vel = body.getLinearVelocity();
+        if(!(vel.x >= maxHorzVel && tsData1.horz > 0) && !(vel.x <= -maxHorzVel && tsData1.horz < 0)) {
+            body.applyForceToCenter(horzFactor * tsData1.horz, 0, true);
+        }
+
+        vel = body.getLinearVelocity();
+
+        // ground friction
         if(onGround) {
             if(vel.x > 0) {
                 vel.x -= Math.min(0.15f, vel.x);
@@ -171,9 +223,15 @@ public class Player extends LivingEntity {
     public void onTick() {
         super.onTick();
 
+        if(invincible && (tsData1.horz != 0 || tsData1.vert != 0 || tsData2.horz != 0 || tsData2.vert != 0)) {
+            invincible = false;
+        }
+
         if(!worldLoader.isCompleted()) {
             worldLoader.onTick();
         }
+
+        recalcLadder();
 
         getNetManager().putLivingStatsPacket();
 
@@ -206,6 +264,30 @@ public class Player extends LivingEntity {
         }
     }
 
+    private void recalcLadder() {
+
+        float w = getWidth();
+        float h = getHeight();
+        float wh = w/2;
+        float hh = h/2;
+        Vector2 center = getCenter();
+
+        int leftX = (int) (center.x - wh);
+        int bottomY = (int) (center.y - hh);
+
+        for(int x = leftX; x <= center.x + w; x++) {
+            for(int y = bottomY; y <= center.y + h; y++) {
+                Tile t = server.getWorld().getTileAt(x, y);
+                if(t.getMaterial().isClimbable()) {
+                    onLadder = true;
+                    return;
+                }
+            }
+        }
+        onLadder = false;
+
+    }
+
     private void plannedRecalcNearEntities() {
         recalcNearEntities();
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
@@ -231,6 +313,15 @@ public class Player extends LivingEntity {
             mainInv.remove(is);
         }
         mainInv.append(recipe.getProduct());
+    }
+
+    public void writeLivingStats(PacketOutputStream out) {
+        out.putByte(getHealthLevel());
+        out.putByte(getFoodLevel());
+        out.putByte((byte) getActiveLivingEffects().size());
+        for(LivingEffect effect : getActiveLivingEffects()) {
+            out.putByte((byte) effect.ordinal());
+        }
     }
 
     public ServerPacketManager getNetManager() {

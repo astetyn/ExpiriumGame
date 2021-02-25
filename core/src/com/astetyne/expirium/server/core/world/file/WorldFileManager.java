@@ -43,7 +43,7 @@ public class WorldFileManager {
         int width = Consts.WORLD_BIOME_WIDTH * Consts.WORLD_BIOMES_NUMBER;
         int height = Consts.WORLD_HEIGHT;
         long seed = (long) (Math.random() * Long.MAX_VALUE);
-        long tick = Consts.TICKS_IN_DAY / 24 * 7;
+        long tick = Consts.TICKS_IN_HOUR * 7;
 
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         gen.generateWorld();

@@ -55,7 +55,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
 
     @Override
     protected boolean canInsert(Item item, int x, int y) {
-        if(y == 0 && x + item.getGridWidth() >= 4) return false;
+        if(y == 0 && x + item.getGridWidth() >= 3) return false;
         return super.canInsert(item, x, y);
     }
 
@@ -64,8 +64,27 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         GridItemStack gis = grid[pos1.x][pos1.y];
         if(gis == null) return;
         if(pos2.y == 0) {
-            if(pos2.x == 3) {
-                // split
+            if(pos2.x == 2) {
+                // split half
+                IntVector2 appendPos = null;
+                outer:
+                for(int y = rows - 1; y >= 0; y--) {
+                    for(int x = 0; x < columns; x++) {
+                        if(canInsert(gis.getItem(), x, y)) {
+                            appendPos = new IntVector2(x, y);
+                            break outer;
+                        }
+                    }
+                }
+                if(gis.getAmount() == 1 || appendPos == null) return;
+                int newAmount = gis.getAmount() / 2;
+                gis.decreaseAmount(newAmount);
+                decreaseWeight(gis.getItem().getWeight() * newAmount);
+                insert(new ItemStack(gis.getItem(), newAmount), appendPos);
+                willNeedUpdate();
+                return;
+            }else if(pos2.x == 3) {
+                // split one
                 IntVector2 appendPos = null;
                 outer:
                 for(int y = rows - 1; y >= 0; y--) {

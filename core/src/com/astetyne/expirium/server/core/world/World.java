@@ -3,6 +3,7 @@ package com.astetyne.expirium.server.core.world;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
@@ -121,14 +122,14 @@ public class World implements WorldSaveable, Disposable {
             day++;
         }
 
-        waterEngine.onTick(); // should be called before physics step
+        // should be called before physics step
+        waterEngine.onTick();
 
         // time step should be 1/32 but then items are kinda buggy, so it is doubled
         for(int i = 0; i < 2; i++) {
-            for(Player pp : server.getPlayers()) {
-                pp.applyPhysics();
+            for(Entity e : server.getEntities()) {
+                e.applyPhysics();
             }
-            waterEngine.applyPhysics();
             b2dWorld.step(1f/64, 6, 2);
         }
 
@@ -171,6 +172,7 @@ public class World implements WorldSaveable, Disposable {
 
         //DEBUG------
         waterEngine.createWater(t);
+        p.getNetManager().putWarningPacket("ahoj ty tam, lol", 1000, ExpiColor.GREEN);
         //DEBUG------
 
         // following code is only for tile placing

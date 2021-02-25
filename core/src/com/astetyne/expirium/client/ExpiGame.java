@@ -13,6 +13,7 @@ import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
+import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -55,6 +56,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	public void create () {
 		TextureAtlas bg = new TextureAtlas("background.atlas");
 		TextureAtlas textures = new TextureAtlas("textures.atlas");
+		LivingEffect.loadTextures(textures);
 		BGRes.loadTextures(bg);
 		GuiRes.loadTextures(textures);// must be called before Res
 		Res.loadTextures(textures, textures);

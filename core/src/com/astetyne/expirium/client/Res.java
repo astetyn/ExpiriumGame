@@ -20,13 +20,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class Res {
 
     // gui
-    public static BitmapFont MAIN_FONT, TITLE_FONT, WORLD_FONT;
+    public static BitmapFont MAIN_FONT, TITLE_FONT, WARN_FONT, WORLD_FONT;
 
     public static Button.ButtonStyle BUTTON_STYLE;
     public static TextureRegion CROSS_ICON;
     public static TextButton.TextButtonStyle TEXT_BUTTON_STYLE;
     public static TextField.TextFieldStyle TEXT_FIELD_STYLE;
-    public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE;
+    public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE, WARN_LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
     public static MoveThumbStick.MoveThumbStickStyle MOVE_THUMB_STICK_STYLE;
     public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
@@ -43,20 +43,12 @@ public class Res {
 
         Animation.PlayMode loop_pong = Animation.PlayMode.LOOP_PINGPONG;
 
-        /*FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("LadylikeBB.ttf"));
-        //FreeTypeFontGenerator gen = new FreeTypeFontGenerator(Gdx.files.internal("Life is goofy.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 70;
-        TITLE_FONT = gen.generateFont(parameter);
-        TITLE_FONT.getData().setScale(2);
-        parameter.size = 70;
-        MAIN_FONT = gen.generateFont(parameter);
-        /*gen.dispose();*/
-
         // fonts
         MAIN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), gui.findRegion("main_font"));
         TITLE_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), gui.findRegion("main_font"));
         TITLE_FONT.getData().setScale(2);
+        WARN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), gui.findRegion("main_font"));
+        WARN_FONT.getData().setScale(1.6f);
         WORLD_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), gui.findRegion("main_font"));
         WORLD_FONT.getData().setScale(0.01f);
 
@@ -80,6 +72,7 @@ public class Res {
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(GuiRes.FRAME_GRAY.getDrawable(), GuiRes.FRAME_GREEN.getDrawable(), GuiRes.FRAME_GRAY.getDrawable(), MAIN_FONT);
         TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, GuiRes.FRAME_GRAY.getDrawable());
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
+        WARN_LABEL_STYLE = new Label.LabelStyle(WARN_FONT, Color.WHITE);
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         MOVE_THUMB_STICK_STYLE = new MoveThumbStick.MoveThumbStickStyle(tsFore, moveTsSideArrow, moveTsUpArrow);

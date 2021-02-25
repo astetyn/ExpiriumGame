@@ -48,10 +48,10 @@ public class GameScreen implements Screen {
 
         stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
 
-        warnMsgLabel = new WarnMsgLabel(Res.LABEL_STYLE);
+        warnMsgLabel = new WarnMsgLabel(Res.WARN_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
 
-        setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
+        setRoot(new GameRoot());
 
         multiplexer.addProcessor(stage);
 
@@ -140,6 +140,13 @@ public class GameScreen implements Screen {
         }
     }
 
+    public void onWarningMsgPacket(PacketInputStream in) {
+        String msg = in.getString();
+        int duration = in.getInt();
+        Color c = in.getColor().getColor();
+        addWarning(msg, duration, c);
+    }
+
     public ClientWorld getWorld() {
         return world;
     }
@@ -176,7 +183,7 @@ public class GameScreen implements Screen {
         buildViewActive = !buildViewActive;
     }
 
-    public void addWarning(String msg, long duration, Color color) {
-        warnMsgLabel.addWarning(msg, duration, color);
+    public void addWarning(String msg, long durationMillis, Color color) {
+        warnMsgLabel.addWarning(msg, durationMillis, color);
     }
 }

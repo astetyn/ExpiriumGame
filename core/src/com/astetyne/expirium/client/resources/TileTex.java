@@ -50,6 +50,7 @@ public enum TileTex implements Textureable {
     FURNACE_OFF,
     CHEST,
     TORCH,
+    LADDER,
     ;
 
     private TextureRegion textureRegion;

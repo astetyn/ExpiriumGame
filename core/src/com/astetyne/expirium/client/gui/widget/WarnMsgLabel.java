@@ -22,8 +22,8 @@ public class WarnMsgLabel extends Label {
         lastMsgStart = 0;
     }
 
-    public void addWarning(String msg, long duration, Color color) {
-        queue.add(new WarningMessage(msg, duration, color));
+    public void addWarning(String msg, long durationMillis, Color color) {
+        queue.add(new WarningMessage(msg, durationMillis, color));
     }
 
     public void act(float delta) {

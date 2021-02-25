@@ -2,8 +2,6 @@ package com.astetyne.expirium.client.utils;
 
 import com.badlogic.gdx.graphics.Color;
 
-import java.util.HashMap;
-
 public enum ExpiColor {
 
     RED(Color.RED),
@@ -21,25 +19,8 @@ public enum ExpiColor {
         return c;
     }
 
-    public byte getId() {
-        return id;
-    }
-
-    byte id;
-    private static final HashMap<Byte, ExpiColor> map;
-    static {
-        System.out.println("ExpiColor class loading.");
-        map = new HashMap<>();
-        byte i = 0;
-        for(ExpiColor it : ExpiColor.values()) {
-            it.id = i;
-            map.put(it.id, it);
-            i++;
-        }
-    }
-
-    public static ExpiColor get(int id) {
-        return map.get((byte)id);
+    public static ExpiColor get(int i) {
+        return values()[i];
     }
 
 }

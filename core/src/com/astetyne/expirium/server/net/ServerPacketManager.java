@@ -8,7 +8,6 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.Entity;
-import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
@@ -190,12 +189,7 @@ public class ServerPacketManager {
 
     public void putLivingStatsPacket() {
         out.startPacket(27);
-        out.putByte(owner.getHealthLevel());
-        out.putByte(owner.getFoodLevel());
-        out.putByte((byte) owner.getActiveLivingEffects().size());
-        for(LivingEffect effect : owner.getActiveLivingEffects()) {
-            out.putByte((byte) effect.ordinal());
-        }
+        owner.writeLivingStats(out);
     }
 
     public void putSimpleServerPacket(SimpleServerPacket p) {
@@ -245,6 +239,13 @@ public class ServerPacketManager {
         out.startPacket(35);
         out.putVector(loc);
         out.putString(text);
-        out.putByte(c.getId());
+        out.putColor(c);
+    }
+
+    public void putWarningPacket(String msg, int durationMillis, ExpiColor c) {
+        out.startPacket(23);
+        out.putString(msg);
+        out.putInt(durationMillis);
+        out.putColor(c);
     }
 }

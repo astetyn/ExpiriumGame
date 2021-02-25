@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.entity.Entity;
 import com.badlogic.gdx.math.Vector2;
@@ -78,6 +79,10 @@ public class PacketOutputStream {
     public void putIntVector(IntVector2 vec) {
         putInt(vec.x);
         putInt(vec.y);
+    }
+
+    public void putColor(ExpiColor c) {
+        putByte((byte) c.ordinal());
     }
 
     public void putEntity(Entity e) {

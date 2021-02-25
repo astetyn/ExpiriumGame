@@ -5,6 +5,9 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerDataHandler {
 
     // inventory
@@ -14,6 +17,7 @@ public class PlayerDataHandler {
 
     // living stats
     private byte health, food;
+    private final List<LivingEffect> activeEffects;
 
     public PlayerDataHandler() {
         mainData = new StorageGridData();
@@ -25,14 +29,18 @@ public class PlayerDataHandler {
 
         thumbStickData1 = new ThumbStickData();
         thumbStickData2 = new ThumbStickData();
+
+        activeEffects = new ArrayList<>();
     }
 
     public void feedLivingStats(PacketInputStream in) {
+        activeEffects.clear();
         health = in.getByte();
         food = in.getByte();
         byte effectsSize = in.getByte();
         for(int i = 0; i < effectsSize; i++) {
             LivingEffect effect = LivingEffect.get(in.getByte());
+            activeEffects.add(effect);
         }
         GameScreen.get().getActiveRoot().refresh();
     }
@@ -69,5 +77,9 @@ public class PlayerDataHandler {
 
     public ThumbStickData getThumbStickData2() {
         return thumbStickData2;
+    }
+
+    public List<LivingEffect> getActiveEffects() {
+        return activeEffects;
     }
 }

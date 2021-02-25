@@ -60,6 +60,7 @@ public enum Material implements Textureable {
     FURNACE_OFF(TileTex.FURNACE_OFF, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
     CHEST(TileTex.CHEST, MetaTileChest.class, TileFix.CHEST, Solidity.LABILE_VERT, 1, 2, Item.CHEST),
     TORCH(TileTex.TORCH, MetaTileTorch.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
+    LADDER(TileTex.CHROMITE, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.LADDER),
     ;
 
     private final Textureable textureable;
@@ -204,6 +205,14 @@ public enum Material implements Textureable {
             case GLASS:
             case WOODEN_WALL:
             case SOFT_WOODEN_WALL:
+                return true;
+            default: return false;
+        }
+    }
+
+    public boolean isClimbable() {
+        switch(this) {
+            case LADDER:
                 return true;
             default: return false;
         }

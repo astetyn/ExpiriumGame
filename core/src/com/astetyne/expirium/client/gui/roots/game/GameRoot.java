@@ -12,6 +12,7 @@ import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
+import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
 import com.badlogic.gdx.Gdx;
@@ -46,7 +47,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
 
         toolSlot = new HotBarSlot("Tools", ChosenSlot.TOOL_SLOT);
         materialSlot = new HotBarSlot("Mats", ChosenSlot.MATERIAL_SLOT);
-        consumableSlot = new HotBarSlot("Misc", ChosenSlot.CONSUMABLE_SLOT);
+        consumableSlot = new HotBarSlot("Food", ChosenSlot.CONSUMABLE_SLOT);
 
         toolSlot.setFocus(true);
         lastFocused = toolSlot;
@@ -141,9 +142,9 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         playerStatsTable.setBounds(1800, 850, 200, 150);
         playerStatsTable.align(Align.topRight);
         addActor(playerStatsTable);
-        inventoryButton.setBounds(1870, 750, 100, 100);
+        inventoryButton.setBounds(1870, 660, 100, 100);
         addActor(inventoryButton);
-        moveTS.setBounds(140, 100, 320, Utils.percFromW(320));
+        moveTS.setBounds(120, 60, 320, Utils.percFromW(320));
         addActor(moveTS);
 
         int slotW = 120;
@@ -167,7 +168,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         addActor(consumableSlot);
         addActor(switchArrowRight);
 
-        breakTS.setBounds(1540, 100, 320, Utils.percFromW(320));
+        breakTS.setBounds(1540, 80, 320, Utils.percFromW(320));
         addActor(breakTS);
         activeLeftActor = breakTS;
 
@@ -181,15 +182,23 @@ public class GameRoot extends WidgetGroup implements GameRootable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        fpsLabel.setText("fps: "+Gdx.graphics.getFramesPerSecond());
-        Vector2 loc = GameScreen.get().getWorld().getPlayer().getLocation();
-        locationLabel.setText("x: "+((int)loc.x)+" y: "+((int)loc.y));
-        entityLabel.setText("entities: "+ GameScreen.get().getWorld().getEntitiesID().keySet().size());
-        callsLabel.setText(ExpiGame.get().getBatch().totalRenderCalls);
-        ExpiGame.get().getBatch().totalRenderCalls = 0;
-        String out = "out: "+Math.round(ExpiGame.get().getClientGateway().getOut().occupied() * 1000) / 10f+"%";
-        String in = "in: "+Math.round(ExpiGame.get().getClientGateway().getIn().occupied() * 1000) / 10f+"%";
-        buffersLabel.setText(out+" "+in);
+        if(Consts.DEBUG) {
+            fpsLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond());
+            Vector2 loc = GameScreen.get().getWorld().getPlayer().getLocation();
+            locationLabel.setText("x: " + ((int) loc.x) + " y: " + ((int) loc.y));
+            entityLabel.setText("entities: " + GameScreen.get().getWorld().getEntitiesID().keySet().size());
+            callsLabel.setText(ExpiGame.get().getBatch().totalRenderCalls);
+            ExpiGame.get().getBatch().totalRenderCalls = 0;
+            String out = "out: " + Math.round(ExpiGame.get().getClientGateway().getOut().occupied() * 1000) / 10f + "%";
+            String in = "in: " + Math.round(ExpiGame.get().getClientGateway().getIn().occupied() * 1000) / 10f + "%";
+            buffersLabel.setText(out + " " + in);
+        }
+
+        for(int i = 0; i < GameScreen.get().getPlayerData().getActiveEffects().size(); i++) {
+            LivingEffect effect = GameScreen.get().getPlayerData().getActiveEffects().get(i);
+            float iconSize = 80;
+            batch.draw(effect.getTex(), 2000 - (i+1)*iconSize - i*20, 770, iconSize, Utils.percFromW(iconSize));
+        }
 
         super.draw(batch, parentAlpha);
     }
@@ -207,7 +216,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
     @Override
     public void refresh() {
 
-        HotSlotsData data = GameScreen.get().getPlayerData().getHotSlotsData();
+        PlayerDataHandler playerData = GameScreen.get().getPlayerData();
+        HotSlotsData data = playerData.getHotSlotsData();
 
         switch(data.getChosenSlot()) {
             case TOOL_SLOT:
@@ -248,8 +258,6 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         if(!lastFocused.isFocused()) {
             lastFocused = focusedSlot;
         }
-
-        PlayerDataHandler playerData = GameScreen.get().getPlayerData();
 
         healthStat.setText(playerData.getHealth()+" %");
         foodStat.setText(playerData.getFood()+" %");
