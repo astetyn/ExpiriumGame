@@ -6,6 +6,7 @@ import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.Entity;
 import com.astetyne.expirium.server.core.entity.LivingEntity;
@@ -189,7 +190,7 @@ public class Player extends LivingEntity {
         }else {
             horzFactor = 1250;
             maxHorzVel = 3;
-            if(tsData1.vert >= jumpThreshold && onGround && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if(tsData1.vert >= jumpThreshold && (onGround || false) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
                 body.applyLinearImpulse(0, 350f, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
@@ -306,8 +307,14 @@ public class Player extends LivingEntity {
             mainInv.append(recipe.getProduct());
             return;
         }
-        if(!mainInv.contains(recipe.getRequiredItems())) return;
-        if(!mainInv.canAppend(recipe.getProduct())) return;
+        if(!mainInv.contains(recipe.getRequiredItems())) {
+            getNetManager().putWarningPacket("Not enough resources.", 500, ExpiColor.RED);
+            return;
+        }
+        if(!mainInv.canAppend(recipe.getProduct())) {
+            getNetManager().putWarningPacket("Not enough space.", 500, ExpiColor.RED);
+            return;
+        }
 
         for(ItemStack is : recipe.getRequiredItems()) {
             mainInv.remove(is);

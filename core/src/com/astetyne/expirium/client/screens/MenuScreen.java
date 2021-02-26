@@ -81,8 +81,8 @@ public class MenuScreen implements Screen {
         activeRoot = root;
     }
 
-    public void addWarning(String msg, long duration, Color color) {
-        warnMsgLabel.addWarning(msg, duration, color);
+    public void addWarning(String msg, int duration, Color color) {
+        warnMsgLabel.setMsg(msg, duration, color);
     }
 
     public Stage getStage() {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class BaseGrid extends Widget {
 
@@ -32,15 +33,16 @@ public class BaseGrid extends Widget {
         int tileSizeX = (int) (getWidth() / data.columns);
         int tileSizeY = (int) (getHeight() / data.rows);
 
+        outer:
         for(int i = 0; i < data.rows; i++) {
             for(int j = 0; j < data.columns; j++) {
-                if(withUtils && i == 0 && j == data.columns-2) {
-                    batch.draw(style.splitTile, getX()+j*tileSizeX, getY(), tileSizeX, tileSizeY);
-                    batch.draw(style.throwTile, getX()+(j+1)*tileSizeX, getY(), tileSizeX, tileSizeY);
-                    j++;
-                    continue;
+                if(withUtils && i == 0 && j == data.columns-3) {
+                    style.splitTileHalf.draw(batch, getX()+(j)*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    style.splitTile.draw(batch, getX()+(j+1)*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    style.throwTile.draw(batch, getX()+(j+2)*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    continue outer;
                 }
-                batch.draw(style.gridTile, getX()+j*tileSizeX, getY()+i*tileSizeY, tileSizeX, tileSizeY);
+                style.gridTile.draw(batch, getX()+j*tileSizeX, getY()+i*tileSizeY, tileSizeX, tileSizeY);
             }
         }
         for(GridItemStack is : data.items) {
@@ -95,12 +97,13 @@ public class BaseGrid extends Widget {
 
     public static class BaseGridStyle {
 
-        final TextureRegion gridTile, throwTile, splitTile;
+        final Drawable gridTile, throwTile, splitTile, splitTileHalf;
 
-        public BaseGridStyle(TextureRegion gridTile, TextureRegion throwTile, TextureRegion splitTile) {
+        public BaseGridStyle(Drawable gridTile, Drawable throwTile, Drawable splitTile, Drawable splitTileHalf) {
             this.gridTile = gridTile;
             this.throwTile = throwTile;
             this.splitTile = splitTile;
+            this.splitTileHalf = splitTileHalf;
         }
     }
 

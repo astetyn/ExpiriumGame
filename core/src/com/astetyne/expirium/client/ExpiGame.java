@@ -59,7 +59,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		LivingEffect.loadTextures(textures);
 		BGRes.loadTextures(bg);
 		GuiRes.loadTextures(textures);// must be called before Res
-		Res.loadTextures(textures, textures);
+		Res.loadTextures(textures);
 		TileTex.loadTextures(textures);
 		TileTexAnim.loadTextures(textures);
 		Item.loadTextures(textures);

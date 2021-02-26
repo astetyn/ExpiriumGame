@@ -6,6 +6,7 @@ import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRootable;
+import com.astetyne.expirium.client.gui.widget.OverlapImage;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.world.Background;
@@ -28,6 +29,7 @@ public class GameScreen implements Screen {
     private final InputMultiplexer multiplexer;
     private final Stage stage;
     private final WarnMsgLabel warnMsgLabel;
+    private final OverlapImage overlapImage;
     private final ClientWorld world;
     private final Background background;
     private int time;
@@ -51,13 +53,16 @@ public class GameScreen implements Screen {
         warnMsgLabel = new WarnMsgLabel(Res.WARN_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
 
-        setRoot(new GameRoot());
-
         multiplexer.addProcessor(stage);
 
         world = new ClientWorld(in);
 
+        overlapImage = new OverlapImage(world, playerDataHandler);
+        overlapImage.setBounds(0, 0, stage.getWidth(), stage.getHeight());
+
         background = new Background(world);
+
+        setRoot(new GameRoot());
 
     }
 
@@ -129,6 +134,7 @@ public class GameScreen implements Screen {
         stage.clear();
         stage.addActor(root.getActor());
         stage.addActor(warnMsgLabel);
+        stage.addActor(overlapImage);
         activeRoot = root;
     }
 
@@ -183,7 +189,11 @@ public class GameScreen implements Screen {
         buildViewActive = !buildViewActive;
     }
 
-    public void addWarning(String msg, long durationMillis, Color color) {
-        warnMsgLabel.addWarning(msg, durationMillis, color);
+    public void addWarning(String msg, int durationMillis, Color color) {
+        warnMsgLabel.setMsg(msg, durationMillis, color);
+    }
+
+    public OverlapImage getOverlapImage() {
+        return overlapImage;
     }
 }

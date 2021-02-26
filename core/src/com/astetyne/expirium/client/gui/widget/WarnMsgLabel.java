@@ -5,55 +5,37 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class WarnMsgLabel extends Label {
 
-    private final Queue<WarningMessage> queue;
-    private long lastMsgStart;
-    private WarningMessage actualMsg;
+    private final static int transparentTime = 200;
+
+    private long startTime;
+    public int duration;
 
     public WarnMsgLabel(LabelStyle style) {
         super("", style);
         setAlignment(Align.center);
         setTouchable(Touchable.disabled);
-        queue = new LinkedList<>();
-        lastMsgStart = 0;
+        startTime = 0;
+        duration = 0;
     }
 
-    public void addWarning(String msg, long durationMillis, Color color) {
-        queue.add(new WarningMessage(msg, durationMillis, color));
+    public void setMsg(String msg, int durationMillis, Color color) {
+        setText(msg);
+        duration = durationMillis;
+        setColor(color);
+        startTime = System.currentTimeMillis();
+        setVisible(true);
     }
 
     public void act(float delta) {
 
-        if(actualMsg != null && lastMsgStart + actualMsg.duration < System.currentTimeMillis()) {
-            actualMsg = null;
-            setText("");
-        }
+        int diff = (int) (startTime + duration - System.currentTimeMillis());
 
-        if(queue.size() == 0) return;
-
-        if(actualMsg == null) {
-            actualMsg = queue.poll();
-            lastMsgStart = System.currentTimeMillis();
-            setColor(actualMsg.color);
-            setText(actualMsg.msg);
-        }
-
-    }
-
-    public static class WarningMessage {
-
-        public String msg;
-        public long duration;
-        public Color color;
-
-        public WarningMessage(String msg, long duration, Color color) {
-            this.msg = msg;
-            this.duration = duration;
-            this.color = color;
+        if(diff < 0) {
+            setVisible(false);
+        }else if(diff < transparentTime) {
+            getColor().a = (float)diff / transparentTime;
         }
     }
 
