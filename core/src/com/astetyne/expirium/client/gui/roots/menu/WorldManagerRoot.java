@@ -2,7 +2,6 @@ package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
@@ -23,8 +22,8 @@ public class WorldManagerRoot extends WidgetGroup implements MenuRootable {
 
     public WorldManagerRoot(MenuScreen menu) {
 
-        Image imgLeft = new Image(GuiRes.FRAME_SQUARE.getDrawable());
-        Image imgRight = new Image(GuiRes.FRAME_SQUARE.getDrawable());
+        Image imgLeft = new Image(Res.FRAME_SQUARE_GRAY);
+        Image imgRight = new Image(Res.FRAME_SQUARE_GRAY);
 
         // load world side
         TextButton loadWorldButton = new TextButton("Load World", Res.TEXT_BUTTON_STYLE);
@@ -41,7 +40,7 @@ public class WorldManagerRoot extends WidgetGroup implements MenuRootable {
         });
 
         Table savedWorldTable = new Table();
-        savedWorldTable.setBackground(GuiRes.FRAME_GRAY.getDrawable());
+        savedWorldTable.setBackground(Res.FRAME_ROUND_GRAY);
 
         Label savedWorldStatusLabel = new Label("", Res.LABEL_STYLE);
         savedWorldTable.add(savedWorldStatusLabel);

@@ -58,7 +58,4 @@ public class TextInputRoot extends WidgetGroup implements MenuRootable {
 
     }
 
-    public String getInputText() {
-        return tf.getText();
-    }
 }

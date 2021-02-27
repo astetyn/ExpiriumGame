@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -39,7 +38,7 @@ public class HotBarSlot extends Widget {
             batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
         }
 
-        GuiRes.FRAME_GRAY.getDrawable().draw(batch, getX(), getY(), getWidth(), getHeight());
+        Res.FRAME_ROUND_GRAY.draw(batch, getX(), getY(), getWidth(), getHeight());
         if(itemStack == null || itemStack.getItem() == Item.EMPTY) {
             Res.MAIN_FONT.setColor(0.2f, 0.2f, 0.2f, 1);
             float xOff = getWidth()/2 - Utils.getTextWidth(emptyLabel, Res.MAIN_FONT)/2;

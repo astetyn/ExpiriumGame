@@ -48,11 +48,6 @@ public class WaterEngine {
 
     }
 
-    public void createWater(Tile t) {
-        t.setWaterLevel(2);
-        scheduledWaterTicks.add(new WaterTask(t, server.getWorld().getTick() + updateTicks));
-    }
-
     public void updateWater(Tile t) {
 
         // here we assume that world borders can not be broken and thus we do not need to care about edge cases
@@ -83,10 +78,6 @@ public class WaterEngine {
         int toFill = Math.min(maxLevel - dest.getWaterLevel(), source.getWaterLevel());
         increaseWaterLevel(dest, toFill);
         increaseWaterLevel(source, -toFill);
-        willNeedUpdate(dest);
-        willNeedUpdate(source);
-        updatedTiles.add(source);
-        updatedTiles.add(dest);
     }
 
     private void tryToBalanceSide(Tile source, int increment) {
@@ -110,10 +101,6 @@ public class WaterEngine {
                     increaseWaterLevel(dest, -1);
                     increaseWaterLevel(source, 1);
                 }
-                willNeedUpdate(source);
-                willNeedUpdate(dest);
-                updatedTiles.add(source);
-                updatedTiles.add(dest);
                 break;
             }
 
@@ -146,11 +133,18 @@ public class WaterEngine {
         scheduledWaterTicks.add(new WaterTask(t, server.getWorld().getTick() + updateTicks));
     }
 
+    public void setWaterLevel(Tile t, int level) {
+        level = Math.min(level, maxLevel);
+        increaseWaterLevel(t, level - t.getWaterLevel());
+    }
+
     private void increaseWaterLevel(Tile t, int amount) {
         t.increaseWaterLevel(amount);
         if(t.getY() != h-1) { // update for tile above
             willNeedUpdate(terrain[t.getX()][t.getY() + 1]);
         }
+        updatedTiles.add(t);
+        willNeedUpdate(t);
     }
 
     static class WaterTask implements Comparable<WaterTask> {

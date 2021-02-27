@@ -45,7 +45,8 @@ public abstract class LivingEntity extends Entity implements Collidable {
         alive = true;
         invincible = false;
         lastFallVelocity = 0;
-        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+        server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS);
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
         server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
@@ -62,7 +63,8 @@ public abstract class LivingEntity extends Entity implements Collidable {
         ticksUnderWater = in.readInt();
         invincible = false;
         lastFallVelocity = 0;
-        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+        server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS );
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
         server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
@@ -117,19 +119,25 @@ public abstract class LivingEntity extends Entity implements Collidable {
         lastFallVelocity = 0;
     }
 
-    // once per 2 seconds
-    protected void interval2Sec() {
+    // once per 1 seconds
+    protected void interval1Sec() {
+        if(!alive) return;
+        if(underWater) {
+            ticksUnderWater += Consts.SERVER_TPS;
+            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
+                injure(2);
+            }
+        }
+        server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS);
+    }
+
+    // once per 4 seconds
+    protected void interval4Sec() {
         if(!alive) return;
         if(foodLevel <= Consts.STARVATION_LEVEL) {
             injure(1);
         }
-        if(underWater) {
-            ticksUnderWater += Consts.SERVER_TPS * 2;
-            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
-                injure(5);
-            }
-        }
-        server.getWorld().scheduleTaskAfter(this::interval2Sec, Consts.SERVER_TPS * 2);
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
     }
 
     // once per 10 seconds

@@ -15,15 +15,15 @@ public class CombatToolManager extends ToolManager {
     private long lastHitTime;
     private final Vector2 tempVec, incrementDist;
 
-    public CombatToolManager(ExpiServer server, Player owner) {
-        super(server, owner);
+    public CombatToolManager(ExpiServer server, Player owner, ThumbStickData data) {
+        super(server, owner, data);
         lastHitTime = 0;
         tempVec = new Vector2();
         incrementDist = new Vector2();
     }
 
     @Override
-    public void onTick(ThumbStickData data) {
+    public void onTick() {
 
         float horz = data.horz;
         float vert = data.vert;

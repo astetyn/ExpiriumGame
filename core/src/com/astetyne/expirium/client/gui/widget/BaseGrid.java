@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.StorageGridData;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,6 +20,7 @@ public class BaseGrid extends Widget {
     private GridItemStack selectedItem;
     private final Vector2 itemVec;
     private final boolean withUtils;
+    private int tileWidth, tileHeight;
 
     public BaseGrid(BaseGridStyle style, StorageGridData data, boolean withUtils) {
         this.style = style;
@@ -28,23 +30,28 @@ public class BaseGrid extends Widget {
     }
 
     @Override
+    public void layout() {
+        super.layout();
+        tileWidth = Consts.INV_TILE_WIDTH;
+        tileHeight = (int) Utils.percFromW(Consts.INV_TILE_WIDTH);
+    }
+
+    @Override
     public void draw(Batch batch, float parentAlpha) {
-
-        int tileSizeX = (int) (getWidth() / data.columns);
-        int tileSizeY = (int) (getHeight() / data.rows);
-
+        validate();
         outer:
         for(int i = 0; i < data.rows; i++) {
             for(int j = 0; j < data.columns; j++) {
                 if(withUtils && i == 0 && j == data.columns-3) {
-                    style.splitTileHalf.draw(batch, getX()+(j)*tileSizeX, getY(), tileSizeX, tileSizeY);
-                    style.splitTile.draw(batch, getX()+(j+1)*tileSizeX, getY(), tileSizeX, tileSizeY);
-                    style.throwTile.draw(batch, getX()+(j+2)*tileSizeX, getY(), tileSizeX, tileSizeY);
+                    style.splitTileHalf.draw(batch, getX()+(j)*tileWidth, getY(), tileWidth, tileHeight);
+                    style.splitTile.draw(batch, getX()+(j+1)*tileWidth, getY(), tileWidth, tileHeight);
+                    style.throwTile.draw(batch, getX()+(j+2)*tileWidth, getY(), tileWidth, tileHeight);
                     continue outer;
                 }
-                style.gridTile.draw(batch, getX()+j*tileSizeX, getY()+i*tileSizeY, tileSizeX, tileSizeY);
+                style.gridTile.draw(batch, getX()+j*tileWidth, getY()+i*tileHeight, tileWidth, tileHeight);
             }
         }
+
         for(GridItemStack is : data.items) {
             IntVector2 pos = is.getGridPos();
             TextureRegion tex = is.getItem().getGridTexture();
@@ -54,16 +61,16 @@ public class BaseGrid extends Widget {
                 IntVector2 siPos = selectedItem.getGridPos();
                 if(pos.x == siPos.x && pos.y == siPos.y) batch.setColor(0.5f, 0.5f, 0.5f, 0.5f);
             }
-            float off = tileSizeX * 0.1f;
-            batch.draw(tex, getX() + pos.x * tileSizeX + off, getY() + pos.y * tileSizeY + off, w * tileSizeX - 2*off, h * tileSizeY - 2*off);
+            float off = tileWidth * 0.1f;
+            batch.draw(tex, getX() + pos.x * tileWidth + off, getY() + pos.y * tileHeight + off, w * tileWidth - 2*off, h * tileHeight - 2*off);
             batch.setColor(1,1,1,1);
 
             if(!is.getItem().isMergeable()) continue;
 
             String label = is.getAmount()+"";
-            float xOff = tileSizeX/1.4f - Utils.getTextWidth(label, Res.MAIN_FONT)/2;
-            float yOff = tileSizeY/4f + Utils.getTextHeight(label, Res.MAIN_FONT)/2;
-            Res.MAIN_FONT.draw(batch, label, getX() + pos.x * tileSizeX + xOff, getY() + pos.y * tileSizeY + yOff);
+            float xOff = tileWidth/1.4f - Utils.getTextWidth(label, Res.MAIN_FONT)/2;
+            float yOff = tileHeight/4f + Utils.getTextHeight(label, Res.MAIN_FONT)/2;
+            Res.MAIN_FONT.draw(batch, label, getX() + pos.x * tileWidth + xOff, getY() + pos.y * tileHeight + yOff);
         }
 
         if(selectedItem != null) {

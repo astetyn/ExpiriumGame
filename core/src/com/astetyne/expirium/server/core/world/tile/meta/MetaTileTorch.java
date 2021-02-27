@@ -13,21 +13,21 @@ import java.io.IOException;
 
 public class MetaTileTorch extends MetaTile {
 
-    private final static int duration = Consts.SERVER_TPS * 60 * 4;
+    private final static int durationTicks = Consts.SERVER_TPS * 60 * 7;
 
     private final long placeTick;
 
     public MetaTileTorch(World world, Tile owner) {
         super(world, owner);
         placeTick = System.currentTimeMillis();
-        scheduleAfter(this::onEnd, duration);
+        scheduleAfter(this::onEnd, durationTicks);
     }
 
     public MetaTileTorch(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
         placeTick = in.readLong();
         long tickPassed = world.getTick() - placeTick;
-        scheduleAfter(this::onEnd, duration - tickPassed);
+        scheduleAfter(this::onEnd, durationTicks - tickPassed);
     }
 
     private void onEnd() {

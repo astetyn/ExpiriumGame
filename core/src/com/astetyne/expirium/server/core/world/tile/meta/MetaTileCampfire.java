@@ -17,6 +17,8 @@ import java.io.IOException;
 
 public class MetaTileCampfire extends MetaTile {
 
+    private final static int durationTicks = Consts.SERVER_TPS * 60 * 5;
+
     private final long placeTick;
     private final CookingInventory inventory;
 
@@ -34,8 +36,8 @@ public class MetaTileCampfire extends MetaTile {
         placeTick = in.readLong();
         inventory = new CookingInventory(world, 1, 2, 5, in);
         long tickPassed = world.getTick() - placeTick;
-        scheduleAfter(this::onReduce, Consts.SERVER_TPS*100 - tickPassed);
-        scheduleAfter(this::onEnd, Consts.SERVER_TPS*120 - tickPassed);
+        scheduleAfter(this::onReduce, durationTicks /10 - tickPassed);
+        scheduleAfter(this::onEnd, durationTicks - tickPassed);
         scheduleAfter(this::onInvTick, Consts.SERVER_TPS/2);
     }
 

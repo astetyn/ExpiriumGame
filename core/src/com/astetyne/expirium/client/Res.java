@@ -3,10 +3,14 @@ package com.astetyne.expirium.client;
 import com.astetyne.expirium.client.gui.widget.BaseGrid;
 import com.astetyne.expirium.client.gui.widget.MoveThumbStick;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
-import com.astetyne.expirium.client.resources.GuiRes;
+import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -16,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Res {
+
+    public static NinePatchDrawable FRAME_ROUND, FRAME_SQUARE, FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_YELLOW,
+        FRAME_SQUARE_GRAY, FRAME_ROUND_GRAY_TRANSP, INV_TILE;
 
     // gui
     public static BitmapFont MAIN_FONT, TITLE_FONT, WARN_FONT, WORLD_FONT;
@@ -54,15 +61,31 @@ public class Res {
         MAIN_FONT.setUseIntegerPositions(false);
         WORLD_FONT.setUseIntegerPositions(false);
 
+        Color gray = new Color(110f/255, 110f/255, 110f/255, 1);
+        Color yellow = new Color(132f/255, 118f/255, 55f/255, 1);
+        Color green = new Color(61f/255, 102f/255, 42f/255, 1);
+        Color tranpGray = new Color(Color.GRAY);
+        tranpGray.a = 0.4f;
+
+        // ninepatch
+        FRAME_ROUND = new NinePatchDrawable(atlas.createPatch("frame_round"));
+        FRAME_ROUND.getPatch().scale(10, 10);
+        FRAME_ROUND_GRAY = FRAME_ROUND.tint(gray);
+        FRAME_ROUND_GREEN = FRAME_ROUND.tint(green);
+        FRAME_ROUND_YELLOW = FRAME_ROUND.tint(yellow);
+        FRAME_ROUND_GRAY_TRANSP = FRAME_ROUND.tint(tranpGray);
+        FRAME_SQUARE = new NinePatchDrawable(atlas.createPatch("frame_square"));
+        FRAME_SQUARE.getPatch().scale(10, 10);
+        FRAME_SQUARE_GRAY = FRAME_SQUARE.tint(Color.LIGHT_GRAY);
+        INV_TILE = new NinePatchDrawable(atlas.createPatch("inv_tile"));
+        INV_TILE.getPatch().scale((1f/16)*Consts.INV_TILE_WIDTH, (1f/16) * Utils.percFromW(Consts.INV_TILE_WIDTH));
+
         Drawable selection = new TextureRegionDrawable(atlas.findRegion("selection"));
         Drawable cursor = new TextureRegionDrawable(atlas.findRegion("cursor"));
         TextureRegion tsBack = atlas.findRegion("thumb_stick_back");
         TextureRegion tsFore = atlas.findRegion("thumb_stick_fore");
         ARROW = atlas.findRegion("switch_arrow");
         DAMAGE_OVERLAP = atlas.findRegion("damage_overlap");
-        NinePatch patch = atlas.createPatch("inv_tile");
-        patch.scale(6, 6);
-        NinePatchDrawable invTile = new NinePatchDrawable(patch);
         TextureRegionDrawable invTileSplit = new TextureRegionDrawable(atlas.findRegion("inv_tile_split"));
         TextureRegionDrawable invTileSplitHalf = new TextureRegionDrawable(atlas.findRegion("inv_tile_split_half"));
         TextureRegionDrawable invTileThrow = new TextureRegionDrawable(atlas.findRegion("trash_icon"));
@@ -71,15 +94,15 @@ public class Res {
 
         CROSS_ICON = atlas.findRegion("cross_icon");
 
-        BUTTON_STYLE = new Button.ButtonStyle(GuiRes.FRAME_GRAY.getDrawable(), GuiRes.FRAME_GREEN.getDrawable(), GuiRes.FRAME_GRAY.getDrawable());
-        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(GuiRes.FRAME_GRAY.getDrawable(), GuiRes.FRAME_GREEN.getDrawable(), GuiRes.FRAME_GRAY.getDrawable(), MAIN_FONT);
-        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, GuiRes.FRAME_GRAY.getDrawable());
+        BUTTON_STYLE = new Button.ButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY);
+        TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY, MAIN_FONT);
+        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, FRAME_ROUND_GRAY);
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         WARN_LABEL_STYLE = new Label.LabelStyle(WARN_FONT, Color.WHITE);
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         MOVE_THUMB_STICK_STYLE = new MoveThumbStick.MoveThumbStickStyle(tsFore, moveTsSideArrow, moveTsUpArrow);
-        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(invTile, invTileThrow, invTileSplit, invTileSplitHalf);
+        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(INV_TILE, invTileThrow, invTileSplit, invTileSplitHalf);
 
         // entities
         PLAYER_IDLE_ANIM = new Animation<>(0.5f, atlas.findRegions("player_idle"), loop_pong);

@@ -19,7 +19,6 @@ public class MoveThumbStick extends Widget {
     private float maxRadiusX, maxRadiusY;
     private float circleWidth, circleHeight;
     private boolean touched;
-    private int touchID;
     private final Vector2 touchVec;
 
     public MoveThumbStick(ThumbStickData data, MoveThumbStickStyle style) {
@@ -36,7 +35,6 @@ public class MoveThumbStick extends Widget {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 touched = true;
-                touchID = pointer;
                 recalculate(getX() + x, getY() + y);
                 return true;
             }

@@ -138,8 +138,6 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
 
     private void loadData() {
 
-        System.out.println("loading name");
-
         FileHandle file = Gdx.files.local(path);
         if(!file.exists()) return;
         try {
@@ -159,8 +157,6 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
     }
 
     private void saveData() {
-
-        System.out.println("saving name: "+ExpiGame.get().getPlayerName());
 
         FileHandle file = Gdx.files.local(path);
         try {

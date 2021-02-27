@@ -3,7 +3,6 @@ package com.astetyne.expirium.server.core.world;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
-import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
@@ -171,14 +170,15 @@ public class World implements WorldSaveable, Disposable {
         }
 
         //DEBUG------
-        waterEngine.createWater(t);
-        p.getNetManager().putWarningPacket("ahoj ty tam, lol", 1000, ExpiColor.GREEN);
+        if(!t.getMaterial().isWatertight()) waterEngine.setWaterLevel(t, 5);
         //DEBUG------
 
         // following code is only for tile placing
         if(!p.isInInteractRadius(loc)) return;
 
-        Item item = p.getInv().getItemInHand().getItem();;
+        p.getToolManager().onInteract(t, type);
+
+        Item item = p.getInv().getItemInHand().getItem();
 
         if(t.getMaterial() != Material.AIR) return;
 
@@ -202,6 +202,8 @@ public class World implements WorldSaveable, Disposable {
 
         Material fromMat = t.getMaterial();
         MetaTile fromMeta = t.getMeta();
+
+        if(to.isWatertight()) waterEngine.setWaterLevel(t, 0);
 
         if(to == Material.AIR && withDrops) t.getMeta().dropItems();
 

@@ -154,9 +154,9 @@ public enum Item {
 
     public float getBreakingSpeedCoef() {
         switch(this) {
-            case WOODEN_MATTOCK: return 1.4f;
-            case RHYOLITE_MATTOCK: return 1.8f;
-            case IRON_MATTOCK: return 2.4f;
+            case WOODEN_MATTOCK: return 1.6f;
+            case RHYOLITE_MATTOCK: return 2f;
+            case IRON_MATTOCK: return 2.5f;
             default: return 1;
         }
     }

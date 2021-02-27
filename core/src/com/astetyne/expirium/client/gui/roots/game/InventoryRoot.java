@@ -6,7 +6,6 @@ import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -35,7 +34,7 @@ public class InventoryRoot extends Table implements GameRootable {
         if(Consts.DEBUG) setDebug(true);
 
         recipeDetail = new RecipeDetailTable();
-        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(GuiRes.FRAME_GRAY_TRANSP.getDrawable(), null, null, null, null);
+        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(Res.FRAME_ROUND_GRAY_TRANSP, null, null, null, null);
         recipeList = new ScrollPane(new RecipeListTable(recipeDetail), style);
         recipeList.setScrollingDisabled(true, false);
 

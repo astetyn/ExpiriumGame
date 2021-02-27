@@ -3,7 +3,6 @@ package com.astetyne.expirium.client.gui.roots.menu;
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.net.MulticastListener;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -51,7 +50,7 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
 
         ScrollPane availableServersScroll = new ScrollPane(availableServersTable);
 
-        Image img = new Image(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
+        Image img = new Image(Res.FRAME_ROUND_GRAY);
 
         int left = 300;
         int width = 1400;
@@ -92,15 +91,15 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
             Table t = new Table();
             t.add(name).width(800).height(100).padLeft(50);
             t.add(version).width(200).height(100).align(Align.center);
-            t.setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
+            t.setBackground(Res.FRAME_ROUND_GRAY_TRANSP);
 
             t.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if(lastChosenTable != null) lastChosenTable.setBackground(GuiRes.FRAME_GRAY.getDrawable());
+                    if(lastChosenTable != null) lastChosenTable.setBackground(Res.FRAME_ROUND_GRAY);
                     chosenServer = server;
                     lastChosenTable = t;
-                    t.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
+                    t.setBackground(Res.FRAME_ROUND_YELLOW);
                     joinButton.setColor(Color.YELLOW);
                     joinButton.setDisabled(false);
                 }

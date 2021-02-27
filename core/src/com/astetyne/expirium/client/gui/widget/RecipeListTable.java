@@ -3,7 +3,6 @@ package com.astetyne.expirium.client.gui.widget;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -29,14 +28,14 @@ public class RecipeListTable extends Table {
 
             t.add(icon).width(80).height(Utils.percFromW(80)).align(Align.left).pad(10, 5, 10, 15);
             t.add(label).grow();
-            t.setBackground(GuiRes.FRAME_GRAY.getDrawable());
+            t.setBackground(Res.FRAME_ROUND_GRAY);
             t.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     if(lastSelected != null) {
-                        lastSelected.setBackground(GuiRes.FRAME_GRAY.getDrawable());
+                        lastSelected.setBackground(Res.FRAME_ROUND_GRAY);
                     }
-                    t.setBackground(GuiRes.FRAME_YELLOW.getDrawable());
+                    t.setBackground(Res.FRAME_ROUND_YELLOW);
                     listener.onRecipeChange(recipe);
                     lastSelected = t;
                 }

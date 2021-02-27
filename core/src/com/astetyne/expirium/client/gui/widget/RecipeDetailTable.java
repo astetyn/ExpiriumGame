@@ -4,7 +4,6 @@ import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
-import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,7 +20,7 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
     public RecipeDetailTable() {
 
         requiredItems = new Table();
-        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(GuiRes.FRAME_GRAY.getDrawable(), null, null, null, GuiRes.FRAME_SQUARE.getDrawable());
+        ScrollPane.ScrollPaneStyle style = new ScrollPane.ScrollPaneStyle(Res.FRAME_ROUND_GRAY, null, null, null, Res.FRAME_SQUARE_GRAY);
         scrollRequiredItems = new ScrollPane(requiredItems, style);
         scrollRequiredItems.setScrollingDisabled(true, false);
 
@@ -84,7 +83,7 @@ public class RecipeDetailTable extends Table implements RecipeListTable.RecipeCh
         add(scrollRequiredItems).expandX().height(210);
         row();
         add(desc).grow().width(360).pad(10, 20, 10, 20);
-        setBackground(GuiRes.FRAME_GRAY_TRANSP.getDrawable());
+        setBackground(Res.FRAME_ROUND_GRAY_TRANSP);
         scrollRequiredItems.setScrollbarsVisible(true);
 
     }

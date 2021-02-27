@@ -52,9 +52,9 @@ public class Player extends LivingEntity {
         this.name = name;
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new Inventory(1, 1, 1);
-        toolManager = new TileBreakToolManager(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
+        toolManager = new TileBreakToolManager(server, this, tsData2);
         lastJump = 0;
         resurrectLoc = new Vector2(location);
         wasAlreadyDead = false;
@@ -74,9 +74,9 @@ public class Player extends LivingEntity {
         this.name = name;
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new Inventory(1, 1, 1);
-        toolManager = new TileBreakToolManager(server, this);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
+        toolManager = new TileBreakToolManager(server, this, tsData2);
         lastJump = 0;
         resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
         wasAlreadyDead = in.readBoolean();
@@ -101,8 +101,8 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    protected void interval2Sec() {
-        super.interval2Sec();
+    protected void interval1Sec() {
+        super.interval1Sec();
         if(underWater) {
             if(ticksUnderWater >= Consts.DROWNING_TICKS) {
                 activeLivingEffects.remove(LivingEffect.DROWNING);
@@ -233,7 +233,6 @@ public class Player extends LivingEntity {
         }
 
         recalcLadder();
-
         getNetManager().putLivingStatsPacket();
 
         if(mainInv.needsUpdate(this) || secondInv.needsUpdate(this)) {
@@ -247,12 +246,12 @@ public class Player extends LivingEntity {
 
         if((itemInHand.isTileBreaker() || itemInHand == Item.EMPTY) && !(toolManager instanceof TileBreakToolManager)) {
             toolManager.end();
-            toolManager = new TileBreakToolManager(server, this);
+            toolManager = new TileBreakToolManager(server, this, tsData2);
         }else if(itemInHand.isWeapon() && !(toolManager instanceof CombatToolManager)) {
             toolManager.end();
-            toolManager = new CombatToolManager(server, this);
+            toolManager = new CombatToolManager(server, this, tsData2);
         }
-        toolManager.onTick(tsData2);
+        toolManager.onTick();
     }
 
     @Override
@@ -403,6 +402,10 @@ public class Player extends LivingEntity {
 
     public HashSet<LivingEffect> getActiveLivingEffects() {
         return activeLivingEffects;
+    }
+
+    public ToolManager getToolManager() {
+        return toolManager;
     }
 
     @Override

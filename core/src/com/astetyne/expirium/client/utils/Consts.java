@@ -29,8 +29,6 @@ public class Consts {
 
     public static final float D_I_PICK_DIST = 1.7f;
 
-    public static final float CAMPFIRE_TIME = 180;
-
     public static final int ITEM_COOLDOWN_BREAK = SERVER_TPS/4;
     public static final int ITEM_COOLDOWN_DROP = SERVER_TPS * 6;
 
@@ -64,6 +62,6 @@ public class Consts {
     public static final float HORZ_JUMP_THRESHOLD = 0.4f;
 
     // gui
-    public static final int INV_TILE_MLT = 140;
+    public static final int INV_TILE_WIDTH = 140;
 
 }

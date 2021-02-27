@@ -47,7 +47,7 @@ public class StorageGrid extends Table {
     }
 
     public void rebuild() {
-        int mlt = Consts.INV_TILE_MLT;
+        int mlt = Consts.INV_TILE_WIDTH;
         clear();
         gridCell = add(grid).width(data.columns * mlt).height(Utils.percFromW(data.rows * mlt));
         row();
