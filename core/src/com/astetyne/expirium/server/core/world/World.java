@@ -98,7 +98,13 @@ public class World implements WorldSaveable, Disposable {
         stabilityCalc = new StabilityCalculator(server, terrain, width, height);
         fixtureCalc = new FixtureCalculator(terrain, width, height, terrainBody);
         backWallCalculator = new BackWallCalculator(server, terrain, width, height);
-        waterEngine = new WaterEngine(server, terrain, width, height);
+        waterEngine = new WaterEngine(this, terrain, width, height);
+
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                if(terrain[x][y].getWaterLevel() != 0) waterEngine.updateWater(terrain[x][y]);
+            }
+        }
 
         fixtureCalc.generateWorldFixtures();
         stabilityCalc.generateStability();

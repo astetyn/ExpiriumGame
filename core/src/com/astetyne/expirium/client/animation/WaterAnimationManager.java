@@ -18,13 +18,10 @@ public class WaterAnimationManager {
     }
 
     public void draw(SpriteBatch batch, ClientTile t, int x, int y) {
-
-        if(t.getWaterLevel() == 0) return;
-
         if((y != h-1 && terrain[x][y+1].getWaterLevel() > 0) || (y != 0 && terrain[x][y-1].getWaterLevel() != Consts.MAX_WATER_LEVEL && !terrain[x][y-1].getMaterial().isWatertight())) {
-            batch.draw(TileTexAnim.WATER.getAnim().getKeyFrame(ExpiGame.get().getTimeSinceStart()), x, y, 1, 1);
+            batch.draw(TileTexAnim.WATER_5.getAnim().getKeyFrame(ExpiGame.get().getTimeSinceStart()), x, y, 1, 1);
         }else {
-            batch.draw(TileTexAnim.WATER.getAnim().getKeyFrame(ExpiGame.get().getTimeSinceStart()), x, y, 1, (float)t.getWaterLevel()/Consts.MAX_WATER_LEVEL);
+            batch.draw(TileTexAnim.WATER_5.getAnim().getKeyFrame(ExpiGame.get().getTimeSinceStart()), x, y, 1, (float)t.getWaterLevel()/Consts.MAX_WATER_LEVEL);
         }
     }
 }

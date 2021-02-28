@@ -1,20 +1,21 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.world.calculator.WaterEngine;
 import com.astetyne.expirium.server.core.world.generator.Noise;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
-public class DesertGen extends BiomeGenerator {
+public class WaterBiome extends BiomeGenerator {
 
-    public DesertGen(WorldGenerator gen) {
+    public WaterBiome(WorldGenerator gen) {
         super(gen);
     }
 
     @Override
     public void generate(int i, int leftMH, int rightMH) {
         super.generate(i, leftMH, rightMH);
-        int from = i* Consts.WORLD_BIOME_WIDTH;
+        int from = i * Consts.WORLD_BIOME_WIDTH;
         int to = (i+1)*Consts.WORLD_BIOME_WIDTH;
 
         for(int x = from; x < to; x++) {
@@ -38,42 +39,23 @@ public class DesertGen extends BiomeGenerator {
                 }
             }
         }
-        generateCacti(from, to);
-        createRandSurfacePlacements(from, to, Material.CLAYSTONE, Math.random()*0.1, 1);
-        createOreSpots(Material.COAL_ORE, 0.3, from, to);
+        createOreSpots(Material.COAL_ORE, 0.1, from, to);
+        createOreSpots(Material.MAGNETITE, 0.3, from, to);
+
+        int eighth = (to - from)/8;
+        int startWater = from+eighth;
+        int endWater = to-eighth;
+        for(int x = startWater; x < endWater; x++) {
+            int bottom = (int) (surface[x] - Math.sin((float)(x-startWater) * Math.PI / (endWater - startWater))*30);
+            for(int y = bottom; y <= surface[x]; y++) {
+                terrain[x][y] = Material.AIR;
+                waterMask[x][y] = WaterEngine.maxLevel;
+            }
+        }
     }
 
     @Override
     public int getH(int x) {
         return (int) (50 + Noise.noise(x / 32.0f, seed) * 4);
-    }
-
-    private void generateCacti(int from, int to) {
-
-        int last = from;
-
-        for(int x = from; x < to; x++) {
-
-            int y = surface[x] + 1;
-
-            if(terrain[x][y-1].getSolidity().isLabile() || last + 10 > x || Math.random() < 0.8) continue;
-
-            last = x;
-
-            int cactusHeight = (int) (Math.random()*3) + 3;
-            for(int i = 0; i < cactusHeight; i++) {
-
-                double rand = Math.random();
-
-                if(rand < 0.33) {
-                    terrain[x][y + i] = Material.CACTUS_DOUBLE;
-                }else if(rand < 0.66) {
-                    terrain[x][y + i] = Material.CACTUS_LEFT;
-                }else {
-                    terrain[x][y + i] = Material.CACTUS_RIGHT;
-                }
-            }
-            terrain[x][y+cactusHeight-1] = Material.CACTUS_TOP;
-        }
     }
 }

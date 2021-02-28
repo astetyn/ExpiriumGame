@@ -77,7 +77,7 @@ public abstract class Entity implements Metaable, WorldSaveable {
         int bottomY = (int) (center.y - hh);
 
         // check if is in the water - only checks bottom overlapping tiles
-        for(int x = leftX; x <= center.x + w; x++) {
+        for(int x = leftX; x <= center.x + wh; x++) {
             Tile t = server.getWorld().getTileAt(x, bottomY);
             if(t.getWaterLevel() == 0) continue;
             float th = (float)t.getWaterLevel() / Consts.MAX_WATER_LEVEL;

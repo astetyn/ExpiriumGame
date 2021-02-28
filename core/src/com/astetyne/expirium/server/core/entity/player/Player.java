@@ -275,8 +275,8 @@ public class Player extends LivingEntity {
         int leftX = (int) (center.x - wh);
         int bottomY = (int) (center.y - hh);
 
-        for(int x = leftX; x <= center.x + w; x++) {
-            for(int y = bottomY; y <= center.y + h; y++) {
+        for(int x = leftX; x <= center.x + wh; x++) {
+            for(int y = bottomY; y <= center.y + hh; y++) {
                 Tile t = server.getWorld().getTileAt(x, y);
                 if(t.getMaterial().isClimbable()) {
                     onLadder = true;

@@ -2,6 +2,7 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
+import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
 public abstract class BiomeGenerator {
@@ -9,16 +10,20 @@ public abstract class BiomeGenerator {
     protected static final float smoothing = 7;
 
     protected final Material[][] terrain;
+    protected final byte[][] waterMask;
+    protected final boolean[][] backWallMask;
     protected final int[] surface;
     protected final int w, h;
     protected final long seed;
 
-    public BiomeGenerator(Material[][] terrain, int[] surface, int w, int h, long seed) {
-        this.terrain = terrain;
-        this.surface = surface;
-        this.w = w;
-        this.h = h;
-        this.seed = seed;
+    public BiomeGenerator(WorldGenerator gen) {
+        this.terrain = gen.getTerrain();
+        this.waterMask = gen.getWaterMask();
+        backWallMask = gen.getBackWallMask();
+        this.surface = gen.getSurface();
+        this.w = gen.getW();
+        this.h = gen.getH();
+        this.seed = gen.getSeed();
     }
 
     // MH = midheight, target y for generation

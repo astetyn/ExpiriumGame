@@ -5,29 +5,33 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import java.util.Locale;
+
 public enum TileTexAnim implements Textureable {
 
-    CAMPFIRE_BIG("campfire_big", 0.1f, Animation.PlayMode.LOOP_PINGPONG),
-    CAMPFIRE_SMALL("campfire_small", 0.1f, Animation.PlayMode.LOOP_PINGPONG),
+    CAMPFIRE_BIG(0.1f, Animation.PlayMode.LOOP_PINGPONG),
+    CAMPFIRE_SMALL(0.1f, Animation.PlayMode.LOOP_PINGPONG),
 
-    WATER("water_5", 0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    /*WATER_1(0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    WATER_2(0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    WATER_3(0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    WATER_4(0.5f, Animation.PlayMode.LOOP_PINGPONG),*/
+    WATER_5(0.5f, Animation.PlayMode.LOOP_PINGPONG),
     
-    TILE_BREAK("tile_break", 0.26f, Animation.PlayMode.LOOP);
+    TILE_BREAK(0.26f, Animation.PlayMode.LOOP);
 
-    private final String regionName;
     private Animation<TextureRegion> anim;
     private final float interval;
     private final Animation.PlayMode playMode;
 
-    TileTexAnim(String regionName, float interval, Animation.PlayMode playMode) {
-        this.regionName = regionName;
+    TileTexAnim(float interval, Animation.PlayMode playMode) {
         this.interval = interval;
         this.playMode = playMode;
     }
 
-    public static void loadTextures(TextureAtlas worldAtlas) {
+    public static void loadTextures(TextureAtlas atlas) {
         for(TileTexAnim tta : values()) {
-            tta.anim = new Animation<>(tta.interval, worldAtlas.findRegions(tta.regionName), tta.playMode);
+            tta.anim = new Animation<>(tta.interval, atlas.findRegions(tta.name().toLowerCase(Locale.US)), tta.playMode);
         }
     }
 

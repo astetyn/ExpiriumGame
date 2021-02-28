@@ -31,13 +31,13 @@ public class ClientWorld {
 
     public static float PPM = 32; // pixel per meter when zoom == 1
 
-    private ClientTile[][] terrain;
+    private final ClientTile[][] terrain;
     private final HashMap<Short, ClientEntity> entitiesID;
     private final List<ClientEntity> entities;
-    private MainClientPlayer player;
+    private final MainClientPlayer player;
     private final OrthographicCamera camera;
-    private int terrainWidth, terrainHeight;
-    private LightCalculator lightCalculator;
+    private final int terrainWidth, terrainHeight;
+    private final LightCalculator lightCalculator;
     private final WorldInputListener worldInputListener;
     private final List<BreakingTile> breakingTiles;
     private final WorldAnimationManager animationManager;
@@ -136,6 +136,7 @@ public class ClientWorld {
                 ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
                 if(slot == ChosenSlot.MATERIAL_SLOT && GameScreen.get().isBuildViewActive()) {
                     if(t.getStability() < 1 || t.getStability() >= stabColors.length) {
+                        batch.setColor(Color.WHITE);
                         GuiRes.DEBUG.getDrawable().draw(batch, i, j, 1, 1);
                         continue;
                     }
@@ -178,16 +179,20 @@ public class ClientWorld {
                 e.draw(batch);
             }
         }
-        animationManager.draw(batch);
 
+        // water
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 ClientTile t = terrain[i][j];
+                if(t.getWaterLevel() == 0) continue;
                 float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
                 batch.setColor(b,b,b,1);
                 waterManager.draw(batch, t, i, j);
             }
         }
+
+        animationManager.draw(batch);
+
         batch.setColor(Color.WHITE);
     }
 

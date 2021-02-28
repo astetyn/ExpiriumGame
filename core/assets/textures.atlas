@@ -6,266 +6,266 @@ filter: Nearest,Nearest
 repeat: none
 apple_item
   rotate: false
-  xy: 893, 221
+  xy: 193, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 back_wall
   rotate: false
-  xy: 85, 1
+  xy: 599, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blueberry_bush
   rotate: false
-  xy: 369, 46
+  xy: 707, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blueberry_bush_item
   rotate: false
-  xy: 369, 46
+  xy: 707, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blueberry_bush_grown
   rotate: false
-  xy: 893, 239
+  xy: 671, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 blueberry_item
   rotate: false
-  xy: 207, 46
+  xy: 271, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_double
   rotate: false
-  xy: 315, 64
+  xy: 217, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_item
   rotate: false
-  xy: 405, 64
+  xy: 471, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_left
   rotate: false
-  xy: 619, 103
+  xy: 567, 173
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_right
   rotate: false
-  xy: 929, 203
+  xy: 345, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cactus_top
   rotate: false
-  xy: 225, 46
+  xy: 283, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 campfire_big
   rotate: false
-  xy: 67, 48
+  xy: 581, 223
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_big
   rotate: false
-  xy: 717, 189
+  xy: 615, 223
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_big
   rotate: false
-  xy: 549, 87
+  xy: 649, 223
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 campfire_item
   rotate: false
-  xy: 1, 16
+  xy: 515, 191
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 campfire_small
   rotate: false
-  xy: 515, 87
+  xy: 137, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 campfire_small
   rotate: false
-  xy: 101, 48
+  xy: 515, 89
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 campfire_small
   rotate: false
-  xy: 751, 189
+  xy: 239, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 chest
   rotate: false
-  xy: 477, 46
+  xy: 843, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 chest_item
   rotate: false
-  xy: 243, 46
+  xy: 289, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 chromite
   rotate: false
-  xy: 315, 46
+  xy: 653, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 chromite_item
   rotate: false
-  xy: 875, 239
+  xy: 807, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 chromium_item
   rotate: false
-  xy: 911, 221
+  xy: 843, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 claystone
   rotate: false
-  xy: 351, 46
+  xy: 689, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 claystone_item
   rotate: false
-  xy: 911, 203
+  xy: 327, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 coal_item
   rotate: false
-  xy: 751, 223
+  xy: 171, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 coal_ore
   rotate: false
-  xy: 983, 221
+  xy: 235, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cooked_apple_item
   rotate: false
-  xy: 261, 64
+  xy: 689, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cross_icon
   rotate: false
-  xy: 707, 119
+  xy: 933, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor
   rotate: false
-  xy: 717, 155
+  xy: 683, 223
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 damage_overlap
   rotate: false
-  xy: 515, 155
-  size: 200, 100
-  orig: 200, 100
+  xy: 1, 30
+  size: 100, 50
+  orig: 100, 50
   offset: 0, 0
   index: -1
 debug_icon
   rotate: false
-  xy: 515, 83
+  xy: 549, 90
   size: 2, 2
   orig: 2, 2
   offset: 0, 0
   index: -1
 dirt
   rotate: false
-  xy: 171, 46
+  xy: 567, 119
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dirt_item
   rotate: false
-  xy: 821, 210
+  xy: 109, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 drowning_effect
   rotate: false
-  xy: 875, 203
+  xy: 735, 210
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 fir_cone_item
   rotate: false
-  xy: 441, 64
+  xy: 489, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 food_icon
   rotate: false
-  xy: 207, 64
+  xy: 345, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 frame_round
   rotate: false
-  xy: 103, 4
+  xy: 301, 45
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -273,7 +273,7 @@ frame_round
   index: -1
 frame_square
   rotate: false
-  xy: 1019, 251
+  xy: 515, 83
   size: 4, 4
   split: 1, 1, 1, 1
   orig: 4, 4
@@ -281,98 +281,98 @@ frame_square
   index: -1
 fruit_jam_item
   rotate: false
-  xy: 515, 121
+  xy: 103, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 furnace_item
   rotate: false
-  xy: 423, 46
+  xy: 789, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 furnace_off
   rotate: false
-  xy: 423, 46
+  xy: 789, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 furnace_on
   rotate: false
-  xy: 725, 119
+  xy: 951, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass
   rotate: false
-  xy: 965, 221
+  xy: 879, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass_item
   rotate: false
-  xy: 965, 221
+  xy: 879, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 369, 64
+  xy: 253, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_item
   rotate: false
-  xy: 387, 64
+  xy: 915, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass_slope_right
   rotate: false
-  xy: 875, 221
+  xy: 163, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 growing_plant
   rotate: false
-  xy: 67, 1
+  xy: 103, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 health_icon
   rotate: false
-  xy: 423, 64
+  xy: 933, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 hunting_knife_item
   rotate: false
-  xy: 857, 203
+  xy: 1005, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 hunting_knife_item_grid
   rotate: false
-  xy: 135, 48
+  xy: 717, 223
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 inv_tile
   rotate: false
-  xy: 1019, 245
+  xy: 507, 76
   size: 4, 4
   split: 1, 1, 1, 1
   orig: 4, 4
@@ -380,168 +380,168 @@ inv_tile
   index: -1
 inv_tile_split
   rotate: false
-  xy: 387, 46
+  xy: 753, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 inv_tile_split_half
   rotate: false
-  xy: 297, 46
+  xy: 635, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 inventory
   rotate: false
-  xy: 839, 239
+  xy: 617, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 iron_item
   rotate: false
-  xy: 441, 46
+  xy: 807, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 iron_mattock_item
   rotate: false
-  xy: 189, 64
+  xy: 771, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 iron_mattock_item_grid
   rotate: false
-  xy: 785, 223
+  xy: 549, 157
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 jar_blueberry_jam_item
   rotate: false
-  xy: 983, 203
+  xy: 399, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 jar_item
   rotate: false
-  xy: 671, 137
+  xy: 327, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 jar_raspberry_jam_item
   rotate: false
-  xy: 495, 64
+  xy: 987, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 ladder_item
   rotate: false
-  xy: 947, 221
+  xy: 417, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 ladder
   rotate: false
-  xy: 947, 221
+  xy: 417, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_fir_full
   rotate: false
-  xy: 893, 203
+  xy: 309, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_fir_right
   rotate: false
-  xy: 261, 46
+  xy: 599, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_fir_top
   rotate: false
-  xy: 983, 239
+  xy: 435, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_shorea_right
   rotate: false
-  xy: 689, 119
+  xy: 915, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 leaves_shorea_top
   rotate: false
-  xy: 139, 30
+  xy: 567, 155
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 limestone
   rotate: false
-  xy: 947, 239
+  xy: 707, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 limestone_item
   rotate: false
-  xy: 1001, 221
+  xy: 265, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 log_fir
   rotate: false
-  xy: 121, 30
+  xy: 127, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 log_shorea
   rotate: false
-  xy: 477, 64
+  xy: 969, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 log_shorea_left
   rotate: false
-  xy: 1001, 203
+  xy: 417, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 log_shorea_right
   rotate: false
-  xy: 839, 221
+  xy: 635, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 magnetite
   rotate: false
-  xy: 947, 203
+  xy: 363, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 magnetite_item
   rotate: false
-  xy: 839, 203
+  xy: 987, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -555,413 +555,413 @@ main_font
   index: -1
 peppermint_bush
   rotate: false
-  xy: 103, 12
+  xy: 139, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 peppermint_bush_grown
   rotate: false
-  xy: 495, 46
+  xy: 861, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 planks_item
   rotate: false
-  xy: 459, 64
+  xy: 951, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 player_idle
   rotate: false
-  xy: 803, 228
+  xy: 55, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 1
 player_idle
   rotate: false
-  xy: 821, 228
+  xy: 549, 94
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 2
 player_interact
   rotate: false
-  xy: 751, 160
+  xy: 19, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 2
 player_interact
   rotate: false
-  xy: 153, 53
+  xy: 73, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 4
 player_interact
   rotate: false
-  xy: 635, 126
+  xy: 581, 194
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 1
 player_interact
   rotate: false
-  xy: 803, 199
+  xy: 291, 53
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 3
 player_move
   rotate: false
-  xy: 67, 19
+  xy: 1, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 2
 player_move
   rotate: false
-  xy: 785, 194
+  xy: 37, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 4
 player_move
   rotate: false
-  xy: 601, 92
+  xy: 91, 1
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 1
 player_move
   rotate: false
-  xy: 85, 19
+  xy: 735, 228
   size: 16, 27
   orig: 16, 27
   offset: 0, 0
   index: 3
 raspberry_bush_grown
   rotate: false
-  xy: 171, 64
+  xy: 753, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raspberry_bush_item
   rotate: false
-  xy: 243, 64
+  xy: 825, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raspberry_bush
   rotate: false
-  xy: 243, 64
+  xy: 825, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raspberry_item
   rotate: false
-  xy: 351, 64
+  xy: 453, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 raw_wood_item
   rotate: false
-  xy: 725, 137
+  xy: 381, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite
   rotate: false
-  xy: 333, 46
+  xy: 671, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_item
   rotate: false
-  xy: 769, 171
+  xy: 1005, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item
   rotate: false
-  xy: 279, 46
+  xy: 617, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rhyolite_mattock_item_grid
   rotate: false
-  xy: 583, 87
+  xy: 273, 48
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 1001, 239
+  xy: 897, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand_item
   rotate: false
-  xy: 459, 46
+  xy: 825, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand_slope_right
   rotate: false
-  xy: 279, 64
+  xy: 211, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 selection
   rotate: false
-  xy: 106, 1
+  xy: 584, 191
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 serious_drowning_effect
   rotate: false
-  xy: 689, 137
+  xy: 157, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 settings_icon
   rotate: false
-  xy: 965, 203
+  xy: 381, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 small_meat_cooked_item
   rotate: false
-  xy: 965, 239
+  xy: 229, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 small_meat_raw_item
   rotate: false
-  xy: 297, 64
+  xy: 861, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 soft_wooden_wall_item
   rotate: false
-  xy: 653, 119
+  xy: 879, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 soft_wooden_wall
   rotate: false
-  xy: 653, 119
+  xy: 879, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 squirrel_idle
   rotate: false
-  xy: 405, 46
+  xy: 771, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 starvation_effect
   rotate: false
-  xy: 929, 221
+  xy: 199, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 switch_arrow
   rotate: false
-  xy: 671, 119
+  xy: 897, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 temperature_icon
   rotate: false
-  xy: 821, 192
+  xy: 969, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 thumb_stick_back
   rotate: false
-  xy: 717, 223
+  xy: 515, 157
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 thumb_stick_fore
   rotate: false
-  xy: 929, 239
+  xy: 399, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tile_break
   rotate: false
-  xy: 911, 239
+  xy: 181, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 4
 tile_break
   rotate: false
-  xy: 333, 64
+  xy: 247, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 tile_break
   rotate: false
-  xy: 189, 46
+  xy: 567, 101
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 3
 tile_break
   rotate: false
-  xy: 769, 153
+  xy: 453, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 2
 torch
   rotate: false
-  xy: 121, 12
+  xy: 145, 12
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 torch_item
   rotate: false
-  xy: 225, 64
+  xy: 363, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 trash_icon
   rotate: false
-  xy: 707, 137
+  xy: 175, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 ts_move_arrow_side
   rotate: false
-  xy: 1, 1
+  xy: 471, 49
   size: 14, 13
   orig: 14, 13
   offset: 0, 0
   index: -1
 ts_move_arrow_up
   rotate: false
-  xy: 17, 6
+  xy: 109, 2
   size: 13, 8
   orig: 13, 8
   offset: 0, 0
   index: -1
 use_icon
   rotate: false
-  xy: 857, 221
+  xy: 653, 205
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 warning_icon
   rotate: false
-  xy: 103, 30
+  xy: 121, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 water_5
   rotate: false
-  xy: 803, 181
+  xy: 435, 46
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: 1
 weight_icon
   rotate: false
-  xy: 583, 121
+  xy: 205, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 white_tile
   rotate: false
-  xy: 103, 1
+  xy: 581, 191
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 wooden_bowl_item
   rotate: false
-  xy: 549, 121
+  xy: 515, 123
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 wooden_mattock_item
   rotate: false
-  xy: 139, 12
+  xy: 567, 137
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_mattock_item_grid
   rotate: false
-  xy: 617, 121
+  xy: 549, 123
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 wooden_support
   rotate: false
-  xy: 857, 239
+  xy: 789, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_support_item
   rotate: false
-  xy: 857, 239
+  xy: 789, 239
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall
   rotate: false
-  xy: 653, 137
+  xy: 309, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 wooden_wall_item
   rotate: false
-  xy: 653, 137
+  xy: 309, 64
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

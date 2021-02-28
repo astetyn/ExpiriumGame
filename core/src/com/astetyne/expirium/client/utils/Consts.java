@@ -18,7 +18,7 @@ public class Consts {
 
     // world
     public static final int WORLD_BIOME_WIDTH = 80; // <-- this should NOT change
-    public static final int WORLD_BIOMES_NUMBER = 4; // world width will be calculated as WORLD_BIOME_WIDTH * WORLD_BIOMES_NUMBER
+    public static final int WORLD_BIOMES_NUMBER = 5; // world width will be calculated as WORLD_BIOME_WIDTH * WORLD_BIOMES_NUMBER
     public static final int WORLD_HEIGHT = 128; // this should be used only while creating world and allow custom world size to exists
 
     public static final int COMBAT_PRECISION = 6;

@@ -1,46 +1,61 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
-import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.tile.Tile;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
 public class WaterEngine {
 
-    private final static byte maxLevel = 5;
+    public final static byte maxLevel = 5;
     private final static int updateTicks = 4;
 
-    private final ExpiServer server;
+    private final World world;
     private final Tile[][] terrain;
     private final int w, h;
-    private final PriorityQueue<WaterTask> scheduledWaterTicks;
+    private final PriorityQueue<WaterTask> scheduledWaterMoves;
+    private final PriorityQueue<WaterTask> scheduledWaterEvaporation;
+    private final HashMap<Tile, WaterTask> scheduledEvaporations;
     private final HashSet<Tile> updatedTiles;
 
-    public WaterEngine(ExpiServer server, Tile[][] terrain, int w, int h) {
-        this.server = server;
+    public WaterEngine(World world, Tile[][] terrain, int w, int h) {
+        this.world = world;
         this.terrain = terrain;
         this.w = w;
         this.h = h;
-        scheduledWaterTicks = new PriorityQueue<>();
+        scheduledWaterMoves = new PriorityQueue<>();
+        scheduledWaterEvaporation = new PriorityQueue<>();
+        scheduledEvaporations = new HashMap<>();
         updatedTiles = new HashSet<>();
     }
 
     public void onTick() {
 
-        while(!scheduledWaterTicks.isEmpty()) {
-            WaterTask task = scheduledWaterTicks.peek();
-            if(task.tick <= server.getWorld().getTick()) {
+        while(!scheduledWaterMoves.isEmpty()) {
+            WaterTask task = scheduledWaterMoves.peek();
+            if(task.tick <= world.getTick()) {
                 updateWater(task.t);
-                scheduledWaterTicks.remove();
+                scheduledWaterMoves.remove();
+            }else {
+                break;
+            }
+        }
+
+        while(!scheduledWaterEvaporation.isEmpty()) {
+            WaterTask task = scheduledWaterEvaporation.peek();
+            if(task.tick <= world.getTick()) {
+                tryToEvaporate(task.t);
+                scheduledWaterEvaporation.remove();
             }else {
                 break;
             }
         }
 
         if(updatedTiles.size() > 0) {
-            for(Player p : server.getPlayers()) {
+            for(Player p : world.getServer().getPlayers()) {
                 p.getNetManager().putWaterPacket(updatedTiles);
             }
             updatedTiles.clear();
@@ -130,7 +145,7 @@ public class WaterEngine {
     }
 
     private void willNeedUpdate(Tile t) {
-        scheduledWaterTicks.add(new WaterTask(t, server.getWorld().getTick() + updateTicks));
+        scheduledWaterMoves.add(new WaterTask(t, world.getTick() + updateTicks));
     }
 
     public void setWaterLevel(Tile t, int level) {
@@ -145,6 +160,30 @@ public class WaterEngine {
         }
         updatedTiles.add(t);
         willNeedUpdate(t);
+        if(canBeEvaporated(t)) {
+            int randTicks = (int) (1 * (Math.random() * 30 + 10));
+            WaterTask wt = new WaterTask(t, world.getTick() + randTicks);
+            if(scheduledEvaporations.containsKey(t)) {
+                scheduledWaterEvaporation.remove(scheduledEvaporations.get(t));
+            }
+            scheduledWaterEvaporation.add(wt);
+            scheduledEvaporations.put(t, wt);
+        }
+    }
+
+    private boolean canBeEvaporated(Tile t) {
+        int x = t.getX();
+        int y = t.getY();
+        if(t.getWaterLevel() >= 4) return false;
+        if(y != h-1 && terrain[x][y+1].getMaterial().isWatertight()) return false;
+        if(y != 0 && terrain[x][y-1].getWaterLevel() > 0) return false;
+        return true;
+    }
+
+    private void tryToEvaporate(Tile t) {
+        if(!canBeEvaporated(t) || t.getWaterLevel() == 0) return;
+        scheduledEvaporations.remove(t);
+        increaseWaterLevel(t, -1);
     }
 
     static class WaterTask implements Comparable<WaterTask> {

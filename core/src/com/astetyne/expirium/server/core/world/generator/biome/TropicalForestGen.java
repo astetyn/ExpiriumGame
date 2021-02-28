@@ -2,12 +2,13 @@ package com.astetyne.expirium.server.core.world.generator.biome;
 
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.world.generator.Noise;
+import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class TropicalForestGen extends BiomeGenerator {
 
-    public TropicalForestGen(Material[][] terrain, int[] surface, int w, int h, long seed) {
-        super(terrain, surface, w, h, seed);
+    public TropicalForestGen(WorldGenerator gen) {
+        super(gen);
     }
 
     @Override

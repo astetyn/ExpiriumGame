@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.core.world.generator.biome;
 
-import com.astetyne.expirium.server.core.world.tile.Material;
+import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -10,6 +10,7 @@ public enum BiomeType {
     HILLS(HillsGen.class),
     BOREAL_FOREST(BorealForestGen.class),
     DESERT(DesertGen.class),
+    WATER_BIOME(WaterBiome.class),
     ;
 
     private final Class<? extends BiomeGenerator> clazz;
@@ -18,14 +19,13 @@ public enum BiomeType {
         this.clazz = clazz;
     }
 
-    public BiomeGenerator initGenerator(Material[][] terrain, int[] surface, int w, int h, long seed) {
+    public BiomeGenerator initGenerator(WorldGenerator gen) {
         try {
-            return clazz.getConstructor(Material[][].class, int[].class, int.class, int.class, long.class)
-                    .newInstance(terrain, surface, w, h, seed);
+            return clazz.getConstructor(WorldGenerator.class).newInstance(gen);
         }catch(InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
-        return new DesertGen(terrain, surface, w, h, seed);
+        return new DesertGen(gen);
     }
 
     public static BiomeType get(int i) {
