@@ -11,6 +11,7 @@ import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.world.Background;
 import com.astetyne.expirium.client.world.ClientWorld;
+import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
 import com.badlogic.gdx.Gdx;
@@ -182,7 +183,7 @@ public class GameScreen implements Screen {
     }
 
     public boolean isBuildViewActive() {
-        return buildViewActive;
+        return buildViewActive && playerDataHandler.getHotSlotsData().getChosenSlot() == ChosenSlot.MATERIAL_SLOT;
     }
 
     public void toggleBuildViewActive() {

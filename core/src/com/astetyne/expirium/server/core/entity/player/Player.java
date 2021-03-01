@@ -44,6 +44,7 @@ public class Player extends LivingEntity {
     private final HashSet<Entity> nearActiveEntities;
     private final HashSet<LivingEffect> activeLivingEffects;
     private boolean onLadder;
+    private long lastWaterManipulation;
 
     public Player(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
         super(server, EntityType.PLAYER, location, 100);
@@ -63,6 +64,7 @@ public class Player extends LivingEntity {
         nearActiveEntities = new HashSet<>();
         activeLivingEffects = new HashSet<>();
         onLadder = false;
+        lastWaterManipulation = 0;
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -85,8 +87,12 @@ public class Player extends LivingEntity {
         nearActiveEntities = new HashSet<>();
         activeLivingEffects = new HashSet<>();
         onLadder = false;
+        lastWaterManipulation = 0;
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
+        if(Consts.DEBUG) {
+            getInv().append(Item.BUCKET_WATER, 20);
+        }
     }
 
     @Override
@@ -406,6 +412,14 @@ public class Player extends LivingEntity {
 
     public ToolManager getToolManager() {
         return toolManager;
+    }
+
+    public boolean isAbleManipulateWater() {
+        return lastWaterManipulation + Consts.WATER_MANIPULATE_COOLDOWN < System.currentTimeMillis();
+    }
+
+    public void waterManipulate() {
+        lastWaterManipulation = System.currentTimeMillis();
     }
 
     @Override

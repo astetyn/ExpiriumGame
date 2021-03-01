@@ -258,6 +258,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
     }
 
     public ItemStack getItemInHand() {
+        if(itemInHand.getItem() != Item.EMPTY && itemInHand.getAmount() <= 0) itemInHand.setItem(Item.EMPTY);
         return itemInHand;
     }
 

@@ -52,6 +52,8 @@ public enum Item {
     SMALL_MEAT_COOKED(ItemCat.CONSUMABLE, 0.01f),
     PLANKS(ItemCat.MISC, 0.02f),
     LADDER(ItemCat.MATERIAL, 0.05f),
+    BUCKET(ItemCat.MATERIAL, 0.1f),
+    BUCKET_WATER(ItemCat.MATERIAL, 0.1f),
     ;
 
     ItemCat category;

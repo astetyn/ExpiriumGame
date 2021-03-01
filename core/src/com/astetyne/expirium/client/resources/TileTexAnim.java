@@ -12,11 +12,7 @@ public enum TileTexAnim implements Textureable {
     CAMPFIRE_BIG(0.1f, Animation.PlayMode.LOOP_PINGPONG),
     CAMPFIRE_SMALL(0.1f, Animation.PlayMode.LOOP_PINGPONG),
 
-    /*WATER_1(0.5f, Animation.PlayMode.LOOP_PINGPONG),
-    WATER_2(0.5f, Animation.PlayMode.LOOP_PINGPONG),
-    WATER_3(0.5f, Animation.PlayMode.LOOP_PINGPONG),
-    WATER_4(0.5f, Animation.PlayMode.LOOP_PINGPONG),*/
-    WATER_5(0.5f, Animation.PlayMode.LOOP_PINGPONG),
+    WATER(0.5f, Animation.PlayMode.LOOP_PINGPONG),
     
     TILE_BREAK(0.26f, Animation.PlayMode.LOOP);
 

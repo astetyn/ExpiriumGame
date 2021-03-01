@@ -13,7 +13,6 @@ import com.astetyne.expirium.client.tiles.BreakingTile;
 import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.WorldInputListener;
-import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
@@ -120,6 +119,8 @@ public class ClientWorld {
         int down = (int) Math.max(camera.position.y - renderOffsetY, 0);
         int up = (int) Math.min(camera.position.y + renderOffsetY, terrainHeight);
 
+        boolean stabilityViewActive = GameScreen.get().isBuildViewActive();
+
         for(int i =  left; i < right; i++) {
             for(int j = down; j < up; j++) {
                 ClientTile t = terrain[i][j];
@@ -133,8 +134,7 @@ public class ClientWorld {
                 if(t.getMaterial() == Material.AIR) continue;
 
                 // stability view
-                ChosenSlot slot = GameScreen.get().getPlayerData().getHotSlotsData().getChosenSlot();
-                if(slot == ChosenSlot.MATERIAL_SLOT && GameScreen.get().isBuildViewActive()) {
+                if(stabilityViewActive) {
                     if(t.getStability() < 1 || t.getStability() >= stabColors.length) {
                         batch.setColor(Color.WHITE);
                         GuiRes.DEBUG.getDrawable().draw(batch, i, j, 1, 1);
@@ -159,25 +159,12 @@ public class ClientWorld {
             batch.draw(TileTexAnim.TILE_BREAK.getAnim().getKeyFrame(bt.state), bt.x, bt.y, 1, 1);
         }
 
-        // entities + player
+        // entities
         for(ClientEntity e : entities) {
             if(!e.isActive()) continue;
-            // this is for entities from entities.atlas
-            if(e.getType() != EntityType.DROPPED_ITEM) {
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
-                batch.setColor(b,b,b,1);
-                e.draw(batch);
-            }
-        }
-
-        for(ClientEntity e : entities) {
-            if(!e.isActive()) continue;
-            // this is for dropped items from gui.atlas
-            if(e.getType() == EntityType.DROPPED_ITEM) {
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
-                batch.setColor(b,b,b,1);
-                e.draw(batch);
-            }
+            float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
+            batch.setColor(b,b,b,1);
+            e.draw(batch);
         }
 
         // water
@@ -190,7 +177,6 @@ public class ClientWorld {
                 waterManager.draw(batch, t, i, j);
             }
         }
-
         animationManager.draw(batch);
 
         batch.setColor(Color.WHITE);

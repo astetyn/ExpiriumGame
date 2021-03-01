@@ -86,6 +86,10 @@ public class Inventory implements WorldSaveable {
         return true;
     }
 
+    public void append(Item item) {
+        append(item, 1);
+    }
+
     public void append(ItemStack is) {
         append(is.getItem(), is.getAmount());
     }
@@ -122,6 +126,10 @@ public class Inventory implements WorldSaveable {
         items.add(gis);
         increaseWeight(gis.getWeight());
         refresh();
+    }
+
+    public void remove(Item item) {
+        remove(item, 1);
     }
 
     public void remove(ItemStack is) {

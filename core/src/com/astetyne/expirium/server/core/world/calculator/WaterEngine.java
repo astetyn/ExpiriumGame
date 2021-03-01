@@ -153,7 +153,7 @@ public class WaterEngine {
         increaseWaterLevel(t, level - t.getWaterLevel());
     }
 
-    private void increaseWaterLevel(Tile t, int amount) {
+    public void increaseWaterLevel(Tile t, int amount) {
         t.increaseWaterLevel(amount);
         if(t.getY() != h-1) { // update for tile above
             willNeedUpdate(terrain[t.getX()][t.getY() + 1]);

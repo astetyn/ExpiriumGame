@@ -171,20 +171,31 @@ public class World implements WorldSaveable, Disposable {
         InteractType type = InteractType.getType(in.getInt());
         Tile t = server.getWorld().getTileAt(x, y);
 
-        if(p.isInInteractRadius(loc)) {
-            t.onInteract(p, type);
-        }
-
-        //DEBUG------
-        if(!t.getMaterial().isWatertight()) waterEngine.setWaterLevel(t, 5);
-        //DEBUG------
-
-        // following code is only for tile placing
         if(!p.isInInteractRadius(loc)) return;
 
+        t.onInteract(p, type);
+
+        // following code is only for tile placing
         p.getToolManager().onInteract(t, type);
 
         Item item = p.getInv().getItemInHand().getItem();
+
+        if(p.isAbleManipulateWater() && (type == InteractType.PRESS || type == InteractType.DRAG)) {
+            if(item == Item.BUCKET_WATER && !t.getMaterial().isWatertight()) {
+                p.getInv().remove(Item.BUCKET_WATER);
+                p.getInv().append(Item.BUCKET);
+                int currLevel = t.getWaterLevel();
+                waterEngine.setWaterLevel(t, Math.min(currLevel + 3, WaterEngine.maxLevel));
+                p.waterManipulate();
+                return;
+            }else if(item == Item.BUCKET && t.getWaterLevel() >= 3) {
+                p.getInv().remove(Item.BUCKET);
+                p.getInv().append(Item.BUCKET_WATER);
+                waterEngine.increaseWaterLevel(t, -3);
+                p.waterManipulate();
+                return;
+            }
+        }
 
         if(t.getMaterial() != Material.AIR) return;
 
@@ -195,7 +206,7 @@ public class World implements WorldSaveable, Disposable {
         if(!stabilityCalc.canBeChanged(t, item.getBuildMaterial())) return;
 
         // confirmed from here
-        p.getInv().remove(item, 1);
+        p.getInv().remove(item);
 
         for(Player ep : server.getPlayers()) {
             ep.getNetManager().putHandPunchPacket(p);

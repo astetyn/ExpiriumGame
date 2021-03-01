@@ -2,7 +2,7 @@ package com.astetyne.expirium.client.items;
 
 public class ItemStack {
 
-    protected final Item item;
+    protected Item item;
     protected int amount;
 
     public ItemStack(ItemStack is) {
@@ -17,6 +17,10 @@ public class ItemStack {
     public ItemStack(Item item, int amount) {
         this.item = item;
         this.amount = amount;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 
     public Item getItem() {

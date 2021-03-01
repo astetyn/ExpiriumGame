@@ -218,6 +218,24 @@ public enum Material implements Textureable {
         }
     }
 
+    public boolean isSlopedRight() {
+        switch(this) {
+            case SAND_SLOPE_RIGHT:
+            case GRASS_SLOPE_R:
+                return true;
+            default: return false;
+        }
+    }
+
+    public boolean isSlopedLeft() {
+        switch(this) {
+            case SAND_SLOPE_LEFT:
+            case GRASS_SLOPE_L:
+                return true;
+            default: return false;
+        }
+    }
+
     public static Material get(int i) {
         return values()[i];
     }

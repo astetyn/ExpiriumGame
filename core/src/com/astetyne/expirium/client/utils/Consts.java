@@ -61,6 +61,8 @@ public class Consts {
     public static final float JUMP_THRESHOLD = 0.6f;
     public static final float HORZ_JUMP_THRESHOLD = 0.4f;
 
+    public static final int WATER_MANIPULATE_COOLDOWN = 100; //in millis
+
     // gui
     public static final int INV_TILE_WIDTH = 140;
 
