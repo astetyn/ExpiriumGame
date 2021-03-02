@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.gui.widget;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

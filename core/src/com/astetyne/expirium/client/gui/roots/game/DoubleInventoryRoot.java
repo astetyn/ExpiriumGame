@@ -1,10 +1,10 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.StorageGridData;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -21,25 +21,29 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class DoubleInventoryRoot extends Table implements GameRootable {
 
+    private final GameScreen game;
+
     private final StorageGrid storage1, storage2;
     private final Cell<StorageGrid> storageCell1, storageCell2;
     private final Image returnButton;
     private boolean fromMain;
 
-    public DoubleInventoryRoot(PacketInputStream in) {
+    public DoubleInventoryRoot(GameScreen game, PacketInputStream in) {
 
-        StorageGridData secondData = GameScreen.get().getPlayerData().getSecondData();
+        this.game = game;
+
+        StorageGridData secondData = game.getPlayerData().getSecondData();
         secondData.rows = in.getInt();
         secondData.columns = in.getInt();
 
-        storage1 = new StorageGrid(GameScreen.get().getPlayerData().getMainData(), true);
+        storage1 = new StorageGrid(game.getPlayerData().getMainData(), true);
         storage2 = new StorageGrid(secondData, false);
 
         returnButton = new Image(Res.CROSS_ICON);
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
+                game.setRoot(new GameRoot(game));
             }
         });
 

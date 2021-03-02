@@ -13,6 +13,7 @@ import com.astetyne.expirium.client.tiles.BreakingTile;
 import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.input.WorldInputListener;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.Gdx;
@@ -41,6 +42,8 @@ public class ClientWorld {
     private final List<BreakingTile> breakingTiles;
     private final WorldAnimationManager animationManager;
     private final WaterAnimationManager waterManager;
+    private final Rain rain;
+    private final GameScreen game;
 
     Color[] stabColors = new Color[] {
             new Color(0.9f, 0f, 0f, 1),
@@ -59,13 +62,15 @@ public class ClientWorld {
             new Color(0.2f, 0.4f, 1f, 1),
             };
 
-    public ClientWorld(PacketInputStream in) {
+    public ClientWorld(GameScreen game, PacketInputStream in) {
+
+        this.game = game;
 
         entitiesID = new HashMap<>();
         entities = new ArrayList<>();
 
-        worldInputListener = new WorldInputListener(this);
-        GameScreen.get().getMultiplexer().addProcessor(worldInputListener);
+        worldInputListener = new WorldInputListener(game, this);
+        game.getMultiplexer().addProcessor(worldInputListener);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
@@ -92,6 +97,8 @@ public class ClientWorld {
         Vector2 loc = in.getVector();
         player = new MainClientPlayer(this, pID, loc);
 
+        rain = new Rain(player, terrain, terrainWidth, terrainHeight);
+
         int size = in.getInt();
         for(int i = 0; i < size; i++) {
             EntityType.getType(in.getInt()).initEntity(this, in);
@@ -105,6 +112,9 @@ public class ClientWorld {
         }
         cameraCenter();
         animationManager.update();
+        if(game.getWeather() == WeatherType.RAIN) {
+            rain.update();
+        }
     }
 
     public void draw(SpriteBatch batch) {
@@ -112,21 +122,21 @@ public class ClientWorld {
         batch.setProjectionMatrix(camera.combined);
 
         // tiles
-        int renderOffsetX = (int) (Gdx.graphics.getWidth() / (PPM / camera.zoom * 2)) + 2;
-        int renderOffsetY = (int) (Gdx.graphics.getHeight() / (PPM / camera.zoom * 2)) + 2;
+        float renderOffsetX = (Gdx.graphics.getWidth() / (PPM / camera.zoom * 2)) + 2;
+        float renderOffsetY = (Gdx.graphics.getHeight() / (PPM / camera.zoom * 2)) + 2;
         int left = (int) Math.max(camera.position.x - renderOffsetX, 0);
         int right = (int) Math.min(camera.position.x + renderOffsetX, terrainWidth);
-        int down = (int) Math.max(camera.position.y - renderOffsetY, 0);
-        int up = (int) Math.min(camera.position.y + renderOffsetY, terrainHeight);
+        int bottom = (int) Math.max(camera.position.y - renderOffsetY, 0);
+        int top = (int) Math.min(camera.position.y + renderOffsetY, terrainHeight);
 
-        boolean stabilityViewActive = GameScreen.get().isBuildViewActive();
+        boolean stabilityViewActive = game.isBuildViewActive();
 
         for(int i =  left; i < right; i++) {
-            for(int j = down; j < up; j++) {
+            for(int j = bottom; j < top; j++) {
                 ClientTile t = terrain[i][j];
 
                 if(t.hasBackWall()) {
-                    float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
+                    float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
                     batch.setColor(b,b,b,1);
                     batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
                 }
@@ -146,7 +156,7 @@ public class ClientWorld {
                 }
 
                 // normal view
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
                 //float b = 1;
                 batch.setColor(b,b,b,1);
                 batch.draw(t.getMaterial().getTex(), i, j, 1, 1);
@@ -162,17 +172,17 @@ public class ClientWorld {
         // entities
         for(ClientEntity e : entities) {
             if(!e.isActive()) continue;
-            float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight();
+            float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight(game.getTime());
             batch.setColor(b,b,b,1);
             e.draw(batch);
         }
 
         // water
         for(int i =  left; i < right; i++) {
-            for(int j = down; j < up; j++) {
+            for(int j = bottom; j < top; j++) {
                 ClientTile t = terrain[i][j];
                 if(t.getWaterLevel() == 0) continue;
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight();
+                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
                 batch.setColor(b,b,b,1);
                 waterManager.draw(batch, t, i, j);
             }
@@ -180,6 +190,11 @@ public class ClientWorld {
         animationManager.draw(batch);
 
         batch.setColor(Color.WHITE);
+
+        if(game.getWeather() == WeatherType.RAIN) {
+            rain.draw(batch, left, right, top, bottom);
+        }
+
     }
 
     public void onServerTick() {

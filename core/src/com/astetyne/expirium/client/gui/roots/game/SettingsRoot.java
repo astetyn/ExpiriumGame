@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.client.utils.Utils;
@@ -16,8 +16,11 @@ import com.badlogic.gdx.utils.Align;
 
 public class SettingsRoot extends WidgetGroup implements GameRootable {
 
+    private final GameScreen game;
 
-    public SettingsRoot() {
+    public SettingsRoot(GameScreen game) {
+
+        this.game = game;
 
         Image returnButton = new Image(Res.CROSS_ICON);
         TextButton leaveButton = new TextButton("Leave game", Res.TEXT_BUTTON_STYLE);
@@ -27,7 +30,7 @@ public class SettingsRoot extends WidgetGroup implements GameRootable {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
+                game.setRoot(new GameRoot(game));
             }
         });
 

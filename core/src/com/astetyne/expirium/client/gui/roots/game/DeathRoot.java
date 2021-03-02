@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
-import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Align;
 
 public class DeathRoot extends WidgetGroup implements GameRootable {
 
+    private final GameScreen game;
+
     private static final int waitTime = 10;
 
     private float timeWaiting;
@@ -19,7 +21,9 @@ public class DeathRoot extends WidgetGroup implements GameRootable {
     private final Label timeRemainingLabel;
     private final boolean firstDeath;
 
-    public DeathRoot(boolean firstDeath, long daysSurvived) {
+    public DeathRoot(GameScreen game, boolean firstDeath, long daysSurvived) {
+
+        this.game = game;
 
         this.firstDeath = firstDeath;
 
@@ -38,7 +42,7 @@ public class DeathRoot extends WidgetGroup implements GameRootable {
         resurrectButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                GameScreen.get().setRoot(new GameRoot());
+                game.setRoot(new GameRoot(game));
             }
         });
 

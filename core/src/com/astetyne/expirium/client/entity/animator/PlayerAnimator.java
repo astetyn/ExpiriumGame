@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.entity.animator;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.entity.ClientPlayer;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.resources.Res;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

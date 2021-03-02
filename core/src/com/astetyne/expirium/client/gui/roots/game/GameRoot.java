@@ -1,7 +1,6 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.HotSlotsData;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.widget.HotBarSlot;
@@ -9,6 +8,7 @@ import com.astetyne.expirium.client.gui.widget.MoveThumbStick;
 import com.astetyne.expirium.client.gui.widget.SwitchArrow;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
 import com.astetyne.expirium.client.resources.GuiRes;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
@@ -29,6 +29,8 @@ import com.badlogic.gdx.utils.Align;
 
 public class GameRoot extends WidgetGroup implements GameRootable {
 
+    private final GameScreen game;
+
     private final Table debugInfoTable, playerStatsTable;
 
     private final Label fpsLabel, locationLabel, entityLabel, callsLabel, buffersLabel, versionLabel, healthStat, foodStat;
@@ -41,7 +43,9 @@ public class GameRoot extends WidgetGroup implements GameRootable {
     private final Image inventoryButton, consumeButton, buildViewButton, settingsButton;
     private Actor activeLeftActor;
 
-    public GameRoot() {
+    public GameRoot(GameScreen game) {
+
+        this.game = game;
 
         if(Consts.DEBUG) setDebug(true);
 
@@ -63,7 +67,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new SettingsRoot());
+                game.setRoot(new SettingsRoot(game));
             }
         });
 
@@ -71,14 +75,14 @@ public class GameRoot extends WidgetGroup implements GameRootable {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 ExpiGame.get().getClientGateway().getManager().putUIInteractPacket(UIInteractType.OPEN_INV);
-                GameScreen.get().setRoot(new InventoryRoot());
+                game.setRoot(new InventoryRoot(game));
             }
         });
 
         buildViewButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().toggleBuildViewActive();
+                game.toggleBuildViewActive();
             }
         });
 
@@ -89,8 +93,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
             }
         });
 
-        moveTS = new MoveThumbStick(GameScreen.get().getPlayerData().getThumbStickData1(), Res.MOVE_THUMB_STICK_STYLE);
-        breakTS = new ThumbStick(GameScreen.get().getPlayerData().getThumbStickData2(), Res.THUMB_STICK_STYLE);
+        moveTS = new MoveThumbStick(game.getPlayerData().getThumbStickData1(), Res.MOVE_THUMB_STICK_STYLE);
+        breakTS = new ThumbStick(game.getPlayerData().getThumbStickData2(), Res.THUMB_STICK_STYLE);
 
         debugInfoTable = new Table();
         playerStatsTable = new Table();
@@ -184,9 +188,9 @@ public class GameRoot extends WidgetGroup implements GameRootable {
 
         if(Consts.DEBUG) {
             fpsLabel.setText("fps: " + Gdx.graphics.getFramesPerSecond());
-            Vector2 loc = GameScreen.get().getWorld().getPlayer().getLocation();
+            Vector2 loc = game.getWorld().getPlayer().getLocation();
             locationLabel.setText("x: " + ((int) loc.x) + " y: " + ((int) loc.y));
-            entityLabel.setText("entities: " + GameScreen.get().getWorld().getEntitiesID().keySet().size());
+            entityLabel.setText("entities: " + game.getWorld().getEntitiesID().keySet().size());
             callsLabel.setText(ExpiGame.get().getBatch().totalRenderCalls);
             ExpiGame.get().getBatch().totalRenderCalls = 0;
             String out = "out: " + Math.round(ExpiGame.get().getClientGateway().getOut().occupied() * 1000) / 10f + "%";
@@ -194,8 +198,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
             buffersLabel.setText(out + " " + in);
         }
 
-        for(int i = 0; i < GameScreen.get().getPlayerData().getActiveEffects().size(); i++) {
-            LivingEffect effect = GameScreen.get().getPlayerData().getActiveEffects().get(i);
+        for(int i = 0; i < game.getPlayerData().getActiveEffects().size(); i++) {
+            LivingEffect effect = game.getPlayerData().getActiveEffects().get(i);
             float iconSize = 80;
             batch.draw(effect.getTex(), 2000 - (i+1)*iconSize - i*20, 770, iconSize, Utils.percFromW(iconSize));
         }
@@ -216,7 +220,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
     @Override
     public void refresh() {
 
-        PlayerDataHandler playerData = GameScreen.get().getPlayerData();
+        PlayerDataHandler playerData = game.getPlayerData();
         HotSlotsData data = playerData.getHotSlotsData();
 
         switch(data.getChosenSlot()) {

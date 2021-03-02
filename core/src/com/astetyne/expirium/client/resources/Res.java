@@ -1,4 +1,4 @@
-package com.astetyne.expirium.client;
+package com.astetyne.expirium.client.resources;
 
 import com.astetyne.expirium.client.gui.widget.BaseGrid;
 import com.astetyne.expirium.client.gui.widget.MoveThumbStick;

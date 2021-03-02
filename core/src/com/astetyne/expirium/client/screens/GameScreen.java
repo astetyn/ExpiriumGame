@@ -1,16 +1,17 @@
 package com.astetyne.expirium.client.screens;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRoot;
 import com.astetyne.expirium.client.gui.roots.game.GameRootable;
 import com.astetyne.expirium.client.gui.widget.OverlapImage;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.resources.TileTex;
 import com.astetyne.expirium.client.world.Background;
 import com.astetyne.expirium.client.world.ClientWorld;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.SimpleServerPacket;
@@ -24,8 +25,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 public class GameScreen implements Screen {
 
-    private static GameScreen gameScreen;
-
     private final SpriteBatch batch;
     private final InputMultiplexer multiplexer;
     private final Stage stage;
@@ -34,36 +33,35 @@ public class GameScreen implements Screen {
     private final ClientWorld world;
     private final Background background;
     private int time;
+    private WeatherType weather;
     private final PlayerDataHandler playerDataHandler;
     private GameRootable activeRoot;
     private boolean buildViewActive;
 
     public GameScreen(PacketInputStream in) {
 
-        gameScreen = this;
-
         buildViewActive = false;
 
         batch = ExpiGame.get().getBatch();
         multiplexer = new InputMultiplexer();
 
-        playerDataHandler = new PlayerDataHandler();
+        playerDataHandler = new PlayerDataHandler(this);
 
-        stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
+        stage = new Stage(new StretchViewport(2000, 1000), batch);
 
         warnMsgLabel = new WarnMsgLabel(Res.WARN_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
 
         multiplexer.addProcessor(stage);
 
-        world = new ClientWorld(in);
+        world = new ClientWorld(this, in);
 
         overlapImage = new OverlapImage(world, playerDataHandler);
         overlapImage.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 
         background = new Background(world);
 
-        setRoot(new GameRoot());
+        setRoot(new GameRoot(this));
 
     }
 
@@ -120,9 +118,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        System.out.println("Hiding launcher screen.");
+        System.out.println("Hiding game screen.");
         dispose();
-        gameScreen = null;
     }
 
     @Override
@@ -142,7 +139,7 @@ public class GameScreen implements Screen {
     public void onSimplePacket(SimpleServerPacket ssp) {
         if(ssp == SimpleServerPacket.CLOSE_DOUBLE_INV) {
             if(getActiveRoot() instanceof DoubleInventoryRoot) {
-                setRoot(new GameRoot());
+                setRoot(new GameRoot(this));
             }
         }
     }
@@ -154,20 +151,21 @@ public class GameScreen implements Screen {
         addWarning(msg, duration, c);
     }
 
-    public ClientWorld getWorld() {
-        return world;
+    public void onEnviroPacket(PacketInputStream in) {
+        time = in.getInt();
+        weather = WeatherType.get(in.getByte());
     }
 
-    public static GameScreen get() {
-        return gameScreen;
+    public ClientWorld getWorld() {
+        return world;
     }
 
     public int getTime() {
         return time;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public WeatherType getWeather() {
+        return weather;
     }
 
     public InputMultiplexer getMultiplexer() {
@@ -194,7 +192,4 @@ public class GameScreen implements Screen {
         warnMsgLabel.setMsg(msg, durationMillis, color);
     }
 
-    public OverlapImage getOverlapImage() {
-        return overlapImage;
-    }
 }

@@ -1,11 +1,11 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
 import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -22,6 +22,8 @@ import com.badlogic.gdx.utils.Align;
 
 public class InventoryRoot extends Table implements GameRootable {
 
+    private final GameScreen game;
+
     private final StorageGrid storage;
     private final Cell<StorageGrid> storageCell;
 
@@ -29,7 +31,9 @@ public class InventoryRoot extends Table implements GameRootable {
     private final RecipeDetailTable recipeDetail;
     private final Image returnButton;
 
-    public InventoryRoot() {
+    public InventoryRoot(GameScreen game) {
+
+        this.game = game;
 
         if(Consts.DEBUG) setDebug(true);
 
@@ -42,11 +46,11 @@ public class InventoryRoot extends Table implements GameRootable {
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScreen.get().setRoot(new com.astetyne.expirium.client.gui.roots.game.GameRoot());
+                game.setRoot(new GameRoot(game));
             }
         });
 
-        storage = new StorageGrid(GameScreen.get().getPlayerData().getMainData(), true);
+        storage = new StorageGrid(game.getPlayerData().getMainData(), true);
 
         storage.addListener(new InputListener() {
 

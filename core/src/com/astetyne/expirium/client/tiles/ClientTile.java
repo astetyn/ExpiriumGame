@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.tiles;
 
-import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
@@ -52,8 +51,8 @@ public class ClientTile {
         this.localLight = localLight;
     }
 
-    public int getTimeCompensatedSkyLight() {
-        int time = GameScreen.get().getTime();
+    public int getTimeCompensatedSkyLight(int time) {
+
         float moonLightFactor = 0.3f;
 
         int srs = Consts.SUNRISE_START;
@@ -82,8 +81,8 @@ public class ClientTile {
      *
      * @return Real light level, which can be displayed on screen.
      */
-    public int getLight() {
-        return Math.max(getTimeCompensatedSkyLight(), localLight);
+    public int getLight(int time) {
+        return Math.max(getTimeCompensatedSkyLight(time), localLight);
     }
 
     public boolean hasBackWall() {

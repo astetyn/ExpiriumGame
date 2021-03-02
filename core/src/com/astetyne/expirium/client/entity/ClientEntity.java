@@ -1,7 +1,6 @@
 package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.entity.animator.EntityAnimator;
-import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.tiles.ClientTile;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.ClientWorld;
@@ -29,6 +28,8 @@ public abstract class ClientEntity {
     private boolean active;
 
     public ClientEntity(ClientWorld world, EntityType type, short id, Vector2 loc) {
+
+        this.world = world;
 
         this.type = type;
         this.id = id;
@@ -107,8 +108,8 @@ public abstract class ClientEntity {
     }
 
     public void destroy() {
-        GameScreen.get().getWorld().getEntitiesID().remove(id);
-        GameScreen.get().getWorld().getEntities().remove(this);
+        world.getEntitiesID().remove(id);
+        world.getEntities().remove(this);
     }
 
     public EntityType getType() {
@@ -121,7 +122,7 @@ public abstract class ClientEntity {
 
     public ClientTile getCenterTile() {
         Vector2 center = getCenter();
-        return GameScreen.get().getWorld().getTileAt(center.x, center.y);
+        return world.getTileAt(center.x, center.y);
     }
 
     public void setAnimator(EntityAnimator animator) {

@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.gui.widget;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.roots.menu.MenuRootable;
+import com.astetyne.expirium.client.resources.Res;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;

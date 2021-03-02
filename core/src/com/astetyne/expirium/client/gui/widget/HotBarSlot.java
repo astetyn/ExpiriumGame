@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.gui.widget;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.badlogic.gdx.graphics.g2d.Batch;

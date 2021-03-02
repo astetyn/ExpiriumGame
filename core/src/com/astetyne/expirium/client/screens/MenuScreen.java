@@ -1,10 +1,10 @@
 package com.astetyne.expirium.client.screens;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.gui.roots.menu.MainMenuRoot;
 import com.astetyne.expirium.client.gui.roots.menu.MenuRootable;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
+import com.astetyne.expirium.client.resources.Res;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;

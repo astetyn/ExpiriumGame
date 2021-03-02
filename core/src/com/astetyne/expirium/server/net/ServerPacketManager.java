@@ -177,7 +177,7 @@ public class ServerPacketManager {
     public void putEnviroPacket() {
         out.startPacket(28);
         out.putInt(server.getWorld().getTime());
-        out.putInt(server.getWorld().getWeather().ordinal());
+        out.putByte((byte) server.getWorld().getWeather().ordinal());
     }
 
     public void putBreakingTilePacket(Tile t, float state) {

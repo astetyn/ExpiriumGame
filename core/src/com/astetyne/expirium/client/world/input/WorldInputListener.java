@@ -13,12 +13,14 @@ import com.badlogic.gdx.math.Vector3;
 
 public class WorldInputListener extends InputAdapter implements GestureDetector.GestureListener {
 
+    private final GameScreen game;
     private final GestureDetector detector;
     private final ClientWorld world;
     private boolean pressed;
     private float savedZoom;
 
-    public WorldInputListener(ClientWorld world) {
+    public WorldInputListener(GameScreen game, ClientWorld world) {
+        this.game = game;
         this.world = world;
         pressed = false;
         detector = new GestureDetector(this);
@@ -28,8 +30,8 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     // from input adapter
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
-        savedZoom = GameScreen.get().getWorld().getCamera().zoom;
+        if(!game.getActiveRoot().canInteractWithWorld()) return false;
+        savedZoom = game.getWorld().getCamera().zoom;
         detector.touchDown(screenX, screenY, pointer, button);
         Vector3 vec = world.getCamera().unproject(new Vector3(screenX, screenY, 0));
         if(vec.x < 0 || vec.x >= world.getTerrainWidth() || vec.y < 0 || vec.y >= world.getTerrainHeight()) {
@@ -42,7 +44,7 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
+        if(!game.getActiveRoot().canInteractWithWorld()) return false;
         detector.touchUp(screenX, screenY, pointer, button);
         if(!pressed) return true;
         pressed = false;
@@ -57,7 +59,7 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(!GameScreen.get().getActiveRoot().canInteractWithWorld()) return false;
+        if(!game.getActiveRoot().canInteractWithWorld()) return false;
         detector.touchDragged(screenX, screenY, pointer);
         if(!pressed) return false;
 
@@ -81,8 +83,9 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     public boolean scrolled(float amountX, float amountY) {
         if(!Consts.DEBUG) return false;
         // just for desktop development testing ----
-        OrthographicCamera cam = GameScreen.get().getWorld().getCamera();
+        OrthographicCamera cam = game.getWorld().getCamera();
         cam.zoom += amountY*0.1;
+        cam.zoom = Math.min(cam.zoom, 3);
         cam.update();
         return true;
     }
@@ -120,9 +123,9 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
 
     @Override
     public boolean zoom(float initialDistance, float distance) {
-        if(!GameScreen.get().getPlayerData().getThumbStickData1().isNeutral() ||
-                !GameScreen.get().getPlayerData().getThumbStickData2().isNeutral()) return false;
-        OrthographicCamera cam = GameScreen.get().getWorld().getCamera();
+        if(!game.getPlayerData().getThumbStickData1().isNeutral() ||
+                !game.getPlayerData().getThumbStickData2().isNeutral()) return false;
+        OrthographicCamera cam = game.getWorld().getCamera();
         if(savedZoom * (initialDistance / distance) * cam.viewportWidth >= world.getTerrainWidth() || savedZoom * (initialDistance / distance) * cam.viewportHeight >= world.getTerrainHeight()) {
             return false;
         }

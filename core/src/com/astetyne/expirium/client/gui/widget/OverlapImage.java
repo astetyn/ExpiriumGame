@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.gui.widget;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.PlayerDataHandler;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.world.ClientWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;

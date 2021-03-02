@@ -19,7 +19,12 @@ public class PlayerDataHandler {
     private byte health, food;
     private final List<LivingEffect> activeEffects;
 
-    public PlayerDataHandler() {
+    private final GameScreen game;
+
+    public PlayerDataHandler(GameScreen game) {
+
+        this.game = game;
+
         mainData = new StorageGridData();
         secondData = new StorageGridData();
         hotSlotsData = new HotSlotsData();
@@ -42,13 +47,13 @@ public class PlayerDataHandler {
             LivingEffect effect = LivingEffect.get(in.getByte());
             activeEffects.add(effect);
         }
-        GameScreen.get().getActiveRoot().refresh();
+        game.getActiveRoot().refresh();
     }
 
     public void feedInventory(PacketInputStream in) {
         mainData.feed(in);
         secondData.feed(in);
-        GameScreen.get().getActiveRoot().refresh();
+        game.getActiveRoot().refresh();
     }
 
     public StorageGridData getMainData() {

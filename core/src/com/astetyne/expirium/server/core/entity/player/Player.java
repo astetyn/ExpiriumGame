@@ -181,8 +181,8 @@ public class Player extends LivingEntity {
             }
         }else if(onLadder) {
 
-            horzFactor = 500;
-            maxHorzVel = 0.5f;
+            horzFactor = 800;
+            maxHorzVel = 2f;
 
             float area = type.getWidth() * type.getHeight();
             tempVec.set(0, area * BODY_DENSITY * body.getWorld().getGravity().y * -0.7f);

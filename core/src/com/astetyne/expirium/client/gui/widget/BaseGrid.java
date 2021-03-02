@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.gui.widget;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.data.StorageGridData;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;

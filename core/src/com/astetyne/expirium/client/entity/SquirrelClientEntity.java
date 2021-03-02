@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.entity;
 
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.entity.animator.MoveableEntityAnimator;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.math.Vector2;

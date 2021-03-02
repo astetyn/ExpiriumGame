@@ -1,6 +1,6 @@
 package com.astetyne.expirium.client.animation;
 
-import com.astetyne.expirium.client.Res;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.badlogic.gdx.graphics.Color;

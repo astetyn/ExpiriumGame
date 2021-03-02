@@ -1,8 +1,8 @@
 package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.Res;
 import com.astetyne.expirium.client.net.MulticastListener;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;

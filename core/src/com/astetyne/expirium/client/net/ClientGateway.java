@@ -1,7 +1,6 @@
 package com.astetyne.expirium.client.net;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -108,9 +107,7 @@ public class ClientGateway extends TerminableLooper {
             nextPacketsAvailable = false;
         }
 
-        if(GameScreen.get() != null) {
-            packetManager.putTSPacket();
-        }
+        packetManager.putTSPacket();
 
         out.swap();
         in.swap();
