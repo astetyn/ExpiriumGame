@@ -9,6 +9,7 @@ import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.Entity;
 import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.inventory.ChosenSlot;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
@@ -174,10 +175,9 @@ public class ServerPacketManager {
         }
     }
 
-    public void putEnviroPacket() {
+    public void putTimePacket() {
         out.startPacket(28);
         out.putInt(server.getWorld().getTime());
-        out.putByte((byte) server.getWorld().getWeather().ordinal());
     }
 
     public void putBreakingTilePacket(Tile t, float state) {
@@ -247,5 +247,10 @@ public class ServerPacketManager {
         out.putString(msg);
         out.putInt(durationMillis);
         out.putColor(c);
+    }
+
+    public void putWeatherChangePacket(WeatherType newWeather) {
+        out.startPacket(37);
+        out.putByte((byte) newWeather.ordinal());
     }
 }

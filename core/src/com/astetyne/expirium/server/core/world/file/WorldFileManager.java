@@ -4,6 +4,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.Gdx;
@@ -57,6 +58,9 @@ public class WorldFileManager {
         wb.writeBoolean(true);
 
         gen.writeData(wb);
+
+        wb.writeByte((byte) WeatherType.SUN.ordinal()); // weather type
+        wb.writeLong(tick + Consts.TICKS_IN_HOUR * (24 + (int) (Math.random() * 48))); // weather change tick
 
         wb.writeInt(0); // number of entities
 

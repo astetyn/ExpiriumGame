@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.world;
 
 import com.astetyne.expirium.client.entity.MainClientPlayer;
-import com.astetyne.expirium.client.resources.TileTexAnim;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.tiles.ClientTile;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -69,7 +69,7 @@ public class Rain {
             float x = drop.x;
             float y = drop.spawnY + (System.currentTimeMillis() - drop.spawnTime) * velY;
             if(x >= left && x <= right && y >= bottom && y <= top) {
-                batch.draw(TileTexAnim.WATER.getAnim().getKeyFrame(0), x, y, 0.1f, 0.2f);
+                batch.draw(Res.DAMAGE_OVERLAP, x, y, 0.1f, 0.2f);
             }
         }
     }

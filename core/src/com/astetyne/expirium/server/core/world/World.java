@@ -20,6 +20,8 @@ import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.generator.biome.BiomeType;
 import com.astetyne.expirium.server.core.world.tile.*;
 import com.astetyne.expirium.server.net.PacketInputStream;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -42,11 +44,11 @@ public class World implements WorldSaveable, Disposable {
     private final FixtureCalculator fixtureCalc;
     private final BackWallCalculator backWallCalculator;
     private final WaterEngine waterEngine;
-    private final WeatherType weatherType;
     private final ExpiContactListener contactListener;
     private long tick; // total ticks since world was generated
     private int time; // from midnight = 0 ticks
     private long day; // completed days from server creation
+    private WeatherManager weatherManager;
     private final int width, height;
     private final long seed;
     private final PriorityQueue<TickTask> scheduledTickTasks;
@@ -82,8 +84,7 @@ public class World implements WorldSaveable, Disposable {
             biomes[i] = BiomeType.get(in.readInt());
         }
 
-        //todo: len docasne zatial
-        weatherType = WeatherType.SUNNY;
+        weatherManager = new WeatherManager(server, in);
 
         b2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -17f), false);
 
@@ -121,7 +122,7 @@ public class World implements WorldSaveable, Disposable {
 
         tick++;
         time++;
-        if(Consts.DEBUG) time += 99;
+        if(Consts.DEBUG && Gdx.input.isKeyPressed(Input.Keys.T)) time += 99;
         if(time >= Consts.TICKS_IN_DAY) { // midnight
             time = 0;
             day++;
@@ -137,6 +138,8 @@ public class World implements WorldSaveable, Disposable {
             }
             b2dWorld.step(1f/64, 6, 2);
         }
+
+        weatherManager.onTick();
 
         while(!scheduledTickTasks.isEmpty()) {
             TickTask task = scheduledTickTasks.peek();
@@ -159,7 +162,7 @@ public class World implements WorldSaveable, Disposable {
             for(Entity ee : server.getEntities()) {
                 pp.getNetManager().putEntityMovePacket(ee);
             }
-            pp.getNetManager().putEnviroPacket();
+            pp.getNetManager().putTimePacket();
         }
     }
 
@@ -359,7 +362,7 @@ public class World implements WorldSaveable, Disposable {
     }
 
     public WeatherType getWeather() {
-        return weatherType;
+        return weatherManager.getWeather();
     }
 
     public ExpiContactListener getCL() {
@@ -491,5 +494,7 @@ public class World implements WorldSaveable, Disposable {
         for(BiomeType biome : biomes) {
             out.writeInt(biome.ordinal());
         }
+
+        weatherManager.writeData(out);
     }
 }

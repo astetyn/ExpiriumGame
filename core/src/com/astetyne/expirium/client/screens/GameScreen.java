@@ -85,7 +85,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        background.draw(batch, time);
+        background.draw(batch, time, weather);
 
         world.draw(batch);
 
@@ -151,9 +151,8 @@ public class GameScreen implements Screen {
         addWarning(msg, duration, c);
     }
 
-    public void onEnviroPacket(PacketInputStream in) {
+    public void onTimePacket(PacketInputStream in) {
         time = in.getInt();
-        weather = WeatherType.get(in.getByte());
     }
 
     public ClientWorld getWorld() {
@@ -166,6 +165,10 @@ public class GameScreen implements Screen {
 
     public WeatherType getWeather() {
         return weather;
+    }
+
+    public void setWeather(WeatherType weather) {
+        this.weather = weather;
     }
 
     public InputMultiplexer getMultiplexer() {

@@ -2,7 +2,7 @@ package com.astetyne.expirium.server.core.world;
 
 public enum WeatherType {
 
-    SUNNY,
+    SUN,
     RAIN,
     ;
 

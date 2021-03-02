@@ -13,6 +13,7 @@ import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.inventory.UIInteractType;
 import com.astetyne.expirium.server.net.PacketInputStream;
 import com.astetyne.expirium.server.net.PacketOutputStream;
@@ -107,8 +108,8 @@ public class ClientPacketManager {
                     game.getPlayerData().feedLivingStats(in);
                     break;
 
-                case 28: //EnviroPacket
-                    game.onEnviroPacket(in);
+                case 28: //TimePacket
+                    game.onTimePacket(in);
                     break;
 
                 case 30: //InvHotSlotsFeedPacket
@@ -139,6 +140,10 @@ public class ClientPacketManager {
 
                 case 36: // WaterPacket
                     game.getWorld().onWaterPacket(in);
+                    break;
+
+                case 37: // WeatherChangePacket
+                    game.setWeather(WeatherType.get(in.getByte()));
                     break;
             }
         }

@@ -136,8 +136,7 @@ public class ClientWorld {
                 ClientTile t = terrain[i][j];
 
                 if(t.hasBackWall()) {
-                    float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
-                    batch.setColor(b,b,b,1);
+                    setProperColor(batch, t);
                     batch.draw(TileTex.BACK_WALL.getTex(), i, j, 1, 1);
                 }
 
@@ -156,9 +155,7 @@ public class ClientWorld {
                 }
 
                 // normal view
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
-                //float b = 1;
-                batch.setColor(b,b,b,1);
+                setProperColor(batch, t);
                 batch.draw(t.getMaterial().getTex(), i, j, 1, 1);
             }
         }
@@ -172,8 +169,7 @@ public class ClientWorld {
         // entities
         for(ClientEntity e : entities) {
             if(!e.isActive()) continue;
-            float b = Consts.MAX_LIGHT_LEVEL_INVERTED * e.getCenterTile().getLight(game.getTime());
-            batch.setColor(b,b,b,1);
+            setProperColor(batch, e.getCenterTile());
             e.draw(batch);
         }
 
@@ -182,8 +178,7 @@ public class ClientWorld {
             for(int j = bottom; j < top; j++) {
                 ClientTile t = terrain[i][j];
                 if(t.getWaterLevel() == 0) continue;
-                float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime());
-                batch.setColor(b,b,b,1);
+                setProperColor(batch, t);
                 waterManager.draw(batch, t, i, j);
             }
         }
@@ -194,7 +189,11 @@ public class ClientWorld {
         if(game.getWeather() == WeatherType.RAIN) {
             rain.draw(batch, left, right, top, bottom);
         }
+    }
 
+    private void setProperColor(SpriteBatch batch, ClientTile t) {
+        float b = Consts.MAX_LIGHT_LEVEL_INVERTED * t.getLight(game.getTime(), game.getWeather());
+        batch.setColor(b,b,b,1);
     }
 
     public void onServerTick() {

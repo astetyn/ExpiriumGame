@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.world;
 
 import com.astetyne.expirium.client.resources.BGRes;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -29,10 +30,10 @@ public class Background {
         parallaxHeight = 1300;
     }
 
-    public void draw(SpriteBatch batch, int time) {
+    public void draw(SpriteBatch batch, int time, WeatherType weather) {
 
         // sky
-        Color sky = getSkyColor(batch.getColor(), time);
+        Color sky = getSkyColor(batch.getColor(), time, weather);
         Gdx.gl.glClearColor(sky.r, sky.g, sky.b, sky.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -44,7 +45,7 @@ public class Background {
         float xShift3 = (world.getCamera().position.x*8) % parallaxWidth3;
         float yShift3 = world.getCamera().position.y*8;
 
-        batch.setColor(getBGColor(batch.getColor(), time));
+        batch.setColor(getBGColor(batch.getColor(), time, weather));
         BGRes.BACKGROUND_1.getDrawable().draw(batch, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
         BGRes.BACKGROUND_1.getDrawable().draw(batch, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
         BGRes.BACKGROUND_2.getDrawable().draw(batch, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
@@ -55,7 +56,7 @@ public class Background {
 
     }
 
-    private Color getSkyColor(Color c, int time) {
+    private Color getSkyColor(Color c, int time, WeatherType weather) {
 
         int srs = Consts.SUNRISE_START;
         int srh = (Consts.SUNRISE_END - Consts.SUNRISE_START)/2;
@@ -89,10 +90,18 @@ public class Background {
         }else { // night
             c.set(nightSkyC);
         }
+
+        if(weather == WeatherType.RAIN) {
+            float avr = (c.r + c.g + c.b)/3;
+            c.r = (avr + c.r)/2 * 0.7f;
+            c.g = (avr + c.g)/2 * 0.7f;
+            c.b = (avr + c.b)/2 * 0.7f;
+        }
+
         return c;
     }
 
-    private Color getBGColor(Color c, int time) {
+    private Color getBGColor(Color c, int time, WeatherType weather) {
 
         int srs = Consts.SUNRISE_START;
         int srh = (Consts.SUNRISE_END - Consts.SUNRISE_START)/2;
@@ -126,8 +135,13 @@ public class Background {
         }else { // night
             c.set(nightHillsC);
         }
-        return c;
 
+        if(weather == WeatherType.RAIN) {
+            c.mul(0.6f);
+            c.a = 1;
+        }
+
+        return c;
     }
 
 }

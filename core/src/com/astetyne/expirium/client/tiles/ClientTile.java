@@ -1,6 +1,7 @@
 package com.astetyne.expirium.client.tiles;
 
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.tile.Material;
 
 public class ClientTile {
@@ -51,7 +52,7 @@ public class ClientTile {
         this.localLight = localLight;
     }
 
-    public int getTimeCompensatedSkyLight(int time) {
+    public byte getTimeCompensatedSkyLight(int time) {
 
         float moonLightFactor = 0.3f;
 
@@ -81,8 +82,13 @@ public class ClientTile {
      *
      * @return Real light level, which can be displayed on screen.
      */
-    public int getLight(int time) {
-        return Math.max(getTimeCompensatedSkyLight(time), localLight);
+    public int getLight(int time, WeatherType weatherType) {
+        byte skyLight = getTimeCompensatedSkyLight(time);
+        if(weatherType == WeatherType.RAIN) {
+            skyLight -= 2;
+            skyLight = (byte) Math.max(skyLight, 0);
+        }
+        return Math.max(skyLight, localLight);
     }
 
     public boolean hasBackWall() {
