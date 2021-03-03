@@ -6,7 +6,10 @@ import com.astetyne.expirium.client.net.ClientFailListener;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
 import com.astetyne.expirium.client.net.MulticastListener;
-import com.astetyne.expirium.client.resources.*;
+import com.astetyne.expirium.client.resources.GuiRes;
+import com.astetyne.expirium.client.resources.Res;
+import com.astetyne.expirium.client.resources.TileTex;
+import com.astetyne.expirium.client.resources.TileTexAnim;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
@@ -54,9 +57,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		TextureAtlas bg = new TextureAtlas("background.atlas");
 		TextureAtlas textures = new TextureAtlas("textures.atlas");
 		LivingEffect.loadTextures(textures);
-		BGRes.loadTextures(bg);
 		GuiRes.loadTextures(textures);// must be called before Res
-		Res.loadTextures(textures);
+		Res.loadTextures(textures, bg);
 		TileTex.loadTextures(textures);
 		TileTexAnim.loadTextures(textures);
 		Item.loadTextures(textures);

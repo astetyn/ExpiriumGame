@@ -9,6 +9,7 @@ import com.astetyne.expirium.client.gui.widget.OverlapImage;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.resources.TileTex;
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.world.Background;
 import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.server.core.world.WeatherType;
@@ -47,7 +48,7 @@ public class GameScreen implements Screen {
 
         playerDataHandler = new PlayerDataHandler(this);
 
-        stage = new Stage(new StretchViewport(2000, 1000), batch);
+        stage = new Stage(new StretchViewport(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT), batch);
 
         warnMsgLabel = new WarnMsgLabel(Res.WARN_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
@@ -128,7 +129,7 @@ public class GameScreen implements Screen {
     }
 
     public void setRoot(GameRootable root) {
-        root.getActor().setBounds(0, 0, 2000, 1000);
+        root.getActor().setBounds(0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
         stage.clear();
         stage.addActor(root.getActor());
         stage.addActor(warnMsgLabel);

@@ -1,8 +1,8 @@
 
 textures.png
-size: 1024,256
+size: 1024, 256
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 apple_item
   rotate: false
@@ -658,6 +658,13 @@ player_move
   orig: 16, 27
   offset: 0, 0
   index: 3
+rain_drop
+  rotate: false
+  xy: 725, 215
+  size: 1, 6
+  orig: 1, 6
+  offset: 0, 0
+  index: -1
 raspberry_bush_grown
   rotate: false
   xy: 753, 239

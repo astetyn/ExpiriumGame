@@ -84,9 +84,8 @@ public class ClientTile {
      */
     public int getLight(int time, WeatherType weatherType) {
         byte skyLight = getTimeCompensatedSkyLight(time);
-        if(weatherType == WeatherType.RAIN) {
-            skyLight -= 2;
-            skyLight = (byte) Math.max(skyLight, 0);
+        if(weatherType == WeatherType.RAIN && skyLight >= 6) {
+            skyLight -= 3;
         }
         return Math.max(skyLight, localLight);
     }

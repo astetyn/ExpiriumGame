@@ -43,12 +43,12 @@ public class Consts {
     public static final int DROWNING_TICKS = SERVER_TPS * 10;
     public static final byte STARVATION_LEVEL = 5;
 
-    public static final int TICKS_IN_DAY = 38400;
     public static final int TICKS_IN_HOUR = 1600;
-    public static final int SUNRISE_START = 9600;
-    public static final int SUNRISE_END = 11200;
-    public static final int SUNSET_START = 30400;
-    public static final int SUNSET_END = 32000;
+    public static final int TICKS_IN_DAY = Consts.TICKS_IN_HOUR * 24;
+    public static final int SUNRISE_START = Consts.TICKS_IN_HOUR * 6;
+    public static final int SUNRISE_END = Consts.TICKS_IN_HOUR * 7;
+    public static final int SUNSET_START = Consts.TICKS_IN_HOUR * 19;
+    public static final int SUNSET_END = Consts.TICKS_IN_HOUR * 20;
 
     // player
     public static final float ACTIVE_ENTITIES_RADIUS = 30;
@@ -64,6 +64,8 @@ public class Consts {
     public static final int WATER_MANIPULATE_COOLDOWN = 100; //in millis
 
     // gui
+    public static final int SCREEN_WIDTH = 2000;
+    public static final int SCREEN_HEIGHT = 1000;
     public static final int INV_TILE_WIDTH = 140;
 
 }

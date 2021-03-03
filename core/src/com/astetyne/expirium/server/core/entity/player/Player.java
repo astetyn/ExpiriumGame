@@ -196,7 +196,7 @@ public class Player extends LivingEntity {
         }else {
             horzFactor = 1250;
             maxHorzVel = 3;
-            if(tsData1.vert >= jumpThreshold && (onGround || false) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if(tsData1.vert >= jumpThreshold && (onGround || true) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
                 body.applyLinearImpulse(0, 350f, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();

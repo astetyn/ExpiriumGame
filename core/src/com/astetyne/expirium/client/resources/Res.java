@@ -24,6 +24,10 @@ public class Res {
     public static NinePatchDrawable FRAME_ROUND, FRAME_SQUARE, FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_YELLOW,
         FRAME_SQUARE_GRAY, FRAME_ROUND_GRAY_TRANSP, INV_TILE;
 
+    // background
+    public static NinePatchDrawable BG_1, BG_2, BG_3;
+    public static TextureRegion SUN, MOON, STAR, RAIN_DROP;
+
     // gui
     public static BitmapFont MAIN_FONT, TITLE_FONT, WARN_FONT, WORLD_FONT;
 
@@ -45,17 +49,29 @@ public class Res {
 
     public static Animation<TextureRegion> SQUIRREL_IDLE;
 
-    public static void loadTextures(TextureAtlas atlas) {
+    public static void loadTextures(TextureAtlas textures, TextureAtlas background) {
 
         Animation.PlayMode loop_pong = Animation.PlayMode.LOOP_PINGPONG;
 
+        //background
+        BG_1 = new NinePatchDrawable(background.createPatch("background_1"));
+        BG_2 = new NinePatchDrawable(background.createPatch("background_2"));
+        BG_3 = new NinePatchDrawable(background.createPatch("background_3"));
+        BG_1.getPatch().scale(0, 2);
+        BG_2.getPatch().scale(0, 2);
+        BG_3.getPatch().scale(0, 2);
+        SUN = background.findRegion("sun");
+        MOON = background.findRegion("moon");
+        STAR = background.findRegion("star");
+        RAIN_DROP = textures.findRegion("rain_drop");
+
         // fonts
-        MAIN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), atlas.findRegion("main_font"));
-        TITLE_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), atlas.findRegion("main_font"));
+        MAIN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), textures.findRegion("main_font"));
+        TITLE_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), textures.findRegion("main_font"));
         TITLE_FONT.getData().setScale(2);
-        WARN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), atlas.findRegion("main_font"));
+        WARN_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), textures.findRegion("main_font"));
         WARN_FONT.getData().setScale(1.6f);
-        WORLD_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), atlas.findRegion("main_font"));
+        WORLD_FONT = new BitmapFont(Gdx.files.internal("main_font.fnt"), textures.findRegion("main_font"));
         WORLD_FONT.getData().setScale(0.01f);
 
         MAIN_FONT.setUseIntegerPositions(false);
@@ -68,31 +84,31 @@ public class Res {
         tranpGray.a = 0.4f;
 
         // ninepatch
-        FRAME_ROUND = new NinePatchDrawable(atlas.createPatch("frame_round"));
+        FRAME_ROUND = new NinePatchDrawable(textures.createPatch("frame_round"));
         FRAME_ROUND.getPatch().scale(10, 10);
         FRAME_ROUND_GRAY = FRAME_ROUND.tint(gray);
         FRAME_ROUND_GREEN = FRAME_ROUND.tint(green);
         FRAME_ROUND_YELLOW = FRAME_ROUND.tint(yellow);
         FRAME_ROUND_GRAY_TRANSP = FRAME_ROUND.tint(tranpGray);
-        FRAME_SQUARE = new NinePatchDrawable(atlas.createPatch("frame_square"));
+        FRAME_SQUARE = new NinePatchDrawable(textures.createPatch("frame_square"));
         FRAME_SQUARE.getPatch().scale(10, 10);
         FRAME_SQUARE_GRAY = FRAME_SQUARE.tint(Color.LIGHT_GRAY);
-        INV_TILE = new NinePatchDrawable(atlas.createPatch("inv_tile"));
+        INV_TILE = new NinePatchDrawable(textures.createPatch("inv_tile"));
         INV_TILE.getPatch().scale((1f/16)*Consts.INV_TILE_WIDTH, (1f/16) * Utils.percFromW(Consts.INV_TILE_WIDTH));
 
-        Drawable selection = new TextureRegionDrawable(atlas.findRegion("selection"));
-        Drawable cursor = new TextureRegionDrawable(atlas.findRegion("cursor"));
-        TextureRegion tsBack = atlas.findRegion("thumb_stick_back");
-        TextureRegion tsFore = atlas.findRegion("thumb_stick_fore");
-        ARROW = atlas.findRegion("switch_arrow");
-        DAMAGE_OVERLAP = atlas.findRegion("damage_overlap");
-        TextureRegionDrawable invTileSplit = new TextureRegionDrawable(atlas.findRegion("inv_tile_split"));
-        TextureRegionDrawable invTileSplitHalf = new TextureRegionDrawable(atlas.findRegion("inv_tile_split_half"));
-        TextureRegionDrawable invTileThrow = new TextureRegionDrawable(atlas.findRegion("trash_icon"));
-        TextureRegion moveTsSideArrow = atlas.findRegion("ts_move_arrow_side");
-        TextureRegion moveTsUpArrow = atlas.findRegion("ts_move_arrow_up");
+        Drawable selection = new TextureRegionDrawable(textures.findRegion("selection"));
+        Drawable cursor = new TextureRegionDrawable(textures.findRegion("cursor"));
+        TextureRegion tsBack = textures.findRegion("thumb_stick_back");
+        TextureRegion tsFore = textures.findRegion("thumb_stick_fore");
+        ARROW = textures.findRegion("switch_arrow");
+        DAMAGE_OVERLAP = textures.findRegion("damage_overlap");
+        TextureRegionDrawable invTileSplit = new TextureRegionDrawable(textures.findRegion("inv_tile_split"));
+        TextureRegionDrawable invTileSplitHalf = new TextureRegionDrawable(textures.findRegion("inv_tile_split_half"));
+        TextureRegionDrawable invTileThrow = new TextureRegionDrawable(textures.findRegion("trash_icon"));
+        TextureRegion moveTsSideArrow = textures.findRegion("ts_move_arrow_side");
+        TextureRegion moveTsUpArrow = textures.findRegion("ts_move_arrow_up");
 
-        CROSS_ICON = atlas.findRegion("cross_icon");
+        CROSS_ICON = textures.findRegion("cross_icon");
 
         BUTTON_STYLE = new Button.ButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY);
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY, MAIN_FONT);
@@ -105,11 +121,11 @@ public class Res {
         BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(INV_TILE, invTileThrow, invTileSplit, invTileSplitHalf);
 
         // entities
-        PLAYER_IDLE_ANIM = new Animation<>(0.5f, atlas.findRegions("player_idle"), loop_pong);
-        PLAYER_MOVE_ANIM = new Animation<>(0.05f, atlas.findRegions("player_move"), loop_pong);
-        PLAYER_INTERACT_ANIM = new Animation<>(0.12f, atlas.findRegions("player_interact"), Animation.PlayMode.LOOP);
+        PLAYER_IDLE_ANIM = new Animation<>(0.5f, textures.findRegions("player_idle"), loop_pong);
+        PLAYER_MOVE_ANIM = new Animation<>(0.05f, textures.findRegions("player_move"), loop_pong);
+        PLAYER_INTERACT_ANIM = new Animation<>(0.12f, textures.findRegions("player_interact"), Animation.PlayMode.LOOP);
 
-        SQUIRREL_IDLE = new Animation<>(1, atlas.findRegion("squirrel_idle"));
+        SQUIRREL_IDLE = new Animation<>(1, textures.findRegion("squirrel_idle"));
 
     }
 

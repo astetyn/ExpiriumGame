@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.world;
 import com.astetyne.expirium.client.entity.MainClientPlayer;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.tiles.ClientTile;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,10 +13,10 @@ import java.util.List;
 
 public class Rain {
 
-    private final static int spawnInterval = 2; // new drop every x millis
-    private final static float velY = -20 * 0.001f; // meters per millisecond
+    private final static int spawnInterval = 8; // new drop every x millis
+    private final static float velY = -25; // meters per second
     private final static int radius = 50;
-    private final static int recalcInterval = 1000;
+    private final static int recalcInterval = 1000; // how often should be surface recalculated in millis
 
     private final MainClientPlayer player;
     private final int width, height;
@@ -39,22 +40,26 @@ public class Rain {
 
     public void update() {
 
+        float delta = Gdx.graphics.getDeltaTime();
+        float yAdd = delta * velY;
+
         long currentTime = System.currentTimeMillis();
         Vector2 center = player.getCenter();
+        int precalcX = (int) center.x - radius;
 
+        // this is the fastest method I was able to achieve
         Iterator<RainDrop> it = drops.iterator();
         while(it.hasNext()) {
             RainDrop drop = it.next();
-            int x = Math.max((int)drop.x - (int)center.x + radius, 0);
+            int x = Math.max(drop.xTile - precalcX, 0);
             x = Math.min(x, maxIndex);
-            float y = drop.spawnY + (currentTime - drop.spawnTime) * velY;
-            if(y < surface[x]) it.remove();
+            drop.y += yAdd;
+            if(drop.y < surface[x]) it.remove();
         }
 
-        long diff = Math.min(currentTime - lastSpawn - spawnInterval, 1000);
-        while(diff > 0) {
+        int toSpawn = Math.min((int)((currentTime - lastSpawn)/spawnInterval), 10); // max number of new drops to prevent death loop
+        for(int i = 0; i < toSpawn; i++) {
             drops.add(new RainDrop((float) (center.x - radius + Math.random() * (radius*2)), (float) (center.y + 20 + Math.random() * 10)));
-            diff -= spawnInterval;
             lastSpawn = currentTime;
         }
 
@@ -67,9 +72,9 @@ public class Rain {
     public void draw(SpriteBatch batch, int left, int right, int top, int bottom) {
         for(RainDrop drop : drops) {
             float x = drop.x;
-            float y = drop.spawnY + (System.currentTimeMillis() - drop.spawnTime) * velY;
+            float y = drop.y;
             if(x >= left && x <= right && y >= bottom && y <= top) {
-                batch.draw(Res.DAMAGE_OVERLAP, x, y, 0.1f, 0.2f);
+                batch.draw(Res.RAIN_DROP, x, y, 0.1f, 0.8f);
             }
         }
     }
@@ -91,13 +96,14 @@ public class Rain {
 
     public static class RainDrop {
 
-        public final long spawnTime;
-        public final float x, spawnY;
+        public final float x;
+        public float y;
+        public final int xTile;
 
-        public RainDrop(float x, float spawnY) {
+        public RainDrop(float x, float y) {
             this.x = x;
-            this.spawnY  = spawnY;
-            spawnTime = System.currentTimeMillis();
+            xTile = (int)x;
+            this.y = y;
         }
     }
 

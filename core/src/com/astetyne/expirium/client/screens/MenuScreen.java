@@ -5,6 +5,7 @@ import com.astetyne.expirium.client.gui.roots.menu.MainMenuRoot;
 import com.astetyne.expirium.client.gui.roots.menu.MenuRootable;
 import com.astetyne.expirium.client.gui.widget.WarnMsgLabel;
 import com.astetyne.expirium.client.resources.Res;
+import com.astetyne.expirium.client.utils.Consts;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -24,7 +25,7 @@ public class MenuScreen implements Screen {
 
     public MenuScreen(String info) {
 
-        stage = new Stage(new StretchViewport(2000, 1000), ExpiGame.get().getBatch());
+        stage = new Stage(new StretchViewport(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT), ExpiGame.get().getBatch());
 
         warnMsgLabel = new WarnMsgLabel(Res.TITLE_LABEL_STYLE);
         warnMsgLabel.setBounds(0, 700, 2000, 200);
@@ -74,7 +75,7 @@ public class MenuScreen implements Screen {
 
     public void setRoot(MenuRootable root) {
         if(activeRoot != null) activeRoot.onEnd();
-        root.getActor().setBounds(0, 0, 2000, 1000);
+        root.getActor().setBounds(0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
         stage.clear();
         stage.addActor(root.getActor());
         stage.addActor(warnMsgLabel);

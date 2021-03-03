@@ -1,12 +1,14 @@
 package com.astetyne.expirium.client.world;
 
-import com.astetyne.expirium.client.resources.BGRes;
+import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.server.core.world.WeatherType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 public class Background {
 
@@ -16,6 +18,8 @@ public class Background {
     private final Color nightSkyC, nightHillsC;
     private final int parallaxWidth, parallaxWidth2, parallaxWidth3;
     private final int parallaxHeight;
+    private final float sunWidth, sunHeight, starWidth, starHeight;
+    private final Vector2[] stars;
 
     public Background(ClientWorld world) {
         this.world = world;
@@ -23,11 +27,20 @@ public class Background {
         daySkyC = new Color(0.6f, 0.8f, 1, 1);
         dayHillsC = new Color(1, 1, 1, 1);
         nightSkyC = new Color(0, 0, 0, 1);
-        nightHillsC = new Color(0.1f, 0.1f, 0.1f, 1);
+        nightHillsC = new Color(0.2f, 0.2f, 0.2f, 1);
         parallaxWidth = 3200;
         parallaxWidth2 = 2800;
         parallaxWidth3 = 2000;
         parallaxHeight = 1300;
+        sunWidth = 300;
+        sunHeight = Utils.percFromW(sunWidth);
+        starWidth = 10;
+        starHeight = Utils.percFromW(starWidth);
+
+        stars = new Vector2[100];
+        for(int i = 0; i < stars.length; i++) {
+            stars[i] = new Vector2((float) (Math.random()*2 - 1), (float)(Math.random()*2-1) * Consts.SCREEN_HEIGHT/2);
+        }
     }
 
     public void draw(SpriteBatch batch, int time, WeatherType weather) {
@@ -37,23 +50,68 @@ public class Background {
         Gdx.gl.glClearColor(sky.r, sky.g, sky.b, sky.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if(weather != WeatherType.RAIN) {
+
+            int srm = Consts.SUNRISE_START + (Consts.SUNRISE_END - Consts.SUNRISE_START) / 2;
+            int ssm = Consts.SUNSET_START + (Consts.SUNSET_END - Consts.SUNSET_START) / 2;
+
+            batch.setColor(Color.WHITE);
+
+            // sun
+            if(time >= srm && time < ssm) {
+                float scaled = (float) (time - srm) / (ssm - srm);
+                float x = scaled * (Consts.SCREEN_WIDTH + sunWidth) - sunWidth;
+                batch.draw(Res.SUN, x, getY(scaled), sunWidth, sunHeight);
+            }else {
+
+                int timePassed = time >= ssm ? time - ssm : time + (Consts.TICKS_IN_DAY - ssm);
+                float scaled = (float) timePassed / (srm + Consts.TICKS_IN_DAY - ssm);
+                float x = scaled * (Consts.SCREEN_WIDTH + sunWidth) - sunWidth;
+
+                // stars
+                float a = time >= ssm ? (float)(time - ssm) / (Consts.SUNSET_END - ssm) :
+                        (float)(time - srm) * -1 / (srm - Consts.SUNRISE_START);
+                a = Math.min(a, 1);
+                a = Math.max(a, 0);
+                Color c = batch.getColor();
+                c.a = a;
+                batch.setColor(c);
+
+                for(Vector2 star : stars) {
+                    batch.draw(Res.STAR, x/2 + star.x * ((Consts.SCREEN_WIDTH + sunWidth) - sunWidth), getY(scaled/2 + star.x) + star.y, starWidth, starHeight);
+                }
+
+                batch.setColor(Color.WHITE);
+
+                // moon
+                batch.draw(Res.MOON, x, getY(scaled), sunWidth, sunHeight);
+            }
+        }
+
         // hills
         float xShift1 = (world.getCamera().position.x*2) % parallaxWidth;
         float yShift1 = world.getCamera().position.y*4;
         float xShift2 = (world.getCamera().position.x*6) % parallaxWidth2;
-        float yShift2 = world.getCamera().position.y*7;
+        float yShift2 = world.getCamera().position.y*8;
         float xShift3 = (world.getCamera().position.x*8) % parallaxWidth3;
-        float yShift3 = world.getCamera().position.y*8;
+        float yShift3 = world.getCamera().position.y*10;
 
         batch.setColor(getBGColor(batch.getColor(), time, weather));
-        BGRes.BACKGROUND_1.getDrawable().draw(batch, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
-        BGRes.BACKGROUND_1.getDrawable().draw(batch, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
-        BGRes.BACKGROUND_2.getDrawable().draw(batch, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
-        BGRes.BACKGROUND_2.getDrawable().draw(batch, parallaxWidth2-xShift2, -yShift2, parallaxWidth2, parallaxHeight);
-        BGRes.BACKGROUND_3.getDrawable().draw(batch, -xShift3, -yShift3, parallaxWidth3, parallaxHeight);
-        BGRes.BACKGROUND_3.getDrawable().draw(batch, parallaxWidth3-xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        Res.BG_1.draw(batch, -xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        Res.BG_1.draw(batch, parallaxWidth-xShift1, -yShift1, parallaxWidth, parallaxHeight);
+        Res.BG_2.draw(batch, -xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        Res.BG_2.draw(batch, parallaxWidth2-xShift2, -yShift2, parallaxWidth2, parallaxHeight);
+        Res.BG_3.draw(batch, -xShift3, -yShift3, parallaxWidth3, parallaxHeight);
+        Res.BG_3.draw(batch, parallaxWidth3-xShift3, -yShift3, parallaxWidth3, parallaxHeight);
         batch.setColor(Color.WHITE);
 
+    }
+
+    /** parabolic trajectory of sky elements
+     * x should be from 0 to 1
+     */
+    private float getY(float x) {
+        return Consts.SCREEN_HEIGHT - sunHeight / 2f - (float) (Math.pow(x * 2 - 1, 2)) * (Consts.SCREEN_HEIGHT / 2f);
     }
 
     private Color getSkyColor(Color c, int time, WeatherType weather) {
