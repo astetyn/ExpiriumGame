@@ -1,24 +1,30 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
+import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.net.PacketOutputStream;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
 public class CookingInventory extends Inventory {
 
+    private static final InvVariableType[] variables = new InvVariableType[]{InvVariableType.STOPWATCH};
+
     protected final World world;
     protected long startTick;
     protected CookingRecipe recipe;
     private int multiply;
+    private String timeVariable;
 
     public CookingInventory(World world, int rows, int columns, float maxWeight) {
         super(rows, columns, maxWeight);
         this.world = world;
         startTick = world.getTick();
         multiply = 0;
+        timeVariable = "";
     }
 
     public CookingInventory(World world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
@@ -26,12 +32,13 @@ public class CookingInventory extends Inventory {
         this.world = world;
         startTick = in.readLong();
         multiply = 0;
+        timeVariable = "";
     }
 
     // should be called every half second = 16 ticks
     public void onCookingUpdate() {
         willNeedUpdate();
-        generateLabel();
+        updateVariablesText();
         if(recipe == null) return;
 
         if(startTick + recipe.getTicks() < world.getTick()) {
@@ -42,11 +49,11 @@ public class CookingInventory extends Inventory {
         }
     }
 
-    protected void generateLabel() {
+    protected void updateVariablesText() {
         if(recipe == null) {
-            label = "Unknown recipe";
+            timeVariable = "-";
         }else {
-            label = "Cooking: " + Math.min((int) ((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100) + "%";
+            timeVariable = Math.min((int) ((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100) + "%";
         }
     }
 
@@ -94,6 +101,21 @@ public class CookingInventory extends Inventory {
     public void refresh() {
         super.refresh();
         matchRecipe();
+    }
+
+    @Override
+    public String getLabel() {
+        return "Cooking fire";
+    }
+
+    @Override
+    public InvVariableType[] getVariables() {
+        return variables;
+    }
+
+    @Override
+    public void writeVariablesData(PacketOutputStream out) {
+        out.putShortString(timeVariable);
     }
 
     @Override

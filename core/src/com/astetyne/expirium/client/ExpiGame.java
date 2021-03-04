@@ -1,5 +1,7 @@
 package com.astetyne.expirium.client;
 
+import com.astetyne.expirium.client.data.ExtraCellTexture;
+import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.gui.roots.menu.LoadingRoot;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.net.ClientFailListener;
@@ -62,6 +64,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		TileTex.loadTextures(textures);
 		TileTexAnim.loadTextures(textures);
 		Item.loadTextures(textures);
+		ExtraCellTexture.loadTextures(textures);
+		InvVariableType.loadTextures(textures);
 		batch = new SpriteBatch();
 		setScreen(new MenuScreen());
 		debugRenderer = new Box2DDebugRenderer();

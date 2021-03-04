@@ -7,6 +7,7 @@ public enum ExpiColor {
     RED(Color.RED),
     GREEN(Color.GREEN),
     ORANGE(Color.ORANGE),
+    WHITE(Color.WHITE),
     ;
 
     private final Color c;

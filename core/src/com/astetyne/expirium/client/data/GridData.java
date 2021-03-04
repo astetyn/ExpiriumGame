@@ -8,31 +8,28 @@ import com.astetyne.expirium.server.net.PacketInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StorageGridData {
+public class GridData {
 
     public final List<GridItemStack> items;
-    public int rows, columns;
     public float totalWeight, maxWeight;
     public String label;
 
-    public StorageGridData() {
+    public GridData() {
         items = new ArrayList<>();
-        rows = 1;
-        columns = 1;
-        label = "";
+        label = "This is your inventory.";
     }
 
     public void feed(PacketInputStream in) {
-        label = in.getString();
         totalWeight = in.getFloat();
         maxWeight = in.getFloat();
         items.clear();
-        int itemsNumber = in.getInt();
-        for(int i = 0; i < itemsNumber; i++) {
-            int itemID = in.getInt();
-            int amount = in.getInt();
-            IntVector2 pos = in.getIntVector();
-            items.add(new GridItemStack(Item.get(itemID), amount, pos));
+        int size = in.getByte();
+        for(int i = 0; i < size; i++) {
+            int itemID = in.getShort();
+            int amount = in.getShort();
+            int x = in.getByte();
+            int y = in.getByte();
+            items.add(new GridItemStack(Item.get(itemID), amount, new IntVector2(x, y)));
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.data.ExtraCell;
+import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
@@ -118,33 +120,39 @@ public class ServerPacketManager {
     }
 
     public void putInvFeedPacket() {
-        Inventory inv1 = owner.getInv();
-        Inventory inv2 = owner.getSecondInv();
         out.startPacket(24);
-        out.putString(inv1.getLabel());
-        out.putFloat(inv1.getTotalWeight());
-        out.putFloat(inv1.getMaxWeight());
-        out.putInt(inv1.getItems().size());
-        for(GridItemStack is : inv1.getItems()) {
-            out.putInt(is.getItem().ordinal());
-            out.putInt(is.getAmount());
-            out.putIntVector(is.getGridPos());
-        }
-        out.putString(inv2.getLabel());
-        out.putFloat(inv2.getTotalWeight());
-        out.putFloat(inv2.getMaxWeight());
-        out.putInt(inv2.getItems().size());
-        for(GridItemStack is : inv2.getItems()) {
-            out.putInt(is.getItem().ordinal());
-            out.putInt(is.getAmount());
-            out.putIntVector(is.getGridPos());
+        putInvData(owner.getInv());
+        putInvData(owner.getSecondInv());
+        owner.getSecondInv().writeVariablesData(out);
+    }
+
+    private void putInvData(Inventory inv) {
+        out.putFloat(inv.getTotalWeight());
+        out.putFloat(inv.getMaxWeight());
+        out.putByte((byte) inv.getItems().size());
+        for(GridItemStack is : inv.getItems()) {
+            out.putShort((short) is.getItem().ordinal());
+            out.putShort((short) is.getAmount());
+            out.putByte((byte) is.getGridPos().x);
+            out.putByte((byte) is.getGridPos().y);
         }
     }
 
     public void putOpenDoubleInvPacket() {
         out.startPacket(31);
-        out.putInt(owner.getSecondInv().getRows());
-        out.putInt(owner.getSecondInv().getColumns());
+        Inventory secondInv = owner.getSecondInv();
+        out.putByte((byte) secondInv.getRows());
+        out.putByte((byte) secondInv.getColumns());
+        out.putString(secondInv.getLabel());
+        out.putByte((byte) secondInv.getExtraCells().length);
+        for(ExtraCell cell : secondInv.getExtraCells()) {
+            out.putByte(secondInv.getIndex(cell.pos));
+            out.putByte((byte)cell.tex.ordinal());
+        }
+        out.putByte((byte) secondInv.getVariables().length);
+        for(InvVariableType type : secondInv.getVariables()) {
+            out.putByte((byte) type.ordinal());
+        }
     }
 
     public void putHotSlotsFeedPacket(ChosenSlot slot, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {

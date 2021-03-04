@@ -1,7 +1,6 @@
 package com.astetyne.expirium.client.data;
 
 import com.astetyne.expirium.client.screens.GameScreen;
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.entity.player.LivingEffect;
 import com.astetyne.expirium.server.net.PacketInputStream;
 
@@ -11,9 +10,11 @@ import java.util.List;
 public class PlayerDataHandler {
 
     // inventory
-    private final StorageGridData mainData, secondData;
+    private final GridData mainData;
+    private final SecondGridData secondData;
     private final HotSlotsData hotSlotsData;
     private final ThumbStickData thumbStickData1, thumbStickData2;
+    private final ExtraCell[] defaultExtraCells;
 
     // living stats
     private byte health, food;
@@ -25,17 +26,17 @@ public class PlayerDataHandler {
 
         this.game = game;
 
-        mainData = new StorageGridData();
-        secondData = new StorageGridData();
+        mainData = new GridData();
+        secondData = new SecondGridData();
         hotSlotsData = new HotSlotsData();
-
-        mainData.rows = Consts.PLAYER_INV_ROWS;
-        mainData.columns = Consts.PLAYER_INV_COLUMNS;
 
         thumbStickData1 = new ThumbStickData();
         thumbStickData2 = new ThumbStickData();
 
         activeEffects = new ArrayList<>();
+
+        defaultExtraCells = new ExtraCell[]{new ExtraCell(2, 0, ExtraCellTexture.SPLIT_HALF),
+                new ExtraCell(3, 0, ExtraCellTexture.SPLIT_ONE), new ExtraCell(4, 0, ExtraCellTexture.TRASH)};
     }
 
     public void feedLivingStats(PacketInputStream in) {
@@ -56,11 +57,11 @@ public class PlayerDataHandler {
         game.getActiveRoot().refresh();
     }
 
-    public StorageGridData getMainData() {
+    public GridData getMainData() {
         return mainData;
     }
 
-    public StorageGridData getSecondData() {
+    public SecondGridData getSecondData() {
         return secondData;
     }
 
@@ -87,4 +88,9 @@ public class PlayerDataHandler {
     public List<LivingEffect> getActiveEffects() {
         return activeEffects;
     }
+
+    public ExtraCell[] getDefaultExtraCells() {
+        return defaultExtraCells;
+    }
+
 }

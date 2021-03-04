@@ -1,6 +1,7 @@
 package com.astetyne.expirium.client.gui.widget;
 
-import com.astetyne.expirium.client.data.StorageGridData;
+import com.astetyne.expirium.client.data.ExtraCell;
+import com.astetyne.expirium.client.data.GridData;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.Res;
@@ -14,17 +15,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
-public class StorageGrid extends Table {
+public class InventoryGrid extends Table {
 
     private final BaseGrid grid;
     private final Label weightLabel, infoLabel;
     private final Image weightImage;
     private Cell<BaseGrid> gridCell;
-    private final StorageGridData data;
+    private final GridData data;
 
-    public StorageGrid(StorageGridData data, boolean withUtils) {
+    public InventoryGrid(int rows, int columns, GridData data, ExtraCell[] extraCells) {
         this.data = data;
-        grid = new BaseGrid(Res.BASE_GRID_STYLE, data, withUtils);
+        grid = new BaseGrid(rows, columns, data, extraCells);
         weightLabel = new Label("0.0/0.0", Res.LABEL_STYLE);
         weightLabel.setAlignment(Align.left);
         weightImage = new Image(GuiRes.INV_WEIGHT.getDrawable());
@@ -49,7 +50,7 @@ public class StorageGrid extends Table {
     public void rebuild() {
         int mlt = Consts.INV_TILE_WIDTH;
         clear();
-        gridCell = add(grid).width(data.columns * mlt).height(Utils.percFromW(data.rows * mlt));
+        gridCell = add(grid).width(grid.getColumns() * mlt).height(Utils.percFromW(grid.getRows() * mlt));
         row();
         add(infoLabel).expandX().align(Align.center).padTop(10);
         row();

@@ -1,9 +1,9 @@
 package com.astetyne.expirium.client.gui.roots.game;
 
 import com.astetyne.expirium.client.ExpiGame;
+import com.astetyne.expirium.client.gui.widget.InventoryGrid;
 import com.astetyne.expirium.client.gui.widget.RecipeDetailTable;
 import com.astetyne.expirium.client.gui.widget.RecipeListTable;
-import com.astetyne.expirium.client.gui.widget.StorageGrid;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.GameScreen;
@@ -24,8 +24,8 @@ public class InventoryRoot extends Table implements GameRootable {
 
     private final GameScreen game;
 
-    private final StorageGrid storage;
-    private final Cell<StorageGrid> storageCell;
+    private final InventoryGrid storage;
+    private final Cell<InventoryGrid> storageCell;
 
     private final ScrollPane recipeList;
     private final RecipeDetailTable recipeDetail;
@@ -50,7 +50,7 @@ public class InventoryRoot extends Table implements GameRootable {
             }
         });
 
-        storage = new StorageGrid(game.getPlayerData().getMainData(), true);
+        storage = new InventoryGrid(Consts.INV_MAX_SIZE, Consts.INV_MAX_SIZE, game.getPlayerData().getMainData(), game.getPlayerData().getDefaultExtraCells());
 
         storage.addListener(new InputListener() {
 

@@ -1,6 +1,7 @@
 package com.astetyne.expirium.client.gui.widget;
 
-import com.astetyne.expirium.client.data.StorageGridData;
+import com.astetyne.expirium.client.data.ExtraCell;
+import com.astetyne.expirium.client.data.GridData;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.resources.Res;
@@ -11,21 +12,22 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class BaseGrid extends Widget {
 
-    private final BaseGridStyle style;
-    private final StorageGridData data;
+    private final int rows, columns;
+    private final GridData data;
+    private final ExtraCell[] extraCells;
+
     private GridItemStack selectedItem;
     private final Vector2 itemVec;
-    private final boolean withUtils;
     private int tileWidth, tileHeight;
 
-    public BaseGrid(BaseGridStyle style, StorageGridData data, boolean withUtils) {
-        this.style = style;
+    public BaseGrid(int rows, int columns, GridData data, ExtraCell[] extraCells) {
+        this.rows = rows;
+        this.columns = columns;
         this.data = data;
-        this.withUtils = withUtils;
+        this.extraCells = extraCells;
         itemVec = new Vector2();
     }
 
@@ -39,16 +41,16 @@ public class BaseGrid extends Widget {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         validate();
-        outer:
-        for(int i = 0; i < data.rows; i++) {
-            for(int j = 0; j < data.columns; j++) {
-                if(withUtils && i == 0 && j == data.columns-3) {
-                    style.splitTileHalf.draw(batch, getX()+(j)*tileWidth, getY(), tileWidth, tileHeight);
-                    style.splitTile.draw(batch, getX()+(j+1)*tileWidth, getY(), tileWidth, tileHeight);
-                    style.throwTile.draw(batch, getX()+(j+2)*tileWidth, getY(), tileWidth, tileHeight);
-                    continue outer;
+        for(int i = 0; i < rows; i++) {
+            outer:
+            for(int j = 0; j < columns; j++) {
+                for(ExtraCell cell : extraCells) {
+                    if(cell.pos.x == j && cell.pos.y == i) {
+                        batch.draw(cell.tex.getTex(), getX() + j * tileWidth, getY() + i * tileHeight, tileWidth, tileHeight);
+                        continue outer;
+                    }
                 }
-                style.gridTile.draw(batch, getX()+j*tileWidth, getY()+i*tileHeight, tileWidth, tileHeight);
+                Res.INV_CELL.draw(batch, getX() + j * tileWidth, getY() + i * tileHeight, tileWidth, tileHeight);
             }
         }
 
@@ -81,8 +83,8 @@ public class BaseGrid extends Widget {
     }
 
     public GridItemStack getItemAt(float x, float y) {
-        x /= (getWidth() / data.columns);
-        y /= (getHeight() / data.rows);
+        x /= (getWidth() / columns);
+        y /= (getHeight() / rows);
         for(GridItemStack is : data.items) {
             Item item = is.getItem();
             IntVector2 pos = is.getGridPos();
@@ -96,22 +98,10 @@ public class BaseGrid extends Widget {
     }
 
     public IntVector2 getGridPos(float x, float y) {
-        x /= (getWidth() / data.columns);
-        y /= (getHeight() / data.rows);
-        if(x < 0 || x >= data.columns || y < 0 || y >= data.rows) return new IntVector2(-1, -1);
+        x /= (getWidth() / columns);
+        y /= (getHeight() / rows);
+        if(x < 0 || x >= columns || y < 0 || y >= rows) return new IntVector2(-1, -1);
         return new IntVector2((int)x, (int)y);
-    }
-
-    public static class BaseGridStyle {
-
-        final Drawable gridTile, throwTile, splitTile, splitTileHalf;
-
-        public BaseGridStyle(Drawable gridTile, Drawable throwTile, Drawable splitTile, Drawable splitTileHalf) {
-            this.gridTile = gridTile;
-            this.throwTile = throwTile;
-            this.splitTile = splitTile;
-            this.splitTileHalf = splitTileHalf;
-        }
     }
 
     public GridItemStack getSelectedItem() {
@@ -122,11 +112,19 @@ public class BaseGrid extends Widget {
         this.selectedItem = selectedItem;
     }
 
-    public StorageGridData getData() {
+    public GridData getData() {
         return data;
     }
 
     public void updateVec(float x, float y) {
         itemVec.set(x, y);
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
     }
 }

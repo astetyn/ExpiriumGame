@@ -91,7 +91,7 @@ public class Player extends LivingEntity {
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
         if(Consts.DEBUG) {
-            getInv().append(Item.BUCKET_WATER, 20);
+            getInv().append(Item.COAL, 20);
         }
     }
 

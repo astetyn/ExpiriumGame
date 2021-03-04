@@ -21,16 +21,16 @@ public class MetaTileFurnace extends MetaTile {
 
     public MetaTileFurnace(World world, Tile owner) {
         super(world, owner);
-        inventory = new FuelCookingInventory(world, 2, 2, 5);
+        inventory = new FuelCookingInventory(world, 1, 4, 5);
         placeTick = world.getTick();
-        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS/2);
     }
 
     public MetaTileFurnace(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
-        inventory = new FuelCookingInventory(world, 2, 2, 5, in);
+        inventory = new FuelCookingInventory(world, 1, 4, 5, in);
         placeTick = world.getTick();
-        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS/2);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MetaTileFurnace extends MetaTile {
         }else if(inventory.getFuel() > 0 && owner.getMaterial() != Material.FURNACE_ON) {
             world.changeMaterial(owner, Material.FURNACE_ON, false, Source.NATURAL);
         }
-        scheduleAfter(this::onInvTick, Consts.SERVER_TPS);
+        scheduleAfter(this::onInvTick, Consts.SERVER_TPS/2);
     }
 
     @Override

@@ -88,7 +88,7 @@ public enum Item {
         label = sb.toString();
     }
 
-    public static void loadTextures(TextureAtlas gui) {
+    public static void loadTextures(TextureAtlas atlas) {
         for(Item item : values()) {
             if(item == EMPTY) continue;
 
@@ -96,8 +96,8 @@ public enum Item {
             String gridTexName = texName;
             if(item.hasCustomGridTex) gridTexName += "_grid";
 
-            item.texture = gui.findRegion(texName);
-            item.gridTexture = gui.findRegion(gridTexName);
+            item.texture = atlas.findRegion(texName);
+            item.gridTexture = atlas.findRegion(gridTexName);
 
             System.out.println("loaded item "+item+" with tex: "+item.texture);
         }

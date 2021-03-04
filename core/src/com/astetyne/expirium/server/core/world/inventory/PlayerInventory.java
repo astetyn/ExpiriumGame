@@ -36,7 +36,6 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         isCon = new ItemStack(Item.EMPTY);
         chosenSlot = ChosenSlot.TOOL_SLOT;
         itemInHand = new ItemStack(Item.EMPTY);
-        label = "Note that game is still in alpha!";
     }
 
     public PlayerInventory(Player owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {
@@ -50,7 +49,6 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         isCon = new ItemStack(Item.get(in.readInt()));
         chosenSlot = ChosenSlot.get(in.readInt());
         itemInHand = new ItemStack(Item.get(in.readInt()));
-        label = "Note that game is still in alpha!";
     }
 
     @Override

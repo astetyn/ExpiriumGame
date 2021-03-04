@@ -67,5 +67,8 @@ public class Consts {
     public static final int SCREEN_WIDTH = 2000;
     public static final int SCREEN_HEIGHT = 1000;
     public static final int INV_TILE_WIDTH = 140;
+    public static final int INV_MAX_SIZE = 5;
+
+    //misc
 
 }

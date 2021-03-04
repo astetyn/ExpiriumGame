@@ -1,29 +1,39 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
+import com.astetyne.expirium.client.data.ExtraCell;
+import com.astetyne.expirium.client.data.ExtraCellTexture;
+import com.astetyne.expirium.client.data.InvVariableType;
+import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.net.PacketOutputStream;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
 public class FuelCookingInventory extends CookingInventory {
 
+    private static final InvVariableType[] variables = new InvVariableType[]{InvVariableType.STOPWATCH, InvVariableType.COAL_FUEL};
+
     private int fuel;
     private long lastFuelDecreaseTick;
+    private String fuelVariable;
 
     public FuelCookingInventory(World world, int rows, int columns, float maxWeight) {
         super(world, rows, columns, maxWeight);
         fuel = 0;
         lastFuelDecreaseTick = world.getTick();
+        fuelVariable = "";
     }
 
     public FuelCookingInventory(World world, int rows, int columns, float maxWeight, DataInputStream in) throws IOException {
         super(world, rows, columns, maxWeight, in);
         fuel = in.readInt();
         lastFuelDecreaseTick = world.getTick();
+        fuelVariable = "";
     }
 
     @Override
@@ -47,12 +57,9 @@ public class FuelCookingInventory extends CookingInventory {
     }
 
     @Override
-    protected void generateLabel() {
-        if(recipe == null) {
-            label = "[Fuel: " + fuel + "] Unknown recipe";
-        }else {
-            label = "[Fuel: " + fuel + "] Cooking: " + Math.min((int) ((-startTick + world.getTick()) * 100 / recipe.getTicks()), 100) + "%";
-        }
+    protected void updateVariablesText() {
+        super.updateVariablesText();
+        fuelVariable = fuel+"";
     }
 
     @Override
@@ -65,28 +72,24 @@ public class FuelCookingInventory extends CookingInventory {
     }
 
     @Override
-    public void append(Item item, int amount) {
-        if(item == Item.COAL) {
-            increaseFuel(10 * amount);
-            refresh();
-            return;
-        }else if(item == Item.RAW_WOOD) {
-            increaseFuel(2 * amount);
-            refresh();
-            return;
-        }
-        super.append(item, amount);
+    protected boolean canInsert(Item item, int x, int y) {
+        if((getFuel(item) == 0 && y == 0 && x + item.getGridWidth() >= columns)) return false;
+        return super.canInsert(item, x, y);
+    }
+
+    @Override
+    public void move(IntVector2 pos1, IntVector2 pos2) {
+        GridItemStack gis = grid[pos1.x][pos1.y];
+        if(gis == null) return;
+        if(pos2.y == 0 && pos2.x == columns-1) return;
+        super.move(pos1, pos2);
     }
 
     @Override
     public void insert(ItemStack is, IntVector2 pos) {
-        if(is.getItem() == Item.COAL) {
-            increaseFuel(10 * is.getAmount());
-            refresh();
-            return;
-        }else if(is.getItem() == Item.RAW_WOOD) {
-            increaseFuel(2 * is.getAmount());
-            refresh();
+        if(pos.y == 0 && pos.x == columns-1) {
+            increaseFuel(getFuel(is.getItem()) * is.getAmount());
+            willNeedUpdate();
             return;
         }
         super.insert(is, pos);
@@ -97,11 +100,36 @@ public class FuelCookingInventory extends CookingInventory {
     }
 
     private void increaseFuel(int i) {
-        fuel = Math.min(fuel + i, 100);
+        fuel += i;
         lastFuelDecreaseTick = world.getTick();
     }
 
     public int getFuel() {
         return fuel;
+    }
+
+    private int getFuel(Item item) {
+        switch(item) {
+            case COAL: return 20;
+            case PLANKS: return 5;
+            case RAW_WOOD: return 2;
+            default: return 0;
+        }
+    }
+
+    @Override
+    public InvVariableType[] getVariables() {
+        return variables;
+    }
+
+    @Override
+    public void writeVariablesData(PacketOutputStream out) {
+        super.writeVariablesData(out);
+        out.putShortString(fuelVariable);
+    }
+
+    @Override
+    public ExtraCell[] getExtraCells() {
+        return new ExtraCell[]{new ExtraCell(columns-1, 0, ExtraCellTexture.COAL_FUEL)};
     }
 }

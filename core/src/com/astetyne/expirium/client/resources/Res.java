@@ -1,6 +1,5 @@
 package com.astetyne.expirium.client.resources;
 
-import com.astetyne.expirium.client.gui.widget.BaseGrid;
 import com.astetyne.expirium.client.gui.widget.MoveThumbStick;
 import com.astetyne.expirium.client.gui.widget.ThumbStick;
 import com.astetyne.expirium.client.utils.Consts;
@@ -22,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class Res {
 
     public static NinePatchDrawable FRAME_ROUND, FRAME_SQUARE, FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_YELLOW,
-        FRAME_SQUARE_GRAY, FRAME_ROUND_GRAY_TRANSP, INV_TILE;
+        FRAME_SQUARE_GRAY, FRAME_ROUND_GRAY_TRANSP, INV_CELL;
 
     // background
     public static NinePatchDrawable BG_1, BG_2, BG_3;
@@ -38,7 +37,6 @@ public class Res {
     public static Label.LabelStyle LABEL_STYLE, TITLE_LABEL_STYLE, WARN_LABEL_STYLE;
     public static ThumbStick.ThumbStickStyle THUMB_STICK_STYLE;
     public static MoveThumbStick.MoveThumbStickStyle MOVE_THUMB_STICK_STYLE;
-    public static BaseGrid.BaseGridStyle BASE_GRID_STYLE;
     public static TextureRegion ARROW;
     public static TextureRegion DAMAGE_OVERLAP;
 
@@ -93,8 +91,8 @@ public class Res {
         FRAME_SQUARE = new NinePatchDrawable(textures.createPatch("frame_square"));
         FRAME_SQUARE.getPatch().scale(10, 10);
         FRAME_SQUARE_GRAY = FRAME_SQUARE.tint(Color.LIGHT_GRAY);
-        INV_TILE = new NinePatchDrawable(textures.createPatch("inv_tile"));
-        INV_TILE.getPatch().scale((1f/16)*Consts.INV_TILE_WIDTH, (1f/16) * Utils.percFromW(Consts.INV_TILE_WIDTH));
+        INV_CELL = new NinePatchDrawable(textures.createPatch("inv_cell"));
+        INV_CELL.getPatch().scale((1f/16)*Consts.INV_TILE_WIDTH, (1f/16) * Utils.percFromW(Consts.INV_TILE_WIDTH));
 
         Drawable selection = new TextureRegionDrawable(textures.findRegion("selection"));
         Drawable cursor = new TextureRegionDrawable(textures.findRegion("cursor"));
@@ -102,9 +100,6 @@ public class Res {
         TextureRegion tsFore = textures.findRegion("thumb_stick_fore");
         ARROW = textures.findRegion("switch_arrow");
         DAMAGE_OVERLAP = textures.findRegion("damage_overlap");
-        TextureRegionDrawable invTileSplit = new TextureRegionDrawable(textures.findRegion("inv_tile_split"));
-        TextureRegionDrawable invTileSplitHalf = new TextureRegionDrawable(textures.findRegion("inv_tile_split_half"));
-        TextureRegionDrawable invTileThrow = new TextureRegionDrawable(textures.findRegion("trash_icon"));
         TextureRegion moveTsSideArrow = textures.findRegion("ts_move_arrow_side");
         TextureRegion moveTsUpArrow = textures.findRegion("ts_move_arrow_up");
 
@@ -118,7 +113,6 @@ public class Res {
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
         THUMB_STICK_STYLE = new ThumbStick.ThumbStickStyle(tsBack, tsFore);
         MOVE_THUMB_STICK_STYLE = new MoveThumbStick.MoveThumbStickStyle(tsFore, moveTsSideArrow, moveTsUpArrow);
-        BASE_GRID_STYLE = new BaseGrid.BaseGridStyle(INV_TILE, invTileThrow, invTileSplit, invTileSplitHalf);
 
         // entities
         PLAYER_IDLE_ANIM = new Animation<>(0.5f, textures.findRegions("player_idle"), loop_pong);

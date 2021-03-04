@@ -62,6 +62,15 @@ public class PacketInputStream {
         return sb.toString();
     }
 
+    public String getShortString() {
+        int len = getByte();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < len; i++) {
+            sb.append(readBuffer.getChar());
+        }
+        return sb.toString();
+    }
+
     public Vector2 getVector() {
         return new Vector2(readBuffer.getFloat(), readBuffer.getFloat());
     }

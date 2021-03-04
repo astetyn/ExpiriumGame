@@ -1,5 +1,7 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
+import com.astetyne.expirium.client.data.ExtraCell;
+import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.items.GridItemStack;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
@@ -7,6 +9,7 @@ import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
+import com.astetyne.expirium.server.net.PacketOutputStream;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -24,7 +27,6 @@ public class Inventory implements WorldSaveable {
     protected final GridItemStack[][] grid;
     protected float totalWeight;
     protected final float maxWeight;
-    protected String label;
     protected final int rows, columns;
     private final HashSet<Player> viewersSinceUpdate;
 
@@ -35,7 +37,6 @@ public class Inventory implements WorldSaveable {
         items = new ArrayList<>();
         grid = new GridItemStack[columns][rows];
         totalWeight = 0;
-        label = "";
         viewersSinceUpdate = new HashSet<>();
     }
 
@@ -255,7 +256,7 @@ public class Inventory implements WorldSaveable {
     }
 
     public String getLabel() {
-        return label;
+        return "";
     }
 
     public List<GridItemStack> getItems() {
@@ -282,6 +283,10 @@ public class Inventory implements WorldSaveable {
         return columns;
     }
 
+    public byte getIndex(IntVector2 pos) {
+        return (byte) (pos.y * columns + pos.x);
+    }
+
     public void increaseWeight(float f) {
         totalWeight += f;
         totalWeight = Math.round(totalWeight * 100) / 100f;
@@ -303,6 +308,16 @@ public class Inventory implements WorldSaveable {
     public void wasUpdated(Player viewer) {
         viewersSinceUpdate.add(viewer);
     }
+
+    public ExtraCell[] getExtraCells() {
+        return new ExtraCell[0];
+    }
+
+    public InvVariableType[] getVariables() {
+        return new InvVariableType[0];
+    }
+
+    public void writeVariablesData(PacketOutputStream out) {}
 
     @Override
     public void writeData(WorldBuffer out) {

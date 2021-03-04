@@ -71,6 +71,13 @@ public class PacketOutputStream {
         }
     }
 
+    public void putShortString(String s) {
+        putByte((byte) s.length());
+        for(char c : s.toCharArray()) {
+            writeBuffer.putChar(c);
+        }
+    }
+
     public void putVector(Vector2 vec) {
         putFloat(vec.x);
         putFloat(vec.y);
