@@ -10,6 +10,7 @@ public enum InvVariableType {
 
     STOPWATCH(ExpiColor.WHITE),
     COAL_FUEL(ExpiColor.WHITE),
+    RECYCLE(ExpiColor.WHITE),
     ;
 
     private TextureRegion iconTex;

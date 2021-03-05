@@ -3,6 +3,7 @@ package com.astetyne.expirium.server.core.world;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
 import com.astetyne.expirium.server.ExpiServer;
@@ -48,7 +49,7 @@ public class World implements WorldSaveable, Disposable {
     private long tick; // total ticks since world was generated
     private int time; // from midnight = 0 ticks
     private long day; // completed days from server creation
-    private WeatherManager weatherManager;
+    private final WeatherManager weatherManager;
     private final int width, height;
     private final long seed;
     private final PriorityQueue<TickTask> scheduledTickTasks;
@@ -84,7 +85,7 @@ public class World implements WorldSaveable, Disposable {
             biomes[i] = BiomeType.get(in.readInt());
         }
 
-        weatherManager = new WeatherManager(server, in);
+        weatherManager = new WeatherManager(this, in);
 
         b2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -17f), false);
 
@@ -176,7 +177,9 @@ public class World implements WorldSaveable, Disposable {
 
         if(!p.isInInteractRadius(loc)) return;
 
-        t.onInteract(p, type);
+        if(type == InteractType.RELEASE) {
+            t.onInteract(p, type);
+        }
 
         // following code is only for tile placing
         p.getToolManager().onInteract(t, type);
@@ -209,6 +212,12 @@ public class World implements WorldSaveable, Disposable {
         if(!stabilityCalc.canBeChanged(t, item.getBuildMaterial())) return;
 
         // confirmed from here
+
+        if(item == Item.TIME_WARPER) {
+            p.setResurrectLoc(p.getLocation().x, p.getLocation().y );
+            p.getNetManager().putWarningPacket("New home location set", 2000, ExpiColor.ORANGE);
+        }
+
         p.getInv().remove(item);
 
         for(Player ep : server.getPlayers()) {
@@ -286,9 +295,12 @@ public class World implements WorldSaveable, Disposable {
         return new Vector2(x, y+2);
     }
 
-    public void teleport(Entity e, float x, float y) {
+    public void teleport(Entity e, Vector2 loc, float radius) {
 
         float precision = 0.5f;
+
+        float x = loc.x;
+        float y = loc.y;
 
         float rightX = x;
         float leftX = x;
@@ -304,12 +316,15 @@ public class World implements WorldSaveable, Disposable {
             }
             rightX += precision;
             leftX -= precision;
-            if(leftX <= 0 || rightX + e.getType().getWidth() >= width) {
+            if(leftX <= 0 || rightX + e.getType().getWidth() >= width || x - leftX >= radius || rightX - x >= radius) {
                 leftX = x;
                 rightX = x;
                 y++;
             }
             if(y + e.getType().getHeight() >= height) {
+                if(e instanceof Player) {
+                    ((Player)e).getNetManager().putWarningPacket("Cannot find safe location!", 1000, ExpiColor.RED);
+                }
                 System.out.println("Can not find safe teleport loc for: "+e+". Teleport canceled.");
                 break;
             }
@@ -420,6 +435,10 @@ public class World implements WorldSaveable, Disposable {
 
     public ExpiServer getServer() {
         return server;
+    }
+
+    public WaterEngine getWaterEngine() {
+        return waterEngine;
     }
 
     public Entity spawnEntity(EntityType type, Vector2 loc, Object... args) {

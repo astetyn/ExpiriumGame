@@ -34,14 +34,11 @@ public class Squirrel extends LivingEntity {
 
     @Override
     public void die() {
-        if(Math.random() > 0.5) {
+        if(Math.random() > 0.6) {
             server.getWorld().spawnEntity(EntityType.DROPPED_ITEM, getCenter(), Item.SMALL_MEAT_RAW, Consts.ITEM_COOLDOWN_BREAK);
         }
         super.die();
     }
-
-    @Override
-    protected void interval10Sec() {}
 
     @Override
     protected void recalcFallDamage() {

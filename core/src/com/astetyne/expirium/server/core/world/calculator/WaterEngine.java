@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.calculator;
 
+import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.tile.Tile;
@@ -12,6 +13,8 @@ public class WaterEngine {
 
     public final static byte maxLevel = 5;
     private final static int updateTicks = 4;
+    private final static int minEvaporationTicks = Consts.SERVER_TPS * 3;
+    private final static int maxEvaporationTicks = Consts.SERVER_TPS * 60;
 
     private final World world;
     private final Tile[][] terrain;
@@ -153,6 +156,7 @@ public class WaterEngine {
         increaseWaterLevel(t, level - t.getWaterLevel());
     }
 
+    // unchecked
     public void increaseWaterLevel(Tile t, int amount) {
         t.increaseWaterLevel(amount);
         if(t.getY() != h-1) { // update for tile above
@@ -161,7 +165,7 @@ public class WaterEngine {
         updatedTiles.add(t);
         willNeedUpdate(t);
         if(canBeEvaporated(t)) {
-            int randTicks = (int) (1 * (Math.random() * 30 + 10));
+            int randTicks = (int)(Math.random() * (maxEvaporationTicks - minEvaporationTicks)) + minEvaporationTicks;
             WaterTask wt = new WaterTask(t, world.getTick() + randTicks);
             if(scheduledEvaporations.containsKey(t)) {
                 scheduledWaterEvaporation.remove(scheduledEvaporations.get(t));

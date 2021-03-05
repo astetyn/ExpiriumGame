@@ -18,11 +18,10 @@ import java.io.IOException;
 
 public abstract class LivingEntity extends Entity implements Collidable {
 
-    protected final static byte MAX_FOOD_LEVEL = 100;
     protected final static float BODY_DENSITY = 30;
 
     private final byte maxHealth;
-    private byte healthLevel, foodLevel;
+    private byte healthLevel;
 
     protected boolean lookingRight;
     protected boolean onGround, underWater;
@@ -37,7 +36,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         super(server, type, loc);
         this.maxHealth = (byte) maxHealth;
         healthLevel = this.maxHealth;
-        foodLevel = 100;
         lookingRight = true;
         onGround = underWater = false;
         collisions = 0;
@@ -46,8 +44,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         invincible = false;
         lastFallVelocity = 0;
         server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS);
-        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
-        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -55,7 +51,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         super(server, type, in);
         this.maxHealth = (byte) maxHealth;
         healthLevel = in.readByte();
-        foodLevel = in.readByte();
         lookingRight = true;
         alive = in.readBoolean();
         onGround = false;
@@ -64,8 +59,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         invincible = false;
         lastFallVelocity = 0;
         server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS );
-        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
-        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -129,23 +122,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
             }
         }
         server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS);
-    }
-
-    // once per 4 seconds
-    protected void interval4Sec() {
-        if(!alive) return;
-        if(foodLevel <= Consts.STARVATION_LEVEL) {
-            injure(1);
-        }
-        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
-    }
-
-    // once per 10 seconds
-    protected void interval10Sec() {
-        if(!alive) return;
-        decreaseFoodLevel(1);
-        if(foodLevel >= 90) heal(1);
-        server.getWorld().scheduleTaskAfter(this::interval10Sec, Consts.SERVER_TPS * 10);
     }
 
     protected void recalcFallDamage() {
@@ -220,23 +196,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
         this.healthLevel = (byte) healthLevel;
     }
 
-    public byte getFoodLevel() {
-        return foodLevel;
-    }
-
-    public void setFoodLevel(int foodLevel) {
-        this.foodLevel = (byte) foodLevel;
-    }
-
-    public void increaseFoodLevel(int i) {
-        foodLevel = (byte) Math.min(foodLevel + i, MAX_FOOD_LEVEL);
-    }
-
-    public void decreaseFoodLevel(int amount) {
-        if(invincible) return;
-        foodLevel = (byte) Math.max(foodLevel - amount, 0);
-    }
-
     public void recalcLookingDir() {
         Vector2 vel = body.getLinearVelocity();
         if(vel.x > 0) {
@@ -255,7 +214,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
     public void writeData(WorldBuffer out) {
         super.writeData(out);
         out.writeByte(healthLevel);
-        out.writeByte(foodLevel);
         out.writeBoolean(alive);
         out.writeInt(ticksUnderWater);
     }

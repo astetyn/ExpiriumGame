@@ -7,6 +7,7 @@ import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.CookingInventory;
+import com.astetyne.expirium.server.core.world.inventory.Inventory;
 import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.MetaTile;
 import com.astetyne.expirium.server.core.world.tile.Tile;
@@ -61,19 +62,17 @@ public class MetaTileCampfire extends MetaTile {
     }
 
     @Override
-    public void onInteract(Player p, InteractType type) {
-        if(placeTick + 10 > world.getTick()) return;
+    public boolean onInteract(Player p, InteractType type) {
+        if(placeTick + 10 > world.getTick()) return false;
         p.setSecondInv(inventory);
         p.getNetManager().putOpenDoubleInvPacket();
+        return true;
     }
 
     @Override
     public boolean onMaterialChange(Material to) {
-        if(to == Material.CAMPFIRE_SMALL) {
-            return true;
-        }
-        dropInvItems(inventory);
-        return false;
+        if(to == Material.CAMPFIRE_SMALL) return true;
+        return super.onMaterialChange(to);
     }
 
     @Override
@@ -82,4 +81,8 @@ public class MetaTileCampfire extends MetaTile {
         inventory.writeData(out);
     }
 
+    @Override
+    protected Inventory getBoundInventory() {
+        return inventory;
+    }
 }

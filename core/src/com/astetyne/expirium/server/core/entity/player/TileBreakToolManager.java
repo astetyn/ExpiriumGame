@@ -48,7 +48,6 @@ public class TileBreakToolManager extends ToolManager {
     public void onTick() {
 
         if(!findTile()) {
-
             if(clickTime != -1) {
                 if(clickTime + 500 > System.currentTimeMillis()) return;
             }else {
@@ -113,7 +112,7 @@ public class TileBreakToolManager extends ToolManager {
         cancelBreaking();
     }
 
-    private void cancelBreaking() {
+    public void cancelBreaking() {
         targetTile = null;
         timeAccumulator = 0;
         clickTime = -1;

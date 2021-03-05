@@ -10,6 +10,7 @@ import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.inventory.Inventory;
+import com.astetyne.expirium.server.net.SimpleServerPacket;
 import com.badlogic.gdx.math.Vector2;
 
 public class MetaTile implements WorldSaveable {
@@ -25,10 +26,21 @@ public class MetaTile implements WorldSaveable {
 
     /** Returns true if meta should be kept. False if meta should be changed.*/
     public boolean onMaterialChange(Material to) {
+        Inventory inv = getBoundInventory();
+        if(inv != null) {
+            for(Player ep : world.getServer().getPlayers()) {
+                if(ep.getSecondInv() == inv) {
+                    ep.getNetManager().putSimpleServerPacket(SimpleServerPacket.CLOSE_DOUBLE_INV);
+                }
+            }
+            dropInvItems(inv);
+        }
         return false;
     }
 
-    public void onInteract(Player p, InteractType type) {}
+    public boolean onInteract(Player p, InteractType type) {
+        return false;
+    }
 
     public void dropItems() {
         if(owner.getMaterial().getDefaultDropItem() == null) return;
@@ -64,6 +76,10 @@ public class MetaTile implements WorldSaveable {
             if(owner.getMeta() != this) return;
             runnable.run();
         }, tick);
+    }
+
+    protected Inventory getBoundInventory() {
+        return null;
     }
 
 }

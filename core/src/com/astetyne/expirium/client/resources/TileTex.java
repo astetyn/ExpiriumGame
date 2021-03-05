@@ -51,6 +51,8 @@ public enum TileTex implements Textureable {
     CHEST,
     TORCH,
     LADDER,
+    LADDER_WALL, //new from here
+    NATURAL_MIX,
     ;
 
     private TextureRegion textureRegion;

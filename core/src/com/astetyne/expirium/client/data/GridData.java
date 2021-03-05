@@ -16,7 +16,7 @@ public class GridData {
 
     public GridData() {
         items = new ArrayList<>();
-        label = "This is your inventory.";
+        label = "Your inventory.";
     }
 
     public void feed(PacketInputStream in) {

@@ -14,11 +14,14 @@ public enum ItemRecipe {
     SOFT_WOODEN_WALL(Item.SOFT_WOODEN_WALL, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 2)}, "Same as wooden wall but softer to your body."),
     WOODEN_SUPPORT(Item.WOODEN_SUPPORT, 6, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 3)}, "Cheap and useful for maintaining high stability."),
     LADDER(Item.LADDER, 2, new ItemStack[]{new ItemStack(Item.PLANKS, 4), new ItemStack(Item.RHYOLITE, 1)}, "Wood is maybe not the hardest material but do not be afraid."),
+    LADDER_WALL(Item.LADDER_WALL, new ItemStack[]{new ItemStack(Item.PLANKS, 6)}, "Ladder and wooden wall in one piece."),
     CAMPFIRE(Item.CAMPFIRE, new ItemStack[]{new ItemStack(Item.RAW_WOOD, 10)}, "Make it if you are cold. It will warm your small house."),
     FURNACE(Item.FURNACE, new ItemStack[]{new ItemStack(Item.CLAYSTONE, 5), new ItemStack(Item.LIMESTONE, 20)}, "For cooking better meals."),
+    RECYCLER(Item.RECYCLER, new ItemStack[]{new ItemStack(Item.IRON, 3), new ItemStack(Item.RHYOLITE, 5), new ItemStack(Item.LIMESTONE, 10)}, "Recycle stuff and make this planet greener."),
     CHEST(Item.CHEST, new ItemStack[]{new ItemStack(Item.PLANKS, 15), new ItemStack(Item.LIMESTONE, 4), new ItemStack(Item.IRON, 2)}, "Small storage for your items."),
     BOWL(Item.WOODEN_BOWL, new ItemStack[]{new ItemStack(Item.PLANKS, 3)}, "herobrine was added"),
     JAR(Item.JAR, new ItemStack[]{new ItemStack(Item.GLASS, 5)}, "Ideal for tasty jams."),
+    TIME_WARPER(Item.TIME_WARPER, new ItemStack[]{new ItemStack(Item.CHROMIUM, 5), new ItemStack(Item.PLANKS, 20), new ItemStack(Item.GLASS, 10)}, "When die, you will appear near this but you have only one chance to place it!"),
     ;
 
     ItemStack product;

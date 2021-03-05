@@ -54,6 +54,10 @@ public enum Item {
     LADDER(ItemCat.MATERIAL, 0.05f),
     BUCKET(ItemCat.MATERIAL, 0.1f),
     BUCKET_WATER(ItemCat.MATERIAL, 0.1f),
+    LADDER_WALL(ItemCat.MATERIAL, 0.05f),
+    NATURAL_MIX(ItemCat.MATERIAL, 0.05f),
+    RECYCLER(ItemCat.MATERIAL, 0.3f),
+    TIME_WARPER(ItemCat.MATERIAL, 0.1f),
     ;
 
     ItemCat category;
@@ -132,6 +136,10 @@ public enum Item {
             case CHEST: return Material.CHEST;
             case TORCH: return Material.TORCH;
             case LADDER: return Material.LADDER;
+            case LADDER_WALL: return Material.LADDER_WALL;
+            case TIME_WARPER: return Material.TIME_WARPER;
+            case NATURAL_MIX: return Material.NATURAL_MIX;
+            case RECYCLER: return Material.RECYCLER;
             default: return null;
         }
     }

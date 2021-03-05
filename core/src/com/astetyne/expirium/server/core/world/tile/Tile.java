@@ -53,8 +53,8 @@ public class Tile implements WorldSaveable {
         }
     }
 
-    public void onInteract(Player p, InteractType type) {
-        metaTile.onInteract(p, type);
+    public boolean onInteract(Player p, InteractType type) {
+        return metaTile.onInteract(p, type);
     }
 
     public Material getMaterial() {

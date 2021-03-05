@@ -16,11 +16,15 @@ public class WeatherManager implements WorldSaveable {
     private final ExpiServer server;
     private WeatherType weather;
     private long endTick;
+    private final float surfaceWatersPerTick;
+    private float reminder;
 
-    public WeatherManager(ExpiServer server, DataInputStream in) throws IOException {
-        this.server = server;
+    public WeatherManager(World world, DataInputStream in) throws IOException {
+        this.server = world.getServer();
         this.weather = WeatherType.get(in.readByte());
         this.endTick = in.readLong();
+        surfaceWatersPerTick = world.getTerrainWidth() / (Consts.SERVER_TPS * 70f);
+        reminder = 0;
     }
 
     public void onTick() {
@@ -37,6 +41,24 @@ public class WeatherManager implements WorldSaveable {
             for(Player p : server.getPlayers()) {
                 p.getNetManager().putWeatherChangePacket(weather);
             }
+        }
+
+        if(weather == WeatherType.RAIN) {
+            int i = 0;
+            for(; i < surfaceWatersPerTick + reminder; i++) {
+                int x = (int) (Math.random() * (server.getWorld().getTerrainWidth() - 2) + 1);
+                for(int y = server.getWorld().getTerrainHeight()-2; y >= 1; y--) {
+                    if(server.getWorld().getTileAt(x, y).getMaterial().isWatertight()) {
+                        if(!server.getWorld().getTileAt(x, y+1).getMaterial().isWatertight()) {
+                            if(server.getWorld().getTileAt(x, y+1).getWaterLevel() != Consts.MAX_WATER_LEVEL) {
+                                server.getWorld().getWaterEngine().increaseWaterLevel(server.getWorld().getTileAt(x, y + 1), 1);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            reminder = surfaceWatersPerTick + reminder - i;
         }
     }
 

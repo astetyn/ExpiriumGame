@@ -56,11 +56,15 @@ public enum Material implements Textureable {
     CLAYSTONE(TileTex.CLAYSTONE, MetaTile.class, TileFix.LIMESTONE, Solidity.LABILE_VERT, 1, 3, Item.CLAYSTONE),
     SAND_SLOPE_RIGHT(TileTex.SAND_SLOPE_RIGHT, MetaTile.class, TileFix.SLOPE_R, Solidity.LABILE_VERT, 1, 2, Item.SAND),
     SAND_SLOPE_LEFT(TileTex.SAND_SLOPE_LEFT, MetaTile.class, TileFix.SLOPE_L, Solidity.LABILE_VERT, 1, 2, Item.SAND),
-    FURNACE_ON(TileTex.FURNACE_ON, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
-    FURNACE_OFF(TileTex.FURNACE_OFF, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE, 3, 4, Item.FURNACE),
+    FURNACE_ON(TileTex.FURNACE_ON, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE_VERT, 3, 4, Item.FURNACE),
+    FURNACE_OFF(TileTex.FURNACE_OFF, MetaTileFurnace.class, TileFix.FULL, Solidity.LABILE_VERT, 3, 4, Item.FURNACE),
     CHEST(TileTex.CHEST, MetaTileChest.class, TileFix.CHEST, Solidity.LABILE_VERT, 1, 2, Item.CHEST),
     TORCH(TileTex.TORCH, MetaTileTorch.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 1),
     LADDER(TileTex.LADDER, MetaTile.class, TileFix.SOFT, Solidity.ONLY_VERT, 1, 2, Item.LADDER),
+    LADDER_WALL(TileTex.LADDER_WALL, MetaTile.class, TileFix.SOFT, Solidity.SOLID, 8, 2, Item.LADDER_WALL),
+    TIME_WARPER(TileTexAnim.TIME_WARPER, MetaTile.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 5),
+    NATURAL_MIX(TileTex.NATURAL_MIX, MetaTileNaturalMix.class, TileFix.FULL, Solidity.SOLID, 3, 2),
+    RECYCLER(TileTexAnim.RECYCLER, MetaTileRecycler.class, TileFix.SOFT, Solidity.LABILE_VERT, 1, 2, Item.RECYCLER),
     ;
 
     private final Textureable textureable;
@@ -175,6 +179,7 @@ public enum Material implements Textureable {
         switch(this) {
             case WOODEN_WALL:
             case SOFT_WOODEN_WALL:
+            case LADDER_WALL:
             case GLASS: return true;
             default: return false;
         }
@@ -213,6 +218,7 @@ public enum Material implements Textureable {
     public boolean isClimbable() {
         switch(this) {
             case LADDER:
+            case LADDER_WALL:
                 return true;
             default: return false;
         }

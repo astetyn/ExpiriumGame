@@ -12,10 +12,13 @@ import com.astetyne.expirium.server.core.world.tile.Tile;
 
 public class MetaTileBlueberryBush extends MetaTile {
 
+    private final static int minGrowSeconds = 30;
+    private final static int maxGrowSeconds = 240;
+
     public MetaTileBlueberryBush(World world, Tile owner) {
         super(world, owner);
         if(owner.getMaterial() == Material.BLUEBERRY_BUSH) {
-            scheduleAfter(this::onGrow, Consts.SERVER_TPS*(int)(Math.random()*180+10));
+            scheduleAfter(this::onGrow, Consts.SERVER_TPS*(int)(Math.random()*(maxGrowSeconds-minGrowSeconds)) + minGrowSeconds);
         }
     }
 
@@ -30,7 +33,7 @@ public class MetaTileBlueberryBush extends MetaTile {
     }
 
     @Override
-    public void onInteract(Player p, InteractType type) {
+    public boolean onInteract(Player p, InteractType type) {
         if(owner.getMaterial() == Material.BLUEBERRY_BUSH_GROWN) {
             world.changeMaterial(owner, Material.BLUEBERRY_BUSH, false, Source.NATURAL);
             for(Player ep : world.getServer().getPlayers()) {
@@ -41,6 +44,7 @@ public class MetaTileBlueberryBush extends MetaTile {
                 dropItem(Item.BLUEBERRY);
             }
         }
+        return false;
     }
 
     @Override

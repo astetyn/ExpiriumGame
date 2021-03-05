@@ -28,10 +28,12 @@ import java.util.HashSet;
 
 public class Player extends LivingEntity {
 
+    private final static byte MAX_FOOD_LEVEL = 100;
     private final static float jumpThreshold = 0.6f;
 
     private final ServerPlayerGateway gateway;
     private final String name;
+    private byte foodLevel;
     private final PlayerInventory mainInv;
     private Inventory secondInv;
     private ToolManager toolManager;
@@ -51,6 +53,7 @@ public class Player extends LivingEntity {
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
+        foodLevel = MAX_FOOD_LEVEL;
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
         secondInv = new Inventory(1, 1, 1);
         tsData1 = new ThumbStickData();
@@ -65,6 +68,8 @@ public class Player extends LivingEntity {
         activeLivingEffects = new HashSet<>();
         onLadder = false;
         lastWaterManipulation = 0;
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
+        server.getWorld().scheduleTaskAfter(this::interval20Sec, Consts.SERVER_TPS * 20);
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
     }
@@ -74,6 +79,7 @@ public class Player extends LivingEntity {
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
+        foodLevel = in.readByte();
         mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new Inventory(1, 1, 1);
         tsData1 = new ThumbStickData();
@@ -88,10 +94,15 @@ public class Player extends LivingEntity {
         activeLivingEffects = new HashSet<>();
         onLadder = false;
         lastWaterManipulation = 0;
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
+        server.getWorld().scheduleTaskAfter(this::interval20Sec, Consts.SERVER_TPS * 20);
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
         if(Consts.DEBUG) {
-            getInv().append(Item.COAL, 20);
+            getInv().append(Item.TIME_WARPER, 20);
+            getInv().append(Item.NATURAL_MIX, 20);
+            getInv().append(Item.LADDER_WALL, 20);
+            getInv().append(Item.RECYCLER, 20);
         }
     }
 
@@ -109,29 +120,30 @@ public class Player extends LivingEntity {
     @Override
     protected void interval1Sec() {
         super.interval1Sec();
-        if(underWater) {
-            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
-                activeLivingEffects.remove(LivingEffect.DROWNING);
-                activeLivingEffects.add(LivingEffect.SERIOUS_DROWNING);
-            }else {
-                activeLivingEffects.add(LivingEffect.DROWNING);
-            }
-        }else {
-            activeLivingEffects.remove(LivingEffect.DROWNING);
-            activeLivingEffects.remove(LivingEffect.SERIOUS_DROWNING);
-        }
-        if(getFoodLevel() <= Consts.STARVATION_LEVEL) {
-            activeLivingEffects.add(LivingEffect.STARVATION);
-        }else {
-            activeLivingEffects.remove(LivingEffect.STARVATION);
-        }
+    }
+
+    // once per 4 seconds
+    protected void interval4Sec() {
+        if(!alive) return;
+
+        if(foodLevel <= Consts.STARVATION_LEVEL) injure(1);
+        else if(foodLevel >= 90) heal(1);
+
+        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
+    }
+
+    // once per 20 seconds
+    protected void interval20Sec() {
+        if(!alive) return;
+        decreaseFoodLevel(1);
+        server.getWorld().scheduleTaskAfter(this::interval20Sec, Consts.SERVER_TPS * 20);
     }
 
     @Override
     public void die() {
         invincible = true;
         getNetManager().putDeathPacket(!wasAlreadyDead, server.getWorld().getDay() - lastDeathDay);
-        setFoodLevel(20);
+        foodLevel = 20;
         setHealthLevel(20);
         for(ItemStack is : mainInv.getItems()) {
             int dropAmount = (int) (Math.random() * is.getAmount()) + 1;
@@ -140,7 +152,7 @@ public class Player extends LivingEntity {
             }
         }
         mainInv.clear();
-        server.getWorld().teleport(this, resurrectLoc.x, resurrectLoc.y);
+        server.getWorld().teleport(this, resurrectLoc, 20);
         tsData1.reset();
         tsData2.reset();
         body.setLinearVelocity(0, 0);
@@ -258,6 +270,27 @@ public class Player extends LivingEntity {
             toolManager = new CombatToolManager(server, this, tsData2);
         }
         toolManager.onTick();
+
+        checkEffects();
+    }
+
+    private void checkEffects() {
+        if(underWater) {
+            if(ticksUnderWater >= Consts.DROWNING_TICKS) {
+                activeLivingEffects.remove(LivingEffect.DROWNING);
+                activeLivingEffects.add(LivingEffect.SERIOUS_DROWNING);
+            }else {
+                activeLivingEffects.add(LivingEffect.DROWNING);
+            }
+        }else {
+            activeLivingEffects.remove(LivingEffect.DROWNING);
+            activeLivingEffects.remove(LivingEffect.SERIOUS_DROWNING);
+        }
+        if(foodLevel <= Consts.STARVATION_LEVEL) {
+            activeLivingEffects.add(LivingEffect.STARVATION);
+        }else {
+            activeLivingEffects.remove(LivingEffect.STARVATION);
+        }
     }
 
     @Override
@@ -329,7 +362,7 @@ public class Player extends LivingEntity {
 
     public void writeLivingStats(PacketOutputStream out) {
         out.putByte(getHealthLevel());
-        out.putByte(getFoodLevel());
+        out.putByte(foodLevel);
         out.putByte((byte) getActiveLivingEffects().size());
         for(LivingEffect effect : getActiveLivingEffects()) {
             out.putByte((byte) effect.ordinal());
@@ -346,6 +379,15 @@ public class Player extends LivingEntity {
 
     public String getName() {
         return name;
+    }
+
+    public void increaseFoodLevel(int i) {
+        foodLevel = (byte) Math.min(foodLevel + i, MAX_FOOD_LEVEL);
+    }
+
+    public void decreaseFoodLevel(int amount) {
+        if(invincible) return;
+        foodLevel = (byte) Math.max(foodLevel - amount, 0);
     }
 
     @Override
@@ -425,6 +467,7 @@ public class Player extends LivingEntity {
     @Override
     public void writeData(WorldBuffer out) {
         super.writeData(out);
+        out.writeByte(foodLevel);
         mainInv.writeData(out);
         out.writeFloat(resurrectLoc.x);
         out.writeFloat(resurrectLoc.y);
