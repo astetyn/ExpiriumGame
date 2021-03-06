@@ -5,11 +5,10 @@ import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.TerminableLooper;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 public class MulticastListener extends TerminableLooper {
@@ -29,8 +28,10 @@ public class MulticastListener extends TerminableLooper {
         try {
 
             byte[] buffer = new byte[1024];
-            socket = new MulticastSocket(1414);
+            socket = new MulticastSocket(Consts.SERVER_PORT);
             InetAddress group = InetAddress.getByName(Consts.MULTICAST_ADDRESS);
+            NetworkInterface networkInterface = getWlanEth();
+            if(networkInterface != null) socket.setNetworkInterface(networkInterface);
             socket.joinGroup(group);
 
             outer:
@@ -99,5 +100,28 @@ public class MulticastListener extends TerminableLooper {
             this.address = address;
             lastPing = System.currentTimeMillis();
         }
+    }
+
+    public static NetworkInterface getWlanEth() {
+        Enumeration<NetworkInterface> enumeration = null;
+        try {
+            enumeration = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        if(enumeration == null) return null;
+        NetworkInterface wlan0 = null;
+        StringBuilder sb = new StringBuilder();
+        while (enumeration.hasMoreElements()) {
+            wlan0 = enumeration.nextElement();
+            sb.append(wlan0.getName() + " ");
+            if (wlan0.getName().equals("wlan0")) {
+                //there is probably a better way to find ethernet interface
+                System.out.println("wlan0 found");
+                return wlan0;
+            }
+        }
+
+        return null;
     }
 }

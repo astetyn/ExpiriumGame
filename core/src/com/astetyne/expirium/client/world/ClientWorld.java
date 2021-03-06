@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client.world;
 
+import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.animation.WaterAnimationManager;
 import com.astetyne.expirium.client.animation.WorldAnimationManager;
 import com.astetyne.expirium.client.entity.ClientEntity;
@@ -82,6 +83,8 @@ public class ClientWorld {
         terrainWidth = in.getInt();
         terrainHeight = in.getInt();
 
+        game.setWeather(WeatherType.get(in.getByte()));
+
         terrain = new ClientTile[terrainWidth][terrainHeight];
 
         for(int i = 0; i < terrainWidth; i++) {
@@ -95,7 +98,7 @@ public class ClientWorld {
 
         short pID = in.getShort();
         Vector2 loc = in.getVector();
-        player = new MainClientPlayer(this, pID, loc);
+        player = new MainClientPlayer(this, pID, loc, ExpiGame.get().getCharacter());
 
         rain = new Rain(player, terrain, terrainWidth, terrainHeight);
 

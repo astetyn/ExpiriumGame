@@ -76,6 +76,7 @@ public class ServerPacketManager {
 
         out.putInt(server.getWorld().getTerrainWidth());
         out.putInt(server.getWorld().getTerrainHeight());
+        out.putByte(server.getWorld().getWeather().ordinal());
 
         out.putShort(owner.getId());
         out.putVector(owner.getLocation());
@@ -92,7 +93,7 @@ public class ServerPacketManager {
         out.putInt(layer);
         for(int i = 0; i < server.getWorld().getTerrainWidth(); i++) {
             Tile t = server.getWorld().getTileAt(i, layer);
-            out.putByte((byte) t.getMaterial().ordinal());
+            out.putByte(t.getMaterial().ordinal());
             out.putByte(t.getStability());
             out.putBoolean(t.hasBackWall());
             out.putByte(t.getWaterLevel());
@@ -129,35 +130,35 @@ public class ServerPacketManager {
     private void putInvData(Inventory inv) {
         out.putFloat(inv.getTotalWeight());
         out.putFloat(inv.getMaxWeight());
-        out.putByte((byte) inv.getItems().size());
+        out.putByte(inv.getItems().size());
         for(GridItemStack is : inv.getItems()) {
             out.putShort((short) is.getItem().ordinal());
             out.putShort((short) is.getAmount());
-            out.putByte((byte) is.getGridPos().x);
-            out.putByte((byte) is.getGridPos().y);
+            out.putByte(is.getGridPos().x);
+            out.putByte(is.getGridPos().y);
         }
     }
 
     public void putOpenDoubleInvPacket() {
         out.startPacket(31);
         Inventory secondInv = owner.getSecondInv();
-        out.putByte((byte) secondInv.getRows());
-        out.putByte((byte) secondInv.getColumns());
+        out.putByte(secondInv.getRows());
+        out.putByte(secondInv.getColumns());
         out.putString(secondInv.getLabel());
-        out.putByte((byte) secondInv.getExtraCells().length);
+        out.putByte(secondInv.getExtraCells().length);
         for(ExtraCell cell : secondInv.getExtraCells()) {
             out.putByte(secondInv.getIndex(cell.pos));
-            out.putByte((byte)cell.tex.ordinal());
+            out.putByte(cell.tex.ordinal());
         }
-        out.putByte((byte) secondInv.getVariables().length);
+        out.putByte(secondInv.getVariables().length);
         for(InvVariableType type : secondInv.getVariables()) {
-            out.putByte((byte) type.ordinal());
+            out.putByte(type.ordinal());
         }
     }
 
     public void putHotSlotsFeedPacket(ChosenSlot slot, ItemStack toolIS, ItemStack materialIS, ItemStack consIS) {
         out.startPacket(30);
-        out.putByte((byte) slot.ordinal());
+        out.putByte(slot.ordinal());
         out.putInt(toolIS.getItem().ordinal());
         out.putInt(toolIS.getAmount());
         out.putInt(materialIS.getItem().ordinal());
@@ -259,6 +260,6 @@ public class ServerPacketManager {
 
     public void putWeatherChangePacket(WeatherType newWeather) {
         out.startPacket(37);
-        out.putByte((byte) newWeather.ordinal());
+        out.putByte(newWeather.ordinal());
     }
 }

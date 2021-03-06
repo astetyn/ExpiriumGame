@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.player.Player;
@@ -98,7 +99,8 @@ public class ServerGateway extends TerminableLooper {
                 // here we assume that joining client is verified and thus following reads will not fail
                 PacketInputStream in = gateway.getIn();
                 String name = in.getString();
-                Player p = server.getFileManager().loadPlayer(gateway, name);
+                PlayerCharacter character = PlayerCharacter.get(in.getByte());
+                Player p = server.getFileManager().loadPlayer(gateway, name, character);
 
                 // initial packet
                 p.getNetManager().putInitDataPacket(server.getEntities());

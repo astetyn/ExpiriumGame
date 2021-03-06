@@ -5,8 +5,6 @@ import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.WorldSaveable;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -29,7 +27,7 @@ public class WeatherManager implements WorldSaveable {
 
     public void onTick() {
 
-        if(endTick <= server.getWorld().getTick() || Gdx.input.isKeyPressed(Input.Keys.K)) {
+        if(endTick <= server.getWorld().getTick()) {
             // weather change
             if(weather == WeatherType.SUN) {
                 weather = WeatherType.RAIN;
@@ -51,6 +49,7 @@ public class WeatherManager implements WorldSaveable {
                     if(server.getWorld().getTileAt(x, y).getMaterial().isWatertight()) {
                         if(!server.getWorld().getTileAt(x, y+1).getMaterial().isWatertight()) {
                             if(server.getWorld().getTileAt(x, y+1).getWaterLevel() != Consts.MAX_WATER_LEVEL) {
+                                System.out.println("");
                                 server.getWorld().getWaterEngine().increaseWaterLevel(server.getWorld().getTileAt(x, y + 1), 1);
                             }
                         }

@@ -158,4 +158,9 @@ public abstract class Entity implements Metaable, WorldSaveable {
         out.writeFloat(body.getPosition().y);
     }
 
+    public static void writeDefaultData(WorldBuffer out, Vector2 spawnLoc) {
+        out.writeFloat(spawnLoc.x);
+        out.writeFloat(spawnLoc.y);
+    }
+
 }

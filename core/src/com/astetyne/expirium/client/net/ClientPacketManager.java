@@ -10,6 +10,7 @@ import com.astetyne.expirium.client.gui.roots.game.DeathRoot;
 import com.astetyne.expirium.client.gui.roots.game.DoubleInventoryRoot;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.screens.GameScreen;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.world.input.InteractType;
@@ -149,9 +150,10 @@ public class ClientPacketManager {
         }
     }
 
-    public void putJoinReqPacket(String name) {
+    public void putJoinReqPacket(String name, PlayerCharacter character) {
         out.startPacket(10);
         out.putString(name);
+        out.putByte(character.ordinal());
     }
 
     public void putTSPacket() {

@@ -52,8 +52,6 @@ public class Consts {
 
     // player
     public static final float ACTIVE_ENTITIES_RADIUS = 30;
-    public static final int PLAYER_INV_COLUMNS = 5;
-    public static final int PLAYER_INV_ROWS = 5;
     public static final int PLAYER_INV_MAX_WEIGHT = 10;
     public static final int JUMP_DELAY = 200;
     public static final int INTERACT_RADIUS = 6;

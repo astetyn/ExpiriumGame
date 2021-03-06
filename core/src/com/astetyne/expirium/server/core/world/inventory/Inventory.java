@@ -328,6 +328,11 @@ public class Inventory implements WorldSaveable {
         out.writeFloat(totalWeight);
     }
 
+    public static void writeDefaultData(WorldBuffer out) {
+        out.writeInt(0);
+        out.writeFloat(0);
+    }
+
     /*private void printGrid() {
         for(int x = 0; x < columns; x++) {
             for(int y = 0; y < rows; y++) {

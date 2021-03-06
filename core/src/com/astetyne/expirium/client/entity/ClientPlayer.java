@@ -2,7 +2,7 @@ package com.astetyne.expirium.client.entity;
 
 import com.astetyne.expirium.client.entity.animator.PlayerAnimator;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.resources.Res;
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.world.ClientWorld;
 import com.badlogic.gdx.math.Vector2;
 
@@ -10,9 +10,9 @@ public abstract class ClientPlayer extends ClientEntity {
 
     private Item itemInHand;
 
-    public ClientPlayer(ClientWorld world, short id, Vector2 loc) {
+    public ClientPlayer(ClientWorld world, short id, Vector2 loc, PlayerCharacter character) {
         super(world, EntityType.PLAYER, id, loc);
-        setAnimator(new PlayerAnimator(this, Res.PLAYER_IDLE_ANIM, Res.PLAYER_MOVE_ANIM));
+        setAnimator(new PlayerAnimator(this, character));
         itemInHand = Item.EMPTY;
     }
 

@@ -272,4 +272,16 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
         out.writeInt(chosenSlot.ordinal());
         out.writeInt(itemInHand.getItem().ordinal());
     }
+
+    public static void writeDefaultData(WorldBuffer out) {
+        Inventory.writeDefaultData(out);
+        out.writeInt(0);
+        out.writeInt(0);
+        out.writeInt(0);
+        out.writeInt(Item.EMPTY.ordinal());
+        out.writeInt(Item.EMPTY.ordinal());
+        out.writeInt(Item.EMPTY.ordinal());
+        out.writeInt(ChosenSlot.TOOL_SLOT.ordinal());
+        out.writeInt(Item.EMPTY.ordinal());
+    }
 }

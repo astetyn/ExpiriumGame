@@ -8,10 +8,7 @@ import com.astetyne.expirium.client.net.ClientFailListener;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
 import com.astetyne.expirium.client.net.MulticastListener;
-import com.astetyne.expirium.client.resources.GuiRes;
-import com.astetyne.expirium.client.resources.Res;
-import com.astetyne.expirium.client.resources.TileTex;
-import com.astetyne.expirium.client.resources.TileTexAnim;
+import com.astetyne.expirium.client.resources.*;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.ServerFailListener;
@@ -32,6 +29,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	private final ClientGateway clientGateway;
 	private String playerName;
+	private PlayerCharacter character;
 	private float timeSinceStart;
 	private SpriteBatch batch;
 	private boolean hostingServer;
@@ -45,6 +43,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		clientGateway = new ClientGateway(this);
 		timeSinceStart = 0;
 		playerName = "";
+		character = PlayerCharacter.FENDER;
 		hostingServer = false;
 		tasks = new LinkedList<>();
 
@@ -66,6 +65,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		Item.loadTextures(textures);
 		ExtraCellTexture.loadTextures(textures);
 		InvVariableType.loadTextures(textures);
+		PlayerCharacter.loadTextures(textures);
 		batch = new SpriteBatch();
 		setScreen(new MenuScreen());
 		debugRenderer = new Box2DDebugRenderer();
@@ -136,6 +136,14 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
+	}
+
+	public PlayerCharacter getCharacter() {
+		return character;
+	}
+
+	public void setCharacter(PlayerCharacter character) {
+		this.character = character;
 	}
 
 	public float getTimeSinceStart() {

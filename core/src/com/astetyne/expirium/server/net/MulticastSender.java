@@ -37,7 +37,6 @@ public class MulticastSender extends TerminableLooper {
 
                 Thread.sleep(1000);
             }
-
             socket.close();
 
         }catch(IOException | InterruptedException e) {

@@ -1,5 +1,6 @@
 package com.astetyne.expirium.client.entity;
 
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.utils.Utils;
 import com.astetyne.expirium.client.world.ClientWorld;
@@ -13,7 +14,7 @@ public class FriendClientPlayer extends ClientPlayer {
     private final float nameOffset;
 
     public FriendClientPlayer(ClientWorld world, short id, Vector2 loc, PacketInputStream in) {
-        super(world, id, loc);
+        super(world, id, loc, PlayerCharacter.get(in.getByte()));
         name = in.getString();
         nameOffset = Utils.getTextWidth(name, Res.WORLD_FONT) / 2;
     }

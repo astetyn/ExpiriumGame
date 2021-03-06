@@ -1,6 +1,6 @@
 package com.astetyne.expirium.server.core.world.file;
 
-import com.astetyne.expirium.client.entity.EntityType;
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.player.Player;
@@ -9,6 +9,7 @@ import com.astetyne.expirium.server.core.world.generator.WorldGenerator;
 import com.astetyne.expirium.server.net.ServerPlayerGateway;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.io.*;
@@ -49,7 +50,7 @@ public class WorldFileManager {
         WorldGenerator gen = new WorldGenerator(width, height, seed);
         gen.generateWorld();
 
-        WorldBuffer wb = new WorldBuffer(4194304);
+        WorldBuffer wb = new WorldBuffer(2097152);// 4194304
 
         wb.writeInt(width);
         wb.writeInt(height);
@@ -111,7 +112,7 @@ public class WorldFileManager {
 
         saveQuickInfo(server.getWorld().getTick(), true);
 
-        WorldBuffer wb = new WorldBuffer(4194304);
+        WorldBuffer wb = new WorldBuffer(2097152);
         server.writeData(wb);
         saveAsync(wb);
 
@@ -121,15 +122,24 @@ public class WorldFileManager {
 
     }
 
-    public Player loadPlayer(ServerPlayerGateway gateway, String name) {
+    public Player loadPlayer(ServerPlayerGateway gateway, String name, PlayerCharacter character) {
         FileHandle file = Gdx.files.local(path+playersPath+name);
 
-        if(!file.exists())
-            return (Player) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
-
-        DataInputStream in = new DataInputStream(new BufferedInputStream(file.read()));
         try {
-            Player ep = new Player(server, gateway, name, in);
+            InputStream is;
+
+            if(!file.exists()) {
+                WorldBuffer buff = new WorldBuffer(2048);
+                Vector2 loc = server.getWorld().getSpawnLocation();
+                Player.writeDefaultData(buff, loc);
+                is = new ByteArrayInputStream(buff.getBuffer().array());
+            }else {
+                is = new BufferedInputStream(file.read());
+            }
+
+            DataInputStream in = new DataInputStream(is);
+
+            Player ep = new Player(server, gateway, name, character, in);
             in.close();
             ep.createBodyFixtures();
             for(Player ep2 : server.getPlayers()) {
@@ -139,14 +149,14 @@ public class WorldFileManager {
             return ep;
         }catch(IOException e) {
             e.printStackTrace();
-            return (Player) server.getWorld().spawnEntity(EntityType.PLAYER, server.getWorld().getSpawnLocation(), gateway, name);
+            return null;
         }
     }
 
     public void savePlayer(Player p) {
         try {
 
-            WorldBuffer wb = new WorldBuffer(4096);
+            WorldBuffer wb = new WorldBuffer(2048);
             p.writeData(wb);
 
             FileHandle file = Gdx.files.local(path + playersPath + p.getName());

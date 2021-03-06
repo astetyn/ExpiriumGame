@@ -3,7 +3,7 @@ package com.astetyne.expirium.client.entity.animator;
 import com.astetyne.expirium.client.entity.ClientPlayer;
 import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
-import com.astetyne.expirium.client.resources.Res;
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,9 +16,9 @@ public class PlayerAnimator extends MoveableEntityAnimator {
     private final Animation<TextureRegion> interactAnim;
     private final float xOff, yOff, baseAngle;
 
-    public PlayerAnimator(ClientPlayer p, Animation<TextureRegion> idleAnim, Animation<TextureRegion> moveAnim) {
-        super(p, idleAnim, moveAnim);
-        interactAnim = Res.PLAYER_INTERACT_ANIM;
+    public PlayerAnimator(ClientPlayer p, PlayerCharacter character) {
+        super(p, character.getIdleAnim(), character.getMoveAnim());
+        interactAnim = character.getInteractAnim();
         lastInteractTime = 0;
         xOff = 0.22f;
         yOff = 0.35f;

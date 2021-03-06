@@ -102,8 +102,6 @@ public enum Item {
 
             item.texture = atlas.findRegion(texName);
             item.gridTexture = atlas.findRegion(gridTexName);
-
-            System.out.println("loaded item "+item+" with tex: "+item.texture);
         }
     }
 

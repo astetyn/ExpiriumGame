@@ -65,7 +65,7 @@ public class ClientGateway extends TerminableLooper {
 
             packetManager = new ClientPacketManager(in, out);
 
-            packetManager.putJoinReqPacket(ExpiGame.get().getPlayerName());
+            packetManager.putJoinReqPacket(ExpiGame.get().getPlayerName(), ExpiGame.get().getCharacter());
             out.swap();
             out.flush();
             out.reset();

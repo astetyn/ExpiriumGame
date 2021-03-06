@@ -218,6 +218,13 @@ public abstract class LivingEntity extends Entity implements Collidable {
         out.writeInt(ticksUnderWater);
     }
 
+    public static void writeDefaultData(WorldBuffer out, Vector2 spawnLoc, int maxHealth) {
+        Entity.writeDefaultData(out, spawnLoc);
+        out.writeByte((byte) maxHealth);
+        out.writeBoolean(true);
+        out.writeInt(0);
+    }
+
     @Override
     public void onCollisionBegin(Contact contact) {
         if((contact.getFixtureA() == bodyFix && !contact.getFixtureB().isSensor())

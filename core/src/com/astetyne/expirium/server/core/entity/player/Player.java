@@ -5,6 +5,7 @@ import com.astetyne.expirium.client.entity.EntityType;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.items.ItemStack;
+import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 public class Player extends LivingEntity {
 
     private final static byte MAX_FOOD_LEVEL = 100;
+    private final static byte MAX_HEALTH = 100;
     private final static float jumpThreshold = 0.6f;
 
     private final ServerPlayerGateway gateway;
@@ -47,40 +49,16 @@ public class Player extends LivingEntity {
     private final HashSet<LivingEffect> activeLivingEffects;
     private boolean onLadder;
     private long lastWaterManipulation;
+    private final PlayerCharacter character;
 
-    public Player(ExpiServer server, Vector2 location, ServerPlayerGateway gateway, String name) {
-        super(server, EntityType.PLAYER, location, 100);
+    public Player(ExpiServer server, ServerPlayerGateway gateway, String name, PlayerCharacter character, DataInputStream in) throws IOException {
+        super(server, EntityType.PLAYER, MAX_HEALTH, in);
         this.gateway = gateway;
         gateway.setOwner(this);
         this.name = name;
-        foodLevel = MAX_FOOD_LEVEL;
-        mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT);
-        secondInv = new Inventory(1, 1, 1);
-        tsData1 = new ThumbStickData();
-        tsData2 = new ThumbStickData();
-        toolManager = new TileBreakToolManager(server, this, tsData2);
-        lastJump = 0;
-        resurrectLoc = new Vector2(location);
-        wasAlreadyDead = false;
-        lastDeathDay = 0;
-        worldLoader = new WorldLoader(server, this);
-        nearActiveEntities = new HashSet<>();
-        activeLivingEffects = new HashSet<>();
-        onLadder = false;
-        lastWaterManipulation = 0;
-        server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
-        server.getWorld().scheduleTaskAfter(this::interval20Sec, Consts.SERVER_TPS * 20);
-        server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
-        server.getPlayers().add(this);
-    }
-
-    public Player(ExpiServer server, ServerPlayerGateway gateway, String name, DataInputStream in) throws IOException {
-        super(server, EntityType.PLAYER, 100, in);
-        this.gateway = gateway;
-        gateway.setOwner(this);
-        this.name = name;
+        this.character = character;
         foodLevel = in.readByte();
-        mainInv = new PlayerInventory(this, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_ROWS, Consts.PLAYER_INV_MAX_WEIGHT, in);
+        mainInv = new PlayerInventory(this, Consts.INV_MAX_SIZE, Consts.INV_MAX_SIZE, Consts.PLAYER_INV_MAX_WEIGHT, in);
         secondInv = new Inventory(1, 1, 1);
         tsData1 = new ThumbStickData();
         tsData2 = new ThumbStickData();
@@ -99,6 +77,7 @@ public class Player extends LivingEntity {
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
         server.getPlayers().add(this);
         if(Consts.DEBUG) {
+            // for fast item testing - append items here
             getInv().append(Item.TIME_WARPER, 20);
             getInv().append(Item.NATURAL_MIX, 20);
             getInv().append(Item.LADDER_WALL, 20);
@@ -115,11 +94,6 @@ public class Player extends LivingEntity {
         filter.maskBits = Consts.DEFAULT_BIT;
         bodyFix.setFilterData(filter);
         body.setUserData(this);
-    }
-
-    @Override
-    protected void interval1Sec() {
-        super.interval1Sec();
     }
 
     // once per 4 seconds
@@ -208,7 +182,7 @@ public class Player extends LivingEntity {
         }else {
             horzFactor = 1250;
             maxHorzVel = 3;
-            if(tsData1.vert >= jumpThreshold && (onGround || true) && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
+            if(tsData1.vert >= jumpThreshold && onGround && lastJump + Consts.JUMP_DELAY < System.currentTimeMillis()) {
                 Vector2 center = body.getWorldCenter();
                 body.applyLinearImpulse(0, 350f, center.x, center.y, true);
                 lastJump = System.currentTimeMillis();
@@ -363,9 +337,9 @@ public class Player extends LivingEntity {
     public void writeLivingStats(PacketOutputStream out) {
         out.putByte(getHealthLevel());
         out.putByte(foodLevel);
-        out.putByte((byte) getActiveLivingEffects().size());
+        out.putByte(getActiveLivingEffects().size());
         for(LivingEffect effect : getActiveLivingEffects()) {
-            out.putByte((byte) effect.ordinal());
+            out.putByte(effect.ordinal());
         }
     }
 
@@ -407,6 +381,7 @@ public class Player extends LivingEntity {
 
     @Override
     public void writeInitClientMeta(PacketOutputStream out) {
+        out.putByte(character.ordinal());
         out.putString(name);
     }
 
@@ -473,5 +448,15 @@ public class Player extends LivingEntity {
         out.writeFloat(resurrectLoc.y);
         out.writeBoolean(wasAlreadyDead);
         out.writeLong(lastDeathDay);
+    }
+
+    public static void writeDefaultData(WorldBuffer out, Vector2 spawnLoc) {
+        LivingEntity.writeDefaultData(out, spawnLoc, MAX_HEALTH);
+        out.writeByte(MAX_FOOD_LEVEL);
+        PlayerInventory.writeDefaultData(out);
+        out.writeFloat(spawnLoc.x);
+        out.writeFloat(spawnLoc.y);
+        out.writeBoolean(false);
+        out.writeLong(0);
     }
 }

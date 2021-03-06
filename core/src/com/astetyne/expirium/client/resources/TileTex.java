@@ -75,7 +75,6 @@ public enum TileTex implements Textureable {
             }else {
                 tileTex.textureRegion = world.findRegion(tileTex.name().toLowerCase(Locale.US));
             }
-            System.out.println("loaded texture: "+tileTex.textureRegion+" for: "+tileTex);
             //tileTex.textureRegion.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         }
     }

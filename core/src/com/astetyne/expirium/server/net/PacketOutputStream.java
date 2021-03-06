@@ -40,8 +40,8 @@ public class PacketOutputStream {
         writeBuffer.putShort((short) packetID);
     }
 
-    public void putByte(byte b) {
-        writeBuffer.put(b);
+    public void putByte(int b) {
+        writeBuffer.put((byte) b);
     }
 
     public void putBoolean(boolean b) {
@@ -72,7 +72,7 @@ public class PacketOutputStream {
     }
 
     public void putShortString(String s) {
-        putByte((byte) s.length());
+        putByte(s.length());
         for(char c : s.toCharArray()) {
             writeBuffer.putChar(c);
         }
@@ -89,7 +89,7 @@ public class PacketOutputStream {
     }
 
     public void putColor(ExpiColor c) {
-        putByte((byte) c.ordinal());
+        putByte(c.ordinal());
     }
 
     public void putEntity(Entity e) {
