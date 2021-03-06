@@ -22,14 +22,14 @@ public class MetaTileFurnace extends MetaTile {
 
     public MetaTileFurnace(World world, Tile owner) {
         super(world, owner);
-        inventory = new FuelCookingInventory(world, 1, 4, 5);
+        inventory = new FuelCookingInventory(world, 2, 4, 5);
         placeTick = world.getTick();
         scheduleAfter(this::onInvUpdate, Consts.SERVER_TPS/2);
     }
 
     public MetaTileFurnace(World world, Tile owner, DataInputStream in) throws IOException {
         super(world, owner);
-        inventory = new FuelCookingInventory(world, 1, 4, 5, in);
+        inventory = new FuelCookingInventory(world, 2, 4, 5, in);
         placeTick = world.getTick();
         scheduleAfter(this::onInvUpdate, Consts.SERVER_TPS/2);
     }

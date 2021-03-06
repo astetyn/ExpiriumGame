@@ -12,9 +12,9 @@ public class WorldBuffer {
         buffer = ByteBuffer.allocate(initSize);
     }
 
-    public void writeByte(byte b) {
+    public void writeByte(int b) {
         checkCapacity(1);
-        buffer.put(b);
+        buffer.put((byte)b);
     }
 
     public void writeBoolean(boolean b) {

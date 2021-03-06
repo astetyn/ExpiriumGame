@@ -29,7 +29,7 @@ import java.util.HashSet;
 
 public class Player extends LivingEntity {
 
-    private final static byte MAX_FOOD_LEVEL = 100;
+    public final static byte MAX_FOOD_LEVEL = 100;
     private final static byte MAX_HEALTH = 100;
     private final static float jumpThreshold = 0.6f;
 
@@ -78,10 +78,11 @@ public class Player extends LivingEntity {
         server.getPlayers().add(this);
         if(Consts.DEBUG) {
             // for fast item testing - append items here
-            getInv().append(Item.TIME_WARPER, 20);
-            getInv().append(Item.NATURAL_MIX, 20);
+            getInv().append(Item.BUCKET_WATER, 20);
+            getInv().append(Item.SMALL_MEAT_RAW, 20);
             getInv().append(Item.LADDER_WALL, 20);
             getInv().append(Item.RECYCLER, 20);
+            getInv().append(Item.COAL, 20);
         }
     }
 
@@ -437,6 +438,10 @@ public class Player extends LivingEntity {
 
     public void waterManipulate() {
         lastWaterManipulation = System.currentTimeMillis();
+    }
+
+    public byte getFoodLevel() {
+        return foodLevel;
     }
 
     @Override

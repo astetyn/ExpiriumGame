@@ -31,8 +31,9 @@ public enum Item {
     COOKED_APPLE(ItemCat.CONSUMABLE, 0.03f),
     RASPBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     RASPBERRY(ItemCat.CONSUMABLE, 0.01f),
-    WOODEN_BOWL(ItemCat.MISC, 0.05f),
-    FRUIT_BOWL(ItemCat.CONSUMABLE, 0.05f),
+    WOODEN_BOWL(ItemCat.MISC, 2, 1, 0.05f, true),
+    FRUIT_BOWL(ItemCat.CONSUMABLE, 2, 1, 0.05f, true),
+    MEAT_SOUP(ItemCat.CONSUMABLE, 2, 1, 0.06f, true),
     COAL(ItemCat.MISC, 0.05f),
     SAND(ItemCat.MATERIAL, 0.08f),
     GLASS(ItemCat.MATERIAL, 0.06f),
@@ -57,7 +58,7 @@ public enum Item {
     LADDER_WALL(ItemCat.MATERIAL, 0.05f),
     NATURAL_MIX(ItemCat.MATERIAL, 0.05f),
     RECYCLER(ItemCat.MATERIAL, 0.3f),
-    TIME_WARPER(ItemCat.MATERIAL, 0.1f),
+    TIME_WARPER(ItemCat.MATERIAL, 2, 2, 0.1f),
     ;
 
     ItemCat category;
@@ -187,6 +188,7 @@ public enum Item {
             case BLUEBERRY: return 5;
             case SMALL_MEAT_COOKED:
             case FRUIT_BOWL: return 25;
+            case MEAT_SOUP: return 30;
             default: return 0;
         }
     }

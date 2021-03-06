@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.core.world.inventory;
 
 import com.astetyne.expirium.client.data.InvVariableType;
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemStack;
 import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
@@ -46,6 +47,11 @@ public class CookingInventory extends Inventory {
             recipe = null;
             clear(); // this will null recipe anyways
             append(currRecipe.getProduct().getItem(), currRecipe.getProduct().getAmount()*multiply);
+
+            //this is only for this case - will need to by generalized
+            if(currRecipe.getProduct().getItem() == Item.MEAT_SOUP) {
+                append(Item.BUCKET, multiply);
+            }
         }
     }
 

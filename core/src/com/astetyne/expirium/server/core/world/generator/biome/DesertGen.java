@@ -41,6 +41,7 @@ public class DesertGen extends BiomeGenerator {
         generateCacti(from, to);
         createRandSurfacePlacements(from, to, Material.CLAYSTONE, Math.random()*0.1, 1);
         createOreSpots(Material.COAL_ORE, 0.3, from, to);
+        createOreSpots(Material.MAGNETITE, 0.3, from, to);
     }
 
     @Override

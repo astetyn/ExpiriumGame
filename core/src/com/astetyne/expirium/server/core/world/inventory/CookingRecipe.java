@@ -14,6 +14,7 @@ public enum CookingRecipe {
     IRON(Consts.SERVER_TPS*30, new ItemStack[]{new ItemStack(Item.MAGNETITE)}, new ItemStack(Item.IRON)),
     CHROMIUM(Consts.SERVER_TPS*30, new ItemStack[]{new ItemStack(Item.CHROMITE)}, new ItemStack(Item.CHROMIUM)),
     SMALL_MEAT(Consts.SERVER_TPS*25, new ItemStack[]{new ItemStack(Item.SMALL_MEAT_RAW)}, new ItemStack(Item.SMALL_MEAT_COOKED)),
+    MEAT_SOUP(Consts.SERVER_TPS*60, new ItemStack[]{new ItemStack(Item.BUCKET_WATER), new ItemStack(Item.WOODEN_BOWL), new ItemStack(Item.SMALL_MEAT_RAW)}, new ItemStack(Item.MEAT_SOUP)),
     ;
 
     private final int ticks;

@@ -47,7 +47,8 @@ public class WaterBiome extends BiomeGenerator {
         int endWater = to-eighth;
         for(int x = startWater; x < endWater; x++) {
             int bottom = (int) (surface[x] - Math.sin((float)(x-startWater) * Math.PI / (endWater - startWater))*30);
-            for(int y = bottom; y <= surface[x]; y++) {
+            terrain[x][surface[x]] = Material.AIR;
+            for(int y = bottom; y < surface[x]; y++) {
                 terrain[x][y] = Material.AIR;
                 waterMask[x][y] = WaterEngine.maxLevel;
             }

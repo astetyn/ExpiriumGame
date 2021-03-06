@@ -36,6 +36,7 @@ public class DroppedItem extends Entity {
         item = Item.get(in.readInt());
         pickTick = server.getWorld().getTick();
         ticksCooldown = Consts.SERVER_TPS * 3;
+        body.setAngularVelocity(((float)Math.random()-0.5f)*10);
         server.getWorld().scheduleTaskAfter(this::checkPick, 8); //every 8 ticks
         server.getWorld().scheduleTaskAfter(this::destroy, Consts.SERVER_TPS*Consts.ITEM_DESPAWN_TIME);
     }

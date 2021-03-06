@@ -180,7 +180,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
                 // toto je zbytocne?
                 break;
             case CONSUME_BUTTON:
-                if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE) break;
+                if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE && owner.getFoodLevel() == Player.MAX_FOOD_LEVEL) break;
                 remove(itemInHand.getItem(), 1);
                 owner.increaseFoodLevel(itemInHand.getItem().getFood());
 

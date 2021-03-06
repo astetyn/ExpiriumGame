@@ -72,7 +72,7 @@ public abstract class LivingEntity extends Entity implements Collidable {
 
         fixtureDef.density = BODY_DENSITY;
         fixtureDef.restitution = 0f;
-        fixtureDef.friction = 0.2f;
+        fixtureDef.friction = 0.3f;
         fixtureDef.filter.categoryBits = Consts.DEFAULT_BIT;
         fixtureDef.shape = polyShape;
 
@@ -198,9 +198,9 @@ public abstract class LivingEntity extends Entity implements Collidable {
 
     public void recalcLookingDir() {
         Vector2 vel = body.getLinearVelocity();
-        if(vel.x > 0) {
+        if(vel.x > 0.05) {
             lookingRight = true;
-        }else if(vel.x < 0) {
+        }else if(vel.x < -0.05) {
             lookingRight = false;
         }
     }
