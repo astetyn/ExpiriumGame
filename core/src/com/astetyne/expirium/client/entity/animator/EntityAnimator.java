@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class EntityAnimator {
 
-    protected static final float yOffset = 0.04f;
+    protected static final float yOffset = 0.018f;
 
     protected final ClientEntity entity;
     protected float timer;

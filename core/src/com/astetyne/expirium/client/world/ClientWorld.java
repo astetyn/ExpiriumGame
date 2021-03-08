@@ -17,7 +17,6 @@ import com.astetyne.expirium.client.world.input.WorldInputListener;
 import com.astetyne.expirium.server.core.world.WeatherType;
 import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.net.PacketInputStream;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ClientWorld {
-
-    public static float PPM = 32; // pixel per meter when zoom == 1
 
     private final ClientTile[][] terrain;
     private final HashMap<Short, ClientEntity> entitiesID;
@@ -74,7 +71,7 @@ public class ClientWorld {
         game.getMultiplexer().addProcessor(worldInputListener);
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
+        camera.setToOrtho(false, Consts.TPW, Consts.TPH);
         camera.update();
 
         breakingTiles = new ArrayList<>();
@@ -125,8 +122,8 @@ public class ClientWorld {
         batch.setProjectionMatrix(camera.combined);
 
         // tiles
-        float renderOffsetX = (Gdx.graphics.getWidth() / (PPM / camera.zoom * 2)) + 2;
-        float renderOffsetY = (Gdx.graphics.getHeight() / (PPM / camera.zoom * 2)) + 2;
+        float renderOffsetX = camera.zoom * Consts.TPW / 2 + 2;
+        float renderOffsetY = camera.zoom * Consts.TPH / 2 + 2;
         int left = (int) Math.max(camera.position.x - renderOffsetX, 0);
         int right = (int) Math.min(camera.position.x + renderOffsetX, terrainWidth);
         int bottom = (int) Math.max(camera.position.y - renderOffsetY, 0);

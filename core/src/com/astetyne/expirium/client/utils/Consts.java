@@ -5,7 +5,7 @@ public class Consts {
     public static final int VERSION = 1;
     public static final String VERSION_TEXT = "alpha 1.3";
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // server
     public static final long SAVE_INTERVAL = 20000; // in millis
@@ -14,11 +14,10 @@ public class Consts {
     public static final int SERVER_PORT = 1414;
     public static final int BUFFER_SIZE = 131072; //262144, 2097152, 32768
     public static final int SERVER_TPS = 32;
-    public static final String MULTICAST_ADDRESS = "234.14.14.14";
 
     // world
-    public static final int WORLD_BIOME_WIDTH = 80; // <-- this should NOT change
-    public static final int WORLD_BIOMES_NUMBER = 5; // world width will be calculated as WORLD_BIOME_WIDTH * WORLD_BIOMES_NUMBER
+    public static final int WORLD_BIOME_WIDTH = 70; // <-- this should NOT change
+    public static final int WORLD_BIOMES_NUMBER = 20; // world width will be calculated as WORLD_BIOME_WIDTH * WORLD_BIOMES_NUMBER
     public static final int WORLD_HEIGHT = 128; // this should be used only while creating world and allow custom world size to exists
 
     public static final int COMBAT_PRECISION = 6;
@@ -68,5 +67,9 @@ public class Consts {
     public static final int INV_MAX_SIZE = 5;
 
     //misc
+    public static final float TPW = 32; // tiles per width of screen (how much tiles to match the screen width with default zoom)
+    public static final float TPH = Utils.worldRatioFromW(TPW); // tiles per height
+    public static final float MAX_ZOOM = 0.2f; // maximum zoom (max tile size)
+    public static final float MIN_ZOOM = 3; // maximum un-zoom (max tiles on screen)
 
 }

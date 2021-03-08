@@ -85,7 +85,8 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
         // just for desktop development testing ----
         OrthographicCamera cam = game.getWorld().getCamera();
         cam.zoom += amountY*0.1;
-        cam.zoom = Math.min(cam.zoom, 3);
+        cam.zoom = Math.min(cam.zoom, Consts.MIN_ZOOM);
+        cam.zoom = Math.max(cam.zoom, Consts.MAX_ZOOM);
         cam.update();
         return true;
     }
@@ -125,12 +126,17 @@ public class WorldInputListener extends InputAdapter implements GestureDetector.
     public boolean zoom(float initialDistance, float distance) {
         if(!game.getPlayerData().getThumbStickData1().isNeutral() ||
                 !game.getPlayerData().getThumbStickData2().isNeutral()) return false;
+        if(pressed) {
+            pressed = false;
+            Vector2 vec = world.getPlayer().getCenter();
+            ExpiGame.get().getClientGateway().getManager().putInteractPacket(vec.x, vec.y, InteractType.RELEASE);
+        }
         OrthographicCamera cam = game.getWorld().getCamera();
         if(savedZoom * (initialDistance / distance) * cam.viewportWidth >= world.getTerrainWidth() || savedZoom * (initialDistance / distance) * cam.viewportHeight >= world.getTerrainHeight()) {
             return false;
         }
-        cam.zoom = Math.min(savedZoom * (initialDistance / distance), 3);
-        cam.zoom = Math.max(cam.zoom, 0.2f);
+        cam.zoom = Math.min(savedZoom * (initialDistance / distance), Consts.MIN_ZOOM);
+        cam.zoom = Math.max(cam.zoom, Consts.MAX_ZOOM);
         cam.update();
         return false;
     }

@@ -1,7 +1,7 @@
 package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
-import com.astetyne.expirium.client.net.MulticastListener;
+import com.astetyne.expirium.client.net.BroadcastListener;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.badlogic.gdx.graphics.Color;
@@ -17,7 +17,7 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
     private final Table availableServersTable;
     private final TextButton joinButton;
 
-    private MulticastListener.AvailableServer chosenServer;
+    private BroadcastListener.AvailableServer chosenServer;
     private Table lastChosenTable;
 
     public ServerListRoot(MenuScreen menu) {
@@ -82,10 +82,10 @@ public class ServerListRoot extends WidgetGroup implements MenuRootable {
 
     private void populateTableWithServers() {
 
-        MulticastListener listener = ExpiGame.get().getMulticastListener();
+        BroadcastListener listener = ExpiGame.get().getMulticastListener();
 
         availableServersTable.clear();
-        for(MulticastListener.AvailableServer server : listener.getAvailableServers()) {
+        for(BroadcastListener.AvailableServer server : listener.getAvailableServers()) {
             Label name = new Label(server.owner+"'s", Res.LABEL_STYLE);
             Label version = new Label("ver. "+server.version, Res.LABEL_STYLE);
             Table t = new Table();

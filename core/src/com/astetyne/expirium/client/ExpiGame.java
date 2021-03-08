@@ -4,10 +4,10 @@ import com.astetyne.expirium.client.data.ExtraCellTexture;
 import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.gui.roots.menu.LoadingRoot;
 import com.astetyne.expirium.client.items.Item;
+import com.astetyne.expirium.client.net.BroadcastListener;
 import com.astetyne.expirium.client.net.ClientFailListener;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
-import com.astetyne.expirium.client.net.MulticastListener;
 import com.astetyne.expirium.client.resources.*;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
@@ -35,7 +35,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	private boolean hostingServer;
 	private ExpiServer server;
 	private final Queue<Runnable> tasks;
-	private final MulticastListener multicastListener;
+	private final BroadcastListener broadcastListener;
 	Box2DDebugRenderer debugRenderer;
 
 	public ExpiGame() {
@@ -47,8 +47,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		hostingServer = false;
 		tasks = new LinkedList<>();
 
-		multicastListener = new MulticastListener();
-		Thread t = new Thread(multicastListener);
+		broadcastListener = new BroadcastListener();
+		Thread t = new Thread(broadcastListener);
 		t.setName("Multicast listener");
 		t.start();
 	}
@@ -94,7 +94,7 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	@Override
 	public void dispose () {
 		super.dispose();
-		multicastListener.stop();
+		broadcastListener.stop();
 		getScreen().dispose();
 		if(server != null) {
 			server.close();
@@ -158,8 +158,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 		return hostingServer;
 	}
 
-	public MulticastListener getMulticastListener() {
-		return multicastListener;
+	public BroadcastListener getMulticastListener() {
+		return broadcastListener;
 	}
 
 	public void runOnMainThread(Runnable r) {

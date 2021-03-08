@@ -20,7 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Res {
 
-    public static NinePatchDrawable FRAME_ROUND, FRAME_SQUARE, FRAME_ROUND_GRAY, FRAME_ROUND_GRAY_LIGHT, FRAME_ROUND_GREEN, FRAME_ROUND_YELLOW,
+    public static NinePatchDrawable FRAME_ROUND, FRAME_SQUARE, FRAME_ROUND_GRAY, FRAME_ROUND_TF_COLOR, FRAME_ROUND_GREEN, FRAME_ROUND_YELLOW,
         FRAME_SQUARE_GRAY, FRAME_ROUND_GRAY_TRANSP, INV_CELL;
 
     // background
@@ -41,7 +41,7 @@ public class Res {
     public static TextureRegion DAMAGE_OVERLAP;
 
     // entities
-    public static Animation<TextureRegion> SQUIRREL_IDLE;
+    public static Animation<TextureRegion> SQUIRREL_IDLE, FROG_IDLE;
 
     public static void loadTextures(TextureAtlas textures, TextureAtlas background) {
 
@@ -70,7 +70,7 @@ public class Res {
         WORLD_FONT.setUseIntegerPositions(false);
 
         Color gray = new Color(110f/255, 110f/255, 110f/255, 1);
-        Color textFieldColor = new Color(180f/255, 180f/255, 150f/255, 1);
+        Color textFieldColor = new Color(130f/255, 120f/255, 60f/255, 1);
         Color yellow = new Color(132f/255, 118f/255, 55f/255, 1);
         Color green = new Color(61f/255, 102f/255, 42f/255, 1);
         Color transpGray = new Color(Color.GRAY);
@@ -80,7 +80,7 @@ public class Res {
         FRAME_ROUND = new NinePatchDrawable(textures.createPatch("frame_round"));
         FRAME_ROUND.getPatch().scale(10, 10);
         FRAME_ROUND_GRAY = FRAME_ROUND.tint(gray);
-        FRAME_ROUND_GRAY_LIGHT = FRAME_ROUND.tint(textFieldColor);
+        FRAME_ROUND_TF_COLOR = FRAME_ROUND.tint(textFieldColor);
         FRAME_ROUND_GREEN = FRAME_ROUND.tint(green);
         FRAME_ROUND_YELLOW = FRAME_ROUND.tint(yellow);
         FRAME_ROUND_GRAY_TRANSP = FRAME_ROUND.tint(transpGray);
@@ -103,7 +103,7 @@ public class Res {
 
         BUTTON_STYLE = new Button.ButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY);
         TEXT_BUTTON_STYLE = new TextButton.TextButtonStyle(FRAME_ROUND_GRAY, FRAME_ROUND_GREEN, FRAME_ROUND_GRAY, MAIN_FONT);
-        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, FRAME_ROUND_GRAY_LIGHT);
+        TEXT_FIELD_STYLE = new TextField.TextFieldStyle(MAIN_FONT, Color.WHITE, cursor, selection, FRAME_ROUND_TF_COLOR);
         LABEL_STYLE = new Label.LabelStyle(MAIN_FONT, Color.WHITE);
         WARN_LABEL_STYLE = new Label.LabelStyle(WARN_FONT, Color.WHITE);
         TITLE_LABEL_STYLE = new Label.LabelStyle(TITLE_FONT, Color.WHITE);
@@ -112,6 +112,7 @@ public class Res {
 
         // entities
         SQUIRREL_IDLE = new Animation<>(1, textures.findRegion("squirrel_idle"));
+        FROG_IDLE = new Animation<>(1, textures.findRegion("frog_idle"));
 
     }
 

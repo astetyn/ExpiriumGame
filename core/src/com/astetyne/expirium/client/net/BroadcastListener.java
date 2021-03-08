@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class MulticastListener extends TerminableLooper {
+public class BroadcastListener extends TerminableLooper {
 
-    private MulticastSocket socket;
+    private DatagramSocket socket;
     private boolean serversChanged;
     private final List<AvailableServer> availableServers;
 
-    public MulticastListener() {
+    public BroadcastListener() {
         serversChanged = false;
         availableServers = new ArrayList<>();
     }
@@ -28,11 +28,7 @@ public class MulticastListener extends TerminableLooper {
         try {
 
             byte[] buffer = new byte[1024];
-            socket = new MulticastSocket(Consts.SERVER_PORT);
-            InetAddress group = InetAddress.getByName(Consts.MULTICAST_ADDRESS);
-            NetworkInterface networkInterface = getWlanEth();
-            if(networkInterface != null) socket.setNetworkInterface(networkInterface);
-            socket.joinGroup(group);
+            socket = new DatagramSocket(Consts.SERVER_PORT);
 
             outer:
             while(isRunning()) {
@@ -61,10 +57,7 @@ public class MulticastListener extends TerminableLooper {
                 availableServers.add(new AvailableServer(playerName.toString(), version, address));
                 serversChanged = true;
             }
-
-            socket.leaveGroup(group);
             socket.close();
-
         }catch(IOException ignored) {}
 
     }

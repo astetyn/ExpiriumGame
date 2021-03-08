@@ -90,6 +90,10 @@ public class Utils {
         return Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth() * val * 2;
     }
 
+    public static float worldRatioFromW(float val) {
+        return Gdx.graphics.getHeight() / (float)Gdx.graphics.getWidth() * val;
+    }
+
     /*// main only for testing
     public static void main(String[] args) throws UnknownHostException {
         System.out.println("-- running main for testing --");

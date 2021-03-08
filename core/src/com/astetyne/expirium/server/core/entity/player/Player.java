@@ -42,7 +42,7 @@ public class Player extends LivingEntity {
     private final ThumbStickData tsData1, tsData2;
     private long lastJump;
     private final Vector2 resurrectLoc;
-    private boolean wasAlreadyDead;
+    private boolean firstLife;
     private long lastDeathDay;
     private final WorldLoader worldLoader;
     private final HashSet<Entity> nearActiveEntities;
@@ -65,7 +65,7 @@ public class Player extends LivingEntity {
         toolManager = new TileBreakToolManager(server, this, tsData2);
         lastJump = 0;
         resurrectLoc = new Vector2(in.readFloat(), in.readFloat());
-        wasAlreadyDead = in.readBoolean();
+        firstLife = in.readBoolean();
         lastDeathDay = in.readLong();
         worldLoader = new WorldLoader(server, this);
         nearActiveEntities = new HashSet<>();
@@ -117,7 +117,7 @@ public class Player extends LivingEntity {
     @Override
     public void die() {
         invincible = true;
-        getNetManager().putDeathPacket(!wasAlreadyDead, server.getWorld().getDay() - lastDeathDay);
+        getNetManager().putDeathPacket(firstLife, server.getWorld().getDay() - lastDeathDay);
         foodLevel = 20;
         setHealthLevel(20);
         for(ItemStack is : mainInv.getItems()) {
@@ -131,7 +131,7 @@ public class Player extends LivingEntity {
         tsData1.reset();
         tsData2.reset();
         body.setLinearVelocity(0, 0);
-        wasAlreadyDead = true;
+        firstLife = false;
         lastDeathDay = server.getWorld().getDay();
     }
 
@@ -444,6 +444,10 @@ public class Player extends LivingEntity {
         return foodLevel;
     }
 
+    public boolean isLivingFirstLife() {
+        return firstLife;
+    }
+
     @Override
     public void writeData(WorldBuffer out) {
         super.writeData(out);
@@ -451,7 +455,7 @@ public class Player extends LivingEntity {
         mainInv.writeData(out);
         out.writeFloat(resurrectLoc.x);
         out.writeFloat(resurrectLoc.y);
-        out.writeBoolean(wasAlreadyDead);
+        out.writeBoolean(firstLife);
         out.writeLong(lastDeathDay);
     }
 
@@ -461,7 +465,7 @@ public class Player extends LivingEntity {
         PlayerInventory.writeDefaultData(out);
         out.writeFloat(spawnLoc.x);
         out.writeFloat(spawnLoc.y);
-        out.writeBoolean(false);
+        out.writeBoolean(true);
         out.writeLong(0);
     }
 }

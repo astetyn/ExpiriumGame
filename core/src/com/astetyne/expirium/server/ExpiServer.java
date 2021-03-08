@@ -10,7 +10,7 @@ import com.astetyne.expirium.server.core.world.World;
 import com.astetyne.expirium.server.core.world.file.WorldBuffer;
 import com.astetyne.expirium.server.core.world.file.WorldFileManager;
 import com.astetyne.expirium.server.core.world.file.WorldQuickInfo;
-import com.astetyne.expirium.server.net.MulticastSender;
+import com.astetyne.expirium.server.net.BroadcastSender;
 import com.astetyne.expirium.server.net.ServerGateway;
 
 import java.io.DataInputStream;
@@ -34,7 +34,7 @@ public class ExpiServer implements WorldSaveable {
     private final List<WorldSaveable> saveableModules;
 
     private final ServerFailListener failListener;
-    private final MulticastSender multicastSender;
+    private final BroadcastSender broadcastSender;
 
     private boolean fullyRunning;
     private boolean closeRequest;
@@ -56,7 +56,7 @@ public class ExpiServer implements WorldSaveable {
 
         tickLooper = new TickLooper(this);
         serverGateway = new ServerGateway(Consts.SERVER_PORT, this);
-        multicastSender = new MulticastSender();
+        broadcastSender = new BroadcastSender();
 
         fileManager = new WorldFileManager(this, createNew);
 
@@ -95,7 +95,7 @@ public class ExpiServer implements WorldSaveable {
         t.setName("Server gateway");
         t.start();
 
-        Thread t2 = new Thread(multicastSender);
+        Thread t2 = new Thread(broadcastSender);
         t2.setName("Multicast sender loop");
         t2.start();
 
@@ -119,7 +119,7 @@ public class ExpiServer implements WorldSaveable {
     public void faultClose() {
         System.out.println("performing fault close");
         fileManager.saveServer();
-        multicastSender.stop();
+        broadcastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
         for(Player p : players) {
@@ -134,7 +134,7 @@ public class ExpiServer implements WorldSaveable {
     private void performClose() {
         System.out.println("performing normal close");
         fileManager.saveServer();
-        multicastSender.stop();
+        broadcastSender.stop();
         tickLooper.stop();
         serverGateway.stop();
         for(Player p : players) {

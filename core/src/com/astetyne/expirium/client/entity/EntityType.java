@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.entity;
 import com.astetyne.expirium.client.world.ClientWorld;
 import com.astetyne.expirium.server.core.entity.DroppedItem;
 import com.astetyne.expirium.server.core.entity.Entity;
+import com.astetyne.expirium.server.core.entity.Frog;
 import com.astetyne.expirium.server.core.entity.Squirrel;
 import com.astetyne.expirium.server.core.entity.player.Player;
 import com.astetyne.expirium.server.net.PacketInputStream;
@@ -16,6 +17,7 @@ public enum EntityType {
     PLAYER(FriendClientPlayer.class, Player.class, 0.9f, 1.5f),
     DROPPED_ITEM(DroppedItemClientEntity.class, DroppedItem.class, 0.4f, 0.4f),
     SQUIRREL(SquirrelClientEntity.class, Squirrel.class, 0.6f, 0.6f),
+    FROG(FrogClientEntity.class, Frog.class, 0.6f, 0.49f),
     ;
 
     Class<? extends ClientEntity> entityClazz;

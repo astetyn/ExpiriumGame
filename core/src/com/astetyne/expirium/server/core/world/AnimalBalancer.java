@@ -10,6 +10,7 @@ public class AnimalBalancer {
 
     private final World world;
     private final int squirrelLimit;
+    private final int frogLimit;
 
     public AnimalBalancer(World world) {
         this.world = world;
@@ -18,17 +19,29 @@ public class AnimalBalancer {
             if(biome == BiomeType.BOREAL_FOREST) squirrelBiomesFound++;
         }
         squirrelLimit = squirrelBiomesFound*6;
+
+        int frogBiomesFound = 0;
+        for(BiomeType biome : world.getBiomes()) {
+            if(biome == BiomeType.TROPICAL_FOREST) frogBiomesFound++;
+        }
+        frogLimit = frogBiomesFound*6;
     }
 
     public void onTick() {
 
         EntityType sqType = EntityType.SQUIRREL;
-
         int squirrelCount = 0;
         for(Entity ee : world.getServer().getEntities()) {
             if(ee.getType() == sqType) squirrelCount++;
         }
         if(squirrelCount < squirrelLimit) world.spawnEntity(sqType, getRandSpawnLocOnGround(sqType, BiomeType.BOREAL_FOREST));
+
+        EntityType frogType = EntityType.FROG;
+        int frogCount = 0;
+        for(Entity ee : world.getServer().getEntities()) {
+            if(ee.getType() == frogType) frogCount++;
+        }
+        if(frogCount < frogLimit) world.spawnEntity(frogType, getRandSpawnLocOnGround(frogType, BiomeType.TROPICAL_FOREST));
     }
 
     private Vector2 getRandSpawnLocOnGround(EntityType type, BiomeType reqBiome) {

@@ -59,6 +59,7 @@ public enum Item {
     NATURAL_MIX(ItemCat.MATERIAL, 0.05f),
     RECYCLER(ItemCat.MATERIAL, 0.3f),
     TIME_WARPER(ItemCat.MATERIAL, 2, 2, 0.1f),
+    DRY_LEAVES(ItemCat.MISC, 0.001f),
     ;
 
     ItemCat category;

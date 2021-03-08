@@ -3,7 +3,6 @@ package com.astetyne.expirium.client.gui.widget;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.items.ItemRecipe;
 import com.astetyne.expirium.client.resources.Res;
-import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.Utils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -20,13 +19,12 @@ public class RecipeListTable extends Table {
 
         for(ItemRecipe recipe : ItemRecipe.values()) {
             Table t = new Table();
-            if(Consts.DEBUG) t.debugAll();
             Item item = recipe.getProduct().getItem();
             Image icon = new Image(item.getTexture());
             Label label = new Label(item.getLabel(), Res.LABEL_STYLE);
             label.setWrap(true);
 
-            t.add(icon).width(80).height(Utils.percFromW(80)).align(Align.left).pad(10, 5, 10, 15);
+            t.add(icon).width(80).height(Utils.percFromW(80)).align(Align.left).pad(10, 15, 10, 15);
             t.add(label).grow();
             t.setBackground(Res.FRAME_ROUND_GRAY);
             t.addListener(new ClickListener() {
@@ -40,7 +38,10 @@ public class RecipeListTable extends Table {
                     lastSelected = t;
                 }
             });
-            add(t).width(450);
+
+            // 340 is a magic value get from observations
+            int height = Utils.getTextWidth(label.getText().toString(), label.getStyle().font) / 340 > 1 ? 140 : 112;
+            add(t).width(450).height(height);
             row();
         }
     }

@@ -102,6 +102,9 @@ public class FuelCookingInventory extends CookingInventory {
     private void increaseFuel(int i) {
         fuel += i;
         lastFuelDecreaseTick = world.getTick();
+        if(recipe == null) {
+            matchRecipe();
+        }
     }
 
     public int getFuel() {
@@ -110,9 +113,15 @@ public class FuelCookingInventory extends CookingInventory {
 
     private int getFuel(Item item) {
         switch(item) {
-            case COAL: return 20;
-            case PLANKS: return 5;
-            case RAW_WOOD: return 2;
+            case COAL: return 30;
+            case PLANKS:
+            case WOODEN_WALL:
+                return 10;
+            case RAW_WOOD: return 5;
+            case DRY_LEAVES: return 1;
+            case WOODEN_MATTOCK:
+            case WOODEN_BOWL:
+                return 2;
             default: return 0;
         }
     }

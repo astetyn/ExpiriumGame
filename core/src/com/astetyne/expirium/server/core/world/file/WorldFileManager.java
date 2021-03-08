@@ -110,7 +110,7 @@ public class WorldFileManager {
 
     public void saveServer() {
 
-        saveQuickInfo(server.getWorld().getTick(), true);
+        saveQuickInfo(server.getWorld().getTick(), server.getPlayers().get(0).isLivingFirstLife());
 
         WorldBuffer wb = new WorldBuffer(2097152);
         server.writeData(wb);

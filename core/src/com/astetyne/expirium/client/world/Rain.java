@@ -3,6 +3,7 @@ package com.astetyne.expirium.client.world;
 import com.astetyne.expirium.client.entity.MainClientPlayer;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.tiles.ClientTile;
+import com.astetyne.expirium.client.utils.Consts;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -15,7 +16,7 @@ public class Rain {
 
     private final static int spawnInterval = 8; // new drop every x millis
     private final static float velY = -25; // meters per second
-    private final static int radius = 50;
+    private final static int radius = (int) (Consts.MIN_ZOOM * Consts.TPW / 2) + 4;
     private final static int recalcInterval = 1000; // how often should be surface recalculated in millis
 
     private final MainClientPlayer player;
