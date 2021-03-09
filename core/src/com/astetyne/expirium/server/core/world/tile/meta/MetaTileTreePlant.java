@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.core.world.tile.meta;
 
+import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.client.utils.Utils;
@@ -40,9 +41,10 @@ public class MetaTileTreePlant extends MetaTile {
         IntVector2 vec = new IntVector2(0, 0);
 
         // if soil is not grass or dirt
-        if(owner.getY() == 0 || (world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.GRASS &&
-                world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.DIRT)) {
-            growTick = scheduleAfter(this::grow, Utils.getRandAddTime(GROW_TIME));
+        if(world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.GRASS &&
+                world.getTileAt(owner.getLoc(vec).add(0, -1)).getMaterial() != Material.DIRT) {
+            world.changeMaterial(owner, Material.AIR, false, Source.NATURAL);
+            dropItem(Item.DRY_LEAVES);
             return;
         }
 

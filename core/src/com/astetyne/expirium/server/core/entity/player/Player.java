@@ -75,7 +75,6 @@ public class Player extends LivingEntity {
         server.getWorld().scheduleTaskAfter(this::interval4Sec, Consts.SERVER_TPS * 4);
         server.getWorld().scheduleTaskAfter(this::interval20Sec, Consts.SERVER_TPS * 20);
         server.getWorld().scheduleTaskAfter(this::plannedRecalcNearEntities, Consts.SERVER_TPS/2);
-        server.getPlayers().add(this);
         if(Consts.DEBUG) {
             // for fast item testing - append items here
             getInv().append(Item.BUCKET_WATER, 20);
@@ -368,16 +367,6 @@ public class Player extends LivingEntity {
     @Override
     public EntityType getType() {
         return EntityType.PLAYER;
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        server.getPlayers().remove(this);
-    }
-
-    public void destroySafe() {
-        super.destroy();
     }
 
     @Override

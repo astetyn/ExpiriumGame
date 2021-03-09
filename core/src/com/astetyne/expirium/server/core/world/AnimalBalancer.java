@@ -24,7 +24,7 @@ public class AnimalBalancer {
         for(BiomeType biome : world.getBiomes()) {
             if(biome == BiomeType.TROPICAL_FOREST) frogBiomesFound++;
         }
-        frogLimit = frogBiomesFound*6;
+        frogLimit = frogBiomesFound;
     }
 
     public void onTick() {

@@ -48,7 +48,7 @@ blueberry_item
   index: -1
 bucket_item
   rotate: false
-  xy: 739, 221
+  xy: 721, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -62,7 +62,7 @@ bucket_water_item
   index: -1
 cactus_double
   rotate: false
-  xy: 757, 221
+  xy: 739, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -370,7 +370,7 @@ coal_item
   index: -1
 coal_ore
   rotate: false
-  xy: 829, 221
+  xy: 811, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -431,6 +431,13 @@ drowning_effect
   orig: 16, 16
   offset: 0, 0
   index: -1
+dry_leaves_item
+  rotate: false
+  xy: 865, 221
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 fir_cone_item
   rotate: false
   xy: 585, 85
@@ -447,7 +454,7 @@ food_icon
   index: -1
 frame_round
   rotate: false
-  xy: 635, 163
+  xy: 619, 129
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -461,6 +468,13 @@ frame_square
   orig: 4, 4
   offset: 0, 0
   index: -1
+frog_idle
+  rotate: false
+  xy: 635, 156
+  size: 16, 13
+  orig: 16, 13
+  offset: 0, 0
+  index: 1
 fruit_jam_item
   rotate: false
   xy: 103, 48
@@ -498,14 +512,14 @@ furnace_on
   index: -1
 glass
   rotate: false
-  xy: 775, 221
+  xy: 757, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass_item
   rotate: false
-  xy: 775, 221
+  xy: 757, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -540,7 +554,7 @@ growing_plant
   index: -1
 health_icon
   rotate: false
-  xy: 653, 176
+  xy: 669, 187
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -618,14 +632,14 @@ jar_raspberry_jam_item
   index: -1
 ladder_item
   rotate: false
-  xy: 703, 221
+  xy: 259, 35
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 ladder
   rotate: false
-  xy: 703, 221
+  xy: 259, 35
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -660,7 +674,7 @@ leaves_fir_right
   index: -1
 leaves_fir_top
   rotate: false
-  xy: 793, 221
+  xy: 775, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -793,7 +807,7 @@ planks_item
   index: -1
 rain_drop
   rotate: false
-  xy: 635, 155
+  xy: 1009, 224
   size: 1, 6
   orig: 1, 6
   offset: 0, 0
@@ -842,7 +856,7 @@ recycle_icon
   index: -1
 recycler
   rotate: false
-  xy: 811, 221
+  xy: 793, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -891,7 +905,7 @@ rhyolite_mattock_item_grid
   index: -1
 sand
   rotate: false
-  xy: 847, 221
+  xy: 829, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -912,7 +926,7 @@ sand_slope_right
   index: -1
 selection
   rotate: false
-  xy: 669, 202
+  xy: 651, 191
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -933,14 +947,14 @@ settings_icon
   index: -1
 small_meat_cooked_item
   rotate: false
-  xy: 721, 221
+  xy: 703, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 small_meat_raw_item
   rotate: false
-  xy: 259, 35
+  xy: 637, 138
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1031,7 +1045,7 @@ tile_break
   index: 4
 tile_break
   rotate: false
-  xy: 865, 221
+  xy: 847, 221
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -1164,7 +1178,7 @@ weight_icon
   index: -1
 white_tile
   rotate: false
-  xy: 653, 173
+  xy: 619, 126
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

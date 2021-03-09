@@ -136,7 +136,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         playerStatsTable.row();
         if(Consts.DEBUG) playerStatsTable.setDebug(true);
 
-        settingsButton.setBounds(10, 890, 100, 100);
+        settingsButton.setBounds(10, 890, 100, Utils.percFromW(100));
         addActor(settingsButton);
         versionLabel.setBounds(140, 890, 200, 100);
         addActor(versionLabel);
@@ -146,7 +146,7 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         playerStatsTable.setBounds(1800, 850, 200, 150);
         playerStatsTable.align(Align.topRight);
         addActor(playerStatsTable);
-        inventoryButton.setBounds(1870, 660, 100, 100);
+        inventoryButton.setBounds(1870, 660, 100, Utils.percFromW(100));
         addActor(inventoryButton);
         moveTS.setBounds(120, 60, 320, Utils.percFromW(320));
         addActor(moveTS);
@@ -176,8 +176,8 @@ public class GameRoot extends WidgetGroup implements GameRootable {
         addActor(breakTS);
         activeLeftActor = breakTS;
 
-        consumeButton.setBounds(1750, 50, 200, 200);
-        buildViewButton.setBounds(1750, 50, 200, 200);
+        consumeButton.setBounds(1750, 50, 200, Utils.percFromW(200));
+        buildViewButton.setBounds(1750, 50, 200, Utils.percFromW(200));
 
         refresh();
 

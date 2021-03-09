@@ -139,14 +139,15 @@ public class WorldFileManager {
 
             DataInputStream in = new DataInputStream(is);
 
-            Player ep = new Player(server, gateway, name, character, in);
+            Player p = new Player(server, gateway, name, character, in);
             in.close();
-            ep.createBodyFixtures();
-            for(Player ep2 : server.getPlayers()) {
-                if(ep == ep2) continue;
-                ep2.getNetManager().putEntitySpawnPacket(ep);
+            p.createBodyFixtures();
+            server.getPlayers().add(p);
+            for(Player p2 : server.getPlayers()) {
+                if(p == p2) continue;
+                p2.getNetManager().putEntitySpawnPacket(p);
             }
-            return ep;
+            return p;
         }catch(IOException e) {
             e.printStackTrace();
             return null;

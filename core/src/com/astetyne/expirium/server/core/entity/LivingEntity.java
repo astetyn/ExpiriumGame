@@ -58,7 +58,7 @@ public abstract class LivingEntity extends Entity implements Collidable {
         ticksUnderWater = in.readInt();
         invincible = false;
         lastFallVelocity = 0;
-        server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS );
+        server.getWorld().scheduleTaskAfter(this::interval1Sec, Consts.SERVER_TPS);
         server.getWorld().getCL().registerListener(this);
     }
 
@@ -98,7 +98,6 @@ public abstract class LivingEntity extends Entity implements Collidable {
     @Override
     public void destroy() {
         super.destroy();
-        alive = false;
         server.getWorld().getCL().unregisterListener(this);
     }
 

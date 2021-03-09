@@ -30,17 +30,17 @@ public class MetaTileLeaves extends MetaTile {
                 if(Math.random() < 0.3) {
                     dropItem(Item.FIR_CONE);
                 }
-                if(Math.random() < 0.3) {
+                if(Math.random() < 0.4) {
                     dropItem(Item.DRY_LEAVES);
                 }
                 break;
             case LEAVES_SHOREA_LEFT:
             case LEAVES_SHOREA_RIGHT:
             case LEAVES_SHOREA_TOP:
-                if(Math.random() < 0.3) {
+                if(Math.random() < 0.6) {
                     dropItem(Item.APPLE);
                 }
-                if(Math.random() < 0.3) {
+                if(Math.random() < 0.4) {
                     dropItem(Item.DRY_LEAVES);
                 }
                 break;

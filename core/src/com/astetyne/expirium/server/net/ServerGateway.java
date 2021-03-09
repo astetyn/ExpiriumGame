@@ -1,6 +1,7 @@
 package com.astetyne.expirium.server.net;
 
 import com.astetyne.expirium.client.resources.PlayerCharacter;
+import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.player.Player;
@@ -84,10 +85,13 @@ public class ServerGateway extends TerminableLooper {
         synchronized(leavingPlayers) {
             for(Player p : leavingPlayers) {
                 server.getPlayers().remove(p);
-                p.destroySafe();
+                p.destroy();
                 p.getGateway().stop();
                 server.getFileManager().savePlayer(p);
                 System.out.println("Player "+p.getName()+" left the server.");
+                for(Player p2 : server.getPlayers()) {
+                    p2.getNetManager().putWarningPacket(p.getName()+" left this world.", 1500, ExpiColor.WHITE);
+                }
                 break;
             }
             leavingPlayers.clear();
@@ -109,6 +113,10 @@ public class ServerGateway extends TerminableLooper {
                     p.getGateway().getJoinLock().notify();
                 }
                 System.out.println("Player "+p.getName()+" joined the server.");
+                for(Player p2 : server.getPlayers()) {
+                    if(p == p2) continue;
+                    p2.getNetManager().putWarningPacket(p.getName()+" joined this world.", 1500, ExpiColor.WHITE);
+                }
             }
             joiningClients.clear();
         }

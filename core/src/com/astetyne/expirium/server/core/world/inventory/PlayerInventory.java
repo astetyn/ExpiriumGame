@@ -25,19 +25,6 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
     private ItemStack isTool, isMat, isCon;
     private ChosenSlot chosenSlot;
 
-    public PlayerInventory(Player owner, int columns, int rows, float maxWeight) {
-        super(rows, columns, maxWeight);
-        this.owner = owner;
-        indexTools = 0;
-        indexMats = 0;
-        indexCons = 0;
-        isTool = new ItemStack(Item.EMPTY);
-        isMat = new ItemStack(Item.EMPTY);
-        isCon = new ItemStack(Item.EMPTY);
-        chosenSlot = ChosenSlot.TOOL_SLOT;
-        itemInHand = new ItemStack(Item.EMPTY);
-    }
-
     public PlayerInventory(Player owner, int columns, int rows, float maxWeight, DataInputStream in) throws IOException {
         super(rows, columns, maxWeight, in);
         this.owner = owner;
@@ -180,7 +167,8 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
                 // toto je zbytocne?
                 break;
             case CONSUME_BUTTON:
-                if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE && owner.getFoodLevel() == Player.MAX_FOOD_LEVEL) break;
+                if(itemInHand.getItem().getCategory() != ItemCat.CONSUMABLE ||
+                        owner.getFoodLevel() == Player.MAX_FOOD_LEVEL) break;
                 remove(itemInHand.getItem(), 1);
                 owner.increaseFoodLevel(itemInHand.getItem().getFood());
 
