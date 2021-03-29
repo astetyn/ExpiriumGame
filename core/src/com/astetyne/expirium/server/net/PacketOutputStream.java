@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.net.FailListener;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -13,6 +14,7 @@ import java.nio.ByteBuffer;
 public class PacketOutputStream {
 
     protected OutputStream out;
+    private FailListener failListener;
     private final ByteBuffer buffer1;
     private final ByteBuffer buffer2;
     private ByteBuffer writeBuffer;
@@ -21,8 +23,9 @@ public class PacketOutputStream {
     private int activePacketCounter;
     private int lastPacketCounter;
 
-    public PacketOutputStream(OutputStream out) {
+    public PacketOutputStream(OutputStream out, FailListener failListener) {
         this.out = out;
+        this.failListener = failListener;
         buffer1 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
         buffer2 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
         writeBuffer = buffer1;
@@ -37,44 +40,72 @@ public class PacketOutputStream {
 
     public void startPacket(int packetID) {
         activePacketCounter++;
-        writeBuffer.putShort((short) packetID);
+        putShort((short) packetID);
     }
 
     public void putByte(int b) {
+        if(writeBuffer.remaining() < 1) {
+            failListener.onFail("overflow");
+            return;
+        }
         writeBuffer.put((byte) b);
     }
 
     public void putBoolean(boolean b) {
-        writeBuffer.put((byte) (b ? 1 : 0));
+        putByte((byte) (b ? 1 : 0));
     }
 
     public void putInt(int i) {
+        if(writeBuffer.remaining() < 4) {
+            failListener.onFail("overflow");
+            return;
+        }
         writeBuffer.putInt(i);
     }
 
     public void putShort(short s) {
+        if(writeBuffer.remaining() < 2) {
+            failListener.onFail("overflow");
+            return;
+        }
         writeBuffer.putShort(s);
     }
 
     public void putLong(long l) {
+        if(writeBuffer.remaining() < 8) {
+            failListener.onFail("overflow");
+            return;
+        }
         writeBuffer.putLong(l);
     }
 
     public void putFloat(float f) {
+        if(writeBuffer.remaining() < 4) {
+            failListener.onFail("overflow");
+            return;
+        }
         writeBuffer.putFloat(f);
     }
 
+    public void putChar(char c) {
+        if(writeBuffer.remaining() < 2) {
+            failListener.onFail("overflow");
+            return;
+        }
+        writeBuffer.putChar(c);
+    }
+
     public void putString(String s) {
-        writeBuffer.putInt(s.length());
+        putInt(s.length());
         for(char c : s.toCharArray()) {
-            writeBuffer.putChar(c);
+            putChar(c);
         }
     }
 
     public void putShortString(String s) {
         putByte(s.length());
         for(char c : s.toCharArray()) {
-            writeBuffer.putChar(c);
+            putChar(c);
         }
     }
 

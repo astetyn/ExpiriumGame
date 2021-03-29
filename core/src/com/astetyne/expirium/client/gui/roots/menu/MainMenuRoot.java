@@ -2,6 +2,7 @@ package com.astetyne.expirium.client.gui.roots.menu;
 
 import com.astetyne.expirium.client.ExpiGame;
 import com.astetyne.expirium.client.gui.widget.TextInputRoot;
+import com.astetyne.expirium.client.resources.GuiRes;
 import com.astetyne.expirium.client.resources.PlayerCharacter;
 import com.astetyne.expirium.client.resources.Res;
 import com.astetyne.expirium.client.screens.MenuScreen;
@@ -31,6 +32,15 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
         MainMenuRoot ref = this;
 
         loadData();
+
+        // info button
+        Image infoButton = new Image(GuiRes.SETTINGS_ICON.getDrawable());
+        infoButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                menu.setRoot(new InfoRoot(menu));
+            }
+        });
 
         // title
         Label title = new Label("Expirium", Res.TITLE_LABEL_STYLE);
@@ -130,7 +140,10 @@ public class MainMenuRoot extends WidgetGroup implements MenuRootable {
             }
         });
 
-        versionLabel.setBounds(30, 930, 200, 50);
+        infoButton.setBounds(30, 870, 100, Utils.percFromW(100));
+        addActor(infoButton);
+
+        versionLabel.setBounds(1750, 930, 200, 50);
         addActor(versionLabel);
 
         float textWidth = Utils.getTextWidth(title.getText().toString(), Res.MAIN_FONT);

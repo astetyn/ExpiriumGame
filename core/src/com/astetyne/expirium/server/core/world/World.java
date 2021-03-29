@@ -181,9 +181,9 @@ public class World implements WorldSaveable, Disposable {
             t.onInteract(p, type);
         }
 
-        // following code is only for tile placing
         p.getToolManager().onInteract(t, type);
 
+        // following code is only for tile placing
         Item item = p.getInv().getItemInHand().getItem();
 
         if(p.isAbleManipulateWater() && (type == InteractType.PRESS || type == InteractType.DRAG)) {
@@ -210,6 +210,11 @@ public class World implements WorldSaveable, Disposable {
         if(!isTileFree(t, item)) return;
 
         if(!stabilityCalc.canBeChanged(t, item.getBuildMaterial())) return;
+
+        if(item.getBuildMaterial().isHouseOnly() && !t.hasBackWall()) {
+            p.getNetManager().putWarningPacket("Cannot place outside your house.", 1500, ExpiColor.RED);
+            return;
+        }
 
         // confirmed from here
 

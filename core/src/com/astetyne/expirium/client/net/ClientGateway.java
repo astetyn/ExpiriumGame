@@ -22,9 +22,9 @@ public class ClientGateway extends TerminableLooper {
     private int traffic;
     private long time;
     private boolean nextPacketsAvailable;
-    private final ClientFailListener failListener;
+    private final FailListener failListener;
 
-    public ClientGateway(ClientFailListener listener) {
+    public ClientGateway(FailListener listener) {
         nextPacketsLock = new Object();
         traffic = 0;
         time = 0;
@@ -52,7 +52,7 @@ public class ClientGateway extends TerminableLooper {
             }catch(InterruptedException ignored) {}
         }
         if(!socket.isConnected()) {
-            failListener.onClientFail("Can't connect to server.\n Are you on the same network?");
+            failListener.onFail("Can't connect to server.\n Are you on the same network?");
             return;
         }
 
@@ -60,8 +60,8 @@ public class ClientGateway extends TerminableLooper {
 
             socket.setTcpNoDelay(true);
 
-            in = new PacketInputStream(socket.getInputStream());
-            out = new PacketOutputStream(socket.getOutputStream());
+            in = new PacketInputStream(socket.getInputStream(), failListener);
+            out = new PacketOutputStream(socket.getOutputStream(), failListener);
 
             packetManager = new ClientPacketManager(in, out);
 
@@ -92,7 +92,7 @@ public class ClientGateway extends TerminableLooper {
             try {
                 socket.close();
             }catch(IOException ignored) {}
-            failListener.onClientFail("You were disconnected due to connection issue.");
+            failListener.onFail("You were disconnected due to connection issue.");
         }
     }
 

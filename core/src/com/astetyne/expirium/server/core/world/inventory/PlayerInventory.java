@@ -174,7 +174,7 @@ public class PlayerInventory extends Inventory implements WorldSaveable {
 
                 switch(itemInHand.getItem()) {
 
-                    case FRUIT_BOWL:
+                    case FRUIT_JAM:
                         append(Item.WOODEN_BOWL, 1);
                         break;
 

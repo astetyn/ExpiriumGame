@@ -5,9 +5,9 @@ import com.astetyne.expirium.client.data.InvVariableType;
 import com.astetyne.expirium.client.gui.roots.menu.LoadingRoot;
 import com.astetyne.expirium.client.items.Item;
 import com.astetyne.expirium.client.net.BroadcastListener;
-import com.astetyne.expirium.client.net.ClientFailListener;
 import com.astetyne.expirium.client.net.ClientGateway;
 import com.astetyne.expirium.client.net.ClientPacketManager;
+import com.astetyne.expirium.client.net.FailListener;
 import com.astetyne.expirium.client.resources.*;
 import com.astetyne.expirium.client.screens.MenuScreen;
 import com.astetyne.expirium.server.ExpiServer;
@@ -23,7 +23,7 @@ import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ExpiGame extends Game implements ClientFailListener, ServerFailListener {
+public class ExpiGame extends Game implements FailListener, ServerFailListener {
 
 	private static ExpiGame expiGame;
 
@@ -169,8 +169,8 @@ public class ExpiGame extends Game implements ClientFailListener, ServerFailList
 	}
 
 	@Override
-	public void onClientFail(String msg) {
-		System.out.println("client fail");
+	public void onFail(String msg) {
+		System.out.println("client fail: "+msg);
 		runOnMainThread(() -> {
 			if(isHostingServer()) {
 				stopServer();

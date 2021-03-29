@@ -3,7 +3,9 @@ package com.astetyne.expirium.server.core.world.calculator;
 import com.astetyne.expirium.client.utils.IntVector2;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.core.entity.player.Player;
+import com.astetyne.expirium.server.core.event.Source;
 import com.astetyne.expirium.server.core.event.TileChangeEvent;
+import com.astetyne.expirium.server.core.world.tile.Material;
 import com.astetyne.expirium.server.core.world.tile.Tile;
 
 import java.util.ArrayList;
@@ -123,8 +125,12 @@ public class BackWallCalculator {
                 ep.getNetManager().putBackWallPacket(affectedTiles);
             }
 
+            for(Tile at : affectedTiles) {
+                if(at.getMaterial().isHouseOnly()) {
+                    server.getWorld().changeMaterial(at, Material.AIR, true, Source.NATURAL);
+                }
+            }
         }
-
     }
 
     private void clearMap() {

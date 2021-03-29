@@ -32,7 +32,7 @@ public enum Item {
     RASPBERRY_BUSH(ItemCat.MATERIAL, 0.1f),
     RASPBERRY(ItemCat.CONSUMABLE, 0.01f),
     WOODEN_BOWL(ItemCat.MISC, 2, 1, 0.05f, true),
-    FRUIT_BOWL(ItemCat.CONSUMABLE, 2, 1, 0.05f, true),
+    FRUIT_JAM(ItemCat.CONSUMABLE, 2, 1, 0.05f, true),
     MEAT_SOUP(ItemCat.CONSUMABLE, 2, 1, 0.06f, true),
     COAL(ItemCat.MISC, 0.05f),
     SAND(ItemCat.MATERIAL, 0.08f),
@@ -188,7 +188,7 @@ public enum Item {
             case RASPBERRY:
             case BLUEBERRY: return 5;
             case SMALL_MEAT_COOKED:
-            case FRUIT_BOWL: return 25;
+            case FRUIT_JAM: return 25;
             case MEAT_SOUP: return 30;
             default: return 0;
         }

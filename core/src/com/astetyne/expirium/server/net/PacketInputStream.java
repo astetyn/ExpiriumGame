@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.net.FailListener;
 import com.astetyne.expirium.client.utils.Consts;
 import com.astetyne.expirium.client.utils.ExpiColor;
 import com.astetyne.expirium.client.utils.IntVector2;
@@ -12,6 +13,7 @@ import java.nio.ByteBuffer;
 public class PacketInputStream {
 
     protected InputStream in;
+    private FailListener failListener;
     private final ByteBuffer buffer1;
     private final ByteBuffer buffer2;
     private ByteBuffer writeBuffer;
@@ -21,8 +23,9 @@ public class PacketInputStream {
     private int ping;
     private int lastPing;
 
-    public PacketInputStream(InputStream in) {
+    public PacketInputStream(InputStream in, FailListener failListener) {
         this.in = in;
+        this.failListener = failListener;
         buffer1 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
         buffer2 = ByteBuffer.allocate(Consts.BUFFER_SIZE);
         writeBuffer = buffer1;
@@ -30,34 +33,62 @@ public class PacketInputStream {
     }
 
     public byte getByte() {
+        if(readBuffer.remaining() < 1) {
+            failListener.onFail("underflow");
+            return 0;
+        }
         return readBuffer.get();
     }
 
-    public boolean getBoolean() {
-        return readBuffer.get() == 1;
+    public char getChar() {
+        if(readBuffer.remaining() < 2) {
+            failListener.onFail("underflow");
+            return 0;
+        }
+        return readBuffer.getChar();
     }
 
     public int getInt() {
+        if(readBuffer.remaining() < 4) {
+            failListener.onFail("underflow");
+            return 0;
+        }
         return readBuffer.getInt();
     }
 
     public short getShort() {
+        if(readBuffer.remaining() < 2) {
+            failListener.onFail("underflow");
+            return 0;
+        }
         return readBuffer.getShort();
     }
 
     public long getLong() {
+        if(readBuffer.remaining() < 8) {
+            failListener.onFail("underflow");
+            return 0;
+        }
         return readBuffer.getLong();
     }
 
     public float getFloat() {
+        if(readBuffer.remaining() < 4) {
+            failListener.onFail("underflow");
+            return 0;
+        }
         return readBuffer.getFloat();
     }
 
+    public boolean getBoolean() {
+        return getByte() == 1;
+    }
+
     public String getString() {
-        int len = readBuffer.getInt();
+        int len = getInt();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < len; i++) {
-            sb.append(readBuffer.getChar());
+            sb.append(getChar());
         }
         return sb.toString();
     }
@@ -66,17 +97,17 @@ public class PacketInputStream {
         int len = getByte();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < len; i++) {
-            sb.append(readBuffer.getChar());
+            sb.append(getChar());
         }
         return sb.toString();
     }
 
     public Vector2 getVector() {
-        return new Vector2(readBuffer.getFloat(), readBuffer.getFloat());
+        return new Vector2(getFloat(), getFloat());
     }
 
     public IntVector2 getIntVector() {
-        return new IntVector2(readBuffer.getInt(), readBuffer.getInt());
+        return new IntVector2(getInt(), getInt());
     }
 
     public ExpiColor getColor() {
@@ -136,21 +167,6 @@ public class PacketInputStream {
 
     public void skip(int i) {
         readBuffer.position(readBuffer.position() + i);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder s = new StringBuilder("First buff 10: ");
-        for(int i = 0; i < 10; i++) {
-            s.append(buffer1.array()[i]);
-            s.append(" ");
-        }
-        s.append("\n Second buff 10: ");
-        for(int i = 0; i < 10; i++) {
-            s.append(buffer2.array()[i]);
-            s.append(" ");
-        }
-        return s.toString();
     }
 
     public float occupied() {

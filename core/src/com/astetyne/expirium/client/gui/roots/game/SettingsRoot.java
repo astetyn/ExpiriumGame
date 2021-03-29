@@ -16,14 +16,19 @@ import com.badlogic.gdx.utils.Align;
 
 public class SettingsRoot extends WidgetGroup implements GameRootable {
 
-    private final GameScreen game;
-
     public SettingsRoot(GameScreen game) {
 
-        this.game = game;
+        TextButton recipesButton = new TextButton("Cooking recipes", Res.TEXT_BUTTON_STYLE);
+        recipesButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setRoot(new RecipesRoot(game));
+            }
+        });
 
         Image returnButton = new Image(Res.CROSS_ICON);
         TextButton leaveButton = new TextButton("Leave game", Res.TEXT_BUTTON_STYLE);
+        leaveButton.setColor(1f, 0.3f, 0.3f, 1);
         Label codeLabel = new Label("Game not paused.", Res.TITLE_LABEL_STYLE);
         codeLabel.setAlignment(Align.center);
 
@@ -44,6 +49,9 @@ public class SettingsRoot extends WidgetGroup implements GameRootable {
                 ExpiGame.get().setScreen(new MenuScreen());
             }
         });
+
+        recipesButton.setBounds(760, 180, 440, 100);
+        addActor(recipesButton);
         returnButton.setBounds(1880, 890, 100, Utils.percFromW(100));
         addActor(returnButton);
         codeLabel.setBounds(760, 720, 440, 160);

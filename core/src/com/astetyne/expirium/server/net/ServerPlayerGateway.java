@@ -1,5 +1,6 @@
 package com.astetyne.expirium.server.net;
 
+import com.astetyne.expirium.client.net.FailListener;
 import com.astetyne.expirium.server.ExpiServer;
 import com.astetyne.expirium.server.TerminableLooper;
 import com.astetyne.expirium.server.core.entity.player.Player;
@@ -7,7 +8,7 @@ import com.astetyne.expirium.server.core.entity.player.Player;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ServerPlayerGateway extends TerminableLooper {
+public class ServerPlayerGateway extends TerminableLooper implements FailListener {
 
     private final Socket client;
     private final Object joinLock;
@@ -35,8 +36,8 @@ public class ServerPlayerGateway extends TerminableLooper {
             System.out.println("New client connected.");
             client.setTcpNoDelay(true);
 
-            in = new PacketInputStream(client.getInputStream());
-            out = new PacketOutputStream(client.getOutputStream());
+            in = new PacketInputStream(client.getInputStream(), this);
+            out = new PacketOutputStream(client.getOutputStream(), this);
 
             client.setSoTimeout(10000);
             int readBytes = in.fillBuffer();
@@ -125,5 +126,12 @@ public class ServerPlayerGateway extends TerminableLooper {
 
     public PacketOutputStream getOut() {
         return out;
+    }
+
+    @Override
+    public void onFail(String msg) {
+        System.out.println("server player gateway fail: "+msg);
+        stop();
+        server.getServerGateway().playerPreLeaveAsync(owner);
     }
 }

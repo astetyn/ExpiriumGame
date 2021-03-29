@@ -242,6 +242,17 @@ public enum Material implements Textureable {
         }
     }
 
+    public boolean isHouseOnly() {
+        switch(this) {
+            case FURNACE_ON:
+            case FURNACE_OFF:
+            case TIME_WARPER:
+            case CHEST:
+                return true;
+            default: return false;
+        }
+    }
+
     public static Material get(int i) {
         return values()[i];
     }
